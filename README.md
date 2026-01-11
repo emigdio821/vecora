@@ -1,4 +1,4 @@
-<img src="./public/images/android-chrome-192x192" alt="is an open-source and simple residential manager." width="76px" height="76px" />
+<img src="./public/images/android-chrome-192x192.png" alt="is an open-source and simple residential manager." width="76px" height="76px" />
 
 **resido** is an open-source and simple residential manager.
 
