@@ -1,4 +1,4 @@
-import { boolean, integer, pgEnum, pgTable, serial, text, timestamp, unique } from 'drizzle-orm/pg-core'
+import { boolean, pgEnum, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core'
 
 // Enums
 export const profileTypeEnum = pgEnum('profile_type', ['owner', 'external'])
@@ -6,7 +6,7 @@ export const roleNameEnum = pgEnum('role_name', ['admin', 'maintainer', 'securit
 
 // Auth Users table
 export const authUsers = pgTable('auth_users', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
   isActive: boolean('is_active').notNull().default(true),
@@ -17,7 +17,7 @@ export const authUsers = pgTable('auth_users', {
 
 // Owners table
 export const owners = pgTable('owners', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   identificationNumber: text('identification_number').notNull().unique(),
   address: text('address').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -26,7 +26,7 @@ export const owners = pgTable('owners', {
 
 // External persons table
 export const externalPersons = pgTable('external_persons', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   identificationNumber: text('identification_number').notNull().unique(),
   address: text('address').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -35,8 +35,8 @@ export const externalPersons = pgTable('external_persons', {
 
 // User Profiles table
 export const userProfiles = pgTable('user_profiles', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id')
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
     .notNull()
     .unique()
     .references(() => authUsers.id, { onDelete: 'cascade' }),
@@ -44,15 +44,15 @@ export const userProfiles = pgTable('user_profiles', {
   lastName: text('last_name').notNull(),
   phone: text('phone'),
   profileType: profileTypeEnum('profile_type').notNull(),
-  profileId: integer('profile_id').notNull(),
+  profileId: uuid('profile_id').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
 // Houses table
 export const houses = pgTable('houses', {
-  id: serial('id').primaryKey(),
-  ownerId: integer('owner_id')
+  id: uuid('id').primaryKey().defaultRandom(),
+  ownerId: uuid('owner_id')
     .notNull()
     .references(() => owners.id, { onDelete: 'cascade' }),
   address: text('address').notNull(),
@@ -63,7 +63,7 @@ export const houses = pgTable('houses', {
 
 // Roles table
 export const roles = pgTable('roles', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: roleNameEnum('name').notNull().unique(),
   description: text('description'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -74,11 +74,11 @@ export const roles = pgTable('roles', {
 export const userRoles = pgTable(
   'user_roles',
   {
-    id: serial('id').primaryKey(),
-    userId: integer('user_id')
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
       .notNull()
       .references(() => authUsers.id, { onDelete: 'cascade' }),
-    roleId: integer('role_id')
+    roleId: uuid('role_id')
       .notNull()
       .references(() => roles.id, { onDelete: 'cascade' }),
     assignedAt: timestamp('assigned_at').defaultNow().notNull(),

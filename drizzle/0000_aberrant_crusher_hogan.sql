@@ -1,7 +1,7 @@
 CREATE TYPE "public"."profile_type" AS ENUM('owner', 'external');--> statement-breakpoint
 CREATE TYPE "public"."role_name" AS ENUM('admin', 'maintainer', 'security', 'president', 'treasurer');--> statement-breakpoint
 CREATE TABLE "auth_users" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"email" text NOT NULL,
 	"password" text NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE "auth_users" (
 );
 --> statement-breakpoint
 CREATE TABLE "external_persons" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"identification_number" text NOT NULL,
 	"address" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -21,8 +21,8 @@ CREATE TABLE "external_persons" (
 );
 --> statement-breakpoint
 CREATE TABLE "houses" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"owner_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"owner_id" uuid NOT NULL,
 	"address" text NOT NULL,
 	"property_number" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE "houses" (
 );
 --> statement-breakpoint
 CREATE TABLE "owners" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"identification_number" text NOT NULL,
 	"address" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE "owners" (
 );
 --> statement-breakpoint
 CREATE TABLE "roles" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" "role_name" NOT NULL,
 	"description" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -49,22 +49,22 @@ CREATE TABLE "roles" (
 );
 --> statement-breakpoint
 CREATE TABLE "user_profiles" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
 	"first_name" text NOT NULL,
 	"last_name" text NOT NULL,
 	"phone" text,
 	"profile_type" "profile_type" NOT NULL,
-	"profile_id" integer NOT NULL,
+	"profile_id" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "user_profiles_user_id_unique" UNIQUE("user_id")
 );
 --> statement-breakpoint
 CREATE TABLE "user_roles" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
-	"role_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"role_id" uuid NOT NULL,
 	"assigned_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "unique_user_role" UNIQUE("user_id","role_id")
 );
