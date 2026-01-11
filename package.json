@@ -15,7 +15,11 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:pull": "drizzle-kit pull",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,jsx,tsx,json,jsonc}": "biome check --no-errors-on-unmatched"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
@@ -31,7 +35,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.1",
-    "lucide-react": "^0.562.0",
     "pg": "^8.16.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -53,13 +56,14 @@
     "@vitejs/plugin-react": "^5.1.2",
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.8",
+    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
+    "lint-staged": "^16.2.7",
     "nitro": "^3.0.1-alpha.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-tsconfig-paths": "^6.0.4",
-    "vitest": "^4.0.16",
-    "web-vitals": "^5.1.0"
+    "vitest": "^4.0.16"
   }
 }
