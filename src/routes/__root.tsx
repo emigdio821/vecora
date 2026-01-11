@@ -2,6 +2,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, HeadContent, Scripts } from '@tanstack/react-router'
 import Header from '@/components/Header'
 import { TSDevtools } from '@/components/tanstack/devtools'
+import { LINK_ICONS } from '@/config/site'
 import appCss from '../styles.css?url'
 
 interface RouteContext {
@@ -37,50 +38,9 @@ export const Route = createRootRouteWithContext<RouteContext>()({
         rel: 'stylesheet',
         href: appCss,
       },
-      {
-        rel: 'apple-touch-icon',
-        sizes: '180x180',
-        href: '/images/apple-touch-icon.png',
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '16x16',
-        href: '/images/favicon-16x16.png',
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '32x32',
-        href: '/images/favicon-32x32.png',
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '192x192',
-        href: '/images/android-chrome-192x192.png',
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '512x512',
-        href: '/images/android-chrome-512x512.png',
-      },
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '16x16',
-        href: '/favicon-16x16.png',
-      },
-
-      {
-        rel: 'shortcut icon',
-        href: '/images/android-chrome-512x512.png',
-      },
-      { rel: 'icon', href: '/images/favicon.ico' },
+      ...LINK_ICONS,
     ],
   }),
-  // TODO: Move to a SEO configuration
 
   shellComponent: RootDocument,
 })
