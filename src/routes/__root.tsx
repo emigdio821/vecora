@@ -1,9 +1,8 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, HeadContent, Scripts } from '@tanstack/react-router'
-import Header from '@/components/Header'
 import { TSDevtools } from '@/components/tanstack/devtools'
 import { LINK_ICONS } from '@/config/site'
-import appCss from '../styles.css?url'
+import appCss from '@/styles/app.css?url'
 
 interface RouteContext {
   queryClient: QueryClient
@@ -52,7 +51,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Header />
         {children}
         <TSDevtools />
         <Scripts />

@@ -13,6 +13,7 @@ export const getRouter = () => {
     context: {
       queryClient,
     },
+    defaultNotFoundComponent: () => <div>404 - Not Found</div>,
 
     // defaultPreload: 'intent',
   })
