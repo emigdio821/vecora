@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
-import { roles, userProfile, userRoles } from '@/db/schemas/main'
+import { profiles, roles, userRoles } from '@/db/schemas/main'
 import { auth } from '@/lib/auth'
 
 export const Route = createFileRoute('/api/user/profile')({
@@ -22,8 +22,8 @@ export const Route = createFileRoute('/api/user/profile')({
 
         try {
           // Get user profile with related data
-          const profile = await db.query.userProfile.findFirst({
-            where: eq(userProfile.userId, session.user.id),
+          const profile = await db.query.profiles.findFirst({
+            where: eq(profiles.userId, session.user.id),
             with: {
               owner: true,
               externalUser: true,
@@ -77,7 +77,7 @@ export const Route = createFileRoute('/api/user/profile')({
             userId: session.user.id,
             email: session.user.email,
             name: session.user.name,
-            userType: profile.ownerId ? 'owner' : 'external',
+            profileType: profile.profileType,
             profile: profileData,
             roles: userRolesList.map((role) => ({
               id: role.roleId,

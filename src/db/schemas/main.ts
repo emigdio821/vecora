@@ -1,6 +1,9 @@
-import { relations } from 'drizzle-orm'
-import { index, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { relations, sql } from 'drizzle-orm'
+import { check, index, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 import { user } from './auth'
+
+// Profile type enum
+export const profileTypeEnum = pgEnum('profile_type', ['owner', 'external'])
 
 // Roles table - defines all available roles in the system
 export const roles = pgTable('roles', {
@@ -66,24 +69,33 @@ export const houses = pgTable(
   (table) => [index('houses_ownerId_idx').on(table.ownerId)],
 )
 
-// User Profile - links auth users to either owners or external users
-// A user can be linked to EITHER an owner OR an external user, not both
-export const userProfile = pgTable(
-  'user_profile',
+// Profiles - links auth users to either owners or external users
+// Must have EITHER ownerId OR externalUserId set, not both or neither
+export const profiles = pgTable(
+  'profiles',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     userId: text('user_id')
       .notNull()
       .unique()
       .references(() => user.id, { onDelete: 'cascade' }),
+    profileType: profileTypeEnum('profile_type').notNull(),
     ownerId: uuid('owner_id').references(() => owners.id, { onDelete: 'cascade' }),
     externalUserId: uuid('external_user_id').references(() => externalUsers.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [
-    index('user_profile_userId_idx').on(table.userId),
-    index('user_profile_ownerId_idx').on(table.ownerId),
-    index('user_profile_externalUserId_idx').on(table.externalUserId),
+    index('profiles_userId_idx').on(table.userId),
+    index('profiles_ownerId_idx').on(table.ownerId),
+    index('profiles_externalUserId_idx').on(table.externalUserId),
+    check(
+      'profile_type_constraint',
+      sql`(
+        (${table.profileType} = 'owner' AND ${table.ownerId} IS NOT NULL AND ${table.externalUserId} IS NULL)
+        OR
+        (${table.profileType} = 'external' AND ${table.ownerId} IS NULL AND ${table.externalUserId} IS NOT NULL)
+      )`,
+    ),
   ],
 )
 
@@ -113,16 +125,16 @@ export const rolesRelations = relations(roles, ({ many }) => ({
 
 export const ownersRelations = relations(owners, ({ many, one }) => ({
   houses: many(houses),
-  userProfile: one(userProfile, {
+  profile: one(profiles, {
     fields: [owners.id],
-    references: [userProfile.ownerId],
+    references: [profiles.ownerId],
   }),
 }))
 
 export const externalUsersRelations = relations(externalUsers, ({ one }) => ({
-  userProfile: one(userProfile, {
+  profile: one(profiles, {
     fields: [externalUsers.id],
-    references: [userProfile.externalUserId],
+    references: [profiles.externalUserId],
   }),
 }))
 
@@ -133,17 +145,17 @@ export const housesRelations = relations(houses, ({ one }) => ({
   }),
 }))
 
-export const userProfileRelations = relations(userProfile, ({ one }) => ({
+export const profilesRelations = relations(profiles, ({ one }) => ({
   user: one(user, {
-    fields: [userProfile.userId],
+    fields: [profiles.userId],
     references: [user.id],
   }),
   owner: one(owners, {
-    fields: [userProfile.ownerId],
+    fields: [profiles.ownerId],
     references: [owners.id],
   }),
   externalUser: one(externalUsers, {
-    fields: [userProfile.externalUserId],
+    fields: [profiles.externalUserId],
     references: [externalUsers.id],
   }),
 }))

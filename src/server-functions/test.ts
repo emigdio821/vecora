@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
-import { externalUsers, owners, roles, userProfile, userRoles } from '@/db/schemas/main'
+import { externalUsers, owners, profiles, roles, userRoles } from '@/db/schemas/main'
 import { auth } from '@/lib/auth'
 
 type CreateUserWithProfileInput = {
@@ -73,8 +73,9 @@ export const createUserWithProfile = createServerFn()
       }
 
       // Step 3: Create user profile link
-      await db.insert(userProfile).values({
+      await db.insert(profiles).values({
         userId,
+        profileType: data.userType,
         ownerId,
         externalUserId,
       })

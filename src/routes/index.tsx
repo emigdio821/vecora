@@ -94,7 +94,7 @@ function RouteComponent() {
                 <div>
                   <span className="text-muted-foreground">Tipo:</span>{' '}
                   <span className="font-medium">
-                    {userProfile.userType === 'owner' ? 'Propietario' : 'Usuario Externo'}
+                    {userProfile.profileType === 'owner' ? 'Propietario' : 'Usuario Externo'}
                   </span>
                 </div>
                 {userProfile.profile && (

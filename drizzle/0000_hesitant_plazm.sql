@@ -1,3 +1,4 @@
+CREATE TYPE "public"."profile_type" AS ENUM('owner', 'external');--> statement-breakpoint
 CREATE TABLE "external_users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"first_name" varchar(100) NOT NULL,
@@ -32,6 +33,21 @@ CREATE TABLE "owners" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "profiles" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL,
+	"profile_type" "profile_type" NOT NULL,
+	"owner_id" uuid,
+	"external_user_id" uuid,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "profiles_user_id_unique" UNIQUE("user_id"),
+	CONSTRAINT "profile_type_constraint" CHECK ((
+        ("profiles"."profile_type" = 'owner' AND "profiles"."owner_id" IS NOT NULL AND "profiles"."external_user_id" IS NULL)
+        OR
+        ("profiles"."profile_type" = 'external' AND "profiles"."owner_id" IS NULL AND "profiles"."external_user_id" IS NOT NULL)
+      ))
+);
+--> statement-breakpoint
 CREATE TABLE "roles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(50) NOT NULL,
@@ -39,15 +55,6 @@ CREATE TABLE "roles" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "roles_name_unique" UNIQUE("name")
-);
---> statement-breakpoint
-CREATE TABLE "user_profile" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
-	"owner_id" uuid,
-	"external_user_id" uuid,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "user_profile_user_id_unique" UNIQUE("user_id")
 );
 --> statement-breakpoint
 CREATE TABLE "user_roles" (
@@ -111,17 +118,17 @@ CREATE TABLE "verification" (
 );
 --> statement-breakpoint
 ALTER TABLE "houses" ADD CONSTRAINT "houses_owner_id_owners_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."owners"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_profile" ADD CONSTRAINT "user_profile_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_profile" ADD CONSTRAINT "user_profile_owner_id_owners_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."owners"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_profile" ADD CONSTRAINT "user_profile_external_user_id_external_users_id_fk" FOREIGN KEY ("external_user_id") REFERENCES "public"."external_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "profiles" ADD CONSTRAINT "profiles_owner_id_owners_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."owners"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "profiles" ADD CONSTRAINT "profiles_external_user_id_external_users_id_fk" FOREIGN KEY ("external_user_id") REFERENCES "public"."external_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "houses_ownerId_idx" ON "houses" USING btree ("owner_id");--> statement-breakpoint
-CREATE INDEX "user_profile_userId_idx" ON "user_profile" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "user_profile_ownerId_idx" ON "user_profile" USING btree ("owner_id");--> statement-breakpoint
-CREATE INDEX "user_profile_externalUserId_idx" ON "user_profile" USING btree ("external_user_id");--> statement-breakpoint
+CREATE INDEX "profiles_userId_idx" ON "profiles" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "profiles_ownerId_idx" ON "profiles" USING btree ("owner_id");--> statement-breakpoint
+CREATE INDEX "profiles_externalUserId_idx" ON "profiles" USING btree ("external_user_id");--> statement-breakpoint
 CREATE INDEX "user_roles_userId_idx" ON "user_roles" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "user_roles_roleId_idx" ON "user_roles" USING btree ("role_id");--> statement-breakpoint
 CREATE INDEX "account_userId_idx" ON "account" USING btree ("user_id");--> statement-breakpoint

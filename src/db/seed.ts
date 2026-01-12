@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from './index'
 import { user } from './schemas/auth'
-import { externalUsers, roles, userProfile, userRoles } from './schemas/main'
+import { externalUsers, profiles, roles, userRoles } from './schemas/main'
 
 async function seed() {
   console.log('Seeding database...')
@@ -60,11 +60,7 @@ async function seed() {
   }
 
   // Step 3: Create external user profile for admin
-  const existingProfile = await db
-    .select()
-    .from(userProfile)
-    .where(eq(userProfile.userId, adminUserId))
-    .limit(1)
+  const existingProfile = await db.select().from(profiles).where(eq(profiles.userId, adminUserId)).limit(1)
 
   if (existingProfile.length === 0) {
     console.log('Creating admin profile...')
@@ -82,8 +78,9 @@ async function seed() {
       .returning()
 
     // Link to user profile
-    await db.insert(userProfile).values({
+    await db.insert(profiles).values({
       userId: adminUserId,
+      profileType: 'external',
       ownerId: null,
       externalUserId: adminExternalUser.id,
     })
