@@ -1,21 +1,20 @@
 import { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
+import { NotFound } from './components/not-found'
 import { routeTree } from './routeTree.gen'
 
-// Create a new router instance
-export const getRouter = () => {
+export function getRouter() {
   const queryClient = new QueryClient()
 
   const router = createRouter({
     routeTree,
     scrollRestoration: true,
+    defaultPreload: 'intent',
     context: {
       queryClient,
     },
-    defaultNotFoundComponent: () => <div>404 - Not Found</div>,
-
-    // defaultPreload: 'intent',
+    defaultNotFoundComponent: () => <NotFound />,
   })
 
   setupRouterSsrQueryIntegration({ router, queryClient })

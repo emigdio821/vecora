@@ -1,7 +1,10 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, HeadContent, Scripts } from '@tanstack/react-router'
+import { NotFound } from '@/components/not-found'
+import { Providers } from '@/components/providers'
 import { TSDevtools } from '@/components/tanstack/devtools'
 import { LINK_ICONS } from '@/config/site'
+import { cn } from '@/lib/utils'
 import appCss from '@/styles/app.css?url'
 
 interface RouteContext {
@@ -40,18 +43,18 @@ export const Route = createRootRouteWithContext<RouteContext>()({
       ...LINK_ICONS,
     ],
   }),
-
+  notFoundComponent: () => <NotFound />,
   shellComponent: RootDocument,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
-      <body>
-        {children}
+      <body className={cn('relative flex min-h-dvh flex-col antialiased')}>
+        <Providers>{children}</Providers>
         <TSDevtools />
         <Scripts />
       </body>

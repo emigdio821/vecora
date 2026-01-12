@@ -9,26 +9,61 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AuthedTreasuryRouteImport } from './routes/_authed/treasury'
+import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
+import { Route as AuthedSecurityRouteImport } from './routes/_authed/security'
+import { Route as AuthedPresidencyRouteImport } from './routes/_authed/presidency'
+import { Route as AuthedMaintenanceRouteImport } from './routes/_authed/maintenance'
+import { Route as AuthedAdministrationRouteImport } from './routes/_authed/administration'
 import { Route as ApiUserProfileRouteImport } from './routes/api/user/profile'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/_authed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedIndexRoute = AuthedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedTreasuryRoute = AuthedTreasuryRouteImport.update({
+  id: '/treasury',
+  path: '/treasury',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedSettingsRoute = AuthedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedSecurityRoute = AuthedSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedPresidencyRoute = AuthedPresidencyRouteImport.update({
+  id: '/presidency',
+  path: '/presidency',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedMaintenanceRoute = AuthedMaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdministrationRoute = AuthedAdministrationRouteImport.update({
+  id: '/administration',
+  path: '/administration',
+  getParentRoute: () => AuthedRoute,
 } as any)
 const ApiUserProfileRoute = ApiUserProfileRouteImport.update({
   id: '/api/user/profile',
@@ -42,58 +77,92 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/administration': typeof AuthedAdministrationRoute
+  '/maintenance': typeof AuthedMaintenanceRoute
+  '/presidency': typeof AuthedPresidencyRoute
+  '/security': typeof AuthedSecurityRoute
+  '/settings': typeof AuthedSettingsRoute
+  '/treasury': typeof AuthedTreasuryRoute
+  '/': typeof AuthedIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/user/profile': typeof ApiUserProfileRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/administration': typeof AuthedAdministrationRoute
+  '/maintenance': typeof AuthedMaintenanceRoute
+  '/presidency': typeof AuthedPresidencyRoute
+  '/security': typeof AuthedSecurityRoute
+  '/settings': typeof AuthedSettingsRoute
+  '/treasury': typeof AuthedTreasuryRoute
+  '/': typeof AuthedIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/user/profile': typeof ApiUserProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/_authed/administration': typeof AuthedAdministrationRoute
+  '/_authed/maintenance': typeof AuthedMaintenanceRoute
+  '/_authed/presidency': typeof AuthedPresidencyRoute
+  '/_authed/security': typeof AuthedSecurityRoute
+  '/_authed/settings': typeof AuthedSettingsRoute
+  '/_authed/treasury': typeof AuthedTreasuryRoute
+  '/_authed/': typeof AuthedIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/user/profile': typeof ApiUserProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup' | '/api/auth/$' | '/api/user/profile'
+  fullPaths:
+    | '/login'
+    | '/administration'
+    | '/maintenance'
+    | '/presidency'
+    | '/security'
+    | '/settings'
+    | '/treasury'
+    | '/'
+    | '/api/auth/$'
+    | '/api/user/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/api/auth/$' | '/api/user/profile'
+  to:
+    | '/login'
+    | '/administration'
+    | '/maintenance'
+    | '/presidency'
+    | '/security'
+    | '/settings'
+    | '/treasury'
+    | '/'
+    | '/api/auth/$'
+    | '/api/user/profile'
   id:
     | '__root__'
-    | '/'
+    | '/_authed'
     | '/login'
-    | '/signup'
+    | '/_authed/administration'
+    | '/_authed/maintenance'
+    | '/_authed/presidency'
+    | '/_authed/security'
+    | '/_authed/settings'
+    | '/_authed/treasury'
+    | '/_authed/'
     | '/api/auth/$'
     | '/api/user/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
   LoginRoute: typeof LoginRoute
-  SignupRoute: typeof SignupRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiUserProfileRoute: typeof ApiUserProfileRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -101,12 +170,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/': {
+      id: '/_authed/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthedIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/treasury': {
+      id: '/_authed/treasury'
+      path: '/treasury'
+      fullPath: '/treasury'
+      preLoaderRoute: typeof AuthedTreasuryRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/settings': {
+      id: '/_authed/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthedSettingsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/security': {
+      id: '/_authed/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof AuthedSecurityRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/presidency': {
+      id: '/_authed/presidency'
+      path: '/presidency'
+      fullPath: '/presidency'
+      preLoaderRoute: typeof AuthedPresidencyRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/maintenance': {
+      id: '/_authed/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof AuthedMaintenanceRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/administration': {
+      id: '/_authed/administration'
+      path: '/administration'
+      fullPath: '/administration'
+      preLoaderRoute: typeof AuthedAdministrationRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/api/user/profile': {
       id: '/api/user/profile'
@@ -125,10 +243,32 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthedRouteChildren {
+  AuthedAdministrationRoute: typeof AuthedAdministrationRoute
+  AuthedMaintenanceRoute: typeof AuthedMaintenanceRoute
+  AuthedPresidencyRoute: typeof AuthedPresidencyRoute
+  AuthedSecurityRoute: typeof AuthedSecurityRoute
+  AuthedSettingsRoute: typeof AuthedSettingsRoute
+  AuthedTreasuryRoute: typeof AuthedTreasuryRoute
+  AuthedIndexRoute: typeof AuthedIndexRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedAdministrationRoute: AuthedAdministrationRoute,
+  AuthedMaintenanceRoute: AuthedMaintenanceRoute,
+  AuthedPresidencyRoute: AuthedPresidencyRoute,
+  AuthedSecurityRoute: AuthedSecurityRoute,
+  AuthedSettingsRoute: AuthedSettingsRoute,
+  AuthedTreasuryRoute: AuthedTreasuryRoute,
+  AuthedIndexRoute: AuthedIndexRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AuthedRoute: AuthedRouteWithChildren,
   LoginRoute: LoginRoute,
-  SignupRoute: SignupRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiUserProfileRoute: ApiUserProfileRoute,
 }

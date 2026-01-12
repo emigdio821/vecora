@@ -1,0 +1,13 @@
+import { SITE_CONFIG } from '@/config/site'
+
+export function Footer() {
+  return (
+    <footer className="mt-auto flex items-center justify-center gap-2 p-4">
+      <span className="flex h-5 items-center gap-2 text-sm">
+        <span>{new Date().getFullYear()}</span>
+        <div className="h-4 w-px bg-border" />
+        <span className="font-semibold">{SITE_CONFIG.title}</span>
+      </span>
+    </footer>
+  )
+}

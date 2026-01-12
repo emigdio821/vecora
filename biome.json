@@ -39,6 +39,9 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "style": {
+        "useSelfClosingElements": "error"
+      },
       "nursery": {
         "useSortedClasses": {
           "fix": "safe",

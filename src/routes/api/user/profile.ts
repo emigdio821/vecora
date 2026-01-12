@@ -2,13 +2,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { profiles, roles, userRoles } from '@/db/schemas/main'
+import { type ProfileResponse, profileResponseSchema } from '@/db/schemas/zod'
 import { auth } from '@/lib/auth'
 
 export const Route = createFileRoute('/api/user/profile')({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        // Get session from auth
         const session = await auth.api.getSession({
           headers: request.headers,
         })
@@ -21,10 +21,10 @@ export const Route = createFileRoute('/api/user/profile')({
         }
 
         try {
-          // Get user profile with related data
           const profile = await db.query.profiles.findFirst({
             where: eq(profiles.userId, session.user.id),
             with: {
+              user: true,
               owner: true,
               externalUser: true,
             },
@@ -37,57 +37,31 @@ export const Route = createFileRoute('/api/user/profile')({
             })
           }
 
-          // Get user roles
           const userRolesList = await db
             .select({
               roleId: userRoles.roleId,
               roleName: roles.name,
-              roleDescription: roles.description,
-              assignedAt: userRoles.assignedAt,
             })
             .from(userRoles)
             .innerJoin(roles, eq(userRoles.roleId, roles.id))
             .where(eq(userRoles.userId, session.user.id))
 
-          // Build response
-          const profileData =
-            profile.ownerId && profile.owner
-              ? {
-                  type: 'owner' as const,
-                  id: profile.owner.id,
-                  firstName: profile.owner.firstName,
-                  lastName: profile.owner.lastName,
-                  phone: profile.owner.phone,
-                  email: profile.owner.email,
-                  address: profile.owner.address,
-                }
-              : profile.externalUser
-                ? {
-                    type: 'external' as const,
-                    id: profile.externalUser.id,
-                    firstName: profile.externalUser.firstName,
-                    lastName: profile.externalUser.lastName,
-                    phone: profile.externalUser.phone,
-                    email: profile.externalUser.email,
-                    address: profile.externalUser.address,
-                  }
-                : null
-
-          const response = {
-            userId: session.user.id,
-            email: session.user.email,
-            name: session.user.name,
+          const response: ProfileResponse = {
+            userId: profile.userId,
+            email: profile.user.email,
+            firstName: profile.owner?.firstName ?? profile.externalUser?.firstName ?? '',
+            lastName: profile.owner?.lastName ?? profile.externalUser?.lastName ?? '',
             profileType: profile.profileType,
-            profile: profileData,
-            roles: userRolesList.map((role) => ({
-              id: role.roleId,
-              name: role.roleName,
-              description: role.roleDescription,
-              assignedAt: role.assignedAt,
-            })),
+            ownerId: profile.ownerId,
+            externalUserId: profile.externalUserId,
+            roles: userRolesList.map((r) => r.roleName),
+            image: profile.user.image,
           }
 
-          return new Response(JSON.stringify(response), {
+          // Validate response with Zod schema
+          const validatedResponse = profileResponseSchema.parse(response)
+
+          return new Response(JSON.stringify(validatedResponse), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
           })
