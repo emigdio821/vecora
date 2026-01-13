@@ -1,5 +1,7 @@
 import { IconUserShield } from '@tabler/icons-react'
+import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation } from '@tanstack/react-router'
+import { userProfileQueryOptions } from '@/lib/ts-queries/user'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -11,6 +13,11 @@ import {
 export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
   const location = useLocation()
   const { pathname } = location
+  const { data: profile, isLoading } = useQuery(userProfileQueryOptions())
+
+  if (isLoading || !profile?.roles.includes('admin')) {
+    return null
+  }
 
   return (
     <SidebarGroup {...props}>

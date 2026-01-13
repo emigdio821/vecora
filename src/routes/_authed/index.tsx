@@ -2,12 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { userProfileQueryOptions } from '@/lib/ts-queries/user'
-import { authMiddleware } from '@/middleware/auth'
 
 export const Route = createFileRoute('/_authed/')({
-  server: {
-    middleware: [authMiddleware],
-  },
   component: RouteComponent,
 })
 

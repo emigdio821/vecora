@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { AdministrationTabs } from '@/components/admin/administration-tabs'
 
-export const Route = createFileRoute('/_authed/administration')({
+export const Route = createFileRoute('/_authed/_admin/administration')({
   component: RouteComponent,
 })
 

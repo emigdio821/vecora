@@ -43,11 +43,7 @@ export function NavUser() {
 
   if (error || !profile)
     return (
-      <SidebarMenuButton onClick={() => refetch()}>
-        <Avatar className="size-5">
-          <AvatarImage src="" />
-          <AvatarFallback />
-        </Avatar>
+      <SidebarMenuButton onClick={() => refetch()} size="lg">
         <div className="grid flex-1 text-left text-sm leading-tight">
           <span className="truncate font-medium">Refetch profile</span>
         </div>
