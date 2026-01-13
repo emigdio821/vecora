@@ -2,12 +2,26 @@ import { redirect } from '@tanstack/react-router'
 import { createMiddleware } from '@tanstack/react-start'
 import { getServerSession } from '@/server-fns/session'
 
-export const authMiddleware = createMiddleware().server(async ({ next }) => {
+export const authRouteMiddleware = createMiddleware().server(async ({ next }) => {
   const session = await getServerSession()
 
   if (!session) {
     throw redirect({ to: '/login' })
   }
 
-  return await next()
+  return next()
+})
+
+export const authAPIMiddleware = createMiddleware().server(async ({ next }) => {
+  const session = await getServerSession()
+
+  if (!session) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
+  return next({
+    context: {
+      session,
+    },
+  })
 })

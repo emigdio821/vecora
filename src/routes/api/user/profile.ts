@@ -3,19 +3,14 @@ import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { profiles, roles, userRoles } from '@/db/schemas/main'
 import { type ProfileResponse, profileResponseSchema } from '@/db/schemas/zod'
-import { auth } from '@/lib/auth'
+import { authAPIMiddleware } from '@/middleware/auth'
 
 export const Route = createFileRoute('/api/user/profile')({
   server: {
+    middleware: [authAPIMiddleware],
     handlers: {
-      GET: async ({ request }) => {
-        const session = await auth.api.getSession({
-          headers: request.headers,
-        })
-
-        if (!session?.user) {
-          return new Response('Unauthorized', { status: 401 })
-        }
+      GET: async ({ context }) => {
+        const { session } = context
 
         try {
           const profile = await db.query.profiles.findFirst({
