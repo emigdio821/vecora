@@ -1,19 +1,59 @@
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import {
+  type ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import { useState } from 'react'
 import { DataTablePagination } from '@/components/table/pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
+import { useQueryPagination } from '@/hooks/use-query-pagination'
+import { ownersTableColumns } from './columns'
 import { OwnersDataTableHeader } from './data-table-header'
-import { ownersTableColumns } from './table-columns'
 
 interface OwnersDataTableProps {
   data: OwnerWithRelations[]
 }
 
 export function OwnersDataTable({ data }: OwnersDataTableProps) {
+  const [rowSelection, setRowSelection] = useState({})
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [{ pageIndex, pageSize }, setPagination] = useQueryPagination()
+
   const table = useReactTable({
     data,
     columns: ownersTableColumns,
+    // onSortingChange: setSorting,
+    onPaginationChange: (updater) => {
+      const newPagination = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater
+      setPagination(newPagination)
+    },
     getCoreRowModel: getCoreRowModel(),
+    onRowSelectionChange: setRowSelection,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    autoResetPageIndex: false,
+    state: {
+      // sorting,
+      rowSelection,
+      columnFilters,
+      pagination: {
+        pageIndex,
+        pageSize,
+      },
+    },
+    initialState: {
+      pagination: {
+        pageIndex,
+        pageSize,
+      },
+    },
   })
 
   return (

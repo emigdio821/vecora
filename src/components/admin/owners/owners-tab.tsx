@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
-import { OwnersDataTable } from './data-table'
+import { OwnersDataTable } from './table/data-table'
 
 export function OwnersTab() {
   const { data: owners, isLoading, error, refetch } = useQuery(ownersListQueryOptions())

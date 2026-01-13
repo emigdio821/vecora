@@ -1,11 +1,29 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
+import { OwnersTableActions } from './actions'
 
 export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   {
-    accessorKey: 'email',
-    header: 'Email',
+    id: 'select',
+    enablePinning: false,
+    enableResizing: false,
+    header: ({ table }) => (
+      <Checkbox
+        aria-label="Seleccionar todo"
+        checked={table.getIsAllPageRowsSelected()}
+        indeterminate={table.getIsSomePageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        aria-label="Seleccionar elemento"
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
   },
   {
     accessorKey: 'firstName',
@@ -16,6 +34,10 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
 
       return `${firstName} ${lastName}`
     },
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
   },
   {
     accessorKey: 'phone',
@@ -50,6 +72,12 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
       const payments = row.original.payments.filter((p) => p.status === 'pending')
       return payments.length > 0 ? payments.length : 'Sin pagos pendientes'
     },
+  },
+  {
+    id: 'actions',
+    enablePinning: false,
+    enableResizing: false,
+    cell: ({ row }) => <OwnersTableActions owner={row.original} />,
   },
   // {
   //   accessorKey: 'createdAt',
