@@ -1,9 +1,18 @@
 import { relations, sql } from 'drizzle-orm'
-import { check, index, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { check, index, numeric, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 import { user } from './auth'
 
 // Profile type enum
 export const profileTypeEnum = pgEnum('profile_type', ['owner', 'external'])
+
+// category expenses enum
+export const categoryExpensesEnum = pgEnum('category_expenses', ['security', 'maintenance', 'other'])
+
+// violation enum
+export const violationStatusEnum = pgEnum('violation_status', ['pending', 'paid'])
+
+// payment type enum
+export const paymentTypeEnum = pgEnum('payment_type', ['monthly_fee', 'violation'])
 
 // Roles table - defines all available roles in the system
 export const roles = pgTable('roles', {
@@ -118,6 +127,75 @@ export const userRoles = pgTable(
   ],
 )
 
+// Expenses table
+export const expenses = pgTable(
+  'expenses',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    concept: text('concept'),
+    amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
+    categoryExpenses: categoryExpensesEnum('category_expenses').notNull(),
+    expenseDate: timestamp('expense_date', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('expenses_category_idx').on(table.categoryExpenses),
+    index('expenses_expense_date_idx').on(table.expenseDate),
+  ],
+)
+
+// Violations table
+export const violations = pgTable(
+  'violations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+
+    ownerId: uuid('owner_id')
+      .notNull()
+      .references(() => owners.id, { onDelete: 'cascade' }),
+
+    concept: text('concept').notNull(),
+
+    amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
+
+    violationDate: timestamp('violation_date', { withTimezone: true }).notNull(),
+
+    status: violationStatusEnum('status').default('pending').notNull(),
+
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('violations_owner_idx').on(table.ownerId),
+    index('violations_status_idx').on(table.status),
+  ],
+)
+
+// Payments table
+export const payments = pgTable(
+  'payments',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+
+    ownerId: uuid('owner_id')
+      .notNull()
+      .references(() => owners.id, { onDelete: 'cascade' }),
+
+    amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
+
+    paymentType: paymentTypeEnum('payment_type').notNull(),
+
+    // Example: "2026-01"
+    month: varchar('month', { length: 7 }).notNull(),
+
+    paidAt: timestamp('paid_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index('payments_owner_idx').on(table.ownerId),
+    index('payments_type_idx').on(table.paymentType),
+    index('payments_month_idx').on(table.month),
+  ],
+)
+
 // Relations
 export const rolesRelations = relations(roles, ({ many }) => ({
   userRoles: many(userRoles),
@@ -125,6 +203,8 @@ export const rolesRelations = relations(roles, ({ many }) => ({
 
 export const ownersRelations = relations(owners, ({ many, one }) => ({
   houses: many(houses),
+  violations: many(violations),
+  payments: many(payments),
   profile: one(profiles, {
     fields: [owners.id],
     references: [profiles.ownerId],
@@ -168,5 +248,19 @@ export const userRolesRelations = relations(userRoles, ({ one }) => ({
   role: one(roles, {
     fields: [userRoles.roleId],
     references: [roles.id],
+  }),
+}))
+
+export const violationsRelations = relations(violations, ({ one }) => ({
+  owner: one(owners, {
+    fields: [violations.ownerId],
+    references: [owners.id],
+  }),
+}))
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+  owner: one(owners, {
+    fields: [payments.ownerId],
+    references: [owners.id],
   }),
 }))
