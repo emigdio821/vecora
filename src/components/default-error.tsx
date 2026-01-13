@@ -1,48 +1,24 @@
 import type { ErrorComponentProps } from '@tanstack/react-router'
-import { ErrorComponent, Link, rootRouteId, useMatch, useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import { Button } from './ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
 
 export function DefaultError({ error }: ErrorComponentProps) {
   const router = useRouter()
-  const isRoot = useMatch({
-    strict: false,
-    select: (state) => state.id === rootRouteId,
-  })
-
-  console.error(error)
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-6 p-4">
-      <ErrorComponent error={error} />
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          onClick={() => {
-            router.invalidate()
-          }}
-          className={`rounded-sm bg-gray-600 px-2 py-1 font-extrabold text-white uppercase dark:bg-gray-700`}
-        >
-          Try Again
+    <Card className="mx-auto w-full max-w-sm">
+      <CardHeader>
+        <CardTitle className="text-center">Error</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <code className="block w-full rounded-md bg-muted p-2 font-mono text-xs">{error.message}</code>
+      </CardContent>
+      <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <Button className="grow" onClick={() => router.invalidate()}>
+          Refresh
         </Button>
-        {isRoot ? (
-          <Link
-            to="/"
-            className={`rounded-sm bg-gray-600 px-2 py-1 font-extrabold text-white uppercase dark:bg-gray-700`}
-          >
-            Home
-          </Link>
-        ) : (
-          <Link
-            to="/"
-            className={`rounded-sm bg-gray-600 px-2 py-1 font-extrabold text-white uppercase dark:bg-gray-700`}
-            onClick={(e) => {
-              e.preventDefault()
-              window.history.back()
-            }}
-          >
-            Go Back
-          </Link>
-        )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   )
 }

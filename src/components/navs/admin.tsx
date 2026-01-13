@@ -18,7 +18,7 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              isActive={pathname === '/admin-panel'}
+              isActive={pathname === '/administration'}
               render={
                 <Link to="/administration">
                   <IconUserShield className="size-4" />

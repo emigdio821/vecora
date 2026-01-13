@@ -42,6 +42,9 @@
       "style": {
         "useSelfClosingElements": "error"
       },
+      "a11y": {
+        "useKeyWithClickEvents": "off"
+      },
       "nursery": {
         "useSortedClasses": {
           "fix": "safe",

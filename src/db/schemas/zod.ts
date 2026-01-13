@@ -1,6 +1,7 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { externalUsers, owners, profiles, roles, userRoles } from './main'
+import { user } from './auth'
+import { externalUsers, houses, owners, payments, profiles, roles, userRoles, violations } from './main'
 
 // Profile schemas
 export const insertProfileSchema = createInsertSchema(profiles)
@@ -21,6 +22,21 @@ export const selectRoleSchema = createSelectSchema(roles)
 // User role schemas
 export const insertUserRoleSchema = createInsertSchema(userRoles)
 export const selectUserRoleSchema = createSelectSchema(userRoles)
+
+// Houses schemas
+export const insertHouseSchema = createInsertSchema(houses)
+export const selectHouseSchema = createSelectSchema(houses)
+
+// Violations schemas
+export const insertViolationSchema = createInsertSchema(violations)
+export const selectViolationSchema = createSelectSchema(violations)
+
+// Payments schemas
+export const insertPaymentSchema = createInsertSchema(payments)
+export const selectPaymentSchema = createSelectSchema(payments)
+
+// User schemas
+export const selectUserSchema = createSelectSchema(user)
 
 // Custom schema for profile API response
 export const profileResponseSchema = z.object({
@@ -47,3 +63,22 @@ export type SelectRole = z.infer<typeof selectRoleSchema>
 export type InsertUserRole = z.infer<typeof insertUserRoleSchema>
 export type SelectUserRole = z.infer<typeof selectUserRoleSchema>
 export type ProfileResponse = z.infer<typeof profileResponseSchema>
+export type InsertHouse = z.infer<typeof insertHouseSchema>
+export type SelectHouse = z.infer<typeof selectHouseSchema>
+export type InsertViolation = z.infer<typeof insertViolationSchema>
+export type SelectViolation = z.infer<typeof selectViolationSchema>
+export type InsertPayment = z.infer<typeof insertPaymentSchema>
+export type SelectPayment = z.infer<typeof selectPaymentSchema>
+export type SelectUser = z.infer<typeof selectUserSchema>
+
+// Type for owners with all relations included
+export type OwnerWithRelations = SelectOwner & {
+  houses: SelectHouse[]
+  violations: SelectViolation[]
+  payments: SelectPayment[]
+  profile:
+    | (SelectProfile & {
+        user: SelectUser
+      })
+    | null
+}
