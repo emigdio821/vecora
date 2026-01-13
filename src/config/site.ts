@@ -1,6 +1,10 @@
+const appName = 'Resido'
+const appDesc = 'An open-source and simple residential manager.'
+
 export const SITE_CONFIG = {
-  title: 'resido',
-  description: 'An open-source and simple residential manager.',
+  title: appName,
+  description: appDesc,
+  url: '', // TODO: Add site URL here
   icons: {
     favicon: '/images/favicon.ico',
     appleTouchIcon: '/images/apple-touch-icon.png',
@@ -9,6 +13,33 @@ export const SITE_CONFIG = {
     s192Icon: '/images/android-chrome-192x192.png',
     s512Icon: '/images/android-chrome-512x512.png',
   },
+  ogTwitter: {
+    card: 'summary_large_image',
+    title: appName,
+    description: appDesc,
+    image: '', // TODO: Add a default image URL here
+    creator: '@luzapien, @emigdio821',
+  },
+  og: {
+    title: appName,
+    description: appDesc,
+    url: '', // TODO: Add site URL here
+    siteName: appName,
+    type: 'website',
+    image: '', // TODO: Add a default image URL here
+    locale: 'es_MX',
+  },
+  keywords: [
+    'Resido',
+    'React',
+    'TanStack Start',
+    'TanStack Query',
+    'Residential Manager',
+    'Tailwind',
+    'opensource',
+    'Drizzle ORM',
+    'TypeScript',
+  ],
 } as const
 
 export const LINK_ICONS = [
