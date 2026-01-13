@@ -115,7 +115,7 @@ export function NavUser() {
             <DropdownMenuSeparator />
 
             <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={handleLogOut}>
+              <DropdownMenuItem onClick={handleLogOut}>
                 <IconLogout className="size-4" />
                 Cerrar sesión
               </DropdownMenuItem>

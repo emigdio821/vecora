@@ -32,7 +32,6 @@
     "@tanstack/react-router-devtools": "^1.149.0",
     "@tanstack/react-router-ssr-query": "^1.147.3",
     "@tanstack/react-start": "^1.149.2",
-    "@tanstack/router-plugin": "^1.149.0",
     "axios": "^1.13.2",
     "better-auth": "^1.4.11",
     "class-variance-authority": "^0.7.1",
@@ -51,7 +50,6 @@
   "devDependencies": {
     "@biomejs/biome": "2.3.11",
     "@tailwindcss/vite": "^4.1.18",
-    "@tanstack/devtools-vite": "^0.4.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.1",
     "@types/node": "^24.10.7",

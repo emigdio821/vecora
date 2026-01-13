@@ -1,4 +1,4 @@
-import { IconChevronLeft, IconGhost3 } from '@tabler/icons-react'
+import { IconGhost3 } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Footer } from './footer'
@@ -17,15 +17,7 @@ export function NotFound() {
             <CardDescription className="text-center">This page does not exist.</CardDescription>
           </CardHeader>
           <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button
-              className="grow"
-              render={
-                <Link to="/">
-                  <IconChevronLeft className="size-4" />
-                  Start over
-                </Link>
-              }
-            />
+            <Button className="grow" render={<Link to="/">Start over</Link>} />
           </CardFooter>
         </Card>
       </section>

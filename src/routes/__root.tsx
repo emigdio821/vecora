@@ -1,10 +1,12 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, HeadContent, Scripts } from '@tanstack/react-router'
+import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import { DefaultError } from '@/components/default-error'
 import { NotFound } from '@/components/not-found'
 import { Providers } from '@/components/providers'
 import { TSDevtools } from '@/components/tanstack/devtools'
 import { LINK_ICONS } from '@/config/site'
-import { cn } from '@/lib/utils'
+import { FONT_LINKS } from '@/lib/fonts'
+import { createSEOMeta } from '@/lib/seo'
 import appCss from '@/styles/app.css?url'
 
 interface RouteContext {
@@ -13,39 +15,34 @@ interface RouteContext {
 
 export const Route = createRootRouteWithContext<RouteContext>()({
   head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'TanStack Start Starter',
-      },
-      {
-        name: 'theme-color',
-        media: '(prefers-color-scheme: light)',
-        content: '#ffffff',
-      },
-      {
-        name: 'theme-color',
-        media: '(prefers-color-scheme: dark)',
-        content: '#09090b',
-      },
-    ],
+    meta: createSEOMeta(),
     links: [
+      ...LINK_ICONS,
+      ...FONT_LINKS,
       {
         rel: 'stylesheet',
         href: appCss,
       },
-      ...LINK_ICONS,
     ],
   }),
+  errorComponent: (props) => {
+    return (
+      <RootDocument>
+        <DefaultError {...props} />
+      </RootDocument>
+    )
+  },
   notFoundComponent: () => <NotFound />,
-  shellComponent: RootDocument,
+  component: RootComponent,
 })
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -53,7 +50,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className={cn('relative flex min-h-dvh flex-col antialiased')}>
+      <body className="relative flex min-h-dvh flex-col antialiased">
         <Providers>{children}</Providers>
         <TSDevtools />
         <Scripts />

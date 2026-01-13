@@ -41,7 +41,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               render={
                 <Link to="/">
                   <IconLayoutDashboard className="size-4" />
-                  <span>Resumen</span>
+                  <span>Dashboard</span>
                 </Link>
               }
             />
