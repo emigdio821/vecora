@@ -14,6 +14,9 @@ export const violationStatusEnum = pgEnum('violation_status', ['pending', 'paid'
 // payment type enum
 export const paymentTypeEnum = pgEnum('payment_type', ['monthly_fee', 'violation'])
 
+// payment status enum
+export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'paid'])
+
 // Roles table - defines all available roles in the system
 export const roles = pgTable('roles', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -149,19 +152,13 @@ export const violations = pgTable(
   'violations',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-
     ownerId: uuid('owner_id')
       .notNull()
       .references(() => owners.id, { onDelete: 'cascade' }),
-
     concept: text('concept').notNull(),
-
     amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
-
     violationDate: timestamp('violation_date', { withTimezone: true }).notNull(),
-
     status: violationStatusEnum('status').default('pending').notNull(),
-
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [
@@ -175,24 +172,22 @@ export const payments = pgTable(
   'payments',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-
     ownerId: uuid('owner_id')
       .notNull()
       .references(() => owners.id, { onDelete: 'cascade' }),
-
     amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
-
     paymentType: paymentTypeEnum('payment_type').notNull(),
-
     // Example: "2026-01"
     month: varchar('month', { length: 7 }).notNull(),
-
-    paidAt: timestamp('paid_at', { withTimezone: true }).defaultNow().notNull(),
+    status: paymentStatusEnum('status').default('pending').notNull(),
+    paidAt: timestamp('paid_at', { withTimezone: true }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [
     index('payments_owner_idx').on(table.ownerId),
     index('payments_type_idx').on(table.paymentType),
     index('payments_month_idx').on(table.month),
+    index('payments_status_idx').on(table.status),
   ],
 )
 

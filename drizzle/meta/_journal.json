@@ -8,6 +8,13 @@
       "when": 1768260581043,
       "tag": "0000_flashy_vengeance",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1768327878281,
+      "tag": "0001_mushy_thunderbird",
+      "breakpoints": true
     }
   ]
 }
