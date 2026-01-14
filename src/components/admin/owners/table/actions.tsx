@@ -1,5 +1,3 @@
-'use client'
-
 import { IconDotsVertical, IconEdit, IconTrash, IconUser } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import {

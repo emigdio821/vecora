@@ -37,7 +37,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   },
   {
     accessorKey: 'email',
-    header: 'Email',
+    header: 'Correo',
   },
   {
     accessorKey: 'phone',

@@ -2,11 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { Controller, useForm } from 'react-hook-form'
+import { isValidPhoneNumber } from 'react-phone-number-input'
 import { z } from 'zod'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
 import {
   Sheet,
   SheetClose,
@@ -36,8 +38,11 @@ const createOwnerFormSchema = insertOwnerSchema
   .extend({
     firstName: z.string().min(1, 'El nombre es requerido').max(100, 'El nombre es muy largo'),
     lastName: z.string().min(1, 'El apellido es requerido').max(100, 'El apellido es muy largo'),
-    phone: z.string().max(20, 'El teléfono es muy largo'),
-    email: z.email('Email inválido').min(1, 'El email es requerido').max(255, 'El email es muy largo'),
+    phone: z
+      .string()
+      .min(1, 'El teléfono es requerido')
+      .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
+    email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
     address: z.string().max(500, 'La dirección es muy larga').optional().or(z.literal('')),
   })
 
@@ -137,14 +142,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                     <FieldLabel htmlFor={field.name}>
                       Teléfono <span className="text-destructive">*</span>
                     </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      type="tel"
-                      placeholder="Ej: +52 123 456 7890"
-                      aria-invalid={fieldState.invalid}
-                      disabled={createOwnerMutation.isPending}
-                    />
+                    <PhoneInput id={field.name} onBlur={field.onBlur} onChange={field.onChange} />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -156,12 +154,13 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
-                      Email <span className="text-destructive">*</span>
+                      Correo <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Input
                       {...field}
                       type="email"
                       id={field.name}
+                      autoComplete="email"
                       aria-invalid={fieldState.invalid}
                       disabled={createOwnerMutation.isPending}
                     />
@@ -180,6 +179,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                       {...field}
                       rows={3}
                       id={field.name}
+                      autoComplete="off"
                       aria-invalid={fieldState.invalid}
                       disabled={createOwnerMutation.isPending}
                     />
