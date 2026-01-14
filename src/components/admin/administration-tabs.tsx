@@ -1,3 +1,4 @@
+import { useQueryState } from 'nuqs'
 import { ExternalUsersTab } from '@/components/admin/external-users/external-users-tab'
 import { OwnersTab } from '@/components/admin/owners/owners-tab'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -6,8 +7,12 @@ import { PaymentsTab } from './payments/payments-tab'
 import { ViolationsTab } from './violations/violations-tab'
 
 export function AdministrationTabs() {
+  const [tab, setTab] = useQueryState('tab', {
+    defaultValue: 'owners',
+  })
+
   return (
-    <Tabs defaultValue="owners">
+    <Tabs value={tab} onValueChange={(value) => setTab(value)}>
       <TabsList>
         <TabsTrigger value="owners">Propietarios</TabsTrigger>
         <TabsTrigger value="external-users">Usuarios externos</TabsTrigger>

@@ -34,8 +34,6 @@ export function DataTablePagination<T>({
   const pagination = table.getState().pagination
   const { pageIndex, pageSize } = pagination
 
-  if (rowLength <= DEFAULT_TABLE_PAGE_SIZE) return null
-
   function handlePageSizeChange(value: string | null) {
     if (!value) return
     table.setPageSize(Number(value))

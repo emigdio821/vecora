@@ -60,3 +60,20 @@ export const createOwner = createServerFn({ method: 'POST' })
 
     return newOwner satisfies SelectOwner
   })
+
+export const deleteOwnerSchema = z.object({
+  ownerId: z.uuid('ID de propietario inválido'),
+})
+
+export type DeleteOwnerData = z.infer<typeof deleteOwnerSchema>
+
+export const deleteOwner = createServerFn({ method: 'POST' })
+  .middleware([adminOnlyAPIMiddleware])
+  .inputValidator(deleteOwnerSchema)
+  .handler(async ({ data }) => {
+    await db.update(houses).set({ ownerId: null }).where(eq(houses.ownerId, data.ownerId))
+
+    const [deletedOwner] = await db.delete(owners).where(eq(owners.id, data.ownerId)).returning()
+
+    return deletedOwner satisfies SelectOwner
+  })

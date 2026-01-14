@@ -14,5 +14,5 @@ export const ResidoIcon = (props: IconProps) => (
 )
 
 export const LoaderIcon = ({ className, ...props }: IconProps) => (
-  <IconLoader2 className={cn('animate-spin', className)} {...props} />
+  <IconLoader2 className={cn('size-4 animate-spin', className)} {...props} />
 )

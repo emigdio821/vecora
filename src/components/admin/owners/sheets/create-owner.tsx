@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
@@ -61,8 +62,12 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
       queryClient.invalidateQueries({ queryKey: [AVAILABLE_HOUSES_QUERY_KEY] })
-      form.reset()
       onOpenChange(false)
+      form.reset()
+      toast.success('Propietario creado exitosamente.')
+    },
+    onError: () => {
+      toast.error('Ocurrió un error al crear el propietario, intenta nuevamente.')
     },
   })
 
@@ -84,7 +89,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Crear nuevo propietario</SheetTitle>
-          <SheetDescription>Complete la información del nuevo propietario.</SheetDescription>
+          <SheetDescription>Ingresa la información del nuevo propietario.</SheetDescription>
         </SheetHeader>
 
         <div className="flex-1">

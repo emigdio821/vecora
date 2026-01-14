@@ -8,10 +8,7 @@ import { routeTree } from './routeTree.gen'
 export function getRouter() {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: {
-        retry: 2,
-        refetchOnWindowFocus: false,
-      },
+      queries: { retry: 2 },
     },
   })
 

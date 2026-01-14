@@ -4,6 +4,7 @@ import { DefaultError } from '@/components/default-error'
 import { NotFound } from '@/components/not-found'
 import { Providers } from '@/components/providers'
 import { TSDevtools } from '@/components/tanstack/devtools'
+import { Toaster } from '@/components/ui/sonner'
 import { LINK_ICONS } from '@/config/site'
 import { FONT_LINKS } from '@/lib/fonts'
 import { createSEOMeta } from '@/lib/seo'
@@ -54,6 +55,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Providers>{children}</Providers>
         <TSDevtools />
         <Scripts />
+        <Toaster />
       </body>
     </html>
   )
