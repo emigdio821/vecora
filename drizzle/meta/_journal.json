@@ -15,6 +15,20 @@
       "when": 1768327878281,
       "tag": "0001_mushy_thunderbird",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768422175375,
+      "tag": "0002_round_sally_floyd",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1768425447541,
+      "tag": "0003_new_speedball",
+      "breakpoints": true
     }
   ]
 }

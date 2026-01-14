@@ -36,7 +36,6 @@ export const owners = pgTable('owners', {
   lastName: varchar('last_name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 20 }),
   email: varchar('email', { length: 255 }),
-  address: text('address'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -51,7 +50,6 @@ export const externalUsers = pgTable('external_users', {
   lastName: varchar('last_name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 20 }),
   email: varchar('email', { length: 255 }),
-  address: text('address'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -64,9 +62,7 @@ export const houses = pgTable(
   'houses',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    ownerId: uuid('owner_id')
-      .notNull()
-      .references(() => owners.id, { onDelete: 'cascade' }),
+    ownerId: uuid('owner_id').references(() => owners.id, { onDelete: 'set null' }),
     houseNumber: varchar('house_number', { length: 20 }).notNull(),
     street: varchar('street', { length: 255 }),
     city: varchar('city', { length: 100 }),

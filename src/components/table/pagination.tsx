@@ -91,8 +91,8 @@ export function DataTablePagination<T>({
             <IconChevronLeftPipe className="size-4" />
           </Button>
           <Button
-            variant="outline"
             size="icon"
+            variant="outline"
             onClick={table.previousPage}
             disabled={!table.getCanPreviousPage()}
           >

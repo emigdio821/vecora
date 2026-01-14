@@ -1,0 +1,16 @@
+import { createServerFn } from '@tanstack/react-start'
+import { isNull } from 'drizzle-orm'
+import { db } from '@/db'
+import { houses } from '@/db/schemas/main'
+import type { SelectHouse } from '@/db/schemas/zod'
+import { authAPIMiddleware } from '@/middleware/auth'
+
+export const getAvailableHouses = createServerFn()
+  .middleware([authAPIMiddleware])
+  .handler(async () => {
+    const availableHouses = await db.query.houses.findMany({
+      where: isNull(houses.ownerId),
+    })
+
+    return availableHouses satisfies SelectHouse[]
+  })

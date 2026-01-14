@@ -99,7 +99,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
         }
       />
       <PopoverContent className="w-72 p-0" align="start">
-        <Command shouldFilter={false}>
+        <Command shouldFilter={false} className="p-0">
           <CommandInput placeholder="Buscar..." onValueChange={handleCountryFilter} />
           <CommandList>
             {filteredOptions.length === 0 ? (

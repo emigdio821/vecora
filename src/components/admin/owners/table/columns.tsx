@@ -49,7 +49,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     cell: ({ row }) => {
       const houses = row.original.houses
       const houseBadges = houses.map((house) => (
-        <Badge variant="secondary" key={house.id}>
+        <Badge variant="outline" key={house.id}>
           {house.houseNumber}
         </Badge>
       ))

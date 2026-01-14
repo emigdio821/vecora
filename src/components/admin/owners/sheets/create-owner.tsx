@@ -1,14 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
-import { isValidPhoneNumber } from 'react-phone-number-input'
-import { z } from 'zod'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { PhoneInput } from '@/components/ui/phone-input'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Sheet,
   SheetClose,
@@ -18,9 +23,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Textarea } from '@/components/ui/textarea'
-import { insertOwnerSchema } from '@/db/schemas/zod'
+import { AVAILABLE_HOUSES_QUERY_KEY, availableHousesQueryOptions } from '@/lib/ts-queries/houses'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
+import { type CreateOwnerFormData, createOwner, createOwnerSchema } from '@/server-fns/owners'
 
 interface CreateOwnerDialogProps {
   state: {
@@ -29,48 +34,33 @@ interface CreateOwnerDialogProps {
   }
 }
 
-const createOwnerFormSchema = insertOwnerSchema
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-  })
-  .extend({
-    firstName: z.string().min(1, 'El nombre es requerido').max(100, 'El nombre es muy largo'),
-    lastName: z.string().min(1, 'El apellido es requerido').max(100, 'El apellido es muy largo'),
-    phone: z
-      .string()
-      .min(1, 'El teléfono es requerido')
-      .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
-    email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
-    address: z.string().max(500, 'La dirección es muy larga').optional().or(z.literal('')),
-  })
-
-type CreateOwnerFormData = z.infer<typeof createOwnerFormSchema>
-
 export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
   const { isOpen, onOpenChange } = state
   const queryClient = useQueryClient()
 
+  const { data: availableHouses = [], isLoading: isLoadingAvailableHouses } = useQuery(
+    availableHousesQueryOptions(),
+  )
+
   const form = useForm<CreateOwnerFormData>({
     shouldUnregister: true,
-    resolver: zodResolver(createOwnerFormSchema),
+    resolver: zodResolver(createOwnerSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
       phone: '',
       email: '',
-      address: '',
+      houseId: null,
     },
   })
 
   const createOwnerMutation = useMutation({
     mutationFn: async (data: CreateOwnerFormData) => {
-      const response = await axios.post('/api/owners', data)
-      return response.data
+      return await createOwner({ data })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [AVAILABLE_HOUSES_QUERY_KEY] })
       form.reset()
       onOpenChange(false)
     },
@@ -83,6 +73,16 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
   const handleOpenChange = (open: boolean) => {
     if (createOwnerMutation.isPending) return
     onOpenChange(open)
+  }
+
+  function renderAvailableHousesValue(value: string | null) {
+    if (value === null) return 'Selecciona una opción'
+
+    const selectedHouse = availableHouses.find((house) => house.id === value)
+
+    if (!selectedHouse) return 'Selecciona una opción'
+
+    return selectedHouse.houseNumber
   }
 
   return (
@@ -170,19 +170,30 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
               />
 
               <Controller
-                name="address"
+                name="houseId"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Dirección</FieldLabel>
-                    <Textarea
-                      {...field}
-                      rows={3}
-                      id={field.name}
-                      autoComplete="off"
-                      aria-invalid={fieldState.invalid}
-                      disabled={createOwnerMutation.isPending}
-                    />
+                    <FieldLabel htmlFor={field.name}>Casa</FieldLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={availableHouses.length === 0 || isLoadingAvailableHouses}
+                    >
+                      <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
+                        <SelectValue>{renderAvailableHousesValue}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value={null}>Selecciona una opción</SelectItem>
+                          {availableHouses.map((house) => (
+                            <SelectItem key={house.id} value={house.id}>
+                              {house.houseNumber}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -201,7 +212,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
           />
           <Button type="submit" form="create-owner-form" disabled={createOwnerMutation.isPending}>
             Crear propietario
-            {!createOwnerMutation.isPending && <LoaderIcon />}
+            {createOwnerMutation.isPending && <LoaderIcon />}
           </Button>
         </SheetFooter>
       </SheetContent>
