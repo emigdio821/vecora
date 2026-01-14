@@ -27,8 +27,6 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               }
             />
           </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               isActive={pathname === '/treasury'}
@@ -40,8 +38,6 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               }
             />
           </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               isActive={pathname === '/maintenance'}
@@ -53,8 +49,6 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               }
             />
           </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               isActive={pathname === '/security'}

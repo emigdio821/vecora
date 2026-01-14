@@ -66,23 +66,17 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
     },
   })
 
-  const onSubmit = async (data: CreateOwnerFormData) => {
+  function onSubmit(data: CreateOwnerFormData) {
     createOwnerMutation.mutate(data)
   }
 
-  const handleOpenChange = (open: boolean) => {
+  function handleOpenChange(open: boolean) {
     if (createOwnerMutation.isPending) return
     onOpenChange(open)
   }
 
   function renderAvailableHousesValue(value: string | null) {
-    if (value === null) return 'Selecciona una opción'
-
-    const selectedHouse = availableHouses.find((house) => house.id === value)
-
-    if (!selectedHouse) return 'Selecciona una opción'
-
-    return selectedHouse.houseNumber
+    return availableHouses.find((house) => house.id === value)?.houseNumber ?? 'Selecciona una opción'
   }
 
   return (

@@ -18,7 +18,6 @@ import { Route as AuthedSecurityRouteImport } from './routes/_authed/security'
 import { Route as AuthedPresidencyRouteImport } from './routes/_authed/presidency'
 import { Route as AuthedMaintenanceRouteImport } from './routes/_authed/maintenance'
 import { Route as AuthedAdminRouteImport } from './routes/_authed/_admin'
-import { Route as ApiUserProfileRouteImport } from './routes/api/user/profile'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthedAdminAdministrationRouteImport } from './routes/_authed/_admin/administration'
 
@@ -65,11 +64,6 @@ const AuthedAdminRoute = AuthedAdminRouteImport.update({
   id: '/_admin',
   getParentRoute: () => AuthedRoute,
 } as any)
-const ApiUserProfileRoute = ApiUserProfileRouteImport.update({
-  id: '/api/user/profile',
-  path: '/api/user/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -92,7 +86,6 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
   '/administration': typeof AuthedAdminAdministrationRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/user/profile': typeof ApiUserProfileRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -104,7 +97,6 @@ export interface FileRoutesByTo {
   '/': typeof AuthedIndexRoute
   '/administration': typeof AuthedAdminAdministrationRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/user/profile': typeof ApiUserProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -119,7 +111,6 @@ export interface FileRoutesById {
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/_admin/administration': typeof AuthedAdminAdministrationRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/user/profile': typeof ApiUserProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -133,7 +124,6 @@ export interface FileRouteTypes {
     | '/'
     | '/administration'
     | '/api/auth/$'
-    | '/api/user/profile'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -145,7 +135,6 @@ export interface FileRouteTypes {
     | '/'
     | '/administration'
     | '/api/auth/$'
-    | '/api/user/profile'
   id:
     | '__root__'
     | '/_authed'
@@ -159,14 +148,12 @@ export interface FileRouteTypes {
     | '/_authed/'
     | '/_authed/_admin/administration'
     | '/api/auth/$'
-    | '/api/user/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
   LoginRoute: typeof LoginRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiUserProfileRoute: typeof ApiUserProfileRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -234,13 +221,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAdminRouteImport
       parentRoute: typeof AuthedRoute
     }
-    '/api/user/profile': {
-      id: '/api/user/profile'
-      path: '/api/user/profile'
-      fullPath: '/api/user/profile'
-      preLoaderRoute: typeof ApiUserProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -297,7 +277,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   LoginRoute: LoginRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiUserProfileRoute: ApiUserProfileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
