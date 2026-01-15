@@ -65,7 +65,7 @@ export function DataTablePagination<T>({
             <SelectTrigger id="rows-per-page" className="w-16">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="min-w-24">
               <SelectGroup>
                 {pageSizeOptions.map((size) => (
                   <SelectItem key={size} value={size.toString()}>

@@ -2,6 +2,7 @@ import { IconAlertTriangle, IconCash, IconHome, IconMail, IconPhone, IconUser } 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader } from '@/components/ui/empty'
 import {
   Sheet,
@@ -44,15 +45,15 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Avatar>
+                <div className="flex items-center gap-3 rounded-lg border p-3">
+                  <Avatar className="size-5">
                     <AvatarFallback>{owner.firstName.charAt(0)}</AvatarFallback>
                   </Avatar>
-
                   <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 font-medium">{`${owner.firstName} ${owner.lastName}`}</p>
                     <p className="truncate font-mono text-muted-foreground text-xs">{owner.id}</p>
                   </div>
+                  <CopyButton value={owner.id} />
                 </div>
 
                 {owner.email && (
@@ -62,6 +63,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                       <p className="text-muted-foreground text-xs">Correo electrónico</p>
                       <p className="truncate text-sm">{owner.email}</p>
                     </div>
+                    <CopyButton value={owner.email} />
                   </div>
                 )}
 
@@ -72,6 +74,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                       <p className="text-muted-foreground text-xs">Teléfono</p>
                       <p className="text-sm">{owner.phone}</p>
                     </div>
+                    <CopyButton value={owner.phone} />
                   </div>
                 )}
               </div>
