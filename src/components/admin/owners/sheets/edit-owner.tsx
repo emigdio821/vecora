@@ -36,7 +36,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
 
   const form = useForm<UpdateOwnerFormData>({
     resolver: zodResolver(updateOwnerSchema),
-    defaultValues: {
+    values: {
       ownerId: owner.id,
       firstName: owner.firstName,
       lastName: owner.lastName,
@@ -69,13 +69,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
   }
 
   return (
-    <Sheet
-      onOpenChangeComplete={(isOpen) => {
-        if (!isOpen) form.reset(form.getValues())
-      }}
-      open={isOpen}
-      onOpenChange={handleOpenChange}
-    >
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Editar propietario</SheetTitle>
