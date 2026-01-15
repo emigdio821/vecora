@@ -45,6 +45,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   {
     accessorKey: 'email',
     header: 'Correo',
+    cell: ({ row }) => <span className="block max-w-36 truncate">{row.original.email}</span>,
   },
   {
     accessorKey: 'phone',

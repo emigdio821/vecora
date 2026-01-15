@@ -14,7 +14,7 @@ export function OwnerNameCell({ owner }: OwnerNameCellProps) {
     <>
       <Button
         variant="link"
-        className="block max-w-24 truncate xl:max-w-36"
+        className="block max-w-32 truncate lg:max-w-52"
         onClick={() => setIsSheetOpen(true)}
       >
         {`${owner.firstName} ${owner.lastName}`}
