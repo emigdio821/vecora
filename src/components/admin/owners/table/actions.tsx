@@ -27,8 +27,8 @@ import {
 import type { OwnerWithRelations } from '@/db/schemas/zod'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import { type DeleteOwnerData, deleteOwner } from '@/server-fns/owners'
-import { OwnerDetailsSheet } from '../sheets/owner/details'
-import { EditOwnerSheet } from '../sheets/owner/edit'
+import { EditOwnerSheet } from '../sheets/edit-owner'
+import { OwnerDetailsSheet } from '../sheets/owner-details'
 
 interface ActionsProps {
   owner: OwnerWithRelations

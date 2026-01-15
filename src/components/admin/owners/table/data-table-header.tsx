@@ -25,7 +25,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import type { OwnerWithRelations } from '@/db/schemas/zod'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import { deleteOwner } from '@/server-fns/owners'
-import { CreateOwnerSheet } from '../sheets/owner/create'
+import { CreateOwnerSheet } from '../sheets/create-owner'
 
 interface OwnersDataTableHeaderProps {
   table: Table<OwnerWithRelations>
