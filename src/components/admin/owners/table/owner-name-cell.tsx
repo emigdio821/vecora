@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
-import { OwnerDetailsSheet } from '../sheets/owner-details'
+import { OwnerDetailsSheet } from '../sheets/owner/details'
 
 interface OwnerNameCellProps {
   owner: OwnerWithRelations

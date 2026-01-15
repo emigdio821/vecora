@@ -27,7 +27,8 @@ import {
 import type { OwnerWithRelations } from '@/db/schemas/zod'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import { type DeleteOwnerData, deleteOwner } from '@/server-fns/owners'
-import { OwnerDetailsSheet } from '../sheets/owner-details'
+import { OwnerDetailsSheet } from '../sheets/owner/details'
+import { EditOwnerSheet } from '../sheets/owner/edit'
 
 interface ActionsProps {
   owner: OwnerWithRelations
@@ -37,6 +38,7 @@ export function OwnersTableActions({ owner }: ActionsProps) {
   const ownerFullName = `${owner.firstName} ${owner.lastName}`.trim()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isOwnerDetailsSheetOpen, setIsOwnerDetailsSheetOpen] = useState(false)
+  const [isEditOwnerSheetOpen, setIsEditOwnerSheetOpen] = useState(false)
   const queryClient = useQueryClient()
 
   const deleteOwnerMutation = useMutation({
@@ -89,6 +91,11 @@ export function OwnersTableActions({ owner }: ActionsProps) {
         state={{ isOpen: isOwnerDetailsSheetOpen, onOpenChange: setIsOwnerDetailsSheetOpen }}
       />
 
+      <EditOwnerSheet
+        owner={owner}
+        state={{ isOpen: isEditOwnerSheetOpen, onOpenChange: setIsEditOwnerSheetOpen }}
+      />
+
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
@@ -108,7 +115,7 @@ export function OwnersTableActions({ owner }: ActionsProps) {
               Información
             </DropdownMenuItem>
 
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsEditOwnerSheetOpen(true)}>
               <IconEdit className="size-4" />
               Editar
             </DropdownMenuItem>

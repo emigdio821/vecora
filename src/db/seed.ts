@@ -72,8 +72,7 @@ async function seed() {
         firstName: 'Admin',
         lastName: 'System',
         email: 'admin@resido.com',
-        phone: null,
-        address: null,
+        phone: '0000000000',
       })
       .returning()
 
