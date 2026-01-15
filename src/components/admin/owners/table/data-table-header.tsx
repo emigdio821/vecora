@@ -114,7 +114,7 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="flex justify-between">
+      <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full sm:w-sm">
           <InputGroupAddon align="inline-start">
             <IconSearch className="size-4" />
