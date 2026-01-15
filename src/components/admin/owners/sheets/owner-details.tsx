@@ -47,7 +47,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
               <div className="space-y-2">
                 <div className="flex items-center gap-3 rounded-lg border p-3">
                   <Avatar className="size-5">
-                    <AvatarFallback>{owner.firstName.charAt(0)}</AvatarFallback>
+                    <AvatarFallback className="text-xs">{owner.firstName.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 font-medium">{`${owner.firstName} ${owner.lastName}`}</p>

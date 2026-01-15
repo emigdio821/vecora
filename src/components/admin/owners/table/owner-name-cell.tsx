@@ -12,7 +12,11 @@ export function OwnerNameCell({ owner }: OwnerNameCellProps) {
 
   return (
     <>
-      <Button variant="link" className="block max-w-36 truncate" onClick={() => setIsSheetOpen(true)}>
+      <Button
+        variant="link"
+        className="block max-w-32 truncate lg:max-w-52"
+        onClick={() => setIsSheetOpen(true)}
+      >
         {`${owner.firstName} ${owner.lastName}`}
       </Button>
       <OwnerDetailsSheet owner={owner} state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }} />

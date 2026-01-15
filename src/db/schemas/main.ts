@@ -34,8 +34,8 @@ export const owners = pgTable('owners', {
   id: uuid('id').primaryKey().defaultRandom(),
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
-  phone: varchar('phone', { length: 20 }),
-  email: varchar('email', { length: 255 }),
+  phone: varchar('phone', { length: 20 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -48,8 +48,8 @@ export const externalUsers = pgTable('external_users', {
   id: uuid('id').primaryKey().defaultRandom(),
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
-  phone: varchar('phone', { length: 20 }),
-  email: varchar('email', { length: 255 }),
+  phone: varchar('phone', { length: 20 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()

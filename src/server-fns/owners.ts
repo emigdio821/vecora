@@ -62,6 +62,38 @@ export const createOwner = createServerFn({ method: 'POST' })
     return newOwner satisfies SelectOwner
   })
 
+export const updateOwnerSchema = z.object({
+  ownerId: z.uuid(),
+  firstName: z.string().min(1, 'El nombre es requerido').max(100, 'El nombre es muy largo'),
+  lastName: z.string().min(1, 'El apellido es requerido').max(100, 'El apellido es muy largo'),
+  phone: z
+    .string()
+    .min(1, 'El teléfono es requerido')
+    .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
+  email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
+})
+
+export type UpdateOwnerFormData = z.infer<typeof updateOwnerSchema>
+
+export const updateOwner = createServerFn({ method: 'POST' })
+  .middleware([adminOnlyAPIMiddleware])
+  .inputValidator(updateOwnerSchema)
+  .handler(async ({ data }) => {
+    const [updatedOwner] = await db
+      .update(owners)
+      .set({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+        email: data.email,
+        updatedAt: new Date(),
+      })
+      .where(eq(owners.id, data.ownerId))
+      .returning()
+
+    return updatedOwner satisfies SelectOwner
+  })
+
 export const deleteOwnerSchema = z.object({
   ownerId: z.uuid('ID de propietario inválido'),
 })
