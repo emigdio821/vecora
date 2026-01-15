@@ -141,7 +141,13 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                     <FieldLabel htmlFor={field.name}>
                       Teléfono <span className="text-destructive">*</span>
                     </FieldLabel>
-                    <PhoneInput id={field.name} onBlur={field.onBlur} onChange={field.onChange} />
+                    <PhoneInput
+                      id={field.name}
+                      onBlur={field.onBlur}
+                      onChange={(value) => {
+                        field.onChange(value || '')
+                      }}
+                    />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}

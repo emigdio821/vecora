@@ -3,7 +3,8 @@
 import { IconFileExport, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
-import { useState } from 'react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -33,6 +34,7 @@ interface OwnersDataTableHeaderProps {
 export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
   const [openCreateOwnerDialog, setOpenCreateOwnerDialog] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const queryClient = useQueryClient()
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
@@ -71,6 +73,10 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
   function handleBatchDelete() {
     batchDeleteMutation.mutate()
   }
+
+  useEffect(() => {
+    table.getColumn('firstName')?.setFilterValue(searchQuery)
+  }, [searchQuery, table])
 
   return (
     <>
@@ -114,7 +120,12 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
             <IconSearch className="size-4" />
           </InputGroupAddon>
 
-          <InputGroupInput name="search-owner" placeholder="Buscar propietarios" />
+          <InputGroupInput
+            name="search-owner"
+            value={searchQuery}
+            placeholder="Buscar propietarios..."
+            onChange={(e) => setSearchQuery(e.target.value || null)}
+          />
         </InputGroup>
 
         <div className="flex gap-2">

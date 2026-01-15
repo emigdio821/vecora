@@ -7,7 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DataTablePagination } from '@/components/table/pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
@@ -55,6 +55,13 @@ export function OwnersDataTable({ data }: OwnersDataTableProps) {
       },
     },
   })
+
+  useEffect(() => {
+    const maxPage = Math.max(0, Math.ceil(data.length / pageSize) - 1)
+    if (pageIndex > maxPage) {
+      setPagination({ pageIndex: maxPage, pageSize })
+    }
+  }, [data.length, pageIndex, pageSize, setPagination])
 
   return (
     <div className="space-y-4">

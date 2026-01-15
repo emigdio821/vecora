@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/command'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
+import { cn, normalizeString } from '@/lib/utils'
 
 type PhoneInputProps = Omit<
   RPNInputProps<typeof InputComponent>,
@@ -60,20 +60,15 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
     return `+${getCountryCallingCode(country)}`
   }, [])
 
-  const normalizeString = useCallback((str: string) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-  }, [])
-
   const handleCountryFilter = useCallback(
     (value: string) => {
-      const normalizedValue = normalizeString(value)
-      const filtered = countries.filter((country) => normalizeString(country.label).includes(normalizedValue))
+      const normalizedValue = normalizeString(value).toLocaleLowerCase()
+      const filtered = countries.filter((country) =>
+        normalizeString(country.label).toLocaleLowerCase().includes(normalizedValue),
+      )
       setFilteredOptions(filtered)
     },
-    [countries, normalizeString],
+    [countries],
   )
 
   return (

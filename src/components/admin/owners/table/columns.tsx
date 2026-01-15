@@ -2,6 +2,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
+import { normalizeString } from '@/lib/utils'
 import { OwnersTableActions } from './actions'
 
 export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
@@ -33,6 +34,15 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
       const lastName = row.original.lastName
 
       return `${firstName} ${lastName}`
+    },
+    filterFn: (row, _, value: string) => {
+      const normalizedFirstName = normalizeString(row.original.firstName).toLowerCase()
+      const normalizedLastName = normalizeString(row.original.lastName).toLowerCase()
+      const normalizedValue = normalizeString(value).toLowerCase()
+
+      return (
+        normalizedFirstName.includes(normalizedValue) || normalizedLastName.includes(normalizedValue) || false
+      )
     },
   },
   {
