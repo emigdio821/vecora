@@ -1,4 +1,5 @@
 CREATE TYPE "public"."category_expenses" AS ENUM('security', 'maintenance', 'other');--> statement-breakpoint
+CREATE TYPE "public"."payment_status" AS ENUM('pending', 'paid');--> statement-breakpoint
 CREATE TYPE "public"."payment_type" AS ENUM('monthly_fee', 'violation');--> statement-breakpoint
 CREATE TYPE "public"."profile_type" AS ENUM('owner', 'external');--> statement-breakpoint
 CREATE TYPE "public"."violation_status" AS ENUM('pending', 'paid');--> statement-breakpoint
@@ -15,16 +16,15 @@ CREATE TABLE "external_users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"first_name" varchar(100) NOT NULL,
 	"last_name" varchar(100) NOT NULL,
-	"phone" varchar(20),
-	"email" varchar(255),
-	"address" text,
+	"phone" varchar(20) NOT NULL,
+	"email" varchar(255) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "houses" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"owner_id" uuid NOT NULL,
+	"owner_id" uuid,
 	"house_number" varchar(20) NOT NULL,
 	"street" varchar(255),
 	"city" varchar(100),
@@ -38,9 +38,8 @@ CREATE TABLE "owners" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"first_name" varchar(100) NOT NULL,
 	"last_name" varchar(100) NOT NULL,
-	"phone" varchar(20),
-	"email" varchar(255),
-	"address" text,
+	"phone" varchar(20) NOT NULL,
+	"email" varchar(255) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -51,7 +50,9 @@ CREATE TABLE "payments" (
 	"amount" numeric(12, 2) NOT NULL,
 	"payment_type" "payment_type" NOT NULL,
 	"month" varchar(7) NOT NULL,
-	"paid_at" timestamp with time zone DEFAULT now() NOT NULL
+	"status" "payment_status" DEFAULT 'pending' NOT NULL,
+	"paid_at" timestamp with time zone,
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "profiles" (
@@ -148,7 +149,7 @@ CREATE TABLE "verification" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "houses" ADD CONSTRAINT "houses_owner_id_owners_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."owners"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "houses" ADD CONSTRAINT "houses_owner_id_owners_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."owners"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "payments" ADD CONSTRAINT "payments_owner_id_owners_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."owners"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_owner_id_owners_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."owners"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -164,6 +165,7 @@ CREATE INDEX "houses_ownerId_idx" ON "houses" USING btree ("owner_id");--> state
 CREATE INDEX "payments_owner_idx" ON "payments" USING btree ("owner_id");--> statement-breakpoint
 CREATE INDEX "payments_type_idx" ON "payments" USING btree ("payment_type");--> statement-breakpoint
 CREATE INDEX "payments_month_idx" ON "payments" USING btree ("month");--> statement-breakpoint
+CREATE INDEX "payments_status_idx" ON "payments" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "profiles_userId_idx" ON "profiles" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "profiles_ownerId_idx" ON "profiles" USING btree ("owner_id");--> statement-breakpoint
 CREATE INDEX "profiles_externalUserId_idx" ON "profiles" USING btree ("external_user_id");--> statement-breakpoint

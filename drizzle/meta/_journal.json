@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1768260581043,
-      "tag": "0000_flashy_vengeance",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1768327878281,
-      "tag": "0001_mushy_thunderbird",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1768422175375,
-      "tag": "0002_round_sally_floyd",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1768425447541,
-      "tag": "0003_new_speedball",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1768508651097,
-      "tag": "0004_wealthy_sabretooth",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1768508936031,
-      "tag": "0005_fixed_talkback",
+      "when": 1768519178600,
+      "tag": "0000_melted_professor_monster",
       "breakpoints": true
     }
   ]
