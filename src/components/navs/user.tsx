@@ -4,7 +4,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'tanstack-theme-kit'
 import { authClient } from '@/lib/auth-client'
 import { userProfileQueryOptions } from '@/lib/ts-queries/user'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { Avatar, AvatarFallback } from '../ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -61,13 +61,13 @@ export function NavUser() {
                 size="lg"
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={profile.image || ''} alt={profile.firstName} />
-                  <AvatarFallback />
+                <Avatar>
+                  <AvatarFallback>{profile.firstName.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{profile.firstName}</span>
-                  <span className="truncate text-muted-foreground text-xs">{profile.email}</span>
+
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{profile.firstName}</p>
+                  <p className="truncate text-muted-foreground text-xs">{profile.email}</p>
                 </div>
                 <IconSelector className="ml-auto size-4" />
               </SidebarMenuButton>

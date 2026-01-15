@@ -83,7 +83,9 @@ function RouteComponent() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Correo</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    Correo <span className="text-destructive">*</span>
+                  </FieldLabel>
                   <Input {...field} id={field.name} aria-invalid={fieldState.invalid} disabled={isLoading} />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -95,7 +97,9 @@ function RouteComponent() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Contraseña</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    Contraseña <span className="text-destructive">*</span>
+                  </FieldLabel>
                   <Input
                     {...field}
                     id={field.name}

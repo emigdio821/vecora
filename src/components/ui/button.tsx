@@ -45,7 +45,7 @@ type ButtonProps = ButtonPrimitive.Props & ButtonVariants
 
 function Button({ className, variant = 'default', size = 'default', ...props }: ButtonProps) {
   const flatVariants: ButtonVariants['variant'][] = ['link']
-  const btnSize = size || (variant && flatVariants.includes(variant) ? 'flat' : size)
+  const btnSize = flatVariants.includes(variant) ? 'flat' : size
 
   return (
     <ButtonPrimitive

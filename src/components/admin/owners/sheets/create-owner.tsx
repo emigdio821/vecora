@@ -144,6 +144,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                     <PhoneInput
                       id={field.name}
                       onBlur={field.onBlur}
+                      disabled={createOwnerMutation.isPending}
                       onChange={(value) => {
                         field.onChange(value || '')
                       }}

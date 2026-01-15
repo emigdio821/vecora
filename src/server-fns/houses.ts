@@ -10,6 +10,7 @@ export const getAvailableHouses = createServerFn()
   .handler(async () => {
     const availableHouses = await db.query.houses.findMany({
       where: isNull(houses.ownerId),
+      orderBy: (houses, { asc }) => [asc(houses.houseNumber)],
     })
 
     return availableHouses satisfies SelectHouse[]

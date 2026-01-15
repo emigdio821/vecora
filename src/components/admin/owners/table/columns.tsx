@@ -1,9 +1,11 @@
+import { IconMinus } from '@tabler/icons-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
 import { normalizeString } from '@/lib/utils'
 import { OwnersTableActions } from './actions'
+import { OwnerNameCell } from './owner-name-cell'
 
 export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   {
@@ -29,12 +31,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   {
     accessorKey: 'firstName',
     header: 'Nombre',
-    cell: ({ row }) => {
-      const firstName = row.original.firstName
-      const lastName = row.original.lastName
-
-      return `${firstName} ${lastName}`
-    },
+    cell: ({ row }) => <OwnerNameCell owner={row.original} />,
     filterFn: (row, _, value: string) => {
       const normalizedFirstName = normalizeString(row.original.firstName).toLowerCase()
       const normalizedLastName = normalizeString(row.original.lastName).toLowerCase()
@@ -64,7 +61,11 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
         </Badge>
       ))
 
-      return houseBadges.length > 0 ? houseBadges : 'Sin casas asignadas'
+      return (
+        <div className="flex max-w-24 flex-wrap gap-1">
+          {houseBadges.length > 0 ? houseBadges : <IconMinus className="size-4" />}
+        </div>
+      )
     },
   },
   {
@@ -72,7 +73,12 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     header: 'Infracciones',
     cell: ({ row }) => {
       const violations = row.original.violations
-      return violations.length > 0 ? violations.length : 'Sin infracciones'
+
+      return violations.length > 0 ? (
+        <Badge variant="destructive">{violations.length}</Badge>
+      ) : (
+        <IconMinus className="size-4" />
+      )
     },
   },
   {
@@ -80,7 +86,11 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     header: 'Pagos pendientes',
     cell: ({ row }) => {
       const payments = row.original.payments.filter((p) => p.status === 'pending')
-      return payments.length > 0 ? payments.length : 'Sin pagos pendientes'
+      return payments.length > 0 ? (
+        <Badge variant="destructive">{payments.length}</Badge>
+      ) : (
+        <IconMinus className="size-4" />
+      )
     },
   },
   {
@@ -95,7 +105,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   //   cell: ({ row }) => {
   //     const createdAt = row.original.createdAt
 
-  //     return new Date(createdAt).toLocaleDateString(undefined, {
+  //     return new Date(createdAt).toLocaleDateString('es-MX', {
   //       year: 'numeric',
   //       month: 'short',
   //       day: '2-digit',

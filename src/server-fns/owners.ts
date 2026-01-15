@@ -22,6 +22,7 @@ export const getOwners = createServerFn()
           },
         },
       },
+      orderBy: (owner, { desc }) => [desc(owner.updatedAt)],
     })
 
     return ownersData satisfies OwnerWithRelations[]
