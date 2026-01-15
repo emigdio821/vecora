@@ -1,10 +1,10 @@
 import { useQueryState } from 'nuqs'
-import { ExternalUsersTab } from '@/components/admin/external-users/external-users-tab'
-import { OwnersTab } from '@/components/admin/owners/owners-tab'
+import { ExternalUsersTabContent } from '@/components/admin/external-users/external-users-tab-content'
+import { OwnersTabContent } from '@/components/admin/owners/owners-tab-content'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { HousesTab } from './houses/houses-tab'
-import { PaymentsTab } from './payments/payments-tab'
-import { ViolationsTab } from './violations/violations-tab'
+import { HousesTabContent } from './houses/houses-tab-content'
+import { PaymentsTabContent } from './payments/payments-tab-content'
+import { ViolationsTabContent } from './violations/violations-tab-content'
 
 export function AdministrationTabs() {
   const [tab, setTab] = useQueryState('tab', {
@@ -22,23 +22,23 @@ export function AdministrationTabs() {
       </TabsList>
 
       <TabsContent value="owners">
-        <OwnersTab />
+        <OwnersTabContent />
       </TabsContent>
 
       <TabsContent value="external-users">
-        <ExternalUsersTab />
+        <ExternalUsersTabContent />
       </TabsContent>
 
       <TabsContent value="houses">
-        <HousesTab />
+        <HousesTabContent />
       </TabsContent>
 
       <TabsContent value="violations">
-        <ViolationsTab />
+        <ViolationsTabContent />
       </TabsContent>
 
       <TabsContent value="payments">
-        <PaymentsTab />
+        <PaymentsTabContent />
       </TabsContent>
     </Tabs>
   )

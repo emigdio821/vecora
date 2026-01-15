@@ -6,5 +6,5 @@ export const AVAILABLE_HOUSES_QUERY_KEY = 'available-houses'
 export const availableHousesQueryOptions = () =>
   queryOptions({
     queryKey: [AVAILABLE_HOUSES_QUERY_KEY],
-    queryFn: getAvailableHouses,
+    queryFn: async () => await getAvailableHouses(),
   })

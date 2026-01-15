@@ -180,7 +180,11 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                       disabled={availableHouses.length === 0 || isLoadingAvailableHouses}
                     >
                       <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
-                        <SelectValue>{renderAvailableHousesValue}</SelectValue>
+                        {availableHouses.length === 0 ? (
+                          'No hay casas disponibles'
+                        ) : (
+                          <SelectValue>{renderAvailableHousesValue}</SelectValue>
+                        )}
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>

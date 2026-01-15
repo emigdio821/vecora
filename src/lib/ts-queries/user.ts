@@ -6,7 +6,7 @@ export const USER_PROFILE_QUERY_KEY = 'user-profile'
 export const userProfileQueryOptions = () =>
   queryOptions({
     queryKey: [USER_PROFILE_QUERY_KEY],
-    queryFn: getUserProfile,
+    queryFn: async () => await getUserProfile(),
     staleTime: Number.POSITIVE_INFINITY,
     gcTime: Number.POSITIVE_INFINITY,
   })

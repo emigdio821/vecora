@@ -6,5 +6,5 @@ export const OWNERS_QUERY_KEY = 'owners'
 export const ownersListQueryOptions = () =>
   queryOptions({
     queryKey: [OWNERS_QUERY_KEY],
-    queryFn: getOwners,
+    queryFn: async () => await getOwners(),
   })

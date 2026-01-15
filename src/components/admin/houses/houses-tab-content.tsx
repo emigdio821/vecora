@@ -1,7 +1,7 @@
 import { IconBarrierBlock } from '@tabler/icons-react'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 
-export function ExternalUsersTab() {
+export function HousesTabContent() {
   return (
     <Empty>
       <EmptyHeader>
@@ -10,7 +10,7 @@ export function ExternalUsersTab() {
         </EmptyMedia>
         <EmptyTitle>En construcción</EmptyTitle>
         <EmptyDescription>
-          Esta sección está en desarrollo. Pronto podrás administrar usuarios externos desde aquí.
+          Esta sección está en desarrollo. Pronto podrás administrar casas desde aquí.
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

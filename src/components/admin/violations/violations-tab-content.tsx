@@ -1,7 +1,7 @@
 import { IconBarrierBlock } from '@tabler/icons-react'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 
-export function PaymentsTab() {
+export function ViolationsTabContent() {
   return (
     <Empty>
       <EmptyHeader>
@@ -10,7 +10,7 @@ export function PaymentsTab() {
         </EmptyMedia>
         <EmptyTitle>En construcción</EmptyTitle>
         <EmptyDescription>
-          Esta sección está en desarrollo. Pronto podrás administrar pagos desde aquí.
+          Esta sección está en desarrollo. Pronto podrás administrar infracciones desde aquí.
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

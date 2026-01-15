@@ -13,8 +13,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
 import { OwnersDataTable } from './table/data-table'
 
-export function OwnersTab() {
-  const { data: owners, isLoading, error, refetch } = useQuery(ownersListQueryOptions())
+export function OwnersTabContent() {
+  const { data: owners = [], isLoading, error, refetch } = useQuery(ownersListQueryOptions())
 
   if (error) {
     return (
@@ -47,5 +47,5 @@ export function OwnersTab() {
     )
   }
 
-  return <OwnersDataTable data={owners || []} />
+  return <OwnersDataTable data={owners} />
 }
