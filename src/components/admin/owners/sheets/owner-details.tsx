@@ -1,6 +1,6 @@
 import { IconAlertTriangle, IconCash, IconHome, IconMail, IconPhone, IconUser } from '@tabler/icons-react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader } from '@/components/ui/empty'
@@ -37,18 +37,19 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
         <div className="space-y-4 px-4">
           {/* Personal Information */}
           <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger>
-              <span className="flex items-center gap-2">
-                <IconUser className="size-4 text-muted-foreground" />
-                <h3 className="font-medium text-muted-foreground text-sm">Información personal</h3>
-              </span>
-            </CollapsibleTrigger>
+            <CollapsibleTrigger
+              render={
+                <Button variant="plain">
+                  <span className="flex items-center gap-2">
+                    <IconUser className="size-4 text-muted-foreground" />
+                    <h3 className="font-medium text-muted-foreground text-sm">Información personal</h3>
+                  </span>
+                </Button>
+              }
+            />
             <CollapsibleContent>
               <div className="space-y-2">
                 <div className="flex items-center gap-3 rounded-lg border p-3">
-                  <Avatar className="size-5">
-                    <AvatarFallback className="text-xs">{owner.firstName.charAt(0)}</AvatarFallback>
-                  </Avatar>
                   <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 font-medium">{`${owner.firstName} ${owner.lastName}`}</p>
                     <p className="truncate font-mono text-muted-foreground text-xs">{owner.id}</p>
@@ -60,10 +61,9 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                   <div className="flex items-center gap-3 rounded-lg border p-3">
                     <IconMail className="size-5 shrink-0 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-muted-foreground text-xs">Correo electrónico</p>
+                      <p className="text-muted-foreground text-xs">Correo</p>
                       <p className="truncate text-sm">{owner.email}</p>
                     </div>
-                    <CopyButton value={owner.email} />
                   </div>
                 )}
 
@@ -74,7 +74,6 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                       <p className="text-muted-foreground text-xs">Teléfono</p>
                       <p className="text-sm">{owner.phone}</p>
                     </div>
-                    <CopyButton value={owner.phone} />
                   </div>
                 )}
               </div>
@@ -83,13 +82,17 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
 
           {/* Houses */}
           <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger>
-              <span className="flex items-center gap-2">
-                <IconHome className="size-4 text-muted-foreground" />
-                <h3 className="font-medium text-muted-foreground text-sm">Propiedades</h3>
-                <Badge variant="outline">{owner.houses.length}</Badge>
-              </span>
-            </CollapsibleTrigger>
+            <CollapsibleTrigger
+              render={
+                <Button variant="plain">
+                  <span className="flex items-center gap-2">
+                    <IconHome className="size-4 text-muted-foreground" />
+                    <h3 className="font-medium text-muted-foreground text-sm">Propiedades</h3>
+                    <Badge variant="outline">{owner.houses.length}</Badge>
+                  </span>
+                </Button>
+              }
+            />
             <CollapsibleContent>
               {owner.houses.length > 0 ? (
                 <div className="space-y-2">
@@ -126,13 +129,17 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
 
           {/* Violations */}
           <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger>
-              <span className="flex items-center gap-2">
-                <IconAlertTriangle className="size-4 text-muted-foreground" />
-                <h3 className="font-medium text-muted-foreground text-sm">Infracciones</h3>
-                <Badge variant="outline">{owner.violations.length}</Badge>
-              </span>
-            </CollapsibleTrigger>
+            <CollapsibleTrigger
+              render={
+                <Button variant="plain">
+                  <span className="flex items-center gap-2">
+                    <IconAlertTriangle className="size-4 text-muted-foreground" />
+                    <h3 className="font-medium text-muted-foreground text-sm">Infracciones</h3>
+                    <Badge variant="outline">{owner.violations.length}</Badge>
+                  </span>
+                </Button>
+              }
+            />
             <CollapsibleContent>
               {owner.violations.length > 0 ? (
                 <div className="space-y-2">
@@ -173,13 +180,17 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
 
           {/* Pending Payments */}
           <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger>
-              <span className="flex items-center gap-2">
-                <IconCash className="size-4 text-muted-foreground" />
-                <h3 className="font-medium text-muted-foreground text-sm">Pagos pendientes</h3>
-                <Badge variant="outline">{pendingPayments.length}</Badge>
-              </span>
-            </CollapsibleTrigger>
+            <CollapsibleTrigger
+              render={
+                <Button variant="plain">
+                  <span className="flex items-center gap-2">
+                    <IconCash className="size-4 text-muted-foreground" />
+                    <h3 className="font-medium text-muted-foreground text-sm">Pagos pendientes</h3>
+                    <Badge variant="outline">{pendingPayments.length}</Badge>
+                  </span>
+                </Button>
+              }
+            />
             <CollapsibleContent>
               {pendingPayments.length > 0 ? (
                 <div className="space-y-2">

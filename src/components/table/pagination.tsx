@@ -18,7 +18,7 @@ import {
 
 interface DataTablePaginationProps<T> {
   table: Table<T>
-  showSelection?: boolean
+  withSelection?: boolean
   pageSizeOptions?: readonly number[]
 }
 
@@ -27,7 +27,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 30, 40, 50] as const
 
 export function DataTablePagination<T>({
   table,
-  showSelection = true,
+  withSelection = true,
   pageSizeOptions = PAGE_SIZE_OPTIONS,
 }: DataTablePaginationProps<T>) {
   const rowLength = table.getFilteredRowModel().rows.length
@@ -51,7 +51,7 @@ export function DataTablePagination<T>({
 
   return (
     <div className="flex flex-col items-center justify-end gap-2 sm:flex-row">
-      {showSelection && (
+      {withSelection && (
         <div className="flex-1 text-muted-foreground text-sm">
           {table.getFilteredSelectedRowModel().rows.length} de {rowLength} seleccionados
         </div>

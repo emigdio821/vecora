@@ -1,12 +1,11 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
-import { DefaultError } from '@/components/default-error'
-import { NotFound } from '@/components/not-found'
 import { Providers } from '@/components/providers'
+import { DefaultErrorBoundary } from '@/components/shared/errors/default-boundary'
+import { NotFound } from '@/components/shared/errors/not-found'
 // import { TSDevtools } from '@/components/tanstack/devtools'
 import { Toaster } from '@/components/ui/sonner'
 import { LINK_ICONS } from '@/config/site'
-import { FONT_LINKS } from '@/lib/fonts'
 import { createSEOMeta } from '@/lib/seo'
 import appCss from '@/styles/app.css?url'
 
@@ -19,7 +18,6 @@ export const Route = createRootRouteWithContext<RouteContext>()({
     meta: createSEOMeta(),
     links: [
       ...LINK_ICONS,
-      ...FONT_LINKS,
       {
         rel: 'stylesheet',
         href: appCss,
@@ -29,7 +27,7 @@ export const Route = createRootRouteWithContext<RouteContext>()({
   errorComponent: (props) => {
     return (
       <RootDocument>
-        <DefaultError {...props} />
+        <DefaultErrorBoundary {...props} />
       </RootDocument>
     )
   },

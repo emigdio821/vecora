@@ -20,30 +20,31 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { OwnerWithRelations } from '@/db/schemas/zod'
+import type { HouseWithOwner } from '@/db/schemas/zod'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import { deleteOwner } from '@/server-fns/owners'
-import { CreateOwnerSheet } from '../sheets/create-owner'
+import { CreateHouseSheet } from '../sheets/create-house'
 
-interface OwnersDataTableHeaderProps {
-  table: Table<OwnerWithRelations>
+interface HousesDataTableHeaderProps {
+  table: Table<HouseWithOwner>
 }
 
-export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
+export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
   const [openCreateOwnerDialog, setOpenCreateOwnerDialog] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-owners', parseAsString.withDefault(''))
+  const [searchQuery, setSearchQuery] = useQueryState('search-houses', parseAsString.withDefault(''))
   const queryClient = useQueryClient()
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
-  const selectedOwners = selectedRows.map((row) => row.original)
+  const selectedHouses = selectedRows.map((row) => row.original)
 
   const batchDeleteMutation = useMutation({
     mutationFn: async () => {
+      // TODO: Implement delete house server function
       const results = await Promise.allSettled(
-        selectedOwners.map((owner) => deleteOwner({ data: { ownerId: owner.id } })),
+        selectedHouses.map((house) => deleteOwner({ data: { ownerId: house.id } })),
       )
 
       const fulfilled = results.filter((r) => r.status === 'fulfilled').length
@@ -54,18 +55,18 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
     onSuccess: ({ fulfilled, rejected }) => {
       queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
       table.resetRowSelection()
-      setIsDeleteDialogOpen(false)
+      setDeleteDialogOpen(false)
 
       if (rejected === 0) {
-        toast.success('Propietarios seleccionados fueron eliminados exitosamente.')
+        toast.success('Casas seleccionadas fueron eliminadas exitosamente.')
       } else if (fulfilled === 0) {
-        toast.error('Ocurrió un error al eliminar los propietarios, intenta nuevamente.')
+        toast.error('Ocurrió un error al eliminar las casas, intenta nuevamente.')
       } else {
-        toast.warning(`${fulfilled} eliminados, ${rejected} fallaron.`)
+        toast.warning(`${fulfilled} eliminadas, ${rejected} fallaron.`)
       }
     },
     onError: () => {
-      toast.error('Ocurrió un error al eliminar los propietarios, intenta nuevamente.')
+      toast.error('Ocurrió un error al eliminar las casas, intenta nuevamente.')
     },
   })
 
@@ -74,25 +75,25 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
   }
 
   useEffect(() => {
-    table.getColumn('firstName')?.setFilterValue(searchQuery)
+    table.getColumn('houseNumber')?.setFilterValue(searchQuery)
   }, [searchQuery, table])
 
   return (
     <>
-      <CreateOwnerSheet state={{ isOpen: openCreateOwnerDialog, onOpenChange: setOpenCreateOwnerDialog }} />
+      <CreateHouseSheet state={{ isOpen: openCreateOwnerDialog, onOpenChange: setOpenCreateOwnerDialog }} />
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
             <AlertDialogMedia>
               <IconTrash className="text-destructive" />
             </AlertDialogMedia>
-            <AlertDialogTitle>¿Eliminar propietarios?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar casas?</AlertDialogTitle>
             <AlertDialogDescription
               render={
                 <div>
                   <p>
-                    Propietarios seleccionados: <strong>{selectedRowsLength}</strong>.
+                    Casas seleccionadas: <strong>{selectedRowsLength}</strong>.
                   </p>
                   <p>Esta acción no se puede deshacer.</p>
                 </div>
@@ -117,7 +118,7 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
         <InputGroup className="w-full sm:w-sm">
           <InputGroupInput
             value={searchQuery}
-            name="search-owners"
+            name="search-houses"
             placeholder="Buscar..."
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
@@ -140,7 +141,7 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
                   </InputGroupButton>
                 }
               />
-              <TooltipContent>Buscar por nombre.</TooltipContent>
+              <TooltipContent>Buscar por número de casa o propietario.</TooltipContent>
             </Tooltip>
           </InputGroupAddon>
         </InputGroup>
@@ -153,8 +154,8 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
                   <Button
                     size="icon"
                     variant="destructive"
-                    aria-label="Borrar propietario"
-                    onClick={() => setIsDeleteDialogOpen(true)}
+                    aria-label="Borrar casas seleccionadas"
+                    onClick={() => setDeleteDialogOpen(true)}
                   >
                     <IconTrash className="size-4" />
                   </Button>

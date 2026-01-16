@@ -11,7 +11,7 @@ function RouteComponent() {
       <div>
         <h4 className="font-medium text-base leading-normal">Administración</h4>
         <p className="text-muted-foreground text-sm">
-          En esta sección puedes administrar los propietarios, usuarios externos, casas, infracciones y pagos.
+          En esta sección puedes administrar los propietarios, casas, infracciones, pagos y usuarios externos.
         </p>
       </div>
 

@@ -69,7 +69,13 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        if (!isOpen) form.reset()
+      }}
+    >
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Editar propietario</SheetTitle>

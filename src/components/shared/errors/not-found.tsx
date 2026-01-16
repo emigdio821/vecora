@@ -1,8 +1,8 @@
 import { IconGhost3 } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Footer } from './footer'
-import { Button } from './ui/button'
+import { Footer } from '../../footer'
+import { Button } from '../../ui/button'
 
 export function NotFound() {
   return (
@@ -14,10 +14,10 @@ export function NotFound() {
               <IconGhost3 className="mx-auto mb-2 size-8 text-muted-foreground" />
               404
             </CardTitle>
-            <CardDescription className="text-center">This page does not exist.</CardDescription>
+            <CardDescription className="text-center">Eta página no existe.</CardDescription>
           </CardHeader>
           <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button className="grow" render={<Link to="/">Start over</Link>} />
+            <Button className="grow" render={<Link to="/">Inicio</Link>} />
           </CardFooter>
         </Card>
       </section>

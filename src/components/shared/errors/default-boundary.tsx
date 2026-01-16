@@ -1,9 +1,8 @@
 import type { ErrorComponentProps } from '@tanstack/react-router'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { Button } from './ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
-
-export function DefaultError({ error }: ErrorComponentProps) {
+export function DefaultErrorBoundary({ error }: ErrorComponentProps) {
   return (
     <Card className="mx-auto w-full max-w-sm">
       <CardHeader>

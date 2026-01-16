@@ -1,32 +1,50 @@
 import {
+  type ColumnDef,
   type ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type Table as TableType,
   useReactTable,
 } from '@tanstack/react-table'
+import { parseAsIndex, parseAsInteger, useQueryStates } from 'nuqs'
 import { useEffect, useState } from 'react'
-import { DataTablePagination } from '@/components/table/pagination'
+import { DataTablePagination, DEFAULT_TABLE_PAGE_SIZE } from '@/components/table/pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import type { OwnerWithRelations } from '@/db/schemas/zod'
-import { useQueryPagination } from '@/hooks/use-query-pagination'
-import { ownersTableColumns } from './columns'
-import { OwnersDataTableHeader } from './data-table-header'
 
-interface OwnersDataTableProps {
-  data: OwnerWithRelations[]
+interface DataTableProps<TData, TValue> {
+  data: TData[]
+  tableId?: string
+  withSelection?: boolean
+  columns: ColumnDef<TData, TValue>[]
+  header?: (table: TableType<TData>) => React.ReactNode
 }
 
-export function OwnersDataTable({ data }: OwnersDataTableProps) {
+export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
+  const { data, tableId, header, columns, withSelection = true } = props
+
+  const paginationUrlKeys = {
+    pageIndex: tableId ? `${tableId}-page` : 'page',
+    pageSize: tableId ? `${tableId}-perPage` : 'perPage',
+  }
+
   const [rowSelection, setRowSelection] = useState({})
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [{ pageIndex, pageSize }, setPagination] = useQueryPagination()
+
+  const paginationParsers = {
+    pageIndex: parseAsIndex.withDefault(0),
+    pageSize: parseAsInteger.withDefault(DEFAULT_TABLE_PAGE_SIZE),
+  }
+
+  const [{ pageIndex, pageSize }, setPagination] = useQueryStates(paginationParsers, {
+    urlKeys: paginationUrlKeys,
+  })
 
   const table = useReactTable({
     data,
-    columns: ownersTableColumns,
+    columns,
     // onSortingChange: setSorting,
     onPaginationChange: (updater) => {
       const newPagination = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater
@@ -65,9 +83,9 @@ export function OwnersDataTable({ data }: OwnersDataTableProps) {
 
   return (
     <div className="space-y-4">
-      <OwnersDataTableHeader table={table} />
+      {header?.(table)}
 
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-clip rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -97,7 +115,7 @@ export function OwnersDataTable({ data }: OwnersDataTableProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={ownersTableColumns.length} className="h-24 text-center">
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   Sin resultados.
                 </TableCell>
               </TableRow>
@@ -106,7 +124,7 @@ export function OwnersDataTable({ data }: OwnersDataTableProps) {
         </Table>
       </div>
 
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} withSelection={withSelection} />
     </div>
   )
 }
