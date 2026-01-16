@@ -63,7 +63,6 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
       queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
       queryClient.invalidateQueries({ queryKey: [AVAILABLE_HOUSES_QUERY_KEY] })
       onOpenChange(false)
-      form.reset()
       toast.success('Propietario creado exitosamente.')
     },
     onError: () => {
@@ -81,7 +80,10 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
   }
 
   function renderAvailableHousesValue(value: string | null) {
-    return availableHouses.find((house) => house.id === value)?.houseNumber ?? 'Selecciona una opción'
+    if (availableHouses.length === 0) return 'No hay casas disponibles'
+
+    const house = availableHouses.find((house) => house.id === value)
+    return house ? `${house.houseNumber}` : 'Selecciona una opción'
   }
 
   return (

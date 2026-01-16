@@ -7,7 +7,6 @@ import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { PhoneInput } from '@/components/ui/phone-input'
 import {
   Select,
   SelectContent,
@@ -25,9 +24,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { AVAILABLE_HOUSES_QUERY_KEY, availableHousesQueryOptions } from '@/lib/ts-queries/houses'
-import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
-import { type CreateOwnerFormData, createOwner, createOwnerSchema } from '@/server-fns/owners'
+import { HOUSES_LIST_QUERY_KEY } from '@/lib/ts-queries/houses'
+import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
+import { type CreateHouseFormData, createHouse, createHouseSchema } from '@/server-fns/houses'
 
 interface CreateHouseDialogProps {
   state: {
@@ -41,31 +40,28 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
   const { isOpen, onOpenChange } = state
   const queryClient = useQueryClient()
 
-  const { data: availableHouses = [], isLoading: isLoadingAvailableHouses } = useQuery(
-    availableHousesQueryOptions(),
-  )
+  const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
 
-  const form = useForm<CreateOwnerFormData>({
+  const form = useForm<CreateHouseFormData>({
     shouldUnregister: true,
-    resolver: zodResolver(createOwnerSchema),
+    resolver: zodResolver(createHouseSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      email: '',
-      houseId: null,
+      houseNumber: '',
+      street: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      ownerId: null,
     },
   })
 
   const createHouseMutation = useMutation({
-    mutationFn: async (data: CreateOwnerFormData) => {
-      return await createOwner({ data })
+    mutationFn: async (data: CreateHouseFormData) => {
+      return await createHouse({ data })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
-      queryClient.invalidateQueries({ queryKey: [AVAILABLE_HOUSES_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [HOUSES_LIST_QUERY_KEY] })
       onOpenChange(false)
-      form.reset()
       toast.success('Casa creada exitosamente.')
     },
     onError: () => {
@@ -73,7 +69,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
     },
   })
 
-  function onSubmit(data: CreateOwnerFormData) {
+  function onSubmit(data: CreateHouseFormData) {
     createHouseMutation.mutate(data)
   }
 
@@ -82,8 +78,11 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
     onOpenChange(open)
   }
 
-  function renderAvailableHousesValue(value: string | null) {
-    return availableHouses.find((house) => house.id === value)?.houseNumber ?? 'Selecciona una opción'
+  function renderOwnerValue(value: string | null) {
+    if (owners.length === 0) return 'No hay propietarios disponibles'
+
+    const owner = owners.find((owner) => owner.id === value)
+    return owner ? `${owner.firstName} ${owner.lastName}` : 'Selecciona una opción'
   }
 
   return (
@@ -98,12 +97,12 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
           <form id={createHouseFormId} onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup className="px-4">
               <Controller
-                name="firstName"
+                name="houseNumber"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
-                      Nombre <span className="text-destructive">*</span>
+                      Número de casa <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Input
                       {...field}
@@ -117,13 +116,11 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
               />
 
               <Controller
-                name="lastName"
+                name="street"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Apellido <span className="text-destructive">*</span>
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Calle</FieldLabel>
                     <Input
                       {...field}
                       id={field.name}
@@ -136,39 +133,14 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
               />
 
               <Controller
-                name="phone"
+                name="city"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Teléfono <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <PhoneInput
-                      id={field.name}
-                      onBlur={field.onBlur}
-                      disabled={createHouseMutation.isPending}
-                      onChange={(value) => {
-                        field.onChange(value || '')
-                      }}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="email"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Correo <span className="text-destructive">*</span>
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Ciudad</FieldLabel>
                     <Input
                       {...field}
-                      type="email"
                       id={field.name}
-                      autoComplete="email"
                       aria-invalid={fieldState.invalid}
                       disabled={createHouseMutation.isPending}
                     />
@@ -178,34 +150,65 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
               />
 
               <Controller
-                name="houseId"
+                name="state"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Casa</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Estado</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      disabled={createHouseMutation.isPending}
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="zipCode"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Código postal</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      disabled={createHouseMutation.isPending}
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="ownerId"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Propietario</FieldLabel>
                     <Select
                       value={field.value}
                       onValueChange={field.onChange}
-                      disabled={availableHouses.length === 0 || isLoadingAvailableHouses}
+                      disabled={owners.length === 0 || isLoadingOwners}
                     >
                       <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
-                        {availableHouses.length === 0 ? (
-                          'No hay casas disponibles'
-                        ) : (
-                          <SelectValue>{renderAvailableHousesValue}</SelectValue>
-                        )}
+                        <SelectValue>{renderOwnerValue}</SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
                           <SelectItem value={null}>Selecciona una opción</SelectItem>
-                          {availableHouses.map((house) => (
-                            <SelectItem key={house.id} value={house.id}>
-                              {house.houseNumber}
+                          {owners.map((owner) => (
+                            <SelectItem key={owner.id} value={owner.id}>
+                              <span>{`${owner.firstName} ${owner.lastName}`}</span>
                             </SelectItem>
                           ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
+
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}

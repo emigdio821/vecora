@@ -1,9 +1,29 @@
 import { createServerFn } from '@tanstack/react-start'
 import { isNull } from 'drizzle-orm'
+import { z } from 'zod'
 import { db } from '@/db'
 import { houses } from '@/db/schemas/main'
 import type { HouseWithOwner, SelectHouse } from '@/db/schemas/zod'
 import { authAPIMiddleware } from '@/middleware/auth'
+
+export const createHouseSchema = z.object({
+  houseNumber: z.string().min(1, 'El número de casa es requerido'),
+  street: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zipCode: z.string().optional(),
+  ownerId: z.uuid('ID de propietario inválido').nullable(),
+})
+
+export type CreateHouseFormData = z.infer<typeof createHouseSchema>
+
+export const createHouse = createServerFn({ method: 'POST' })
+  .middleware([authAPIMiddleware])
+  .inputValidator(createHouseSchema)
+  .handler(async ({ data }) => {
+    const [newHouse] = await db.insert(houses).values(data).returning()
+    return newHouse
+  })
 
 export const getHouses = createServerFn()
   .middleware([authAPIMiddleware])
