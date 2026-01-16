@@ -31,6 +31,7 @@ export function PhoneInput({ className, ...props }: PhoneInputProps) {
   return (
     <RPNInput
       defaultCountry="MX"
+      international={false}
       labels={defaultLabels}
       inputComponent={InputComponent}
       countrySelectComponent={CountrySelect}
@@ -84,8 +85,8 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
           <Button
             type="button"
             variant="outline"
+            aria-label="País"
             disabled={disabled}
-            aria-label="Country"
             className="w-20 justify-between gap-1 font-normal hover:bg-inherit"
           >
             <span>{selectedCountry ? getCountryCode(selectedCountry) : null}</span>
@@ -93,7 +94,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
           </Button>
         }
       />
-      <PopoverContent className="w-72 p-0" align="start">
+      <PopoverContent className="w-72 p-0">
         <Command shouldFilter={false} className="p-0">
           <CommandInput placeholder="Buscar..." onValueChange={handleCountryFilter} />
           <CommandList>

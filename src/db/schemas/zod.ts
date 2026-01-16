@@ -82,3 +82,8 @@ export type OwnerWithRelations = SelectOwner & {
       })
     | null
 }
+
+// Type for houses with owner relation included
+export type HouseWithOwner = SelectHouse & {
+  owner: SelectOwner | null
+}

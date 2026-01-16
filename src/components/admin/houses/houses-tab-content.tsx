@@ -1,18 +1,28 @@
-import { IconBarrierBlock } from '@tabler/icons-react'
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { useQuery } from '@tanstack/react-query'
+import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
+import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
+import { DataTable } from '@/components/table/data-table'
+import { housesListQueryOptions } from '@/lib/ts-queries/houses'
+import { housesTableColumns } from './table/columns'
+import { HousesDataTableHeader } from './table/data-table-header'
 
 export function HousesTabContent() {
+  const { data: houses = [], isLoading, error, refetch } = useQuery(housesListQueryOptions())
+
+  if (error) {
+    return <TSQueryGenericError refetch={refetch} />
+  }
+
+  if (isLoading) {
+    return <TableGenericSkeleton />
+  }
+
   return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <IconBarrierBlock className="size-4" />
-        </EmptyMedia>
-        <EmptyTitle>En construcción</EmptyTitle>
-        <EmptyDescription>
-          Esta sección está en desarrollo. Pronto podrás administrar casas desde aquí.
-        </EmptyDescription>
-      </EmptyHeader>
-    </Empty>
+    <DataTable
+      data={houses}
+      tableId="houses"
+      columns={housesTableColumns}
+      header={(table) => <HousesDataTableHeader table={table} />}
+    />
   )
 }

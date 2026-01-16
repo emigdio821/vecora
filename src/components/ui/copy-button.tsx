@@ -12,7 +12,7 @@ type CopyButtonProps = ButtonProps & {
 
 export function CopyButton({
   value,
-  tooltipText = 'Copiar al portapapeles',
+  tooltipText = 'Copiar',
   successText = '¡Copiado!',
   iconSize = 16,
   ...props

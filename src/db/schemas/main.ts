@@ -63,7 +63,7 @@ export const houses = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     ownerId: uuid('owner_id').references(() => owners.id, { onDelete: 'set null' }),
-    houseNumber: varchar('house_number', { length: 20 }).notNull(),
+    houseNumber: varchar('house_number', { length: 20 }).notNull().unique(),
     street: varchar('street', { length: 255 }),
     city: varchar('city', { length: 100 }),
     state: varchar('state', { length: 100 }),
