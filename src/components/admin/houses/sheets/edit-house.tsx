@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -7,7 +7,14 @@ import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { PhoneInput } from '@/components/ui/phone-input'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Sheet,
   SheetClose,
@@ -18,8 +25,9 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { HouseWithOwner } from '@/db/schemas/zod'
-import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
-import type { UpdateOwnerFormData } from '@/server-fns/owners'
+import { HOUSES_LIST_QUERY_KEY } from '@/lib/ts-queries/houses'
+import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
+import { type UpdateHouseFormData, updateHouse, updateHouseSchema } from '@/server-fns/houses'
 
 interface EditHouseSheetProps {
   house: HouseWithOwner
@@ -30,68 +38,85 @@ interface EditHouseSheetProps {
 }
 
 export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
-  const editOwnerFormId = useId()
+  const editHouseFormId = useId()
   const { isOpen, onOpenChange } = state
   const queryClient = useQueryClient()
 
-  // const form = useForm<UpdateOwnerFormData>({
-  //   resolver: zodResolver(updateOwnerSchema),
-  //   values: {
-  //     ownerId: owner.id,
-  //     firstName: owner.firstName,
-  //     lastName: owner.lastName,
-  //     phone: owner.phone,
-  //     email: owner.email,
-  //   },
-  // })
+  const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
 
-  // const updateOwnerMutation = useMutation({
-  //   mutationFn: async (data: UpdateOwnerFormData) => {
-  //     return await updateOwner({ data })
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
-  //     onOpenChange(false)
-  //     toast.success('Propietario actualizado exitosamente.')
-  //   },
-  //   onError: () => {
-  //     toast.error('Ocurrió un error al actualizar el propietario, intenta nuevamente.')
-  //   },
-  // })
+  const form = useForm<UpdateHouseFormData>({
+    resolver: zodResolver(updateHouseSchema),
+    values: {
+      houseId: house.id,
+      houseNumber: house.houseNumber,
+      street: house.street ?? '',
+      city: house.city ?? '',
+      state: house.state ?? '',
+      zipCode: house.zipCode ?? '',
+      ownerId: house.ownerId,
+    },
+  })
 
-  // function onSubmit(data: UpdateOwnerFormData) {
-  //   updateOwnerMutation.mutate(data)
-  // }
+  const updateHouseMutation = useMutation({
+    mutationFn: async (data: UpdateHouseFormData) => {
+      return await updateHouse({ data })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [HOUSES_LIST_QUERY_KEY] })
+      onOpenChange(false)
+      toast.success('Casa actualizada exitosamente.')
+    },
+    onError: () => {
+      toast.error('Ocurrió un error al actualizar la casa, intenta nuevamente.')
+    },
+  })
+
+  function onSubmit(data: UpdateHouseFormData) {
+    updateHouseMutation.mutate(data)
+  }
 
   function handleOpenChange(open: boolean) {
-    // if (updateOwnerMutation.isPending) return
+    if (updateHouseMutation.isPending) return
     onOpenChange(open)
   }
 
+  function renderOwnerValue(value: string | null) {
+    if (owners.length === 0) return 'No hay propietarios disponibles'
+
+    const owner = owners.find((owner) => owner.id === value)
+    return owner ? `${owner.firstName} ${owner.lastName}` : 'Selecciona una opción'
+  }
+
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        if (!isOpen) form.reset()
+      }}
+    >
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Editar casa</SheetTitle>
           <SheetDescription>Actualiza la información de la casa.</SheetDescription>
         </SheetHeader>
 
-        {/* <div className="flex-1">
-          <form id={editOwnerFormId} onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex-1">
+          <form id={editHouseFormId} onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup className="px-4">
               <Controller
-                name="firstName"
+                name="houseNumber"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
-                      Nombre <span className="text-destructive">*</span>
+                      Número de casa <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Input
                       {...field}
                       id={field.name}
                       aria-invalid={fieldState.invalid}
-                      disabled={updateOwnerMutation.isPending}
+                      disabled={updateHouseMutation.isPending}
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -99,18 +124,16 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
               />
 
               <Controller
-                name="lastName"
+                name="street"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Apellido <span className="text-destructive">*</span>
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Calle</FieldLabel>
                     <Input
                       {...field}
                       id={field.name}
                       aria-invalid={fieldState.invalid}
-                      disabled={updateOwnerMutation.isPending}
+                      disabled={updateHouseMutation.isPending}
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -118,50 +141,89 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
               />
 
               <Controller
-                name="phone"
+                name="city"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Teléfono <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <PhoneInput
+                    <FieldLabel htmlFor={field.name}>Ciudad</FieldLabel>
+                    <Input
+                      {...field}
                       id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      disabled={updateHouseMutation.isPending}
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="state"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Estado</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      disabled={updateHouseMutation.isPending}
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="zipCode"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Código postal</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      disabled={updateHouseMutation.isPending}
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="ownerId"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Propietario</FieldLabel>
+                    <Select
                       value={field.value}
-                      onBlur={field.onBlur}
-                      disabled={updateOwnerMutation.isPending}
-                      onChange={(value) => {
-                        field.onChange(value || '')
-                      }}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+                      onValueChange={field.onChange}
+                      disabled={owners.length === 0 || isLoadingOwners}
+                    >
+                      <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
+                        <SelectValue>{renderOwnerValue}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value={null}>Selecciona una opción</SelectItem>
+                          {owners.map((owner) => (
+                            <SelectItem key={owner.id} value={owner.id}>
+                              <span>{`${owner.firstName} ${owner.lastName}`}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
 
-              <Controller
-                name="email"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Correo <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      type="email"
-                      id={field.name}
-                      autoComplete="email"
-                      aria-invalid={fieldState.invalid}
-                      disabled={updateOwnerMutation.isPending}
-                    />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
             </FieldGroup>
           </form>
-        </div> */}
+        </div>
 
         <SheetFooter>
           <SheetClose
@@ -171,9 +233,9 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
               </Button>
             }
           />
-          <Button type="submit" form={editOwnerFormId}>
+          <Button type="submit" form={editHouseFormId} disabled={updateHouseMutation.isPending}>
             Guardar cambios
-            {/* {updateOwnerMutation.isPending && <LoaderIcon />} */}
+            {updateHouseMutation.isPending && <LoaderIcon />}
           </Button>
         </SheetFooter>
       </SheetContent>

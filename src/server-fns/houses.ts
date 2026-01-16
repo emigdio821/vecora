@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { isNull } from 'drizzle-orm'
+import { eq, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '@/db'
 import { houses } from '@/db/schemas/main'
@@ -17,12 +17,33 @@ export const createHouseSchema = z.object({
 
 export type CreateHouseFormData = z.infer<typeof createHouseSchema>
 
+export const updateHouseSchema = z.object({
+  houseId: z.uuid('ID de casa inválido'),
+  houseNumber: z.string().min(1, 'El número de casa es requerido'),
+  street: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zipCode: z.string().optional(),
+  ownerId: z.uuid('ID de propietario inválido').nullable(),
+})
+
+export type UpdateHouseFormData = z.infer<typeof updateHouseSchema>
+
 export const createHouse = createServerFn({ method: 'POST' })
   .middleware([authAPIMiddleware])
   .inputValidator(createHouseSchema)
   .handler(async ({ data }) => {
     const [newHouse] = await db.insert(houses).values(data).returning()
     return newHouse
+  })
+
+export const updateHouse = createServerFn({ method: 'POST' })
+  .middleware([authAPIMiddleware])
+  .inputValidator(updateHouseSchema)
+  .handler(async ({ data }) => {
+    const { houseId, ...updateData } = data
+    const [updatedHouse] = await db.update(houses).set(updateData).where(eq(houses.id, houseId)).returning()
+    return updatedHouse
   })
 
 export const getHouses = createServerFn()
