@@ -1,24 +1,24 @@
-import { IconSelector } from '@tabler/icons-react'
-import { useCallback, useMemo, useState } from 'react'
+import { IconSearch, IconSelector } from '@tabler/icons-react'
+import { useCallback, useMemo } from 'react'
 import RPNInput, {
   type Country,
   getCountryCallingCode,
   type Props as RPNInputProps,
 } from 'react-phone-number-input'
 import defaultLabels from 'react-phone-number-input/locale/es'
-import { VList } from 'virtua'
-import { Button } from '@/components/ui/button'
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
+  Combobox,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxTrigger,
+  ComboboxValue,
+} from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn, normalizeString } from '@/lib/utils'
+import { cn } from '@/lib/utils'
+import { Button } from './button'
 
 type PhoneInputProps = Omit<
   RPNInputProps<typeof InputComponent>,
@@ -35,7 +35,7 @@ export function PhoneInput({ className, ...props }: PhoneInputProps) {
       labels={defaultLabels}
       inputComponent={InputComponent}
       countrySelectComponent={CountrySelect}
-      className={cn('flex gap-2 rounded-md', className)}
+      className={cn('flex w-full gap-2 rounded-md', className)}
       {...props}
     />
   )
@@ -45,88 +45,78 @@ function InputComponent({ className, ...props }: React.ComponentProps<'input'>) 
   return <Input className={cn('focus-visible:z-10', className)} {...props} />
 }
 
+interface CountrySelectOption {
+  label: string
+  value: Country | undefined
+}
+
 interface CountrySelectProps {
   disabled?: boolean
   value?: Country
   onChange: (value: Country) => void
-  options: { label: string; value: Country | undefined }[]
+  options: CountrySelectOption[]
 }
 
 function CountrySelect({ disabled, value: selectedCountry, onChange, options }: CountrySelectProps) {
-  const [openPopover, setOpenPopover] = useState(false)
   const countries = useMemo(() => options.filter((option) => option.value !== undefined), [options])
-  const [filteredOptions, setFilteredOptions] = useState(countries)
+  // const [filteredOptions, setFilteredOptions] = useState(countries)
 
   const getCountryCode = useCallback((country: Country) => {
     return `+${getCountryCallingCode(country)}`
   }, [])
 
-  const handleCountryFilter = useCallback(
-    (value: string) => {
-      const normalizedValue = normalizeString(value).toLocaleLowerCase()
-      const filtered = countries.filter((country) =>
-        normalizeString(country.label).toLocaleLowerCase().includes(normalizedValue),
-      )
-      setFilteredOptions(filtered)
-    },
-    [countries],
-  )
+  // const handleCountryFilter = useCallback(
+  //   (value: string) => {
+  //     const normalizedValue = normalizeString(value).toLocaleLowerCase()
+  //     const filtered = countries.filter((country) =>
+  //       normalizeString(country.label).toLocaleLowerCase().includes(normalizedValue),
+  //     )
+  //     setFilteredOptions(filtered)
+  //   },
+  //   [countries],
+  // )
 
   return (
-    <Popover
-      open={openPopover}
-      onOpenChange={setOpenPopover}
-      onOpenChangeComplete={(isOpen) => {
-        if (!isOpen) setFilteredOptions(countries)
+    <Combobox
+      items={countries}
+      disabled={disabled}
+      onValueChange={(item) => {
+        if (item?.value) onChange(item.value)
       }}
+      value={selectedCountry ? countries.find((c) => c.value === selectedCountry) : null}
     >
-      <PopoverTrigger
-        render={
-          <Button
-            type="button"
-            variant="outline"
-            aria-label="País"
-            disabled={disabled}
-            className="w-20 justify-between gap-1 font-normal hover:bg-inherit"
-          >
-            <span>{selectedCountry ? getCountryCode(selectedCountry) : null}</span>
-            <IconSelector className="size-4 text-muted-foreground/80" />
-          </Button>
-        }
-      />
-      <PopoverContent className="w-72 p-0">
-        <Command shouldFilter={false} className="p-0">
-          <CommandInput placeholder="Buscar..." onValueChange={handleCountryFilter} />
-          <CommandList>
-            {filteredOptions.length === 0 ? (
-              <CommandEmpty>Sin resultados.</CommandEmpty>
-            ) : (
-              <CommandGroup>
-                <VList style={{ height: filteredOptions.length > 0 ? 240 : 0, width: '100%' }}>
-                  {filteredOptions.map(
-                    ({ label, value }) =>
-                      value && (
-                        <div key={value}>
-                          <CommandItem
-                            className="justify-between gap-2"
-                            onSelect={() => {
-                              onChange(value)
-                              setOpenPopover(false)
-                            }}
-                            data-checked={value === selectedCountry}
-                          >
-                            <span className="flex-1 truncate text-sm">{label}</span>
-                            <span className="text-muted-foreground text-sm">{getCountryCode(value)}</span>
-                          </CommandItem>
-                        </div>
-                      ),
+      <ComboboxTrigger render={<Button className="w-full max-w-20 justify-between" variant="outline" />}>
+        <ComboboxValue>
+          {(item: CountrySelectOption) => (item.value ? getCountryCode(item.value) : 'País')}
+        </ComboboxValue>
+        <IconSelector className="-me-1!" />
+      </ComboboxTrigger>
+      <ComboboxPopup aria-label="Selecciona una opción" className="[--anchor-width:288px]">
+        <div className="border-b p-2">
+          <ComboboxInput
+            showTrigger={false}
+            placeholder="Buscar"
+            aria-invalid="false"
+            startAddon={<IconSearch />}
+            className="rounded-md before:rounded-[calc(var(--radius-md)-1px)]"
+          />
+        </div>
+        <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
+        <ComboboxList>
+          {(item: CountrySelectOption) =>
+            item && (
+              <ComboboxItem key={item.value} value={item}>
+                <div className="inline-flex w-full items-center justify-between gap-2">
+                  <span>{item.label}</span>
+                  {item.value && (
+                    <span className="text-muted-foreground text-xs">{getCountryCode(item.value)}</span>
                   )}
-                </VList>
-              </CommandGroup>
-            )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+                </div>
+              </ComboboxItem>
+            )
+          }
+        </ComboboxList>
+      </ComboboxPopup>
+    </Combobox>
   )
 }

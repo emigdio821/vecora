@@ -1,29 +1,27 @@
 import { IconDotsVertical, IconEdit, IconTrash, IconUser } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { toast } from 'sonner'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
+  AlertDialogClose,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogMedia,
+  AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  Menu,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuItem,
+  MenuPopup,
+  MenuSeparator,
+  MenuTrigger,
+} from '@/components/ui/menu'
+import { toastManager } from '@/components/ui/toast'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import { type DeleteOwnerData, deleteOwner } from '@/server-fns/owners'
@@ -36,9 +34,9 @@ interface ActionsProps {
 
 export function OwnersTableActions({ owner }: ActionsProps) {
   const ownerFullName = `${owner.firstName} ${owner.lastName}`.trim()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isOwnerDetailsSheetOpen, setIsOwnerDetailsSheetOpen] = useState(false)
-  const [isEditOwnerSheetOpen, setIsEditOwnerSheetOpen] = useState(false)
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [isOwnerDetailsSheetOpen, setOwnerDetailsSheetOpen] = useState(false)
+  const [isEditOwnerSheetOpen, setEditOwnerSheetOpen] = useState(false)
   const queryClient = useQueryClient()
 
   const deleteOwnerMutation = useMutation({
@@ -47,11 +45,21 @@ export function OwnersTableActions({ owner }: ActionsProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
-      setIsDeleteDialogOpen(false)
-      toast.success('Propietario eliminado exitosamente.')
+      setDeleteDialogOpen(false)
+
+      toastManager.add({
+        type: 'success',
+        title: 'Propietario eliminado',
+        description: 'El propietario ha sido eliminado exitosamente.',
+      })
     },
-    onError: () => {
-      toast.error('Ocurrió un error al eliminar el propietario, intenta nuevamente.')
+    onError: (error) => {
+      console.error('Error deleting owner:', error)
+      toastManager.add({
+        type: 'error',
+        title: 'Error',
+        description: 'Ocurrió un error al eliminar el propietario, intenta nuevamente.',
+      })
     },
   })
 
@@ -61,74 +69,76 @@ export function OwnersTableActions({ owner }: ActionsProps) {
 
   return (
     <>
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogMedia>
-              <IconTrash className="text-destructive" />
-            </AlertDialogMedia>
             <AlertDialogTitle>¿Eliminar propietario?</AlertDialogTitle>
             <AlertDialogDescription>
               Estás por eliminar a <strong>{ownerFullName}</strong>. Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteOwnerMutation.isPending}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDeleteOwner}
-              disabled={deleteOwnerMutation.isPending}
+            <AlertDialogClose render={<Button variant="outline" disabled={deleteOwnerMutation.isPending} />}>
+              Cancelar
+            </AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteOwner}
+                  disabled={deleteOwnerMutation.isPending}
+                />
+              }
             >
               Eliminar
               {deleteOwnerMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
+            </AlertDialogClose>
           </AlertDialogFooter>
-        </AlertDialogContent>
+        </AlertDialogPopup>
       </AlertDialog>
 
       <OwnerDetailsSheet
         owner={owner}
-        state={{ isOpen: isOwnerDetailsSheetOpen, onOpenChange: setIsOwnerDetailsSheetOpen }}
+        state={{ isOpen: isOwnerDetailsSheetOpen, onOpenChange: setOwnerDetailsSheetOpen }}
       />
 
       <EditOwnerSheet
         owner={owner}
-        state={{ isOpen: isEditOwnerSheetOpen, onOpenChange: setIsEditOwnerSheetOpen }}
+        state={{ isOpen: isEditOwnerSheetOpen, onOpenChange: setEditOwnerSheetOpen }}
       />
 
-      <DropdownMenu>
-        <DropdownMenuTrigger
+      <Menu>
+        <MenuTrigger
           render={
             <Button aria-label="Table actions" size="icon" variant="ghost">
               <IconDotsVertical className="size-4" />
             </Button>
           }
         />
-        <DropdownMenuContent align="end" className="max-w-42">
-          <DropdownMenuGroup>
-            <DropdownMenuLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
+        <MenuPopup align="end" className="max-w-42">
+          <MenuGroup>
+            <MenuGroupLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
               {ownerFullName}
-            </DropdownMenuLabel>
-
-            <DropdownMenuItem onClick={() => setIsOwnerDetailsSheetOpen(true)}>
+            </MenuGroupLabel>
+            <MenuItem onClick={() => setOwnerDetailsSheetOpen(true)}>
               <IconUser className="size-4" />
               Información
-            </DropdownMenuItem>
+            </MenuItem>
 
-            <DropdownMenuItem onClick={() => setIsEditOwnerSheetOpen(true)}>
+            <MenuItem onClick={() => setEditOwnerSheetOpen(true)}>
               <IconEdit className="size-4" />
               Editar
-            </DropdownMenuItem>
+            </MenuItem>
 
-            <DropdownMenuSeparator />
+            <MenuSeparator />
 
-            <DropdownMenuItem variant="destructive" onClick={() => setIsDeleteDialogOpen(true)}>
+            <MenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
               <IconTrash className="size-4" />
               Eliminar
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            </MenuItem>
+          </MenuGroup>
+        </MenuPopup>
+      </Menu>
     </>
   )
 }

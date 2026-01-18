@@ -76,7 +76,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
       const violations = row.original.violations
 
       return violations.length > 0 ? (
-        <Badge variant="destructive">{violations.length}</Badge>
+        <Badge variant="error">{violations.length}</Badge>
       ) : (
         <IconMinus className="size-4" />
       )
@@ -86,9 +86,11 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     accessorKey: 'payments',
     header: 'Pagos pendientes',
     cell: ({ row }) => {
-      const payments = row.original.payments.filter((p) => p.status === 'pending')
+      const payments = row.original.payments.filter(
+        (p) => p.status === 'pending' && p.paymentType !== 'violation',
+      )
       return payments.length > 0 ? (
-        <Badge variant="destructive">{payments.length}</Badge>
+        <Badge variant="error">{payments.length}</Badge>
       ) : (
         <IconMinus className="size-4" />
       )
@@ -100,17 +102,4 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     enableResizing: false,
     cell: ({ row }) => <OwnersTableActions owner={row.original} />,
   },
-  // {
-  //   accessorKey: 'createdAt',
-  //   header: 'Fecha de creación',
-  //   cell: ({ row }) => {
-  //     const createdAt = row.original.createdAt
-
-  //     return new Date(createdAt).toLocaleDateString('es-MX', {
-  //       year: 'numeric',
-  //       month: 'short',
-  //       day: '2-digit',
-  //     })
-  //   },
-  // },
 ]

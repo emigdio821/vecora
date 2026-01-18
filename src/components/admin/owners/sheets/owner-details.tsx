@@ -1,18 +1,28 @@
-import { IconAlertTriangle, IconCash, IconHome, IconMail, IconPhone, IconUser } from '@tabler/icons-react'
+import {
+  IconAlertTriangle,
+  IconCash,
+  IconChevronDown,
+  IconHome,
+  IconUser,
+  IconWind,
+} from '@tabler/icons-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
-import { Empty, EmptyDescription, EmptyHeader } from '@/components/ui/empty'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
+import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
+  SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
+import { formatDate } from '@/lib/utils'
 
 interface OwnerDetailsSheetProps {
   owner: OwnerWithRelations
@@ -25,231 +35,233 @@ interface OwnerDetailsSheetProps {
 export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
   const { isOpen, onOpenChange } = state
   const pendingPayments = owner.payments.filter((p) => p.status === 'pending')
+  const ownerFullName = `${owner.firstName} ${owner.lastName}`.trim()
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto">
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Información del propietario</SheetTitle>
           <SheetDescription>Información completa y detallada del propietario</SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-4 px-4">
-          {/* Personal Information */}
-          <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger
-              render={
-                <Button variant="plain">
-                  <span className="flex items-center gap-2">
-                    <IconUser className="size-4 text-muted-foreground" />
-                    <h3 className="font-medium text-muted-foreground text-sm">Información personal</h3>
-                  </span>
-                </Button>
-              }
-            />
-            <CollapsibleContent>
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 rounded-lg border p-3">
+        <SheetPanel className="space-y-4">
+          {/* Personal info */}
+          <Frame className="w-full">
+            <Collapsible defaultOpen>
+              <FrameHeader className="flex-row items-center justify-between p-2">
+                <CollapsibleTrigger
+                  className="data-panel-open:[&_svg]:rotate-180"
+                  render={<Button variant="plain" />}
+                >
+                  <IconChevronDown className="size-4" />
+                  Información personal
+                </CollapsibleTrigger>
+                <IconUser className="size-4 text-muted-foreground" />
+              </FrameHeader>
+              <CollapsiblePanel className="space-y-1">
+                <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 font-medium">{`${owner.firstName} ${owner.lastName}`}</p>
+                    <h2 className="font-medium text-sm">{ownerFullName}</h2>
                     <p className="truncate font-mono text-muted-foreground text-xs">{owner.id}</p>
                   </div>
-                  <CopyButton value={owner.id} />
-                </div>
-
+                  <CopyButton tooltipText="Copiar ID" value={owner.id} />
+                </FramePanel>
                 {owner.email && (
-                  <div className="flex items-center gap-3 rounded-lg border p-3">
-                    <IconMail className="size-5 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-muted-foreground text-xs">Correo</p>
-                      <p className="truncate text-sm">{owner.email}</p>
-                    </div>
-                  </div>
+                  <FramePanel className="p-2">
+                    <h2 className="font-medium text-sm">Correo</h2>
+                    <p className="line-clamp-2 text-muted-foreground text-sm">{owner.email}</p>
+                  </FramePanel>
                 )}
-
                 {owner.phone && (
-                  <div className="flex items-center gap-3 rounded-lg border p-3">
-                    <IconPhone className="size-5 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-muted-foreground text-xs">Teléfono</p>
-                      <p className="text-sm">{owner.phone}</p>
-                    </div>
-                  </div>
+                  <FramePanel className="p-2">
+                    <h2 className="font-medium text-sm">Teléfono</h2>
+                    <p className="line-clamp-2 text-muted-foreground text-sm">{owner.phone}</p>
+                  </FramePanel>
                 )}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+              </CollapsiblePanel>
+            </Collapsible>
+          </Frame>
 
-          {/* Houses */}
-          <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger
-              render={
-                <Button variant="plain">
-                  <span className="flex items-center gap-2">
-                    <IconHome className="size-4 text-muted-foreground" />
-                    <h3 className="font-medium text-muted-foreground text-sm">Propiedades</h3>
-                    <Badge variant="outline">{owner.houses.length}</Badge>
-                  </span>
-                </Button>
-              }
-            />
-            <CollapsibleContent>
-              {owner.houses.length > 0 ? (
-                <div className="space-y-2">
-                  {owner.houses.map((house) => (
-                    <div key={house.id} className="rounded-lg border p-3">
-                      <div>
-                        <span className="flex items-center gap-2">
-                          <span className="font-medium">Casa</span>
-                          <Badge variant="outline">{house.houseNumber}</Badge>
-                        </span>
-                        {house.street && (
-                          <p className="text-muted-foreground text-sm">
-                            {house.street}
-                            {house.city && `, ${house.city}`}
-                            {house.state && `, ${house.state}`}
-                          </p>
-                        )}
-                        {house.zipCode && (
-                          <p className="text-muted-foreground text-xs">CP: {house.zipCode}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <Empty className="border border-dashed p-3">
-                  <EmptyHeader>
-                    <EmptyDescription>No tiene propiedades asignadas.</EmptyDescription>
-                  </EmptyHeader>
-                </Empty>
-              )}
-            </CollapsibleContent>
-          </Collapsible>
+          {/* Houses info */}
+          <Frame className="w-full">
+            <Collapsible defaultOpen>
+              <FrameHeader className="flex-row items-center justify-between p-2">
+                <CollapsibleTrigger
+                  className="data-panel-open:[&_svg]:rotate-180"
+                  render={<Button variant="plain" />}
+                >
+                  <IconChevronDown className="size-4" />
+                  Casas
+                </CollapsibleTrigger>
+                <IconHome className="size-4 text-muted-foreground" />
+              </FrameHeader>
+              <CollapsiblePanel>
+                {owner.houses.length > 0 ? (
+                  <div className="space-y-1">
+                    {owner.houses.map((house) => {
+                      const houseAddress = [house.street, house.city, house.state].filter(Boolean).join(', ')
 
-          {/* Violations */}
-          <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger
-              render={
-                <Button variant="plain">
-                  <span className="flex items-center gap-2">
-                    <IconAlertTriangle className="size-4 text-muted-foreground" />
-                    <h3 className="font-medium text-muted-foreground text-sm">Infracciones</h3>
-                    <Badge variant="outline">{owner.violations.length}</Badge>
-                  </span>
-                </Button>
-              }
-            />
-            <CollapsibleContent>
-              {owner.violations.length > 0 ? (
-                <div className="space-y-2">
-                  {owner.violations.map((violation) => (
-                    <div key={violation.id} className="rounded-lg border p-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm">{violation.concept}</p>
-                          <p className="mt-1 text-muted-foreground text-xs">
-                            Monto: ${Number(violation.amount).toFixed(2)}
-                          </p>
-                          {violation.violationDate && (
-                            <p className="mt-1 text-muted-foreground text-xs">
-                              {new Date(violation.violationDate).toLocaleDateString('es-MX', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: '2-digit',
-                              })}
-                            </p>
-                          )}
-                        </div>
-                        <Badge variant={violation.status === 'paid' ? 'default' : 'destructive'}>
-                          {violation.status === 'paid' ? 'Pagada' : 'Pendiente'}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <Empty className="border border-dashed p-3">
-                  <EmptyHeader>
-                    <EmptyDescription>No tiene infracciones registradas.</EmptyDescription>
-                  </EmptyHeader>
-                </Empty>
-              )}
-            </CollapsibleContent>
-          </Collapsible>
-
-          {/* Pending Payments */}
-          <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger
-              render={
-                <Button variant="plain">
-                  <span className="flex items-center gap-2">
-                    <IconCash className="size-4 text-muted-foreground" />
-                    <h3 className="font-medium text-muted-foreground text-sm">Pagos pendientes</h3>
-                    <Badge variant="outline">{pendingPayments.length}</Badge>
-                  </span>
-                </Button>
-              }
-            />
-            <CollapsibleContent>
-              {pendingPayments.length > 0 ? (
-                <div className="space-y-2">
-                  {pendingPayments.map((payment) => (
-                    <div key={payment.id} className="rounded-lg border p-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium">
-                            {payment.paymentType === 'monthly_fee' ? 'Cuota mensual' : 'Infracción'}
-                          </p>
-                          <p className="mt-1 text-muted-foreground text-sm">
-                            Monto: ${Number(payment.amount).toFixed(2)}
-                          </p>
-                          {payment.month && (
-                            <p className="mt-1 text-muted-foreground text-xs">Mes: {payment.month}</p>
-                          )}
-                        </div>
-                        <Badge variant="destructive">Pendiente</Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <Empty className="border border-dashed p-3">
-                  <EmptyHeader>
-                    <EmptyDescription>No tiene pagos pendientes.</EmptyDescription>
-                  </EmptyHeader>
-                </Empty>
-              )}
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-        <SheetFooter className="block border-t">
-          {/* Metadata */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-muted-foreground text-xs">
-              <span>Fecha de registro</span>
-              <span>
-                {new Date(owner.createdAt).toLocaleDateString('es-MX', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: '2-digit',
-                })}
-              </span>
-            </div>
-            {owner.updatedAt &&
-              new Date(owner.updatedAt).getTime() !== new Date(owner.createdAt).getTime() && (
-                <div className="flex items-center justify-between text-muted-foreground text-xs">
-                  <span>Última actualización</span>
-                  <span>
-                    {new Date(owner.updatedAt).toLocaleDateString('es-MX', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: '2-digit',
+                      return (
+                        <FramePanel key={house.id} className="p-2">
+                          <div className="flex items-center gap-2">
+                            <div className="min-w-0 flex-1">
+                              <Badge variant="outline">{house.houseNumber}</Badge>
+                              {houseAddress && (
+                                <p className="text-muted-foreground text-sm">{houseAddress}</p>
+                              )}
+                              {house.zipCode && (
+                                <p className="text-muted-foreground text-sm">CP: {house.zipCode}</p>
+                              )}
+                            </div>
+                            <CopyButton tooltipText="Copiar ID" value={house.id} />
+                          </div>
+                        </FramePanel>
+                      )
                     })}
-                  </span>
-                </div>
-              )}
+                  </div>
+                ) : (
+                  <FramePanel className="p-2">
+                    <Empty className="p-0 md:p-0">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon" className="mb-1">
+                          <IconWind />
+                        </EmptyMedia>
+                        <EmptyDescription>Sin casas asignadas.</EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </FramePanel>
+                )}
+              </CollapsiblePanel>
+            </Collapsible>
+          </Frame>
+
+          {/* Violations info */}
+          <Frame className="w-full">
+            <Collapsible defaultOpen>
+              <FrameHeader className="flex-row items-center justify-between p-2">
+                <CollapsibleTrigger
+                  className="data-panel-open:[&_svg]:rotate-180"
+                  render={<Button variant="plain" />}
+                >
+                  <IconChevronDown className="size-4" />
+                  Infracciones
+                  <Badge variant="outline">{owner.violations.length}</Badge>
+                </CollapsibleTrigger>
+                <IconAlertTriangle className="size-4 text-muted-foreground" />
+              </FrameHeader>
+              <CollapsiblePanel>
+                {owner.violations.length > 0 ? (
+                  <div className="space-y-1">
+                    {owner.violations.map((violation) => {
+                      const isViolationPaid = violation.status === 'paid'
+
+                      return (
+                        <FramePanel key={violation.id} className="p-2">
+                          <div className="flex items-center gap-2">
+                            <div className="min-w-0 flex-1">
+                              <Badge variant={isViolationPaid ? 'success' : 'error'}>
+                                {isViolationPaid ? 'Pagada' : 'Pendiente'}
+                              </Badge>
+                              <h2 className="font-medium text-sm tabular-nums">{`$${Number(violation.amount).toFixed(2)}`}</h2>
+                              <p className="text-muted-foreground text-sm">{violation.concept}</p>
+                              <p className="text-muted-foreground text-xs">
+                                {formatDate(violation.violationDate)}
+                              </p>
+                            </div>
+
+                            <CopyButton tooltipText="Copiar ID" value={violation.id} />
+                          </div>
+                        </FramePanel>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <FramePanel className="p-2">
+                    <Empty className="p-0 md:p-0">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon" className="mb-1">
+                          <IconWind />
+                        </EmptyMedia>
+                        <EmptyDescription>Sin infracciones pendientes.</EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </FramePanel>
+                )}
+              </CollapsiblePanel>
+            </Collapsible>
+          </Frame>
+
+          {/* Peding payments */}
+          <Frame className="w-full">
+            <Collapsible defaultOpen>
+              <FrameHeader className="flex-row items-center justify-between p-2">
+                <CollapsibleTrigger
+                  className="data-panel-open:[&_svg]:rotate-180"
+                  render={<Button variant="plain" />}
+                >
+                  <IconChevronDown className="size-4" />
+                  Pagos pendientes
+                  <Badge variant="outline">{pendingPayments.length}</Badge>
+                </CollapsibleTrigger>
+                <IconCash className="size-4 text-muted-foreground" />
+              </FrameHeader>
+              <CollapsiblePanel>
+                {pendingPayments.length > 0 ? (
+                  <div className="space-y-1">
+                    {pendingPayments.map((payment) => {
+                      const isPaymentPaid = payment.status === 'paid'
+                      const paymentLabel =
+                        payment.paymentType === 'monthly_fee' ? 'Cuota mensual' : 'Infracción'
+
+                      return (
+                        <FramePanel key={payment.id} className="p-2">
+                          <div className="flex items-center gap-2">
+                            <div className="min-w-0 flex-1">
+                              <Badge variant={isPaymentPaid ? 'success' : 'error'}>
+                                {isPaymentPaid ? 'Pagada' : 'Pendiente'}
+                              </Badge>
+                              <h2 className="font-medium text-sm tabular-nums">{`$${Number(payment.amount).toFixed(2)}`}</h2>
+                              {/* TODO: Improve the month display */}
+                              <p className="text-muted-foreground text-sm">{payment.month}</p>
+                              <p className="text-muted-foreground text-xs">{paymentLabel}</p>
+                            </div>
+
+                            <CopyButton tooltipText="Copiar ID" value={payment.id} />
+                          </div>
+                        </FramePanel>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <FramePanel className="p-2">
+                    <Empty className="p-0 md:p-0">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon" className="mb-1">
+                          <IconWind />
+                        </EmptyMedia>
+                        <EmptyDescription>Sin pagos pendientes.</EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </FramePanel>
+                )}
+              </CollapsiblePanel>
+            </Collapsible>
+          </Frame>
+        </SheetPanel>
+
+        <SheetFooter className="block space-y-1">
+          {/* Metadata */}
+          <div className="flex items-center justify-between text-muted-foreground text-xs">
+            <span>Fecha de registro</span>
+            <span>{formatDate(owner.createdAt)}</span>
           </div>
+          {owner.updatedAt && new Date(owner.updatedAt).getTime() > new Date(owner.createdAt).getTime() && (
+            <div className="flex items-center justify-between text-muted-foreground text-xs">
+              <span>Última actualización</span>
+              <span>{formatDate(owner.updatedAt)}</span>
+            </div>
+          )}
         </SheetFooter>
       </SheetContent>
     </Sheet>

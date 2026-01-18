@@ -24,10 +24,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              size="lg"
               render={
                 <Link to="/">
-                  <ResidoIcon className="size-6" />
-                  <span className="font-medium text-base">Resido</span>
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary">
+                    <ResidoIcon className="size-4 text-sidebar-primary-foreground" />
+                  </div>
+
+                  <div className="grid flex-1 text-left text-sm leading-none">
+                    <span className="truncate font-medium text-base text-sidebar-accent-foreground">
+                      Resido
+                    </span>
+                    <span className="truncate text-sidebar-foreground text-xs">Manejo residencial</span>
+                  </div>
                 </Link>
               }
             />
@@ -47,7 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
-        <NavAdmin className="mt-auto" />
+        <NavAdmin />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

@@ -1,15 +1,17 @@
-import { IconHome, IconMail, IconMapPin, IconPhone, IconUser, IconUserHeart } from '@tabler/icons-react'
+import { IconChevronDown, IconHome, IconUserHeart, IconWind } from '@tabler/icons-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
-import { Empty, EmptyDescription, EmptyHeader } from '@/components/ui/empty'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
+import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
-  SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
+  SheetPanel,
+  SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { HouseWithOwner } from '@/db/schemas/zod'
@@ -29,120 +31,110 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto">
+      <SheetPopup>
         <SheetHeader>
           <SheetTitle>Información de la casa</SheetTitle>
           <SheetDescription>Información completa y detallada de la casa</SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-4 px-4">
+        <SheetPanel className="space-y-4">
           {/* House info */}
-          <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger
-              render={
-                <Button variant="plain">
-                  <span className="flex items-center gap-2">
-                    <IconHome className="size-4 text-muted-foreground" />
-                    <h3 className="font-medium text-muted-foreground text-sm">Información de la casa</h3>
-                  </span>
-                </Button>
-              }
-            />
-            <CollapsibleContent>
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 rounded-lg border p-3">
+          <Frame className="w-full">
+            <Collapsible defaultOpen>
+              <FrameHeader className="flex-row items-center justify-between p-2">
+                <CollapsibleTrigger
+                  className="data-panel-open:[&_svg]:rotate-180"
+                  render={<Button variant="plain" />}
+                >
+                  <IconChevronDown className="size-4" />
+                  Información de la casa
+                </CollapsibleTrigger>
+                <IconHome className="size-4 text-muted-foreground" />
+              </FrameHeader>
+              <CollapsiblePanel className="space-y-1">
+                <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <Badge variant="outline">{house.houseNumber}</Badge>
                     <p className="truncate font-mono text-muted-foreground text-xs">{house.id}</p>
                   </div>
-                  <CopyButton value={house.id} />
-                </div>
-
+                  <CopyButton tooltipText="Copiar ID" value={house.id} />
+                </FramePanel>
                 {houseAddress && (
-                  <div className="flex items-center gap-3 rounded-lg border p-3">
-                    <IconMapPin className="size-5 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-muted-foreground text-xs">Dirección</p>
-                      <p className="line-clamp-2 text-sm">{houseAddress}</p>
-                      {house.zipCode && <p className="text-xs">CP: {house.zipCode}</p>}
-                    </div>
-                  </div>
+                  <FramePanel className="p-2">
+                    <h2 className="font-medium text-sm">Direccón</h2>
+                    <p className="line-clamp-2 text-muted-foreground text-sm">{houseAddress}</p>
+                  </FramePanel>
                 )}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+              </CollapsiblePanel>
+            </Collapsible>
+          </Frame>
 
           {/* Owner info */}
-          <Collapsible defaultOpen className="space-y-2">
-            <CollapsibleTrigger
-              render={
-                <Button variant="plain">
-                  <span className="flex items-center gap-2">
-                    <IconUserHeart className="size-4 text-muted-foreground" />
-                    <h3 className="font-medium text-muted-foreground text-sm">Propietario</h3>
-                  </span>
-                </Button>
-              }
-            />
-            <CollapsibleContent>
-              {house.owner ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 rounded-lg border p-3">
-                    <IconUser className="size-5 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-muted-foreground text-xs">Nombre</p>
-                      <p className="line-clamp-2 text-sm">
-                        {`${house.owner.firstName} ${house.owner.lastName}`}
-                      </p>
-                      <p className="truncate font-mono text-muted-foreground text-xs">{house.owner.id}</p>
-                    </div>
-                    <CopyButton value={house.owner.id} />
+          <Frame className="w-full">
+            <Collapsible defaultOpen>
+              <FrameHeader className="flex-row items-center justify-between p-2">
+                <CollapsibleTrigger
+                  className="data-panel-open:[&_svg]:rotate-180"
+                  render={<Button variant="plain" />}
+                >
+                  <IconChevronDown className="size-4" />
+                  Propietario
+                </CollapsibleTrigger>
+                <IconUserHeart className="size-4 text-muted-foreground" />
+              </FrameHeader>
+              <CollapsiblePanel>
+                {house.owner ? (
+                  <div className="space-y-1">
+                    <FramePanel className="p-2">
+                      <div className="flex items-center gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h2 className="font-medium text-sm">Nombre</h2>
+                          <p className="text-muted-foreground text-sm">{`${house.owner.firstName} ${house.owner.lastName}`}</p>
+                          <p className="truncate font-mono text-muted-foreground text-xs">{house.owner.id}</p>
+                        </div>
+                        <CopyButton tooltipText="Copiar ID" value={house.id} />
+                      </div>
+                    </FramePanel>
+                    <FramePanel className="p-2">
+                      <h2 className="font-medium text-sm">Correo</h2>
+                      <p className="text-muted-foreground text-sm">{house.owner.email}</p>
+                    </FramePanel>
+                    <FramePanel className="p-2">
+                      <h2 className="font-medium text-sm">Teléfono</h2>
+                      <p className="text-muted-foreground text-sm">{house.owner.phone}</p>
+                    </FramePanel>
                   </div>
+                ) : (
+                  <FramePanel className="p-2">
+                    <Empty className="p-0 md:p-0">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon" className="mb-1">
+                          <IconWind />
+                        </EmptyMedia>
+                        <EmptyDescription>No tiene propietario asignado.</EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </FramePanel>
+                )}
+              </CollapsiblePanel>
+            </Collapsible>
+          </Frame>
+        </SheetPanel>
 
-                  <div className="flex items-center gap-3 rounded-lg border p-3">
-                    <IconMail className="size-5 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-muted-foreground text-xs">Correo</p>
-                      <p className="line-clamp-2 text-sm">{house.owner.email}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 rounded-lg border p-3">
-                    <IconPhone className="size-5 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-muted-foreground text-xs">Teléfono</p>
-                      <p className="line-clamp-2 text-sm">{house.owner.phone}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <Empty className="border border-dashed p-3">
-                  <EmptyHeader>
-                    <EmptyDescription>No tiene propietario asignado.</EmptyDescription>
-                  </EmptyHeader>
-                </Empty>
-              )}
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-
-        <SheetFooter className="block border-t">
+        <SheetFooter className="block space-y-1">
           {/* Metadata */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-muted-foreground text-xs">
-              <span>Fecha de registro</span>
-              <span>{formatDate(house.createdAt)}</span>
-            </div>
-            {house.updatedAt &&
-              new Date(house.updatedAt).getTime() !== new Date(house.createdAt).getTime() && (
-                <div className="flex items-center justify-between text-muted-foreground text-xs">
-                  <span>Última actualización</span>
-                  <span>{formatDate(house.updatedAt)}</span>
-                </div>
-              )}
+          <div className="flex items-center justify-between text-muted-foreground text-xs">
+            <span>Fecha de registro</span>
+            <span>{formatDate(house.createdAt)}</span>
           </div>
+          {house.updatedAt && new Date(house.updatedAt).getTime() > new Date(house.createdAt).getTime() && (
+            <div className="flex items-center justify-between text-muted-foreground text-xs">
+              <span>Última actualización</span>
+              <span>{formatDate(house.updatedAt)}</span>
+            </div>
+          )}
         </SheetFooter>
-      </SheetContent>
+      </SheetPopup>
     </Sheet>
   )
 }

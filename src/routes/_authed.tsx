@@ -17,7 +17,7 @@ function RouteComponent() {
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        <section className="flex w-full flex-1 flex-col gap-4 p-4 xl:mx-auto xl:max-w-7xl">
+        <section className="flex w-full flex-1 flex-col gap-4 p-6 xl:mx-auto xl:max-w-7xl">
           <Outlet />
         </section>
       </SidebarInset>
