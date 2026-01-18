@@ -4,7 +4,6 @@ import { Providers } from '@/components/providers'
 import { DefaultErrorBoundary } from '@/components/shared/errors/default-boundary'
 import { NotFound } from '@/components/shared/errors/not-found'
 // import { TSDevtools } from '@/components/tanstack/devtools'
-import { Toaster } from '@/components/ui/sonner'
 import { LINK_ICONS } from '@/config/site'
 import { createSEOMeta } from '@/lib/seo'
 import appCss from '@/styles/app.css?url'
@@ -49,11 +48,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="relative flex min-h-dvh flex-col antialiased">
-        <Providers>{children}</Providers>
+      <body className="relative">
+        <Providers>
+          <main className="isolate flex min-h-dvh flex-col antialiased">{children}</main>
+        </Providers>
         {/* <TSDevtools /> */}
         <Scripts />
-        <Toaster />
       </body>
     </html>
   )

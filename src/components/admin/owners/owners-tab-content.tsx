@@ -10,7 +10,9 @@ export function OwnersTabContent() {
   const { data: owners = [], isLoading, error, refetch } = useQuery(ownersListQueryOptions())
 
   if (error) {
-    return <TSQueryGenericError refetch={refetch} />
+    return (
+      <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar los propietarios." />
+    )
   }
 
   if (isLoading) {

@@ -1,7 +1,7 @@
 import { useQueryState } from 'nuqs'
 import { ExternalUsersTabContent } from '@/components/admin/external-users/external-users-tab-content'
 import { OwnersTabContent } from '@/components/admin/owners/owners-tab-content'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { HousesTabContent } from './houses/houses-tab-content'
 import { PaymentsTabContent } from './payments/payments-tab-content'
 import { ViolationsTabContent } from './violations/violations-tab-content'
@@ -14,32 +14,32 @@ export function AdministrationTabs() {
   return (
     <Tabs value={tab} onValueChange={(value) => setTab(value)}>
       <TabsList className="flex w-full justify-start overflow-hidden overflow-x-auto sm:w-fit sm:justify-center">
-        <TabsTrigger value="owners">Propietarios</TabsTrigger>
-        <TabsTrigger value="houses">Casas</TabsTrigger>
-        <TabsTrigger value="violations">Infracciones</TabsTrigger>
-        <TabsTrigger value="payments">Pagos</TabsTrigger>
-        <TabsTrigger value="external-users">Usuarios externos</TabsTrigger>
+        <TabsTab value="owners">Propietarios</TabsTab>
+        <TabsTab value="houses">Casas</TabsTab>
+        <TabsTab value="violations">Infracciones</TabsTab>
+        <TabsTab value="payments">Pagos</TabsTab>
+        <TabsTab value="external-users">Usuarios externos</TabsTab>
       </TabsList>
 
-      <TabsContent value="owners">
+      <TabsPanel value="owners">
         <OwnersTabContent />
-      </TabsContent>
+      </TabsPanel>
 
-      <TabsContent value="houses">
+      <TabsPanel value="houses">
         <HousesTabContent />
-      </TabsContent>
+      </TabsPanel>
 
-      <TabsContent value="violations">
+      <TabsPanel value="violations">
         <ViolationsTabContent />
-      </TabsContent>
+      </TabsPanel>
 
-      <TabsContent value="payments">
+      <TabsPanel value="payments">
         <PaymentsTabContent />
-      </TabsContent>
+      </TabsPanel>
 
-      <TabsContent value="external-users">
+      <TabsPanel value="external-users">
         <ExternalUsersTabContent />
-      </TabsContent>
+      </TabsPanel>
     </Tabs>
   )
 }

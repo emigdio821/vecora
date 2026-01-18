@@ -3,22 +3,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
+  AlertDialogClose,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogMedia,
+  AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
@@ -31,7 +29,7 @@ interface OwnersDataTableHeaderProps {
 
 export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
   const [openCreateOwnerDialog, setOpenCreateOwnerDialog] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-owners', parseAsString.withDefault(''))
   const queryClient = useQueryClient()
@@ -54,18 +52,35 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
     onSuccess: ({ fulfilled, rejected }) => {
       queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
       table.resetRowSelection()
-      setIsDeleteDialogOpen(false)
+      setDeleteDialogOpen(false)
 
       if (rejected === 0) {
-        toast.success('Propietarios seleccionados fueron eliminados exitosamente.')
+        toastManager.add({
+          type: 'success',
+          title: 'Propietarios eliminados',
+          description: 'Los propietarios seleccionados han sido eliminados exitosamente.',
+        })
       } else if (fulfilled === 0) {
-        toast.error('Ocurrió un error al eliminar los propietarios, intenta nuevamente.')
+        toastManager.add({
+          type: 'error',
+          title: 'Error',
+          description: 'Ocurrió un error al eliminar los propietarios, intenta nuevamente.',
+        })
       } else {
-        toast.warning(`${fulfilled} eliminados, ${rejected} fallaron.`)
+        toastManager.add({
+          type: 'warning',
+          title: 'Advertencia',
+          description: `${fulfilled} eliminados, ${rejected} fallaron.`,
+        })
       }
     },
-    onError: () => {
-      toast.error('Ocurrió un error al eliminar los propietarios, intenta nuevamente.')
+    onError: (error) => {
+      console.error('Error deleting owners:', error)
+      toastManager.add({
+        type: 'error',
+        title: 'Error',
+        description: 'Ocurrió un error al eliminar los propietarios, intenta nuevamente.',
+      })
     },
   })
 
@@ -81,12 +96,9 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
     <>
       <CreateOwnerSheet state={{ isOpen: openCreateOwnerDialog, onOpenChange: setOpenCreateOwnerDialog }} />
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent size="sm">
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogMedia>
-              <IconTrash className="text-destructive" />
-            </AlertDialogMedia>
             <AlertDialogTitle>¿Eliminar propietarios?</AlertDialogTitle>
             <AlertDialogDescription
               render={
@@ -100,44 +112,54 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
             />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={batchDeleteMutation.isPending}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleBatchDelete}
-              disabled={batchDeleteMutation.isPending}
+            <AlertDialogClose render={<Button variant="outline" disabled={batchDeleteMutation.isPending} />}>
+              Cancelar
+            </AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant="destructive"
+                  onClick={handleBatchDelete}
+                  disabled={batchDeleteMutation.isPending}
+                />
+              }
             >
               Eliminar
               {batchDeleteMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
+            </AlertDialogClose>
           </AlertDialogFooter>
-        </AlertDialogContent>
+        </AlertDialogPopup>
       </AlertDialog>
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full sm:w-sm">
           <InputGroupInput
+            type="search"
             value={searchQuery}
+            aria-label="Buscar"
+            placeholder="Buscar"
             name="search-owners"
-            placeholder="Buscar..."
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
-          <InputGroupAddon align="inline-start">
-            <IconSearch className="size-4" />
+          <InputGroupAddon>
+            <IconSearch />
           </InputGroupAddon>
+
           <InputGroupAddon align="inline-end">
             <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
               <TooltipTrigger
                 render={
-                  <InputGroupButton
+                  <Button
                     size="icon-xs"
-                    className="rounded-full"
+                    variant="ghost"
+                    className="cursor-default"
                     onClick={(e) => {
                       e.preventBaseUIHandler()
                       setSearchTooltipOpen(true)
                     }}
                   >
                     <IconInfoCircle className="size-4" />
-                  </InputGroupButton>
+                  </Button>
                 }
               />
               <TooltipContent>Buscar por nombre.</TooltipContent>
@@ -152,9 +174,9 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
                 render={
                   <Button
                     size="icon"
-                    variant="destructive"
+                    variant="destructive-outline"
                     aria-label="Borrar propietario"
-                    onClick={() => setIsDeleteDialogOpen(true)}
+                    onClick={() => setDeleteDialogOpen(true)}
                   >
                     <IconTrash className="size-4" />
                   </Button>

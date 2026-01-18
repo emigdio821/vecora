@@ -2,10 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PhoneInput } from '@/components/ui/phone-input'
 import {
@@ -15,8 +15,10 @@ import {
   SheetDescription,
   SheetFooter,
   SheetHeader,
+  SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { toastManager } from '@/components/ui/toast'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import { type UpdateOwnerFormData, updateOwner, updateOwnerSchema } from '@/server-fns/owners'
@@ -52,10 +54,20 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
       onOpenChange(false)
-      toast.success('Propietario actualizado exitosamente.')
+      toastManager.add({
+        type: 'success',
+        title: 'Propietario actualizado',
+        description: 'El propietario ha sido actualizado exitosamente.',
+      })
     },
-    onError: () => {
-      toast.error('Ocurrió un error al actualizar el propietario, intenta nuevamente.')
+    onError: (error) => {
+      console.error('Error updating owner:', error)
+
+      toastManager.add({
+        type: 'error',
+        title: 'Error',
+        description: 'Ocurrió un error al actualizar el propietario, intenta nuevamente.',
+      })
     },
   })
 
@@ -76,98 +88,96 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
         if (!isOpen) form.reset()
       }}
     >
-      <SheetContent className="overflow-y-auto">
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Editar propietario</SheetTitle>
           <SheetDescription>Actualiza la información del propietario.</SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1">
-          <form id={editOwnerFormId} onSubmit={form.handleSubmit(onSubmit)}>
-            <FieldGroup className="px-4">
-              <Controller
-                name="firstName"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Nombre <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={updateOwnerMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+        <SheetPanel>
+          <Form id={editOwnerFormId} aria-label="Editar propietario" onSubmit={form.handleSubmit(onSubmit)}>
+            <Controller
+              name="firstName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Nombre <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateOwnerMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="lastName"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Apellido <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={updateOwnerMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <Controller
+              name="lastName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Apellido <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateOwnerMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="phone"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Teléfono <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <PhoneInput
-                      id={field.name}
-                      value={field.value}
-                      onBlur={field.onBlur}
-                      disabled={updateOwnerMutation.isPending}
-                      onChange={(value) => {
-                        field.onChange(value || '')
-                      }}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <Controller
+              name="phone"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Teléfono <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <PhoneInput
+                    id={field.name}
+                    value={field.value}
+                    onBlur={field.onBlur}
+                    disabled={updateOwnerMutation.isPending}
+                    onChange={(value) => {
+                      field.onChange(value || '')
+                    }}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="email"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Correo <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      type="email"
-                      id={field.name}
-                      autoComplete="email"
-                      aria-invalid={fieldState.invalid}
-                      disabled={updateOwnerMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-          </form>
-        </div>
+            <Controller
+              name="email"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Correo <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    type="email"
+                    id={field.name}
+                    autoComplete="email"
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateOwnerMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+          </Form>
+        </SheetPanel>
 
         <SheetFooter>
           <SheetClose

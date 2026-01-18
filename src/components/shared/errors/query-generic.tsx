@@ -11,17 +11,21 @@ import {
 
 interface TSQueryGenericErrorProps extends React.ComponentProps<typeof Empty> {
   refetch: () => void
+  errorTitle?: React.ReactNode
+  errorDescription?: React.ReactNode
 }
 
-export function TSQueryGenericError({ refetch, ...props }: TSQueryGenericErrorProps) {
+export function TSQueryGenericError(props: TSQueryGenericErrorProps) {
+  const { refetch, errorTitle = 'Error', errorDescription = 'Algo salió mal.', ...emptyProps } = props
+
   return (
-    <Empty {...props}>
+    <Empty {...emptyProps}>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <IconBug className="size-4" />
+          <IconBug />
         </EmptyMedia>
-        <EmptyTitle>Error</EmptyTitle>
-        <EmptyDescription>Algo salió mal al cargar los propietarios.</EmptyDescription>
+        <EmptyTitle>{errorTitle}</EmptyTitle>
+        <EmptyDescription>{errorDescription}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <Button onClick={() => refetch()}>Reintentar</Button>

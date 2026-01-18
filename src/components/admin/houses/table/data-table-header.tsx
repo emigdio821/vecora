@@ -3,22 +3,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
+  AlertDialogClose,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogMedia,
+  AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { HouseWithOwner } from '@/db/schemas/zod'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
@@ -58,15 +56,32 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
       setDeleteDialogOpen(false)
 
       if (rejected === 0) {
-        toast.success('Casas seleccionadas fueron eliminadas exitosamente.')
+        toastManager.add({
+          type: 'success',
+          title: 'Casas eliminadas',
+          description: 'Las casas seleccionadas han sido eliminadas exitosamente.',
+        })
       } else if (fulfilled === 0) {
-        toast.error('Ocurrió un error al eliminar las casas, intenta nuevamente.')
+        toastManager.add({
+          type: 'error',
+          title: 'Error',
+          description: 'Ocurrió un error al eliminar las casas, intenta nuevamente.',
+        })
       } else {
-        toast.warning(`${fulfilled} eliminadas, ${rejected} fallaron.`)
+        toastManager.add({
+          type: 'warning',
+          title: 'Advertencia',
+          description: `${fulfilled} eliminadas, ${rejected} fallaron.`,
+        })
       }
     },
-    onError: () => {
-      toast.error('Ocurrió un error al eliminar las casas, intenta nuevamente.')
+    onError: (error) => {
+      console.error('Error deleting houses:', error)
+      toastManager.add({
+        type: 'error',
+        title: 'Error',
+        description: 'Ocurrió un error al eliminar las casas, intenta nuevamente.',
+      })
     },
   })
 
@@ -83,11 +98,8 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
       <CreateHouseSheet state={{ isOpen: openCreateOwnerDialog, onOpenChange: setOpenCreateOwnerDialog }} />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent size="sm">
+        <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogMedia>
-              <IconTrash className="text-destructive" />
-            </AlertDialogMedia>
             <AlertDialogTitle>¿Eliminar casas?</AlertDialogTitle>
             <AlertDialogDescription
               render={
@@ -101,44 +113,54 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
             />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={batchDeleteMutation.isPending}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleBatchDelete}
-              disabled={batchDeleteMutation.isPending}
+            <AlertDialogClose render={<Button variant="outline" disabled={batchDeleteMutation.isPending} />}>
+              Cancelar
+            </AlertDialogClose>
+            <AlertDialogClose
+              render={
+                <Button
+                  variant="destructive"
+                  onClick={handleBatchDelete}
+                  disabled={batchDeleteMutation.isPending}
+                />
+              }
             >
               Eliminar
               {batchDeleteMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
+            </AlertDialogClose>
           </AlertDialogFooter>
-        </AlertDialogContent>
+        </AlertDialogPopup>
       </AlertDialog>
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full sm:w-sm">
           <InputGroupInput
+            type="search"
             value={searchQuery}
+            aria-label="Buscar"
+            placeholder="Buscar"
             name="search-houses"
-            placeholder="Buscar..."
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
-          <InputGroupAddon align="inline-start">
-            <IconSearch className="size-4" />
+          <InputGroupAddon>
+            <IconSearch />
           </InputGroupAddon>
+
           <InputGroupAddon align="inline-end">
             <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
               <TooltipTrigger
                 render={
-                  <InputGroupButton
+                  <Button
                     size="icon-xs"
-                    className="rounded-full"
+                    variant="ghost"
+                    className="cursor-default"
                     onClick={(e) => {
                       e.preventBaseUIHandler()
                       setSearchTooltipOpen(true)
                     }}
                   >
                     <IconInfoCircle className="size-4" />
-                  </InputGroupButton>
+                  </Button>
                 }
               />
               <TooltipContent>Buscar por número de casa o propietario.</TooltipContent>
@@ -153,7 +175,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
                 render={
                   <Button
                     size="icon"
-                    variant="destructive"
+                    variant="destructive-outline"
                     aria-label="Borrar casas seleccionadas"
                     onClick={() => setDeleteDialogOpen(true)}
                   >

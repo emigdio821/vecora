@@ -2,22 +2,22 @@ import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSettings, IconSun 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'tanstack-theme-kit'
+import {
+  Menu,
+  MenuCheckboxItem,
+  MenuGroup,
+  MenuItem,
+  MenuPopup,
+  MenuPortal,
+  MenuSeparator,
+  MenuSub,
+  MenuSubPopup,
+  MenuSubTrigger,
+  MenuTrigger,
+} from '@/components/ui/menu'
 import { authClient } from '@/lib/auth-client'
 import { userProfileQueryOptions } from '@/lib/ts-queries/user'
 import { Avatar, AvatarFallback } from '../ui/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar'
 import { Skeleton } from '../ui/skeleton'
 
@@ -31,15 +31,18 @@ export function NavUser() {
   async function handleLogOut() {
     await authClient.signOut({
       fetchOptions: {
-        onSuccess: () => {
+        onSuccess: async () => {
           queryClient.clear()
-          navigate({ to: '/login' })
+          navigate({ to: '/login', reloadDocument: true })
+        },
+        onError: (error) => {
+          console.error('Error during sign out:', error)
         },
       },
     })
   }
 
-  if (isLoading) return <Skeleton className="h-12" />
+  if (isLoading) return <Skeleton className="h-12 rounded-lg" />
 
   if (error || !profile)
     return (
@@ -54,8 +57,8 @@ export function NavUser() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger
+        <Menu>
+          <MenuTrigger
             render={
               <SidebarMenuButton
                 size="lg"
@@ -73,32 +76,32 @@ export function NavUser() {
               </SidebarMenuButton>
             }
           />
-          <DropdownMenuContent className="sm:w-(--anchor-width)" align="start">
-            <DropdownMenuGroup>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
+          <MenuPopup className="w-(--anchor-width)" align="center">
+            <MenuGroup>
+              <MenuSub>
+                <MenuSubTrigger>
                   <IconMoon className="hidden size-4 dark:block" />
                   <IconSun className="size-4 dark:hidden" />
                   <span>Apariencia</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuCheckboxItem checked={theme === 'light'} onClick={() => setTheme('light')}>
+                </MenuSubTrigger>
+                <MenuPortal>
+                  <MenuSubPopup>
+                    <MenuCheckboxItem checked={theme === 'light'} onClick={() => setTheme('light')}>
                       Claro
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem checked={theme === 'dark'} onClick={() => setTheme('dark')}>
+                    </MenuCheckboxItem>
+                    <MenuCheckboxItem checked={theme === 'dark'} onClick={() => setTheme('dark')}>
                       Oscuro
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem checked={theme === 'system'} onClick={() => setTheme('system')}>
+                    </MenuCheckboxItem>
+                    <MenuCheckboxItem checked={theme === 'system'} onClick={() => setTheme('system')}>
                       Sistema
-                    </DropdownMenuCheckboxItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
-            </DropdownMenuGroup>
+                    </MenuCheckboxItem>
+                  </MenuSubPopup>
+                </MenuPortal>
+              </MenuSub>
+            </MenuGroup>
 
-            <DropdownMenuGroup>
-              <DropdownMenuItem
+            <MenuGroup>
+              <MenuItem
                 render={
                   <Link to="/settings">
                     <IconSettings className="size-4" />
@@ -106,18 +109,18 @@ export function NavUser() {
                   </Link>
                 }
               />
-            </DropdownMenuGroup>
+            </MenuGroup>
 
-            <DropdownMenuSeparator />
+            <MenuSeparator />
 
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={handleLogOut}>
+            <MenuGroup>
+              <MenuItem onClick={handleLogOut}>
                 <IconLogout className="size-4" />
                 Cerrar sesión
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </MenuItem>
+            </MenuGroup>
+          </MenuPopup>
+        </Menu>
       </SidebarMenuItem>
     </SidebarMenu>
   )

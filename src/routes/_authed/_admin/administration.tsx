@@ -8,8 +8,8 @@ export const Route = createFileRoute('/_authed/_admin/administration')({
 function RouteComponent() {
   return (
     <>
-      <div>
-        <h4 className="font-medium text-base leading-normal">Administración</h4>
+      <div className="flex flex-col gap-2">
+        <h4 className="font-heading font-medium text-lg leading-none">Administración</h4>
         <p className="text-muted-foreground text-sm">
           En esta sección puedes administrar los propietarios, casas, infracciones, pagos y usuarios externos.
         </p>

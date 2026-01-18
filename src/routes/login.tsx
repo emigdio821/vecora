@@ -1,20 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertOctagon } from '@tabler/icons-react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { LoaderIcon } from '@/components/icons'
+import { LoaderIcon, ResidoIcon } from '@/components/icons'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { SITE_CONFIG } from '@/config/site'
 import { authClient } from '@/lib/auth-client'
 import { createSEOTitle } from '@/lib/seo'
 import { getServerSession } from '@/server-fns/session'
 
+const DEFAULT_ERROR = 'Ocurrió un error al iniciar sesión, intenta nuevamente.'
+
 const loginSchema = z.object({
-  email: z.email().min(1, 'El email es requerido'),
+  email: z.email('Correo inválido').min(1, 'El correo es requerido'),
   password: z.string().min(1, 'La contraseña es requerida'),
 })
 
@@ -35,6 +40,7 @@ export const Route = createFileRoute('/login')({
 })
 
 function RouteComponent() {
+  const loginFormId = useId()
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -46,83 +52,115 @@ function RouteComponent() {
     },
   })
 
-  const onSubmit = async (data: LoginFormData) => {
+  async function onSubmit(data: LoginFormData) {
     setLoading(true)
     setError('')
 
     try {
-      const result = await authClient.signIn.email({
+      const { error } = await authClient.signIn.email({
         email: data.email,
         password: data.password,
         callbackURL: '/',
       })
 
-      if (result.error) {
-        setError(result.error.message || 'Invalid credentials')
+      if (error) {
+        setLoading(false)
+        console.error('login error:', error)
+
+        setError(error.status === 401 ? 'Crendeciales inválidas, intenta nuevamente.' : DEFAULT_ERROR)
       }
     } catch {
       setLoading(false)
-      setError('An unexpected error occurred')
+      setError(DEFAULT_ERROR)
     }
   }
 
   return (
-    <Card className="m-4 mx-auto w-full max-w-sm">
-      <CardHeader>
-        <CardTitle className="text-lg">Iniciar sesión</CardTitle>
-        <CardDescription className="flex items-center gap-1">
-          <span>Bienvenido a {SITE_CONFIG.title}</span>
-        </CardDescription>
-      </CardHeader>
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <div className="flex items-center gap-2 self-center">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <ResidoIcon className="size-4" />
+          </div>
+          <span className="font-medium text-base text-foreground">{SITE_CONFIG.title}</span>
+        </div>
 
-      <CardContent>
-        <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            <Controller
-              name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Correo <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Input {...field} id={field.name} aria-invalid={fieldState.invalid} disabled={isLoading} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-center text-lg">Iniciar sesión</CardTitle>
+            <CardDescription className="text-center">
+              Ingresa tus credenciales para acceder a tu cuenta.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <Form id={loginFormId} aria-label="Iniciar sesión" onSubmit={form.handleSubmit(onSubmit)}>
+              <Controller
+                name="email"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
+                  >
+                    <FieldLabel htmlFor={field.name}>
+                      Correo <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      autoComplete="email"
+                      disabled={isLoading}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="password"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
+                  >
+                    <FieldLabel htmlFor={field.name}>
+                      Contraseña <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="password"
+                      aria-invalid={fieldState.invalid}
+                      disabled={isLoading}
+                    />
+                    <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
+
+              {error && (
+                <Alert variant="error">
+                  <IconAlertOctagon className="size-4" />
+                  <AlertTitle>Algo salió mal al iniciar sesión</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-            />
+            </Form>
+          </CardContent>
 
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Contraseña <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="password"
-                    aria-invalid={fieldState.invalid}
-                    disabled={isLoading}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          {error && <div className="mt-4 text-destructive text-sm">{error}</div>}
-        </form>
-      </CardContent>
-
-      <CardFooter className="pt-4 text-center">
-        <Button type="submit" form="login-form" className="w-full" disabled={isLoading}>
-          Iniciar sesión
-          {isLoading && <LoaderIcon />}
-        </Button>
-      </CardFooter>
-    </Card>
+          <CardFooter className="pt-4 text-center">
+            <Button type="submit" form={loginFormId} className="w-full" disabled={isLoading}>
+              Iniciar sesión
+              {isLoading && <LoaderIcon />}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
   )
 }

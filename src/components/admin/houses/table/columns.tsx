@@ -29,7 +29,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   },
   {
     accessorKey: 'houseNumber',
-    header: 'Número de casa',
+    header: 'Número',
     cell: ({ row }) => <HouseNumberCell house={row.original} />,
     filterFn: (row, _, value: string) => {
       const ownerFullName = row.original.owner

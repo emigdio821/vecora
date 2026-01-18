@@ -1,5 +1,7 @@
+import { IconRefresh } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { userProfileQueryOptions } from '@/lib/ts-queries/user'
 
@@ -8,7 +10,7 @@ export const Route = createFileRoute('/_authed/')({
 })
 
 function RouteComponent() {
-  const { data: profile, isLoading: profileLoading } = useQuery(userProfileQueryOptions())
+  const { data: profile, isLoading: profileLoading, error, refetch } = useQuery(userProfileQueryOptions())
 
   if (profileLoading) {
     return (
@@ -17,6 +19,16 @@ function RouteComponent() {
       </div>
     )
   }
+
+  if (error || !profile)
+    return (
+      <Button onClick={() => refetch()} size="lg">
+        <div className="grid flex-1 text-left text-sm leading-tight">
+          <span className="truncate font-medium">Refetch profile</span>
+        </div>
+        <IconRefresh className="ml-auto size-4" />
+      </Button>
+    )
 
   return (
     <Card>

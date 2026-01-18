@@ -1,45 +1,32 @@
-import {
-  IconChevronLeft,
-  IconChevronLeftPipe,
-  IconChevronRight,
-  IconChevronRightPipe,
-} from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Pagination,
+  PaginationContent,
+  PaginationInitialPage,
+  PaginationItem,
+  PaginationLastPage,
+  PaginationNext,
+  PaginationPrevious,
+} from '../ui/pagination'
 
 interface DataTablePaginationProps<T> {
   table: Table<T>
-  withSelection?: boolean
   pageSizeOptions?: readonly number[]
 }
 
 export const DEFAULT_TABLE_PAGE_SIZE = 10
-const PAGE_SIZE_OPTIONS = [10, 20, 30, 40, 50] as const
+// const PAGE_SIZE_OPTIONS = [10, 20, 30, 40, 50] as const
 
-export function DataTablePagination<T>({
-  table,
-  withSelection = true,
-  pageSizeOptions = PAGE_SIZE_OPTIONS,
-}: DataTablePaginationProps<T>) {
-  const rowLength = table.getFilteredRowModel().rows.length
-  const pagination = table.getState().pagination
-  const { pageIndex, pageSize } = pagination
+export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
+  // const pagination = table.getState().pagination
+  // const { pageIndex, pageSize } = pagination
 
-  if (rowLength <= DEFAULT_TABLE_PAGE_SIZE) return null
-
-  function handlePageSizeChange(value: string | null) {
-    if (!value) return
-    table.setPageSize(Number(value))
-  }
+  // function handlePageSizeChange(value: string | null) {
+  //   if (!value) return
+  //   table.setPageSize(Number(value))
+  // }
 
   function handleFirstPage() {
     table.setPageIndex(0)
@@ -50,71 +37,114 @@ export function DataTablePagination<T>({
   }
 
   return (
-    <div className="flex flex-col items-center justify-end gap-2 sm:flex-row">
-      {withSelection && (
-        <div className="flex-1 text-muted-foreground text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} de {rowLength} seleccionados
-        </div>
-      )}
-      <div className="flex items-center space-x-1 lg:space-x-6">
-        <div className="flex items-center space-x-2">
-          <Label htmlFor="rows-per-page" className="font-normal">
-            Elementos por página:
-          </Label>
-          <Select name="rows-per-page" value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-            <SelectTrigger id="rows-per-page" className="w-16">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="min-w-24">
-              <SelectGroup>
-                {pageSizeOptions.map((size) => (
-                  <SelectItem key={size} value={size.toString()}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex min-w-25 items-center justify-center text-sm">
-          Página {pageIndex + 1} de {table.getPageCount()}
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            size="icon"
-            variant="outline"
-            className="hidden lg:flex"
-            onClick={handleFirstPage}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <span className="sr-only">Ir a primera página</span>
-            <IconChevronLeftPipe className="size-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={table.previousPage}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <span className="sr-only">Ir a página anterior</span>
-            <IconChevronLeft className="size-4" />
-          </Button>
-          <Button size="icon" variant="outline" onClick={table.nextPage} disabled={!table.getCanNextPage()}>
-            <span className="sr-only">Ir a página siguiente</span>
-            <IconChevronRight className="size-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            className="hidden lg:flex"
-            onClick={handleLastPage}
-            disabled={!table.getCanNextPage()}
-          >
-            <span className="sr-only">Ir a última página</span>
-            <IconChevronRightPipe className="size-4" />
-          </Button>
-        </div>
+    <>
+      <div className="flex w-full items-center gap-2">
+        <p className="text-muted-foreground text-sm">Mostrando</p>
+        <Select
+          items={Array.from({ length: table.getPageCount() }, (_, i) => {
+            const start = i * table.getState().pagination.pageSize + 1
+            const end = Math.min((i + 1) * table.getState().pagination.pageSize, table.getRowCount())
+            const pageNum = i + 1
+            return { label: `${start}-${end}`, value: pageNum }
+          })}
+          onValueChange={(value) => {
+            table.setPageIndex((value as number) - 1)
+          }}
+          value={table.getState().pagination.pageIndex + 1}
+        >
+          <SelectTrigger aria-label="Select result range" className="w-fit min-w-none" size="sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPopup>
+            {Array.from({ length: table.getPageCount() }, (_, i) => {
+              const start = i * table.getState().pagination.pageSize + 1
+              const end = Math.min((i + 1) * table.getState().pagination.pageSize, table.getRowCount())
+              const pageNum = i + 1
+              return (
+                <SelectItem key={pageNum} value={pageNum}>
+                  {`${start}-${end}`}
+                </SelectItem>
+              )
+            })}
+          </SelectPopup>
+        </Select>
+        <p className="text-muted-foreground text-sm">
+          de <strong className="font-medium text-foreground">{table.getRowCount()}</strong> resultados
+        </p>
       </div>
-    </div>
+
+      {/* <div className="flex items-center space-x-2">
+        <Label htmlFor="rows-per-page" className="font-normal">
+          Elementos por página:
+        </Label>
+        <Select name="rows-per-page" value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+          <SelectTrigger id="rows-per-page" className="w-16">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="min-w-24">
+            <SelectGroup>
+              {pageSizeOptions.map((size) => (
+                <SelectItem key={size} value={size.toString()}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div> */}
+
+      <Pagination className="justify-end">
+        <PaginationContent>
+          <PaginationItem className="hidden sm:block">
+            <PaginationInitialPage
+              render={
+                <Button
+                  size="icon-sm"
+                  variant="outline"
+                  disabled={!table.getCanPreviousPage()}
+                  onClick={handleFirstPage}
+                />
+              }
+            />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationPrevious
+              render={
+                <Button
+                  size="icon-sm"
+                  variant="outline"
+                  disabled={!table.getCanPreviousPage()}
+                  onClick={() => table.previousPage()}
+                />
+              }
+            />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext
+              render={
+                <Button
+                  size="icon-sm"
+                  variant="outline"
+                  disabled={!table.getCanNextPage()}
+                  onClick={() => table.nextPage()}
+                />
+              }
+            />
+          </PaginationItem>
+          <PaginationItem className="hidden sm:block">
+            <PaginationLastPage
+              render={
+                <Button
+                  size="icon-sm"
+                  variant="outline"
+                  disabled={!table.getCanNextPage()}
+                  onClick={handleLastPage}
+                />
+              }
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    </>
   )
 }

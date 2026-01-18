@@ -50,7 +50,7 @@
           "fix": "safe",
           "level": "error",
           "options": {
-            "attributes": ["classList"],
+            "attributes": ["classList", "iconClassName"],
             "functions": ["clsx", "cva", "tw", "tw.*"]
           }
         }

@@ -16,7 +16,7 @@ export const authAPIMiddleware = createMiddleware().server(async ({ next }) => {
   const session = await getServerSession()
 
   if (!session) {
-    return new Response('Unauthorized', { status: 401 })
+    throw new Error('Unauthorized')
   }
 
   return next({

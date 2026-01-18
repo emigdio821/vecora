@@ -2,10 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -22,8 +22,10 @@ import {
   SheetDescription,
   SheetFooter,
   SheetHeader,
+  SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { toastManager } from '@/components/ui/toast'
 import type { HouseWithOwner } from '@/db/schemas/zod'
 import { HOUSES_LIST_QUERY_KEY } from '@/lib/ts-queries/houses'
 import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
@@ -64,10 +66,19 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [HOUSES_LIST_QUERY_KEY] })
       onOpenChange(false)
-      toast.success('Casa actualizada exitosamente.')
+      toastManager.add({
+        type: 'success',
+        title: 'Casa actualizada',
+        description: 'La casa ha sido actualizada exitosamente.',
+      })
     },
-    onError: () => {
-      toast.error('Ocurrió un error al actualizar la casa, intenta nuevamente.')
+    onError: (error) => {
+      console.error('Error updating house:', error)
+      toastManager.add({
+        type: 'error',
+        title: 'Error',
+        description: 'Ocurrió un error al actualizar la casa, intenta nuevamente.',
+      })
     },
   })
 
@@ -95,135 +106,133 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
         if (!isOpen) form.reset()
       }}
     >
-      <SheetContent className="overflow-y-auto">
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Editar casa</SheetTitle>
           <SheetDescription>Actualiza la información de la casa.</SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1">
-          <form id={editHouseFormId} onSubmit={form.handleSubmit(onSubmit)}>
-            <FieldGroup className="px-4">
-              <Controller
-                name="houseNumber"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Número de casa <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={updateHouseMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+        <SheetPanel>
+          <Form id={editHouseFormId} aria-label="Editar casa" onSubmit={form.handleSubmit(onSubmit)}>
+            <Controller
+              name="houseNumber"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Número de casa <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateHouseMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="street"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Calle</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={updateHouseMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <Controller
+              name="street"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>Calle</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateHouseMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="city"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Ciudad</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={updateHouseMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <Controller
+              name="city"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>Ciudad</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateHouseMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="state"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Estado</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={updateHouseMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <Controller
+              name="state"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>Estado</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateHouseMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="zipCode"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Código postal</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={updateHouseMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <Controller
+              name="zipCode"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>Código postal</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateHouseMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="ownerId"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Propietario</FieldLabel>
-                    <Select
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      disabled={owners.length === 0 || isLoadingOwners}
-                    >
-                      <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
-                        <SelectValue>{renderOwnerValue}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectItem value={null}>Selecciona una opción</SelectItem>
-                          {owners.map((owner) => (
-                            <SelectItem key={owner.id} value={owner.id}>
-                              <span>{`${owner.firstName} ${owner.lastName}`}</span>
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+            <Controller
+              name="ownerId"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>Propietario</FieldLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={owners.length === 0 || isLoadingOwners}
+                  >
+                    <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
+                      <SelectValue>{renderOwnerValue}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value={null}>Sin selección</SelectItem>
+                        {owners.map((owner) => (
+                          <SelectItem key={owner.id} value={owner.id}>
+                            <span>{`${owner.firstName} ${owner.lastName}`}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
 
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-          </form>
-        </div>
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+          </Form>
+        </SheetPanel>
 
         <SheetFooter>
           <SheetClose

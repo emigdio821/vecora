@@ -1,30 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { LoaderIcon } from '@/components/icons'
+import { AvailableHousesSelector } from '@/components/shared/available-houses-selector'
 import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PhoneInput } from '@/components/ui/phone-input'
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
   Sheet,
   SheetClose,
-  SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
+  SheetPanel,
+  SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { AVAILABLE_HOUSES_QUERY_KEY, availableHousesQueryOptions } from '@/lib/ts-queries/houses'
+import { toastManager } from '@/components/ui/toast'
+import { AVAILABLE_HOUSES_QUERY_KEY } from '@/lib/ts-queries/houses'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import { type CreateOwnerFormData, createOwner, createOwnerSchema } from '@/server-fns/owners'
 
@@ -36,12 +32,9 @@ interface CreateOwnerDialogProps {
 }
 
 export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
+  const createOwnerFormId = useId()
   const { isOpen, onOpenChange } = state
   const queryClient = useQueryClient()
-
-  const { data: availableHouses = [], isLoading: isLoadingAvailableHouses } = useQuery(
-    availableHousesQueryOptions(),
-  )
 
   const form = useForm<CreateOwnerFormData>({
     shouldUnregister: true,
@@ -63,10 +56,20 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
       queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
       queryClient.invalidateQueries({ queryKey: [AVAILABLE_HOUSES_QUERY_KEY] })
       onOpenChange(false)
-      toast.success('Propietario creado exitosamente.')
+      toastManager.add({
+        type: 'success',
+        title: 'Propietario creado',
+        description: 'El propietario ha sido creado exitosamente.',
+      })
     },
-    onError: () => {
-      toast.error('Ocurrió un error al crear el propietario, intenta nuevamente.')
+    onError: (error) => {
+      console.error('Error creating owner:', error)
+
+      toastManager.add({
+        type: 'error',
+        title: 'Error',
+        description: 'Ocurrió un error al crear el propietario, intenta nuevamente.',
+      })
     },
   })
 
@@ -79,140 +82,119 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
     onOpenChange(open)
   }
 
-  function renderAvailableHousesValue(value: string | null) {
-    if (availableHouses.length === 0) return 'No hay casas disponibles'
-
-    const house = availableHouses.find((house) => house.id === value)
-    return house ? `${house.houseNumber}` : 'Selecciona una opción'
-  }
-
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetContent className="overflow-y-auto">
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Crear nuevo propietario</SheetTitle>
           <SheetDescription>Ingresa la información del nuevo propietario.</SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1">
-          <form id="create-owner-form" onSubmit={form.handleSubmit(onSubmit)}>
-            <FieldGroup className="px-4">
-              <Controller
-                name="firstName"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Nombre <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={createOwnerMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+        <SheetPanel>
+          <Form
+            id={createOwnerFormId}
+            aria-label="Crear nuevo propietario"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <Controller
+              name="firstName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Nombre <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={createOwnerMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="lastName"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Apellido <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={createOwnerMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <Controller
+              name="lastName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Apellido <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={createOwnerMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="phone"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Teléfono <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <PhoneInput
-                      id={field.name}
-                      onBlur={field.onBlur}
-                      disabled={createOwnerMutation.isPending}
-                      onChange={(value) => {
-                        field.onChange(value || '')
-                      }}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <Controller
+              name="phone"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Teléfono <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <PhoneInput
+                    id={field.name}
+                    onBlur={field.onBlur}
+                    disabled={createOwnerMutation.isPending}
+                    onChange={(value) => {
+                      field.onChange(value || '')
+                    }}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="email"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Correo <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      type="email"
-                      id={field.name}
-                      autoComplete="email"
-                      aria-invalid={fieldState.invalid}
-                      disabled={createOwnerMutation.isPending}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <Controller
+              name="email"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Correo <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    type="email"
+                    id={field.name}
+                    autoComplete="email"
+                    aria-invalid={fieldState.invalid}
+                    disabled={createOwnerMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
 
-              <Controller
-                name="houseId"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Casa</FieldLabel>
-                    <Select
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      disabled={availableHouses.length === 0 || isLoadingAvailableHouses}
-                    >
-                      <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
-                        {availableHouses.length === 0 ? (
-                          'No hay casas disponibles'
-                        ) : (
-                          <SelectValue>{renderAvailableHousesValue}</SelectValue>
-                        )}
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectItem value={null}>Selecciona una opción</SelectItem>
-                          {availableHouses.map((house) => (
-                            <SelectItem key={house.id} value={house.id}>
-                              {house.houseNumber}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-          </form>
-        </div>
+            <Controller
+              name="houseId"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>Casa</FieldLabel>
+                  <AvailableHousesSelector
+                    id={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={createOwnerMutation.isPending}
+                    invalid={fieldState.invalid}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+          </Form>
+        </SheetPanel>
 
         <SheetFooter>
           <SheetClose
@@ -222,12 +204,12 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
               </Button>
             }
           />
-          <Button type="submit" form="create-owner-form" disabled={createOwnerMutation.isPending}>
+          <Button type="submit" form={createOwnerFormId} disabled={createOwnerMutation.isPending}>
             Crear propietario
             {createOwnerMutation.isPending && <LoaderIcon />}
           </Button>
         </SheetFooter>
-      </SheetContent>
+      </SheetPopup>
     </Sheet>
   )
 }
