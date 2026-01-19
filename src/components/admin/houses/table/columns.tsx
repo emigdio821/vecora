@@ -63,7 +63,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   {
     accessorKey: 'street',
     header: 'Calle',
-    cell: ({ row }) => <p>{row.original.street}</p>,
+    cell: ({ row }) => <p className="tabular-nums">{row.original.street}</p>,
   },
   {
     accessorKey: 'city',
@@ -80,7 +80,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
     header: 'Código postal',
     cell: ({ row }) => {
       const zipCode = row.original.zipCode
-      return zipCode ? <p>{zipCode}</p> : <IconMinus className="size-4" />
+      return zipCode ? <p className="tabular-nums">{zipCode}</p> : <IconMinus className="size-4" />
     },
   },
   {

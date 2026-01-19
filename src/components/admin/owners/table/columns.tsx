@@ -45,11 +45,12 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   {
     accessorKey: 'email',
     header: 'Correo',
-    cell: ({ row }) => <span className="block max-w-36 truncate">{row.original.email}</span>,
+    cell: ({ row }) => <span className="block max-w-36 truncate tabular-nums">{row.original.email}</span>,
   },
   {
     accessorKey: 'phone',
     header: 'Teléfono',
+    cell: ({ row }) => <p className="tabular-nums">{row.original.phone}</p>,
   },
   {
     accessorKey: 'houses',
@@ -76,7 +77,9 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
       const violations = row.original.violations
 
       return violations.length > 0 ? (
-        <Badge variant="error">{violations.length}</Badge>
+        <Badge variant="error" className="tabular-nums">
+          {violations.length}
+        </Badge>
       ) : (
         <IconMinus className="size-4" />
       )
@@ -90,7 +93,9 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
         (p) => p.status === 'pending' && p.paymentType !== 'violation',
       )
       return payments.length > 0 ? (
-        <Badge variant="error">{payments.length}</Badge>
+        <Badge variant="error" className="tabular-nums">
+          {payments.length}
+        </Badge>
       ) : (
         <IconMinus className="size-4" />
       )

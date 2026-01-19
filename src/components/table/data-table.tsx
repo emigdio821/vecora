@@ -117,7 +117,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
           ) : (
             <TableRow>
               <TableCell className="h-24 text-center" colSpan={columns.length}>
-                No results.
+                Sin resultados.
               </TableCell>
             </TableRow>
           )}
