@@ -47,6 +47,20 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
     },
   },
   {
+    accessorKey: 'owner',
+    header: 'Propietario',
+    cell: ({ row }) => {
+      const owner = row.original.owner
+      return owner ? (
+        <p>
+          {owner.firstName} {owner.lastName}
+        </p>
+      ) : (
+        <IconMinus className="size-4" />
+      )
+    },
+  },
+  {
     accessorKey: 'street',
     header: 'Calle',
     cell: ({ row }) => <p>{row.original.street}</p>,
@@ -67,20 +81,6 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
     cell: ({ row }) => {
       const zipCode = row.original.zipCode
       return zipCode ? <p>{zipCode}</p> : <IconMinus className="size-4" />
-    },
-  },
-  {
-    accessorKey: 'owner',
-    header: 'Propietario',
-    cell: ({ row }) => {
-      const owner = row.original.owner
-      return owner ? (
-        <p>
-          {owner.firstName} {owner.lastName}
-        </p>
-      ) : (
-        <IconMinus className="size-4" />
-      )
     },
   },
   {

@@ -9,7 +9,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
         <ToastProvider>
           <AnchoredToastProvider>
-            <TooltipProvider>{children}</TooltipProvider>
+            <TooltipProvider delay={200}>{children}</TooltipProvider>
           </AnchoredToastProvider>
         </ToastProvider>
       </ThemeProvider>

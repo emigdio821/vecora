@@ -42,11 +42,7 @@ export function OwnersSelector({
   return (
     <Select value={value} disabled={owners.length === 0 || disabled} {...selectProps}>
       <SelectTrigger aria-invalid={invalid} className="w-full">
-        {owners.length === 0 ? (
-          'No hay casas disponibles'
-        ) : (
-          <SelectValue>{renderOwnerValue(value)}</SelectValue>
-        )}
+        <SelectValue>{renderOwnerValue(value)}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
