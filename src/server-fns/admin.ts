@@ -2,10 +2,10 @@ import { createServerFn } from '@tanstack/react-start'
 import { and, eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { roles, userRoles } from '@/db/schemas/main'
-import { authAPIMiddleware } from '@/middleware/auth'
+import { authMiddleware } from '@/middleware/auth'
 
 export const isAdminUser = createServerFn()
-  .middleware([authAPIMiddleware])
+  .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const { session } = context
 

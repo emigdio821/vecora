@@ -162,7 +162,7 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
                   </Button>
                 }
               />
-              <TooltipContent>Buscar por nombre.</TooltipContent>
+              <TooltipContent>Buscar por nombre</TooltipContent>
             </Tooltip>
           </InputGroupAddon>
         </InputGroup>
@@ -187,7 +187,7 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
           )}
 
           {tableRowsLength > 0 && (
-            <Button variant="outline">
+            <Button variant="outline" disabled>
               <IconFileExport className="size-4" />
               <span>Exportar</span>
               {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}

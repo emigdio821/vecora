@@ -6,10 +6,10 @@ import { db } from '@/db'
 import { houses, owners } from '@/db/schemas/main'
 import type { OwnerWithRelations, SelectOwner } from '@/db/schemas/zod'
 import { adminOnlyAPIMiddleware } from '@/middleware/admin'
-import { authAPIMiddleware } from '@/middleware/auth'
+import { authMiddleware } from '@/middleware/auth'
 
 export const getOwners = createServerFn()
-  .middleware([authAPIMiddleware])
+  .middleware([authMiddleware])
   .handler(async () => {
     const ownersData = await db.query.owners.findMany({
       with: {

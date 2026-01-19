@@ -3,10 +3,14 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { createSEOTitle } from '@/lib/seo'
 import { userProfileQueryOptions } from '@/lib/ts-queries/user'
 
 export const Route = createFileRoute('/_authed/')({
   component: RouteComponent,
+  head: () => ({
+    meta: [{ title: createSEOTitle('Inicio') }],
+  }),
 })
 
 function RouteComponent() {

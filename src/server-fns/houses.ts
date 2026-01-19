@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { db } from '@/db'
 import { houses } from '@/db/schemas/main'
 import type { HouseWithOwner, SelectHouse } from '@/db/schemas/zod'
-import { authAPIMiddleware } from '@/middleware/auth'
+import { authMiddleware } from '@/middleware/auth'
 
 export const createHouseSchema = z.object({
   houseNumber: z.string().min(1, 'El número de casa es requerido'),
@@ -30,7 +30,7 @@ export const updateHouseSchema = z.object({
 export type UpdateHouseFormData = z.infer<typeof updateHouseSchema>
 
 export const createHouse = createServerFn({ method: 'POST' })
-  .middleware([authAPIMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(createHouseSchema)
   .handler(async ({ data }) => {
     const [newHouse] = await db.insert(houses).values(data).returning()
@@ -38,7 +38,7 @@ export const createHouse = createServerFn({ method: 'POST' })
   })
 
 export const updateHouse = createServerFn({ method: 'POST' })
-  .middleware([authAPIMiddleware])
+  .middleware([authMiddleware])
   .inputValidator(updateHouseSchema)
   .handler(async ({ data }) => {
     const { houseId, ...updateData } = data
@@ -47,7 +47,7 @@ export const updateHouse = createServerFn({ method: 'POST' })
   })
 
 export const getHouses = createServerFn()
-  .middleware([authAPIMiddleware])
+  .middleware([authMiddleware])
   .handler(async () => {
     const allHouses = await db.query.houses.findMany({
       with: {
@@ -60,7 +60,7 @@ export const getHouses = createServerFn()
   })
 
 export const getAvailableHouses = createServerFn()
-  .middleware([authAPIMiddleware])
+  .middleware([authMiddleware])
   .handler(async () => {
     const availableHouses = await db.query.houses.findMany({
       where: isNull(houses.ownerId),

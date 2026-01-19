@@ -163,7 +163,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
                   </Button>
                 }
               />
-              <TooltipContent>Buscar por número de casa o propietario.</TooltipContent>
+              <TooltipContent>Buscar por número de casa o propietario</TooltipContent>
             </Tooltip>
           </InputGroupAddon>
         </InputGroup>
@@ -188,7 +188,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
           )}
 
           {tableRowsLength > 0 && (
-            <Button variant="outline">
+            <Button variant="outline" disabled>
               <IconFileExport className="size-4" />
               <span>Exportar</span>
               {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}

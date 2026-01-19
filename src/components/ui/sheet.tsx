@@ -1,7 +1,7 @@
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog'
 import { IconX } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
+// import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
 const Sheet = SheetPrimitive.Root
@@ -163,16 +163,20 @@ function SheetPanel({
   ...props
 }: React.ComponentProps<'div'> & { scrollFade?: boolean }) {
   return (
-    <ScrollArea scrollFade={scrollFade}>
-      <div
-        className={cn(
-          'px-6 in-[[data-slot=sheet-popup]:has([data-slot=sheet-header])]:pt-1 in-[[data-slot=sheet-popup]:not(:has([data-slot=sheet-header]))]:pt-6 in-[[data-slot=sheet-popup]:not(:has([data-slot=sheet-footer]))]:pb-6! in-[[data-slot=sheet-popup]:not(:has([data-slot=sheet-footer].border-t))]:pb-1 pb-6',
-          className,
-        )}
-        data-slot="sheet-panel"
-        {...props}
-      />
-    </ScrollArea>
+    // <ScrollArea scrollFade={scrollFade}>
+    //   <div
+    //     className={cn(
+    //       'px-6 in-[[data-slot=sheet-popup]:has([data-slot=sheet-header])]:pt-1 in-[[data-slot=sheet-popup]:not(:has([data-slot=sheet-header]))]:pt-6 in-[[data-slot=sheet-popup]:not(:has([data-slot=sheet-footer]))]:pb-6! in-[[data-slot=sheet-popup]:not(:has([data-slot=sheet-footer].border-t))]:pb-1 pb-6',
+    //       className,
+    //     )}
+    //     data-slot="sheet-panel"
+    //     {...props}
+    //   />
+    // </ScrollArea>
+    <div
+      className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 in-[[data-slot=sheet-popup]:has([data-slot=sheet-header])]:pt-1 in-[[data-slot=sheet-popup]:not(:has([data-slot=sheet-header]))]:pt-6 in-[[data-slot=sheet-popup]:not(:has([data-slot=sheet-footer]))]:pb-6! in-[[data-slot=sheet-popup]:not(:has([data-slot=sheet-footer].border-t))]:pb-1 pb-6"
+      {...props}
+    />
   )
 }
 

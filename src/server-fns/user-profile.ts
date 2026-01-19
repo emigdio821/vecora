@@ -3,10 +3,10 @@ import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { profiles, roles, userRoles } from '@/db/schemas/main'
 import { type ProfileResponse, profileResponseSchema } from '@/db/schemas/zod'
-import { authAPIMiddleware } from '@/middleware/auth'
+import { authMiddleware } from '@/middleware/auth'
 
 export const getUserProfile = createServerFn()
-  .middleware([authAPIMiddleware])
+  .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const { session } = context
 

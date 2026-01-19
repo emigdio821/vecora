@@ -1,4 +1,4 @@
-import { IconLayoutDashboard } from '@tabler/icons-react'
+import { IconHomeStats } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
 import {
   Sidebar,
@@ -46,8 +46,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               isActive={pathname === '/'}
               render={
                 <Link to="/">
-                  <IconLayoutDashboard className="size-4" />
-                  <span>Dashboard</span>
+                  <IconHomeStats className="size-4" />
+                  <span>Inicio</span>
                 </Link>
               }
             />
