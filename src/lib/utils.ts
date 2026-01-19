@@ -9,10 +9,14 @@ export function normalizeString(str: string) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
-export function formatDate(date: ConstructorParameters<typeof Date>[0]) {
+export function formatDate(
+  date: ConstructorParameters<typeof Date>[0],
+  options?: Intl.DateTimeFormatOptions,
+) {
   return new Date(date).toLocaleDateString('es-MX', {
     year: 'numeric',
     month: 'long',
     day: '2-digit',
+    ...options,
   })
 }

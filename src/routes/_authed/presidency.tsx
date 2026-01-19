@@ -9,5 +9,12 @@ export const Route = createFileRoute('/_authed/presidency')({
 })
 
 function RouteComponent() {
-  return <div>Presidency</div>
+  return (
+    <div className="flex flex-col gap-2">
+      <h4 className="font-heading font-medium text-lg leading-none">Presidencia</h4>
+      <p className="text-muted-foreground text-sm">
+        En esta sección puedes ver todo lo relacionado con presidencia.
+      </p>
+    </div>
+  )
 }
