@@ -22,9 +22,10 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
-import type { ViolationWithOwner } from '@/db/schemas/zod'
+import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
 import { VIOLATIONS_QUERY_KEY } from '@/lib/ts-queries/violations'
-import { type DeleteViolationData, deleteViolation } from '@/server-fns/violations'
+import type { DeleteViolationData } from '@/schemas/violations'
+import { deleteViolation } from '@/server-fns/violations'
 import { EditViolationSheet } from '../sheets/edit-violation'
 import { ViolationDetailsSheet } from '../sheets/violation-details'
 

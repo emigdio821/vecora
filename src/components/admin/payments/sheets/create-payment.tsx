@@ -30,10 +30,11 @@ import {
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
-import { type PaymentType, paymentTypeSchema } from '@/db/schemas/zod'
+import { type PaymentType, paymentTypeSchema } from '@/db/schemas/zod/payments'
 import { PAYMENTS_QUERY_KEY } from '@/lib/ts-queries/payments'
 import { getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
-import { type CreatePaymentFormData, createPayment, createPaymentSchema } from '@/server-fns/payments'
+import { type CreatePaymentFormData, createPaymentSchema } from '@/schemas/payments'
+import { createPayment } from '@/server-fns/payments'
 
 interface CreatePaymentDialogProps {
   state: {

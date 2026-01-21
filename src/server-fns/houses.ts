@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq, isNull } from 'drizzle-orm'
 import { db } from '@/db'
 import { houses } from '@/db/schemas/main'
-import type { HouseWithOwner, InsertHouse, SelectHouse } from '@/db/schemas/zod'
+import type { HouseWithOwner, InsertHouse, SelectHouse } from '@/db/schemas/zod/houses'
 import { authMiddleware } from '@/middleware/auth'
 import { createHouseSchema, updateHouseSchema } from '@/schemas/houses'
 

@@ -29,10 +29,15 @@ import {
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
-import { type PaymentType, type PaymentWithOwnerAndMonths, paymentTypeSchema } from '@/db/schemas/zod'
+import {
+  type PaymentType,
+  type PaymentWithOwnerAndMonths,
+  paymentTypeSchema,
+} from '@/db/schemas/zod/payments'
 import { PAYMENTS_QUERY_KEY } from '@/lib/ts-queries/payments'
 import { getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
-import { type UpdatePaymentFormData, updatePayment, updatePaymentSchema } from '@/server-fns/payments'
+import { type UpdatePaymentFormData, updatePaymentSchema } from '@/schemas/payments'
+import { updatePayment } from '@/server-fns/payments'
 
 interface UpdatePaymentSheetProps {
   state: {

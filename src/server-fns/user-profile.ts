@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { profiles, roles, userRoles } from '@/db/schemas/main'
-import { type ProfileResponse, profileResponseSchema } from '@/db/schemas/zod'
+import type { ProfileResponse } from '@/db/schemas/zod/profiles'
 import { authMiddleware } from '@/middleware/auth'
 
 export const getUserProfile = createServerFn()
@@ -45,10 +45,7 @@ export const getUserProfile = createServerFn()
         image: profile.user.image,
       }
 
-      // Validate response with Zod schema
-      const validatedResponse = profileResponseSchema.parse(response)
-
-      return validatedResponse
+      return response
     } catch (error) {
       console.error('Error fetching user profile:', error)
       throw error

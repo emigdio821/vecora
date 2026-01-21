@@ -31,11 +31,16 @@ import {
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
-import { type ViolationStatus, type ViolationWithOwner, violationStatusSchema } from '@/db/schemas/zod'
+import {
+  type ViolationStatus,
+  type ViolationWithOwner,
+  violationStatusSchema,
+} from '@/db/schemas/zod/violations'
 import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
 import { VIOLATIONS_QUERY_KEY } from '@/lib/ts-queries/violations'
 import { formatDate } from '@/lib/utils'
-import { type UpdateViolationFormData, updateViolation, updateViolationSchema } from '@/server-fns/violations'
+import { type UpdateViolationFormData, updateViolationSchema } from '@/schemas/violations'
+import { updateViolation } from '@/server-fns/violations'
 
 interface EditViolationSheetProps {
   violation: ViolationWithOwner
@@ -103,7 +108,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
     return owner ? `${owner.firstName} ${owner.lastName}` : 'Selecciona una opción'
   }
 
-  function renderStatusValue(value: ViolationStatus) {
+  function renderStatusValue(value: ViolationStatus | undefined) {
     if (!value) return 'Selecciona una opción'
 
     return value === 'pending' ? 'Pendiente' : 'Pagada'

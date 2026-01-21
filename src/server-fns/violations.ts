@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { violations } from '@/db/schemas/main'
-import type { InsertViolation, SelectViolation, ViolationWithOwner } from '@/db/schemas/zod'
+import type { InsertViolation, SelectViolation, ViolationWithOwner } from '@/db/schemas/zod/violations'
 import { authMiddleware } from '@/middleware/auth'
 import { createViolationSchema, deleteViolationSchema, updateViolationSchema } from '@/schemas/violations'
 

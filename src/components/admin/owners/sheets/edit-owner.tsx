@@ -19,9 +19,10 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { toastManager } from '@/components/ui/toast'
-import type { OwnerWithRelations } from '@/db/schemas/zod'
+import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
-import { type UpdateOwnerFormData, updateOwner, updateOwnerSchema } from '@/server-fns/owners'
+import { type UpdateOwnerFormData, updateOwnerSchema } from '@/schemas/owners'
+import { updateOwner } from '@/server-fns/owners'
 
 interface EditOwnerSheetProps {
   owner: OwnerWithRelations

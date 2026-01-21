@@ -22,10 +22,11 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
-import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod'
+import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
 import { PAYMENTS_QUERY_KEY } from '@/lib/ts-queries/payments'
 import { getPaymentTypeLabel } from '@/lib/utils'
-import { type DeletePaymentData, deletePayment } from '@/server-fns/payments'
+import type { DeletePaymentData } from '@/schemas/payments'
+import { deletePayment } from '@/server-fns/payments'
 import { EditPaymentSheet } from '../sheets/edit-payment'
 import { PaymentDetailsSheet } from '../sheets/payment-details'
 

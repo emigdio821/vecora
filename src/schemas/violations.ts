@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { violationStatusSchema } from '@/db/schemas/zod'
+import { violationStatusSchema } from '@/db/schemas/zod/violations'
 import { requiredAmountSchema } from './shared'
 
 export const createViolationSchema = z.object({

@@ -22,9 +22,10 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
-import type { HouseWithOwner } from '@/db/schemas/zod'
+import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
-import { type DeleteOwnerData, deleteOwner } from '@/server-fns/owners'
+import type { DeleteOwnerData } from '@/schemas/owners'
+import { deleteOwner } from '@/server-fns/owners'
 import { EditHouseSheet } from '../sheets/edit-house'
 import { HouseDetailsSheet } from '../sheets/house-details'
 

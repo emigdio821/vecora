@@ -26,10 +26,11 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { toastManager } from '@/components/ui/toast'
-import type { HouseWithOwner } from '@/db/schemas/zod'
+import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { HOUSES_LIST_QUERY_KEY } from '@/lib/ts-queries/houses'
 import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
-import { type UpdateHouseFormData, updateHouse, updateHouseSchema } from '@/server-fns/houses'
+import { type UpdateHouseFormData, updateHouseSchema } from '@/schemas/houses'
+import { updateHouse } from '@/server-fns/houses'
 
 interface EditHouseSheetProps {
   house: HouseWithOwner

@@ -21,7 +21,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { OwnerWithRelations } from '@/db/schemas/zod'
+import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
 import { cn, formatDate } from '@/lib/utils'
 
 interface OwnerDetailsSheetProps {

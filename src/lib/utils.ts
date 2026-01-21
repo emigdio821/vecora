@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import type { PaymentType } from '@/db/schemas/zod'
+import type { PaymentType } from '@/db/schemas/zod/payments'
 
 const DEFAULT_LOCALE: Intl.LocalesArgument = 'es-MX'
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
-import type { HouseWithOwner } from '@/db/schemas/zod'
+import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { HouseDetailsSheet } from '../sheets/house-details'
 
 interface HouseNumberCellProps {

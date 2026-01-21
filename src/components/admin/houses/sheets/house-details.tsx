@@ -14,7 +14,7 @@ import {
   SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HouseWithOwner } from '@/db/schemas/zod'
+import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { formatDate } from '@/lib/utils'
 
 interface HouseDetailsSheetProps {

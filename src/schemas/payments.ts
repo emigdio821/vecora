@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { paymentStatusSchema, paymentTypeSchema } from '@/db/schemas/zod'
+import { paymentStatusSchema, paymentTypeSchema } from '@/db/schemas/zod/payments'
 import { requiredAmountSchema } from './shared'
 
 export const createPaymentSchema = z

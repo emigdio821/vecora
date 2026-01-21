@@ -14,7 +14,7 @@ import {
   SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ViolationWithOwner } from '@/db/schemas/zod'
+import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
 import { cn, formatDate } from '@/lib/utils'
 
 interface ViolationDetailsSheetProps {
