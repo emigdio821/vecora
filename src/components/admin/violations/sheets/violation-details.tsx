@@ -15,7 +15,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { ViolationWithOwner } from '@/db/schemas/zod'
-import { formatDate } from '@/lib/utils'
+import { cn, formatDate } from '@/lib/utils'
 
 interface ViolationDetailsSheetProps {
   violation: ViolationWithOwner
@@ -27,6 +27,7 @@ interface ViolationDetailsSheetProps {
 
 export function ViolationDetailsSheet({ violation, state }: ViolationDetailsSheetProps) {
   const { isOpen, onOpenChange } = state
+  const isPaid = violation.status === 'paid'
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -68,8 +69,12 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
                 </FramePanel>
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Estado</h2>
-                  <Badge variant={violation.status === 'paid' ? 'success' : 'warning'}>
-                    {violation.status === 'paid' ? 'Pagada' : 'Pendiente'}
+                  <Badge variant="outline">
+                    <span
+                      aria-hidden
+                      className={cn('size-1.5 rounded-full', isPaid ? 'bg-success' : 'bg-warning')}
+                    />
+                    {isPaid ? 'Pagada' : 'Pendiente'}
                   </Badge>
                 </FramePanel>
               </CollapsiblePanel>

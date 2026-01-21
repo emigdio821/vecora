@@ -62,8 +62,8 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
               <CollapsiblePanel className="space-y-1">
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
-                    <h2 className="font-medium text-sm">{ownerFullName}</h2>
-                    <p className="truncate font-mono text-muted-foreground text-xs">{owner.id}</p>
+                    <h2 className="font-medium text-sm">Nombre</h2>
+                    <p className="line-clamp-2 text-muted-foreground text-sm">{ownerFullName}</p>
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={owner.id} />
                 </FramePanel>
@@ -106,7 +106,9 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                         <FramePanel key={house.id} className="p-2">
                           <div className="flex items-center gap-2">
                             <div className="min-w-0 flex-1">
-                              <Badge variant="outline">{house.houseNumber}</Badge>
+                              <Badge size="lg" variant="outline">
+                                {house.houseNumber}
+                              </Badge>
                               {houseAddress && (
                                 <p className="text-muted-foreground text-sm">{houseAddress}</p>
                               )}
@@ -159,7 +161,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                       return (
                         <FramePanel key={violation.id} className="p-2">
                           <div className="flex items-center gap-2">
-                            <div className="min-w-0 leading-none">
+                            <div className="min-w-0 flex-1 leading-none">
                               <Badge variant="outline">
                                 <span
                                   aria-hidden
@@ -237,7 +239,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                               </Badge>
                               <h2 className="font-medium text-sm">{`$${Number(payment.amount).toFixed(2)}`}</h2>
                               {/* TODO: Improve the month display */}
-                              <p className="text-muted-foreground text-sm">{payment.month}</p>
+                              {/* <p className="text-muted-foreground text-sm">{payment.mon}</p> */}
                               <p className="text-muted-foreground text-xs">{paymentLabel}</p>
                             </div>
 

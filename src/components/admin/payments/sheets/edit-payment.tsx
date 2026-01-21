@@ -1,0 +1,339 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Activity, useId } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { LoaderIcon } from '@/components/icons'
+import { OwnersSelector } from '@/components/shared/owners-selector'
+import { Button } from '@/components/ui/button'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Form } from '@/components/ui/form'
+import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
+import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetPanel,
+  SheetTitle,
+} from '@/components/ui/sheet'
+import { Textarea } from '@/components/ui/textarea'
+import { toastManager } from '@/components/ui/toast'
+import { type PaymentType, type PaymentWithOwnerAndMonths, paymentTypeSchema } from '@/db/schemas/zod'
+import { PAYMENTS_QUERY_KEY } from '@/lib/ts-queries/payments'
+import { getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
+import { type UpdatePaymentFormData, updatePayment, updatePaymentSchema } from '@/server-fns/payments'
+
+interface UpdatePaymentSheetProps {
+  state: {
+    isOpen: boolean
+    onOpenChange: (open: boolean) => void
+  }
+  payment: PaymentWithOwnerAndMonths
+}
+
+const MONTHS = getAllMonthsMap()
+
+export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
+  const updatePaymentFormId = useId()
+  const { isOpen, onOpenChange } = state
+  const queryClient = useQueryClient()
+
+  const form = useForm<UpdatePaymentFormData>({
+    shouldUnregister: true,
+    resolver: zodResolver(updatePaymentSchema),
+    defaultValues: {
+      paymentId: payment.id,
+      ownerId: payment.ownerId,
+      concept: payment.concept,
+      amount: payment.amount,
+      paymentType: payment.paymentType,
+      year: payment.year,
+      months: payment.paymentMonths.map((pm) => pm.month),
+      status: payment.status,
+      paidAt: payment.paidAt ? new Date(payment.paidAt) : undefined,
+    },
+  })
+
+  const watchPaymentType = form.watch('paymentType')
+
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: currentYear + 2 - 2020 + 1 }, (_, i) => 2020 + i)
+
+  const updatePaymentMutation = useMutation({
+    mutationFn: async (data: UpdatePaymentFormData) => {
+      return await updatePayment({ data })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [PAYMENTS_QUERY_KEY] })
+      onOpenChange(false)
+      toastManager.add({
+        type: 'success',
+        title: 'Pago actualizado',
+        description: 'El pago ha sido actualizado exitosamente.',
+      })
+    },
+    onError: (error) => {
+      console.error('Error updating payment:', error)
+
+      toastManager.add({
+        type: 'error',
+        title: 'Error',
+        description: 'Ocurrió un error al actualizar el pago, intenta nuevamente.',
+      })
+    },
+  })
+
+  function onSubmit(data: UpdatePaymentFormData) {
+    updatePaymentMutation.mutate(data)
+  }
+
+  function handleOpenChange(open: boolean) {
+    if (updatePaymentMutation.isPending) return
+    onOpenChange(open)
+  }
+
+  function renderPaymentTypeValue(value: PaymentType | undefined) {
+    if (!value) return 'Selecciona una opción'
+
+    return getPaymentTypeLabel(value)
+  }
+
+  function renderPaymentMonthsValue(value: number[] | undefined) {
+    if (!value || value.length === 0) return 'Selecciona una opción'
+
+    const selectedMonths = Object.entries(MONTHS)
+      .filter(([key]) => value.includes(Number(key)))
+      .map(([, month]) => month)
+    return selectedMonths.join(', ')
+  }
+
+  return (
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Editar pago</SheetTitle>
+          <SheetDescription>Actualiza la información del pago.</SheetDescription>
+        </SheetHeader>
+
+        <SheetPanel>
+          <Form id={updatePaymentFormId} aria-label="Editar pago" onSubmit={form.handleSubmit(onSubmit)}>
+            <Controller
+              name="amount"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Monto <span className="text-destructive">*</span>
+                  </FieldLabel>
+
+                  <InputGroup>
+                    <NumberField
+                      id={field.name}
+                      format={{
+                        currency: 'MXN',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }}
+                      value={Number(field.value) || null}
+                      disabled={updatePaymentMutation.isPending}
+                      onValueChange={(value) => field.onChange(value?.toString() || '')}
+                    >
+                      <NumberFieldInput className="text-left" />
+                    </NumberField>
+                    <InputGroupAddon>
+                      <InputGroupText>$</InputGroupText>
+                    </InputGroupAddon>
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupText>MXN</InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="ownerId"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Propietario <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <OwnersSelector
+                    id={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={updatePaymentMutation.isPending}
+                    invalid={fieldState.invalid}
+                    includeNoneOption={false}
+                  />
+
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="paymentType"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Tipo de pago <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
+                      <SelectValue>{renderPaymentTypeValue}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {paymentTypeSchema.options.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {renderPaymentTypeValue(type)}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="concept"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Concepto <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Textarea
+                    id={field.name}
+                    value={field.value}
+                    className="max-h-40"
+                    onBlur={field.onBlur}
+                    onChange={field.onChange}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updatePaymentMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            <Activity name="months-activity" mode={watchPaymentType === 'monthly_fee' ? 'visible' : 'hidden'}>
+              <Controller
+                name="months"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
+                  >
+                    <FieldLabel>
+                      Meses{' '}
+                      {watchPaymentType === 'monthly_fee' && <span className="text-destructive">*</span>}
+                    </FieldLabel>
+
+                    <Select multiple value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
+                        <SelectValue>{renderPaymentMonthsValue}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent className="max-h-96">
+                        <SelectGroup>
+                          {Object.entries(MONTHS).map(([value, month]) => (
+                            <SelectItem key={value} value={Number(value)}>
+                              {month}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
+            </Activity>
+
+            <Controller
+              name="year"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>Año</FieldLabel>
+                  <Select
+                    value={field.value.toString()}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                  >
+                    <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
+                      <SelectValue placeholder="Selecciona una opción" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-96">
+                      <SelectGroup>
+                        {years.map((year) => (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {fieldState.error?.message && <FieldError>{fieldState.error?.message}</FieldError>}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="paymentId"
+              control={form.control}
+              render={({ field }) => <input type="hidden" className="hidden" {...field} />}
+            />
+
+            <Controller
+              name="status"
+              control={form.control}
+              render={({ field }) => <input type="hidden" className="hidden" {...field} />}
+            />
+
+            <Controller
+              name="paidAt"
+              control={form.control}
+              render={({ field }) => (
+                <input type="hidden" className="hidden" {...field} value={field.value?.toLocaleString()} />
+              )}
+            />
+          </Form>
+        </SheetPanel>
+
+        <SheetFooter>
+          <SheetClose
+            render={
+              <Button variant="outline" type="button">
+                Cancelar
+              </Button>
+            }
+          />
+          <Button type="submit" form={updatePaymentFormId} disabled={updatePaymentMutation.isPending}>
+            Actualizar pago
+            {updatePaymentMutation.isPending && <LoaderIcon />}
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  )
+}

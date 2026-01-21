@@ -1,4 +1,4 @@
-import { IconDotsVertical, IconEdit, IconFlag, IconTrash } from '@tabler/icons-react'
+import { IconCurrencyDollar, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { LoaderIcon } from '@/components/icons'
@@ -22,48 +22,49 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
-import type { ViolationWithOwner } from '@/db/schemas/zod'
-import { VIOLATIONS_QUERY_KEY } from '@/lib/ts-queries/violations'
-import { type DeleteViolationData, deleteViolation } from '@/server-fns/violations'
-import { EditViolationSheet } from '../sheets/edit-violation'
-import { ViolationDetailsSheet } from '../sheets/violation-details'
+import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod'
+import { PAYMENTS_QUERY_KEY } from '@/lib/ts-queries/payments'
+import { getPaymentTypeLabel } from '@/lib/utils'
+import { type DeletePaymentData, deletePayment } from '@/server-fns/payments'
+import { EditPaymentSheet } from '../sheets/edit-payment'
+import { PaymentDetailsSheet } from '../sheets/payment-details'
 
 interface ActionsProps {
-  violation: ViolationWithOwner
+  payment: PaymentWithOwnerAndMonths
 }
 
-export function ViolationsTableActions({ violation }: ActionsProps) {
+export function PaymentsTableActions({ payment }: ActionsProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [isViolationDetailsSheetOpen, setViolationDetailsSheetOpen] = useState(false)
-  const [isEditViolationSheetOpen, setEditViolationSheetOpen] = useState(false)
+  const [isPaymentDetailsSheetOpen, setPaymentDetailsSheetOpen] = useState(false)
+  const [isEditPaymentSheetOpen, setEditPaymentSheetOpen] = useState(false)
   const queryClient = useQueryClient()
 
-  const deleteViolationMutation = useMutation({
-    mutationFn: async (data: DeleteViolationData) => {
-      return await deleteViolation({ data })
+  const deletePaymentMutation = useMutation({
+    mutationFn: async (data: DeletePaymentData) => {
+      return await deletePayment({ data })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [VIOLATIONS_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [PAYMENTS_QUERY_KEY] })
       setDeleteDialogOpen(false)
       toastManager.add({
         type: 'success',
-        title: 'Infracción eliminada',
-        description: 'La infracción ha sido eliminada exitosamente.',
+        title: 'Pago eliminado',
+        description: 'El pago ha sido eliminado exitosamente.',
       })
     },
     onError: (error) => {
-      console.error('Error deleting violation:', error)
+      console.error('Error deleting payment:', error)
 
       toastManager.add({
         type: 'error',
         title: 'Error',
-        description: 'Ocurrió un error al eliminar la infracción, intenta nuevamente.',
+        description: 'Ocurrió un error al eliminar el pago, intenta nuevamente.',
       })
     },
   })
 
-  function handleDeleteViolation() {
-    deleteViolationMutation.mutate({ violationId: violation.id })
+  function handleDeletePayment() {
+    deletePaymentMutation.mutate({ paymentId: payment.id })
   }
 
   return (
@@ -71,15 +72,14 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar infracción?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar pago?</AlertDialogTitle>
             <AlertDialogDescription>
-              Estás por eliminar la infracción <strong>{violation.concept}</strong>. Esta acción no se puede
-              deshacer.
+              Estás por eliminar este pago. Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogClose
-              render={<Button variant="outline" disabled={deleteViolationMutation.isPending} />}
+              render={<Button variant="outline" disabled={deletePaymentMutation.isPending} />}
             >
               Cancelar
             </AlertDialogClose>
@@ -87,26 +87,26 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
               render={
                 <Button
                   variant="destructive"
-                  onClick={handleDeleteViolation}
-                  disabled={deleteViolationMutation.isPending}
+                  onClick={handleDeletePayment}
+                  disabled={deletePaymentMutation.isPending}
                 />
               }
             >
               Eliminar
-              {deleteViolationMutation.isPending && <LoaderIcon />}
+              {deletePaymentMutation.isPending && <LoaderIcon />}
             </AlertDialogClose>
           </AlertDialogFooter>
         </AlertDialogPopup>
       </AlertDialog>
 
-      <ViolationDetailsSheet
-        violation={violation}
-        state={{ isOpen: isViolationDetailsSheetOpen, onOpenChange: setViolationDetailsSheetOpen }}
+      <PaymentDetailsSheet
+        payment={payment}
+        state={{ isOpen: isPaymentDetailsSheetOpen, onOpenChange: setPaymentDetailsSheetOpen }}
       />
 
-      <EditViolationSheet
-        violation={violation}
-        state={{ isOpen: isEditViolationSheetOpen, onOpenChange: setEditViolationSheetOpen }}
+      <EditPaymentSheet
+        payment={payment}
+        state={{ isOpen: isEditPaymentSheetOpen, onOpenChange: setEditPaymentSheetOpen }}
       />
 
       <div className="flex">
@@ -121,15 +121,15 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
           <MenuPopup align="end" className="max-w-42">
             <MenuGroup>
               <MenuGroupLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
-                {violation.concept}
+                {`$${payment.amount} - ${getPaymentTypeLabel(payment.paymentType)}`}
               </MenuGroupLabel>
 
-              <MenuItem onClick={() => setViolationDetailsSheetOpen(true)}>
-                <IconFlag className="size-4" />
+              <MenuItem onClick={() => setPaymentDetailsSheetOpen(true)}>
+                <IconCurrencyDollar className="size-4" />
                 Información
               </MenuItem>
 
-              <MenuItem onClick={() => setEditViolationSheetOpen(true)}>
+              <MenuItem onClick={() => setEditPaymentSheetOpen(true)}>
                 <IconEdit className="size-4" />
                 Editar
               </MenuItem>

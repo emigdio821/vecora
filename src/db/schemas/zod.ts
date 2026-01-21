@@ -5,7 +5,10 @@ import {
   externalUsers,
   houses,
   owners,
+  paymentMonths,
+  paymentStatusEnum,
   payments,
+  paymentTypeEnum,
   profiles,
   roles,
   userRoles,
@@ -45,11 +48,21 @@ export const selectViolationSchema = createSelectSchema(violations)
 export const insertPaymentSchema = createInsertSchema(payments)
 export const selectPaymentSchema = createSelectSchema(payments)
 
+// Payment months schemas
+export const insertPaymentMonthSchema = createInsertSchema(paymentMonths)
+export const selectPaymentMonthSchema = createSelectSchema(paymentMonths)
+
 // User schemas
 export const selectUserSchema = createSelectSchema(user)
 
 // Violation status enum
 export const violationStatusSchema = z.enum(violationStatusEnum.enumValues)
+
+// Payment status enum
+export const paymentStatusSchema = z.enum(paymentStatusEnum.enumValues)
+
+// Payment type enum
+export const paymentTypeSchema = z.enum(paymentTypeEnum.enumValues)
 
 // Custom schema for profile API response
 export const profileResponseSchema = z.object({
@@ -82,8 +95,12 @@ export type InsertViolation = z.infer<typeof insertViolationSchema>
 export type SelectViolation = z.infer<typeof selectViolationSchema>
 export type InsertPayment = z.infer<typeof insertPaymentSchema>
 export type SelectPayment = z.infer<typeof selectPaymentSchema>
+export type InsertPaymentMonth = z.infer<typeof insertPaymentMonthSchema>
+export type SelectPaymentMonth = z.infer<typeof selectPaymentMonthSchema>
 export type SelectUser = z.infer<typeof selectUserSchema>
 export type ViolationStatus = z.infer<typeof violationStatusSchema>
+export type PaymentStatus = z.infer<typeof paymentStatusSchema>
+export type PaymentType = z.infer<typeof paymentTypeSchema>
 
 // Type for owners with all relations included
 export type OwnerWithRelations = SelectOwner & {
@@ -105,4 +122,10 @@ export type HouseWithOwner = SelectHouse & {
 // Type for violations with owner relation included
 export type ViolationWithOwner = SelectViolation & {
   owner: SelectOwner | null
+}
+
+// Type for payments with owner and months relations included
+export type PaymentWithOwnerAndMonths = SelectPayment & {
+  owner: SelectOwner | null
+  paymentMonths: SelectPaymentMonth[]
 }

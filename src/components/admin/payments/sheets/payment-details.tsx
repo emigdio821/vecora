@@ -1,4 +1,4 @@
-import { IconChevronDown, IconHome, IconUserHeart, IconWind } from '@tabler/icons-react'
+import { IconChevronDown, IconCurrencyDollar, IconUserHeart, IconWind } from '@tabler/icons-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -14,31 +14,34 @@ import {
   SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HouseWithOwner } from '@/db/schemas/zod'
-import { formatDate } from '@/lib/utils'
+import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod'
+import { cn, formatDate, getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
 
-interface HouseDetailsSheetProps {
-  house: HouseWithOwner
+interface PaymentDetailsSheetProps {
+  payment: PaymentWithOwnerAndMonths
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
   }
 }
 
-export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
+const MONTHS = getAllMonthsMap()
+
+export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps) {
   const { isOpen, onOpenChange } = state
-  const houseAddress = [house.street, house.city, house.state].filter(Boolean).join(', ')
+  const isPaid = payment.status === 'paid'
+  const showMonthlyFee = payment.paymentType === 'monthly_fee' && payment.paymentMonths.length > 0
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetPopup>
         <SheetHeader>
-          <SheetTitle>Información de la casa</SheetTitle>
-          <SheetDescription>Información completa y detallada de la casa</SheetDescription>
+          <SheetTitle>Información del pago</SheetTitle>
+          <SheetDescription>Información completa y detallada del pago</SheetDescription>
         </SheetHeader>
 
         <SheetPanel className="space-y-4">
-          {/* House info */}
+          {/* Payment info */}
           <Frame className="w-full">
             <Collapsible defaultOpen>
               <FrameHeader className="flex-row items-center justify-between p-2">
@@ -47,24 +50,53 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
                   render={<Button variant="plain" />}
                 >
                   <IconChevronDown className="size-4" />
-                  Información de la casa
+                  Información del pago
                 </CollapsibleTrigger>
-                <IconHome className="size-4 text-muted-foreground" />
+                <IconCurrencyDollar className="size-4 text-muted-foreground" />
               </FrameHeader>
               <CollapsiblePanel className="space-y-1">
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
-                    <h2 className="font-medium text-sm">Número de casa</h2>
-                    <Badge variant="outline" size="lg">
-                      {house.houseNumber}
-                    </Badge>
+                    <h2 className="font-medium text-sm">Monto</h2>
+                    <p className="text-muted-foreground text-sm">${payment.amount}</p>
                   </div>
-                  <CopyButton tooltipText="Copiar ID" value={house.id} />
+                  <CopyButton tooltipText="Copiar ID" value={payment.id} />
                 </FramePanel>
-                {houseAddress && (
+                <FramePanel className="p-2">
+                  <h2 className="font-medium text-sm">Tipo de pago</h2>
+                  <p className="text-muted-foreground text-sm">{getPaymentTypeLabel(payment.paymentType)}</p>
+                </FramePanel>
+                <FramePanel className="p-2">
+                  <h2 className="font-medium text-sm">Año</h2>
+                  <p className="text-muted-foreground text-sm">{payment.year}</p>
+                </FramePanel>
+                {showMonthlyFee && (
                   <FramePanel className="p-2">
-                    <h2 className="font-medium text-sm">Direccón</h2>
-                    <p className="line-clamp-2 text-muted-foreground text-sm">{houseAddress}</p>
+                    <h2 className="font-medium text-sm">Meses pagados</h2>
+                    <div className="inline-flex flex-wrap gap-1">
+                      {payment.paymentMonths.map((month) => (
+                        <Badge variant="outline" key={`${month.month}-${month.paymentId}`}>
+                          <span>{MONTHS[month.month]}</span>
+                        </Badge>
+                      ))}
+                    </div>
+                  </FramePanel>
+                )}
+                <FramePanel className="p-2">
+                  <h2 className="font-medium text-sm">Estado</h2>
+
+                  <Badge variant="outline">
+                    <span
+                      aria-hidden
+                      className={cn('size-1.5 rounded-full', isPaid ? 'bg-success' : 'bg-warning')}
+                    />
+                    {isPaid ? 'Pagada' : 'Pendiente'}
+                  </Badge>
+                </FramePanel>
+                {payment.paidAt && (
+                  <FramePanel className="p-2">
+                    <h2 className="font-medium text-sm">Fecha de pago</h2>
+                    <p className="text-muted-foreground text-sm">{formatDate(payment.paidAt)}</p>
                   </FramePanel>
                 )}
               </CollapsiblePanel>
@@ -85,24 +117,24 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
                 <IconUserHeart className="size-4 text-muted-foreground" />
               </FrameHeader>
               <CollapsiblePanel>
-                {house.owner ? (
+                {payment.owner ? (
                   <div className="space-y-1">
                     <FramePanel className="p-2">
                       <div className="flex items-center gap-2">
                         <div className="min-w-0 flex-1">
                           <h2 className="font-medium text-sm">Nombre</h2>
-                          <p className="text-muted-foreground text-sm">{`${house.owner.firstName} ${house.owner.lastName}`}</p>
+                          <p className="text-muted-foreground text-sm">{`${payment.owner.firstName} ${payment.owner.lastName}`}</p>
                         </div>
-                        <CopyButton tooltipText="Copiar ID" value={house.id} />
+                        <CopyButton tooltipText="Copiar ID" value={payment.owner.id} />
                       </div>
                     </FramePanel>
                     <FramePanel className="p-2">
                       <h2 className="font-medium text-sm">Correo</h2>
-                      <p className="text-muted-foreground text-sm">{house.owner.email}</p>
+                      <p className="text-muted-foreground text-sm">{payment.owner.email}</p>
                     </FramePanel>
                     <FramePanel className="p-2">
                       <h2 className="font-medium text-sm">Teléfono</h2>
-                      <p className="text-muted-foreground text-sm">{house.owner.phone}</p>
+                      <p className="text-muted-foreground text-sm">{payment.owner.phone}</p>
                     </FramePanel>
                   </div>
                 ) : (
@@ -126,14 +158,16 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
           {/* Metadata */}
           <div className="flex items-center justify-between text-muted-foreground text-xs">
             <span>Fecha de registro</span>
-            <span>{formatDate(house.createdAt)}</span>
+            <span>{formatDate(payment.createdAt)}</span>
           </div>
-          {house.updatedAt && new Date(house.updatedAt).getTime() > new Date(house.createdAt).getTime() && (
-            <div className="flex items-center justify-between text-muted-foreground text-xs">
-              <span>Última actualización</span>
-              <span>{formatDate(house.updatedAt)}</span>
-            </div>
-          )}
+
+          {payment.updatedAt &&
+            new Date(payment.updatedAt).getTime() > new Date(payment.createdAt).getTime() && (
+              <div className="flex items-center justify-between text-muted-foreground text-xs">
+                <span>Última actualización</span>
+                <span>{formatDate(payment.updatedAt)}</span>
+              </div>
+            )}
         </SheetFooter>
       </SheetPopup>
     </Sheet>

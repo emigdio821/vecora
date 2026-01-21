@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '@/db'
 import { violations } from '@/db/schemas/main'
+import { violationStatusSchema } from '@/db/schemas/zod'
 import { authMiddleware } from '@/middleware/auth'
 
 const requiredAmountSchema = z
@@ -16,8 +17,8 @@ export const createViolationSchema = z.object({
   ownerId: z.uuid('ID de propietario inválido').min(1, 'El propietario es requerido'),
   concept: z.string().min(1, 'El concepto es requerido'),
   amount: requiredAmountSchema,
-  violationDate: z.date({ message: 'La fecha de infracción es requerida' }),
-  status: z.enum(['pending', 'paid']),
+  violationDate: z.date('La fecha de infracción es requerida'),
+  status: z.enum(violationStatusSchema.options, 'Estado de infracción inválido'),
 })
 
 export type CreateViolationFormData = z.infer<typeof createViolationSchema>
@@ -27,8 +28,8 @@ export const updateViolationSchema = z.object({
   ownerId: z.uuid('ID de propietario inválido').min(1, 'El propietario es requerido'),
   concept: z.string().min(1, 'El concepto es requerido'),
   amount: requiredAmountSchema,
-  violationDate: z.date({ message: 'La fecha de infracción es requerida' }),
-  status: z.enum(['pending', 'paid']),
+  violationDate: z.date('La fecha de infracción es requerida'),
+  status: z.enum(violationStatusSchema.options, 'Estado de infracción inválido'),
 })
 
 export type UpdateViolationFormData = z.infer<typeof updateViolationSchema>

@@ -1,4 +1,4 @@
-import { IconDotsVertical, IconEdit, IconTrash, IconUser } from '@tabler/icons-react'
+import { IconDotsVertical, IconEdit, IconHome, IconTrash } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { LoaderIcon } from '@/components/icons'
@@ -123,7 +123,7 @@ export function HousesTableActions({ house }: ActionsProps) {
               </MenuGroupLabel>
 
               <MenuItem onClick={() => setHouseDetailsSheetOpen(true)}>
-                <IconUser className="size-4" />
+                <IconHome className="size-4" />
                 Información
               </MenuItem>
 

@@ -1,15 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconSelector } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { LoaderIcon } from '@/components/icons'
-import { DateSelector } from '@/components/shared/date-selector'
 import { OwnersSelector } from '@/components/shared/owners-selector'
 import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
+import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import {
   Sheet,
   SheetClose,
@@ -22,7 +24,8 @@ import {
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
-import { VIOLATIONS_LIST_QUERY_KEY } from '@/lib/ts-queries/violations'
+import { VIOLATIONS_QUERY_KEY } from '@/lib/ts-queries/violations'
+import { formatDate } from '@/lib/utils'
 import { type CreateViolationFormData, createViolation, createViolationSchema } from '@/server-fns/violations'
 
 interface CreateViolationDialogProps {
@@ -54,7 +57,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
       return await createViolation({ data })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [VIOLATIONS_LIST_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [VIOLATIONS_QUERY_KEY] })
       onOpenChange(false)
       toastManager.add({
         type: 'success',
@@ -159,13 +162,28 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
               render={({ field, fieldState }) => (
                 <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
                   <FieldLabel htmlFor={field.name}>Fecha de infracción</FieldLabel>
-                  <DateSelector
-                    mode="single"
-                    id={field.name}
-                    value={field.value}
-                    selected={field.value}
-                    onSelect={(date) => field.onChange(date || new Date())}
-                  />
+                  <Popover>
+                    <PopoverTrigger
+                      render={
+                        <Button
+                          id={field.name}
+                          variant="outline"
+                          className="w-full justify-between data-[invalid=true]:border-destructive/36"
+                        >
+                          <span className="font-normal">{formatDate(field.value)}</span>
+                          <IconSelector className="-me-1!" />
+                        </Button>
+                      }
+                    />
+                    <PopoverPopup className="p-0">
+                      <Calendar
+                        mode="single"
+                        id={field.name}
+                        selected={field.value}
+                        onSelect={(date) => field.onChange(date || new Date())}
+                      />
+                    </PopoverPopup>
+                  </Popover>
                   <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}

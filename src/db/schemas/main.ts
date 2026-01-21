@@ -1,5 +1,17 @@
 import { relations, sql } from 'drizzle-orm'
-import { check, index, numeric, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import {
+  check,
+  index,
+  integer,
+  numeric,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core'
 import { user } from './auth'
 
 // Profile type enum
@@ -171,19 +183,39 @@ export const payments = pgTable(
     ownerId: uuid('owner_id')
       .notNull()
       .references(() => owners.id, { onDelete: 'cascade' }),
+    concept: text('concept').notNull(),
     amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
     paymentType: paymentTypeEnum('payment_type').notNull(),
-    // Example: "2026-01"
-    month: varchar('month', { length: 7 }).notNull(),
+    year: integer('year').notNull(),
     status: paymentStatusEnum('status').default('pending').notNull(),
     paidAt: timestamp('paid_at', { withTimezone: true }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (table) => [
     index('payments_owner_idx').on(table.ownerId),
     index('payments_type_idx').on(table.paymentType),
-    index('payments_month_idx').on(table.month),
+    index('payments_year_idx').on(table.year),
     index('payments_status_idx').on(table.status),
+  ],
+)
+
+// Payment months junction table - links payments to months (1-12)
+export const paymentMonths = pgTable(
+  'payment_months',
+  {
+    paymentId: uuid('payment_id')
+      .notNull()
+      .references(() => payments.id, { onDelete: 'cascade' }),
+    month: integer('month').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.paymentId, table.month] }),
+    index('payment_months_payment_idx').on(table.paymentId),
+    check('month_range', sql`${table.month} BETWEEN 1 AND 12`),
   ],
 )
 
@@ -249,9 +281,17 @@ export const violationsRelations = relations(violations, ({ one }) => ({
   }),
 }))
 
-export const paymentsRelations = relations(payments, ({ one }) => ({
+export const paymentsRelations = relations(payments, ({ one, many }) => ({
   owner: one(owners, {
     fields: [payments.ownerId],
     references: [owners.id],
+  }),
+  paymentMonths: many(paymentMonths),
+}))
+
+export const paymentMonthsRelations = relations(paymentMonths, ({ one }) => ({
+  payment: one(payments, {
+    fields: [paymentMonths.paymentId],
+    references: [payments.id],
   }),
 }))

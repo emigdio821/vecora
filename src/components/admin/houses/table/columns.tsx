@@ -18,6 +18,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
         aria-label="Seleccionar todo"
         checked={table.getIsAllPageRowsSelected()}
         indeterminate={table.getIsSomePageRowsSelected()}
+        disabled={table.getFilteredRowModel().rows.length === 0}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
       />
     ),

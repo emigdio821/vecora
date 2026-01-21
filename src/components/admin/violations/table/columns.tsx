@@ -14,25 +14,22 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
     enableResizing: false,
     enableSorting: false,
     size: 28,
+    header: ({ table }) => (
+      <Checkbox
+        aria-label="Seleccionar todo"
+        checked={table.getIsAllPageRowsSelected()}
+        indeterminate={table.getIsSomePageRowsSelected()}
+        disabled={table.getFilteredRowModel().rows.length === 0}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      />
+    ),
     cell: ({ row }) => (
       <Checkbox
-        aria-label="Select row"
+        aria-label="Seleccionar elemento"
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
       />
     ),
-    header: ({ table }) => {
-      const isAllSelected = table.getIsAllPageRowsSelected()
-      const isSomeSelected = table.getIsSomePageRowsSelected()
-      return (
-        <Checkbox
-          aria-label="Select all rows"
-          checked={isAllSelected}
-          indeterminate={isSomeSelected && !isAllSelected}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        />
-      )
-    },
   },
   {
     accessorKey: 'concept',

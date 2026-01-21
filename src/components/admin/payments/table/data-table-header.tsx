@@ -18,30 +18,30 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { ViolationWithOwner } from '@/db/schemas/zod'
-import { VIOLATIONS_QUERY_KEY } from '@/lib/ts-queries/violations'
-import { deleteViolation } from '@/server-fns/violations'
-import { CreateViolationSheet } from '../sheets/create-violation'
+import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod'
+import { PAYMENTS_QUERY_KEY } from '@/lib/ts-queries/payments'
+import { deletePayment } from '@/server-fns/payments'
+import { CreatePaymentSheet } from '../sheets/create-payment'
 
-interface ViolationsDataTableHeaderProps {
-  table: Table<ViolationWithOwner>
+interface PaymentsDataTableHeaderProps {
+  table: Table<PaymentWithOwnerAndMonths>
 }
 
-export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderProps) {
-  const [openCreateViolationDialog, setOpenCreateViolationDialog] = useState(false)
+export function PaymentsDataTableHeader({ table }: PaymentsDataTableHeaderProps) {
+  const [openCreatePaymentDialog, setOpenCreatePaymentDialog] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-violations', parseAsString.withDefault(''))
+  const [searchQuery, setSearchQuery] = useQueryState('search-payments', parseAsString.withDefault(''))
   const queryClient = useQueryClient()
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
-  const selectedViolations = selectedRows.map((row) => row.original)
+  const selectedPayments = selectedRows.map((row) => row.original)
 
   const batchDeleteMutation = useMutation({
     mutationFn: async () => {
       const results = await Promise.allSettled(
-        selectedViolations.map((violation) => deleteViolation({ data: { violationId: violation.id } })),
+        selectedPayments.map((payment) => deletePayment({ data: { paymentId: payment.id } })),
       )
 
       const fulfilled = results.filter((r) => r.status === 'fulfilled').length
@@ -50,36 +50,36 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
       return { fulfilled, rejected }
     },
     onSuccess: ({ fulfilled, rejected }) => {
-      queryClient.invalidateQueries({ queryKey: [VIOLATIONS_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [PAYMENTS_QUERY_KEY] })
       table.resetRowSelection()
       setDeleteDialogOpen(false)
 
       if (rejected === 0) {
         toastManager.add({
           type: 'success',
-          title: 'Infracciones eliminadas',
-          description: 'Las infracciones seleccionadas han sido eliminadas exitosamente.',
+          title: 'Pagos eliminados',
+          description: 'Los pagos seleccionados han sido eliminados exitosamente.',
         })
       } else if (fulfilled === 0) {
         toastManager.add({
           type: 'error',
           title: 'Error',
-          description: 'Ocurrió un error al eliminar las infracciones, intenta nuevamente.',
+          description: 'Ocurrió un error al eliminar los pagos, intenta nuevamente.',
         })
       } else {
         toastManager.add({
           type: 'warning',
           title: 'Advertencia',
-          description: `${fulfilled} eliminadas, ${rejected} fallaron.`,
+          description: `${fulfilled} eliminados, ${rejected} fallaron.`,
         })
       }
     },
     onError: (error) => {
-      console.error('Error deleting violations:', error)
+      console.error('Error deleting payments:', error)
       toastManager.add({
         type: 'error',
         title: 'Error',
-        description: 'Ocurrió un error al eliminar las infracciones, intenta nuevamente.',
+        description: 'Ocurrió un error al eliminar los pagos, intenta nuevamente.',
       })
     },
   })
@@ -89,24 +89,24 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
   }
 
   useEffect(() => {
-    table.getColumn('concept')?.setFilterValue(searchQuery)
+    table.getColumn('amount')?.setFilterValue(searchQuery)
   }, [searchQuery, table])
 
   return (
     <>
-      <CreateViolationSheet
-        state={{ isOpen: openCreateViolationDialog, onOpenChange: setOpenCreateViolationDialog }}
+      <CreatePaymentSheet
+        state={{ isOpen: openCreatePaymentDialog, onOpenChange: setOpenCreatePaymentDialog }}
       />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar infracciones?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar pagos?</AlertDialogTitle>
             <AlertDialogDescription
               render={
                 <div>
                   <p>
-                    Infracciones seleccionadas: <strong>{selectedRowsLength}</strong>.
+                    Pagos seleccionados: <strong>{selectedRowsLength}</strong>.
                   </p>
                   <p>Esta acción no se puede deshacer.</p>
                 </div>
@@ -140,7 +140,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
             value={searchQuery}
             aria-label="Buscar"
             placeholder="Buscar"
-            name="search-violations"
+            name="search-payments"
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
           <InputGroupAddon>
@@ -164,7 +164,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
                   </Button>
                 }
               />
-              <TooltipContent>Buscar por concepto o propietario</TooltipContent>
+              <TooltipContent>Buscar por monto o propietario</TooltipContent>
             </Tooltip>
           </InputGroupAddon>
         </InputGroup>
@@ -177,7 +177,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
                   <Button
                     size="icon"
                     variant="destructive-outline"
-                    aria-label="Borrar infracciones seleccionadas"
+                    aria-label="Borrar pagos seleccionados"
                     onClick={() => setDeleteDialogOpen(true)}
                   >
                     <IconTrash className="size-4" />
@@ -196,7 +196,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
             </Button>
           )}
 
-          <Button onClick={() => setOpenCreateViolationDialog(true)}>
+          <Button onClick={() => setOpenCreatePaymentDialog(true)}>
             <IconPlus className="size-4" />
             Crear
           </Button>
