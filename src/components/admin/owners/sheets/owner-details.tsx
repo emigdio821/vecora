@@ -1,7 +1,7 @@
 import {
-  IconAlertTriangle,
-  IconCash,
   IconChevronDown,
+  IconCurrencyDollar,
+  IconFlag,
   IconHome,
   IconUser,
   IconWind,
@@ -22,7 +22,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
-import { formatDate } from '@/lib/utils'
+import { cn, formatDate } from '@/lib/utils'
 
 interface OwnerDetailsSheetProps {
   owner: OwnerWithRelations
@@ -148,7 +148,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                   Infracciones
                   <Badge variant="outline">{owner.violations.length}</Badge>
                 </CollapsibleTrigger>
-                <IconAlertTriangle className="size-4 text-muted-foreground" />
+                <IconFlag className="size-4 text-muted-foreground" />
               </FrameHeader>
               <CollapsiblePanel>
                 {owner.violations.length > 0 ? (
@@ -159,11 +159,18 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                       return (
                         <FramePanel key={violation.id} className="p-2">
                           <div className="flex items-center gap-2">
-                            <div className="min-w-0 flex-1">
-                              <Badge variant={isViolationPaid ? 'success' : 'error'}>
+                            <div className="min-w-0 leading-none">
+                              <Badge variant="outline">
+                                <span
+                                  aria-hidden
+                                  className={cn(
+                                    'size-1.5 rounded-full',
+                                    isViolationPaid ? 'bg-success' : 'bg-warning',
+                                  )}
+                                />
                                 {isViolationPaid ? 'Pagada' : 'Pendiente'}
                               </Badge>
-                              <h2 className="font-medium text-sm tabular-nums">{`$${Number(violation.amount).toFixed(2)}`}</h2>
+                              <h2 className="font-medium text-sm">{`$${Number(violation.amount).toFixed(2)}`}</h2>
                               <p className="text-muted-foreground text-sm">{violation.concept}</p>
                               <p className="text-muted-foreground text-xs">
                                 {formatDate(violation.violationDate)}
@@ -204,7 +211,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                   Pagos pendientes
                   <Badge variant="outline">{pendingPayments.length}</Badge>
                 </CollapsibleTrigger>
-                <IconCash className="size-4 text-muted-foreground" />
+                <IconCurrencyDollar className="size-4 text-muted-foreground" />
               </FrameHeader>
               <CollapsiblePanel>
                 {pendingPayments.length > 0 ? (
@@ -218,10 +225,17 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                         <FramePanel key={payment.id} className="p-2">
                           <div className="flex items-center gap-2">
                             <div className="min-w-0 flex-1">
-                              <Badge variant={isPaymentPaid ? 'success' : 'error'}>
+                              <Badge variant="outline">
+                                <span
+                                  aria-hidden
+                                  className={cn(
+                                    'size-1.5 rounded-full',
+                                    isPaymentPaid ? 'bg-success' : 'bg-warning',
+                                  )}
+                                />
                                 {isPaymentPaid ? 'Pagada' : 'Pendiente'}
                               </Badge>
-                              <h2 className="font-medium text-sm tabular-nums">{`$${Number(payment.amount).toFixed(2)}`}</h2>
+                              <h2 className="font-medium text-sm">{`$${Number(payment.amount).toFixed(2)}`}</h2>
                               {/* TODO: Improve the month display */}
                               <p className="text-muted-foreground text-sm">{payment.month}</p>
                               <p className="text-muted-foreground text-xs">{paymentLabel}</p>

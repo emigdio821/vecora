@@ -86,16 +86,12 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetPopup side="right">
         <SheetHeader>
-          <SheetTitle>Crear nuevo propietario</SheetTitle>
+          <SheetTitle>Crear propietario</SheetTitle>
           <SheetDescription>Ingresa la información del nuevo propietario.</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>
-          <Form
-            id={createOwnerFormId}
-            aria-label="Crear nuevo propietario"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
+          <Form id={createOwnerFormId} aria-label="Crear propietario" onSubmit={form.handleSubmit(onSubmit)}>
             <Controller
               name="firstName"
               control={form.control}

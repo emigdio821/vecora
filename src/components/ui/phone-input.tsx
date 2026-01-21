@@ -92,13 +92,13 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
         <IconSelector className="-me-1!" />
       </ComboboxTrigger>
       <ComboboxPopup aria-label="Selecciona una opción" className="[--anchor-width:288px]">
-        <div className="border-b p-2">
+        <div className="border-b p-1">
           <ComboboxInput
             showTrigger={false}
             placeholder="Buscar"
             aria-invalid="false"
             startAddon={<IconSearch />}
-            className="rounded-md before:rounded-[calc(var(--radius-md)-1px)]"
+            className="rounded-sm before:rounded-[calc(var(--radius-sm)-1px)]"
           />
         </div>
         <ComboboxEmpty>Sin resultados.</ComboboxEmpty>

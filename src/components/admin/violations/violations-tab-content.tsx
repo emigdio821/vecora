@@ -1,26 +1,30 @@
-import { IconBarrierBlock } from '@tabler/icons-react'
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty'
+import { useQuery } from '@tanstack/react-query'
+import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
+import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
+import { DataTable } from '@/components/table/data-table'
+import { violationsListQueryOptions } from '@/lib/ts-queries/violations'
+import { violationsTableColumns } from './table/columns'
+import { ViolationsDataTableHeader } from './table/data-table-header'
 
 export function ViolationsTabContent() {
+  const { data: violations = [], isLoading, error, refetch } = useQuery(violationsListQueryOptions())
+
+  if (error) {
+    return (
+      <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar las infracciones." />
+    )
+  }
+
+  if (isLoading) {
+    return <TableGenericSkeleton />
+  }
+
   return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <IconBarrierBlock />
-        </EmptyMedia>
-        <EmptyTitle>Infracciones</EmptyTitle>
-        <EmptyDescription>Administrar infracciones.</EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        Esta sección está en desarrollo. Pronto podrás administrar infracciones desde aquí.
-      </EmptyContent>
-    </Empty>
+    <DataTable
+      data={violations}
+      tableId="violations"
+      columns={violationsTableColumns}
+      header={(table) => <ViolationsDataTableHeader table={table} />}
+    />
   )
 }

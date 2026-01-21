@@ -107,39 +107,41 @@ export function HousesTableActions({ house }: ActionsProps) {
         state={{ isOpen: isEditHouseSheetOpen, onOpenChange: setEditHouseSheetOpen }}
       />
 
-      <Menu>
-        <MenuTrigger
-          render={
-            <Button aria-label="Table actions" size="icon" variant="ghost">
-              <IconDotsVertical className="size-4" />
-            </Button>
-          }
-        />
-        <MenuPopup align="end" className="max-w-42">
-          <MenuGroup>
-            <MenuGroupLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
-              {house.houseNumber}
-            </MenuGroupLabel>
+      <div className="flex">
+        <Menu>
+          <MenuTrigger
+            render={
+              <Button aria-label="Table actions" size="icon" variant="ghost" className="ml-auto">
+                <IconDotsVertical className="size-4" />
+              </Button>
+            }
+          />
+          <MenuPopup align="end" className="max-w-42">
+            <MenuGroup>
+              <MenuGroupLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
+                {house.houseNumber}
+              </MenuGroupLabel>
 
-            <MenuItem onClick={() => setHouseDetailsSheetOpen(true)}>
-              <IconUser className="size-4" />
-              Información
-            </MenuItem>
+              <MenuItem onClick={() => setHouseDetailsSheetOpen(true)}>
+                <IconUser className="size-4" />
+                Información
+              </MenuItem>
 
-            <MenuItem onClick={() => setEditHouseSheetOpen(true)}>
-              <IconEdit className="size-4" />
-              Editar
-            </MenuItem>
+              <MenuItem onClick={() => setEditHouseSheetOpen(true)}>
+                <IconEdit className="size-4" />
+                Editar
+              </MenuItem>
 
-            <MenuSeparator />
+              <MenuSeparator />
 
-            <MenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
-              <IconTrash className="size-4" />
-              Eliminar
-            </MenuItem>
-          </MenuGroup>
-        </MenuPopup>
-      </Menu>
+              <MenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                <IconTrash className="size-4" />
+                Eliminar
+              </MenuItem>
+            </MenuGroup>
+          </MenuPopup>
+        </Menu>
+      </div>
     </>
   )
 }

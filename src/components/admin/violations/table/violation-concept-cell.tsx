@@ -1,0 +1,29 @@
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import type { ViolationWithOwner } from '@/db/schemas/zod'
+import { ViolationDetailsSheet } from '../sheets/violation-details'
+
+interface ViolationConceptCellProps {
+  violation: ViolationWithOwner
+}
+
+export function ViolationConceptCell({ violation }: ViolationConceptCellProps) {
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+
+  return (
+    <div>
+      <Button
+        variant="link"
+        className="line-clamp-2 whitespace-normal text-left"
+        onClick={() => setIsSheetOpen(true)}
+      >
+        {violation.concept}
+      </Button>
+
+      <ViolationDetailsSheet
+        violation={violation}
+        state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }}
+      />
+    </div>
+  )
+}

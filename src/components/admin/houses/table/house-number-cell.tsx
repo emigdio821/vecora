@@ -13,6 +13,7 @@ export function HouseNumberCell({ house }: HouseNumberCellProps) {
   return (
     <>
       <Badge
+        size="lg"
         variant="outline"
         render={
           <button type="button" onClick={() => setIsSheetOpen(true)}>

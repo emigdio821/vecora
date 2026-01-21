@@ -22,49 +22,48 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
-import type { OwnerWithRelations } from '@/db/schemas/zod'
-import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
-import { type DeleteOwnerData, deleteOwner } from '@/server-fns/owners'
-import { EditOwnerSheet } from '../sheets/edit-owner'
-import { OwnerDetailsSheet } from '../sheets/owner-details'
+import type { ViolationWithOwner } from '@/db/schemas/zod'
+import { VIOLATIONS_LIST_QUERY_KEY } from '@/lib/ts-queries/violations'
+import { type DeleteViolationData, deleteViolation } from '@/server-fns/violations'
+import { EditViolationSheet } from '../sheets/edit-violation'
+import { ViolationDetailsSheet } from '../sheets/violation-details'
 
 interface ActionsProps {
-  owner: OwnerWithRelations
+  violation: ViolationWithOwner
 }
 
-export function OwnersTableActions({ owner }: ActionsProps) {
-  const ownerFullName = `${owner.firstName} ${owner.lastName}`.trim()
+export function ViolationsTableActions({ violation }: ActionsProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [isOwnerDetailsSheetOpen, setOwnerDetailsSheetOpen] = useState(false)
-  const [isEditOwnerSheetOpen, setEditOwnerSheetOpen] = useState(false)
+  const [isViolationDetailsSheetOpen, setViolationDetailsSheetOpen] = useState(false)
+  const [isEditViolationSheetOpen, setEditViolationSheetOpen] = useState(false)
   const queryClient = useQueryClient()
 
-  const deleteOwnerMutation = useMutation({
-    mutationFn: async (data: DeleteOwnerData) => {
-      return await deleteOwner({ data })
+  const deleteViolationMutation = useMutation({
+    mutationFn: async (data: DeleteViolationData) => {
+      return await deleteViolation({ data })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [VIOLATIONS_LIST_QUERY_KEY] })
       setDeleteDialogOpen(false)
-
       toastManager.add({
         type: 'success',
-        title: 'Propietario eliminado',
-        description: 'El propietario ha sido eliminado exitosamente.',
+        title: 'Infracción eliminada',
+        description: 'La infracción ha sido eliminada exitosamente.',
       })
     },
     onError: (error) => {
-      console.error('Error deleting owner:', error)
+      console.error('Error deleting violation:', error)
+
       toastManager.add({
         type: 'error',
         title: 'Error',
-        description: 'Ocurrió un error al eliminar el propietario, intenta nuevamente.',
+        description: 'Ocurrió un error al eliminar la infracción, intenta nuevamente.',
       })
     },
   })
 
-  function handleDeleteOwner() {
-    deleteOwnerMutation.mutate({ ownerId: owner.id })
+  function handleDeleteViolation() {
+    deleteViolationMutation.mutate({ violationId: violation.id })
   }
 
   return (
@@ -72,39 +71,42 @@ export function OwnersTableActions({ owner }: ActionsProps) {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar propietario?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar infracción?</AlertDialogTitle>
             <AlertDialogDescription>
-              Estás por eliminar a <strong>{ownerFullName}</strong>. Esta acción no se puede deshacer.
+              Estás por eliminar la infracción <strong>{violation.concept}</strong>. Esta acción no se puede
+              deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={deleteOwnerMutation.isPending} />}>
+            <AlertDialogClose
+              render={<Button variant="outline" disabled={deleteViolationMutation.isPending} />}
+            >
               Cancelar
             </AlertDialogClose>
             <AlertDialogClose
               render={
                 <Button
                   variant="destructive"
-                  onClick={handleDeleteOwner}
-                  disabled={deleteOwnerMutation.isPending}
+                  onClick={handleDeleteViolation}
+                  disabled={deleteViolationMutation.isPending}
                 />
               }
             >
               Eliminar
-              {deleteOwnerMutation.isPending && <LoaderIcon />}
+              {deleteViolationMutation.isPending && <LoaderIcon />}
             </AlertDialogClose>
           </AlertDialogFooter>
         </AlertDialogPopup>
       </AlertDialog>
 
-      <OwnerDetailsSheet
-        owner={owner}
-        state={{ isOpen: isOwnerDetailsSheetOpen, onOpenChange: setOwnerDetailsSheetOpen }}
+      <ViolationDetailsSheet
+        violation={violation}
+        state={{ isOpen: isViolationDetailsSheetOpen, onOpenChange: setViolationDetailsSheetOpen }}
       />
 
-      <EditOwnerSheet
-        owner={owner}
-        state={{ isOpen: isEditOwnerSheetOpen, onOpenChange: setEditOwnerSheetOpen }}
+      <EditViolationSheet
+        violation={violation}
+        state={{ isOpen: isEditViolationSheetOpen, onOpenChange: setEditViolationSheetOpen }}
       />
 
       <div className="flex">
@@ -119,14 +121,15 @@ export function OwnersTableActions({ owner }: ActionsProps) {
           <MenuPopup align="end" className="max-w-42">
             <MenuGroup>
               <MenuGroupLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
-                {ownerFullName}
+                {violation.concept}
               </MenuGroupLabel>
-              <MenuItem onClick={() => setOwnerDetailsSheetOpen(true)}>
+
+              <MenuItem onClick={() => setViolationDetailsSheetOpen(true)}>
                 <IconUser className="size-4" />
                 Información
               </MenuItem>
 
-              <MenuItem onClick={() => setEditOwnerSheetOpen(true)}>
+              <MenuItem onClick={() => setEditViolationSheetOpen(true)}>
                 <IconEdit className="size-4" />
                 Editar
               </MenuItem>

@@ -24,6 +24,7 @@
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
       "semicolons": "asNeeded",
       "trailingCommas": "all"
     }
@@ -51,7 +52,7 @@
           "level": "error",
           "options": {
             "attributes": ["classList", "iconClassName"],
-            "functions": ["clsx", "cva", "tw", "tw.*"]
+            "functions": ["clsx", "cva", "tw", "tw.*", "cn"]
           }
         }
       }

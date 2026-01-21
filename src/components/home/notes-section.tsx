@@ -8,9 +8,7 @@ export function NotesSection() {
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Ingresos Totales</CardDescription>
-          <CardTitle className="font-semibold @[250px]/card:text-3xl text-2xl tabular-nums">
-            $1,250.00
-          </CardTitle>
+          <CardTitle className="font-semibold @[250px]/card:text-3xl text-2xl">$1,250.00</CardTitle>
           <CardAction>
             <Badge variant="outline">
               <IconTrendingUp />
@@ -29,7 +27,7 @@ export function NotesSection() {
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Últimos pagos</CardDescription>
-          <CardTitle className="font-semibold @[250px]/card:text-3xl text-2xl tabular-nums">0</CardTitle>
+          <CardTitle className="font-semibold @[250px]/card:text-3xl text-2xl">0</CardTitle>
           <CardAction>
             <Badge variant="outline">
               <IconTrendingDown />
@@ -49,7 +47,7 @@ export function NotesSection() {
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Últimas infracciones</CardDescription>
-          <CardTitle className="font-semibold @[250px]/card:text-3xl text-2xl tabular-nums">8</CardTitle>
+          <CardTitle className="font-semibold @[250px]/card:text-3xl text-2xl">8</CardTitle>
           <CardAction>
             <Badge variant="outline">
               <IconTrendingUp />
@@ -69,7 +67,7 @@ export function NotesSection() {
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Pagos pendientes</CardDescription>
-          <CardTitle className="font-semibold @[250px]/card:text-3xl text-2xl tabular-nums">7</CardTitle>
+          <CardTitle className="font-semibold @[250px]/card:text-3xl text-2xl">7</CardTitle>
           <CardAction>
             <Badge variant="outline">
               <IconTrendingUp />

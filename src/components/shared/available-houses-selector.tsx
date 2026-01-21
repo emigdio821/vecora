@@ -44,11 +44,7 @@ export function AvailableHousesSelector({
   return (
     <Select value={value} disabled={availableHouses.length === 0 || disabled} {...selectProps}>
       <SelectTrigger aria-invalid={invalid} className="w-full">
-        {availableHouses.length === 0 ? (
-          'No hay casas disponibles'
-        ) : (
-          <SelectValue>{renderAvailableHousesValue(value)}</SelectValue>
-        )}
+        <SelectValue>{renderAvailableHousesValue(value)}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

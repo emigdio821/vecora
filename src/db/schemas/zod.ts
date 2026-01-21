@@ -1,7 +1,17 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import { user } from './auth'
-import { externalUsers, houses, owners, payments, profiles, roles, userRoles, violations } from './main'
+import {
+  externalUsers,
+  houses,
+  owners,
+  payments,
+  profiles,
+  roles,
+  userRoles,
+  violationStatusEnum,
+  violations,
+} from './main'
 
 // Profile schemas
 export const insertProfileSchema = createInsertSchema(profiles)
@@ -38,6 +48,9 @@ export const selectPaymentSchema = createSelectSchema(payments)
 // User schemas
 export const selectUserSchema = createSelectSchema(user)
 
+// Violation status enum
+export const violationStatusSchema = z.enum(violationStatusEnum.enumValues)
+
 // Custom schema for profile API response
 export const profileResponseSchema = z.object({
   userId: z.string(),
@@ -70,6 +83,7 @@ export type SelectViolation = z.infer<typeof selectViolationSchema>
 export type InsertPayment = z.infer<typeof insertPaymentSchema>
 export type SelectPayment = z.infer<typeof selectPaymentSchema>
 export type SelectUser = z.infer<typeof selectUserSchema>
+export type ViolationStatus = z.infer<typeof violationStatusSchema>
 
 // Type for owners with all relations included
 export type OwnerWithRelations = SelectOwner & {
@@ -85,5 +99,10 @@ export type OwnerWithRelations = SelectOwner & {
 
 // Type for houses with owner relation included
 export type HouseWithOwner = SelectHouse & {
+  owner: SelectOwner | null
+}
+
+// Type for violations with owner relation included
+export type ViolationWithOwner = SelectViolation & {
   owner: SelectOwner | null
 }
