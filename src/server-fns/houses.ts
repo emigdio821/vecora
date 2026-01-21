@@ -1,40 +1,17 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq, isNull } from 'drizzle-orm'
-import { z } from 'zod'
 import { db } from '@/db'
 import { houses } from '@/db/schemas/main'
-import type { HouseWithOwner, SelectHouse } from '@/db/schemas/zod'
+import type { HouseWithOwner, InsertHouse, SelectHouse } from '@/db/schemas/zod'
 import { authMiddleware } from '@/middleware/auth'
-
-export const createHouseSchema = z.object({
-  houseNumber: z.string().min(1, 'El número de casa es requerido'),
-  street: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-  ownerId: z.uuid('ID de propietario inválido').nullable(),
-})
-
-export type CreateHouseFormData = z.infer<typeof createHouseSchema>
-
-export const updateHouseSchema = z.object({
-  houseId: z.uuid('ID de casa inválido'),
-  houseNumber: z.string().min(1, 'El número de casa es requerido'),
-  street: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-  ownerId: z.uuid('ID de propietario inválido').nullable(),
-})
-
-export type UpdateHouseFormData = z.infer<typeof updateHouseSchema>
+import { createHouseSchema, updateHouseSchema } from '@/schemas/houses'
 
 export const createHouse = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
   .inputValidator(createHouseSchema)
   .handler(async ({ data }) => {
     const [newHouse] = await db.insert(houses).values(data).returning()
-    return newHouse
+    return newHouse satisfies InsertHouse
   })
 
 export const updateHouse = createServerFn({ method: 'POST' })
@@ -43,7 +20,7 @@ export const updateHouse = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { houseId, ...updateData } = data
     const [updatedHouse] = await db.update(houses).set(updateData).where(eq(houses.id, houseId)).returning()
-    return updatedHouse
+    return updatedHouse satisfies SelectHouse
   })
 
 export const getHouses = createServerFn()

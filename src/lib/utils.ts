@@ -3,7 +3,6 @@ import { twMerge } from 'tailwind-merge'
 import type { PaymentType } from '@/db/schemas/zod'
 
 const DEFAULT_LOCALE: Intl.LocalesArgument = 'es-MX'
-const DEFAULT_MONTHS_LOCALE: Intl.LocalesArgument = 'es-PE'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -28,7 +27,9 @@ export function formatDate(
 export function getAllMonthsMap(): Record<number, string> {
   const months = Array.from({ length: 12 }, (_, i) => {
     const date = new Date(0, i)
-    return date.toLocaleString(DEFAULT_MONTHS_LOCALE, { month: 'long' })
+    const month = date.toLocaleString(DEFAULT_LOCALE, { month: 'long' })
+
+    return month.charAt(0).toUpperCase() + month.slice(1)
   })
 
   return Object.fromEntries(months.map((month, i) => [i + 1, month]))

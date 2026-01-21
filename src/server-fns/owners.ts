@@ -1,12 +1,11 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import { isValidPhoneNumber } from 'react-phone-number-input'
-import { z } from 'zod'
 import { db } from '@/db'
 import { houses, owners } from '@/db/schemas/main'
 import type { OwnerWithRelations, SelectOwner } from '@/db/schemas/zod'
 import { adminOnlyAPIMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
+import { createOwnerSchema, deleteOwnerSchema, updateOwnerSchema } from '@/schemas/owners'
 
 export const getOwners = createServerFn()
   .middleware([authMiddleware])
@@ -27,19 +26,6 @@ export const getOwners = createServerFn()
 
     return ownersData satisfies OwnerWithRelations[]
   })
-
-export const createOwnerSchema = z.object({
-  firstName: z.string().min(1, 'El nombre es requerido').max(100, 'El nombre es muy largo'),
-  lastName: z.string().min(1, 'El apellido es requerido').max(100, 'El apellido es muy largo'),
-  phone: z
-    .string()
-    .min(1, 'El teléfono es requerido')
-    .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
-  email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
-  houseId: z.uuid('ID de casa inválido').nullable(),
-})
-
-export type CreateOwnerFormData = z.infer<typeof createOwnerSchema>
 
 export const createOwner = createServerFn({ method: 'POST' })
   .middleware([adminOnlyAPIMiddleware])
@@ -62,19 +48,6 @@ export const createOwner = createServerFn({ method: 'POST' })
     return newOwner satisfies SelectOwner
   })
 
-export const updateOwnerSchema = z.object({
-  ownerId: z.uuid(),
-  firstName: z.string().min(1, 'El nombre es requerido').max(100, 'El nombre es muy largo'),
-  lastName: z.string().min(1, 'El apellido es requerido').max(100, 'El apellido es muy largo'),
-  phone: z
-    .string()
-    .min(1, 'El teléfono es requerido')
-    .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
-  email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
-})
-
-export type UpdateOwnerFormData = z.infer<typeof updateOwnerSchema>
-
 export const updateOwner = createServerFn({ method: 'POST' })
   .middleware([adminOnlyAPIMiddleware])
   .inputValidator(updateOwnerSchema)
@@ -93,12 +66,6 @@ export const updateOwner = createServerFn({ method: 'POST' })
 
     return updatedOwner satisfies SelectOwner
   })
-
-export const deleteOwnerSchema = z.object({
-  ownerId: z.uuid('ID de propietario inválido'),
-})
-
-export type DeleteOwnerData = z.infer<typeof deleteOwnerSchema>
 
 export const deleteOwner = createServerFn({ method: 'POST' })
   .middleware([adminOnlyAPIMiddleware])

@@ -1,51 +1,18 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
 import { db } from '@/db'
 import { violations } from '@/db/schemas/main'
-import { violationStatusSchema } from '@/db/schemas/zod'
+import type { InsertViolation, SelectViolation, ViolationWithOwner } from '@/db/schemas/zod'
 import { authMiddleware } from '@/middleware/auth'
-
-const requiredAmountSchema = z
-  .string()
-  .min(1, 'El monto es requerido')
-  .refine((val) => !Number.isNaN(Number(val)) && Number(val) > 0, {
-    message: 'El monto debe ser un número válido mayor a 0',
-  })
-
-export const createViolationSchema = z.object({
-  ownerId: z.uuid('ID de propietario inválido').min(1, 'El propietario es requerido'),
-  concept: z.string().min(1, 'El concepto es requerido'),
-  amount: requiredAmountSchema,
-  violationDate: z.date('La fecha de infracción es requerida'),
-  status: z.enum(violationStatusSchema.options, 'Estado de infracción inválido'),
-})
-
-export type CreateViolationFormData = z.infer<typeof createViolationSchema>
-
-export const updateViolationSchema = z.object({
-  violationId: z.uuid('ID de infracción inválido'),
-  ownerId: z.uuid('ID de propietario inválido').min(1, 'El propietario es requerido'),
-  concept: z.string().min(1, 'El concepto es requerido'),
-  amount: requiredAmountSchema,
-  violationDate: z.date('La fecha de infracción es requerida'),
-  status: z.enum(violationStatusSchema.options, 'Estado de infracción inválido'),
-})
-
-export type UpdateViolationFormData = z.infer<typeof updateViolationSchema>
-
-export const deleteViolationSchema = z.object({
-  violationId: z.uuid('ID de infracción inválido'),
-})
-
-export type DeleteViolationData = z.infer<typeof deleteViolationSchema>
+import { createViolationSchema, deleteViolationSchema, updateViolationSchema } from '@/schemas/violations'
 
 export const createViolation = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
   .inputValidator(createViolationSchema)
   .handler(async ({ data }) => {
     const [newViolation] = await db.insert(violations).values(data).returning()
-    return newViolation
+
+    return newViolation satisfies InsertViolation
   })
 
 export const updateViolation = createServerFn({ method: 'POST' })
@@ -58,7 +25,8 @@ export const updateViolation = createServerFn({ method: 'POST' })
       .set(updateData)
       .where(eq(violations.id, violationId))
       .returning()
-    return updatedViolation
+
+    return updatedViolation satisfies SelectViolation
   })
 
 export const deleteViolation = createServerFn({ method: 'POST' })
@@ -67,7 +35,8 @@ export const deleteViolation = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { violationId } = data
     const [deletedViolation] = await db.delete(violations).where(eq(violations.id, violationId)).returning()
-    return deletedViolation
+
+    return deletedViolation satisfies SelectViolation
   })
 
 export const getViolationsList = createServerFn()
@@ -80,5 +49,5 @@ export const getViolationsList = createServerFn()
       orderBy: (violations, { desc }) => [desc(violations.violationDate)],
     })
 
-    return allViolations
+    return allViolations satisfies ViolationWithOwner[]
   })
