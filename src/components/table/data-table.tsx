@@ -6,6 +6,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type SortingState,
   type Table as TableType,
   useReactTable,
 } from '@tanstack/react-table'
@@ -31,6 +32,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
   }
 
   const [rowSelection, setRowSelection] = useState({})
+  const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const paginationParsers = {
@@ -45,7 +47,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
-    // onSortingChange: setSorting,
+    onSortingChange: setSorting,
     onPaginationChange: (updater) => {
       const newPagination = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater
       setPagination(newPagination)
@@ -57,8 +59,9 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     autoResetPageIndex: false,
+
     state: {
-      // sorting,
+      sorting,
       rowSelection,
       columnFilters,
       pagination: {

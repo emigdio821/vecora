@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { HouseWithOwner } from '@/db/schemas/zod'
 import { normalizeString } from '@/lib/utils'
@@ -30,8 +31,8 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   },
   {
     accessorKey: 'houseNumber',
-    header: 'Número',
     size: 40,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Casa" />,
     cell: ({ row }) => <HouseNumberCell house={row.original} />,
     filterFn: (row, _, value: string) => {
       const ownerFullName = row.original.owner
@@ -50,8 +51,8 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   },
   {
     accessorKey: 'owner',
-    header: 'Propietario',
     size: 200,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Propietario" />,
     cell: ({ row }) => {
       const owner = row.original.owner
 
@@ -60,14 +61,20 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   },
   {
     accessorKey: 'street',
-    header: 'Calle',
     size: 220,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Calle" />,
     cell: ({ row }) => <p>{row.original.street}</p>,
   },
   {
     accessorKey: 'city',
-    header: 'Ciudad',
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Ciudad" />,
     size: 200,
+    sortingFn: (rowA, rowB) => {
+      const rowACity = [rowA.original.city, rowA.original.state].filter(Boolean).join(', ')
+      const rowBCity = [rowB.original.city, rowB.original.state].filter(Boolean).join(', ')
+
+      return rowACity.localeCompare(rowBCity)
+    },
     cell: ({ row }) => {
       const house = row.original
       const houseCityState = [house.city, house.state].filter(Boolean).join(', ')
@@ -77,7 +84,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   },
   {
     accessorKey: 'zipCode',
-    header: 'Código postal',
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Código postal" />,
     size: 180,
     cell: ({ row }) => {
       const zipCode = row.original.zipCode

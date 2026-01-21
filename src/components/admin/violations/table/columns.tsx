@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { ViolationWithOwner } from '@/db/schemas/zod'
@@ -35,8 +36,8 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
   },
   {
     accessorKey: 'concept',
-    header: 'Concepto',
     size: 280,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Concepto" />,
     cell: ({ row }) => <ViolationConceptCell violation={row.original} />,
     filterFn: (row, _, value: string) => {
       const ownerFullName = row.original.owner
@@ -55,8 +56,8 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
   },
   {
     accessorKey: 'owner',
-    header: 'Propietario',
     size: 200,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Propietario" />,
     cell: ({ row }) => {
       const owner = row.original.owner
       return owner && <p className="truncate">{`${owner.firstName} ${owner.lastName}`}</p>
@@ -64,14 +65,15 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
   },
   {
     accessorKey: 'amount',
-    header: 'Monto',
     size: 100,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Monto" />,
+    sortingFn: (rowA, rowB) => Number(rowA.original.amount) - Number(rowB.original.amount),
     cell: ({ row }) => <p>${row.original.amount}</p>,
   },
   {
     accessorKey: 'status',
-    header: 'Estado',
     size: 120,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
     cell: ({ row }) => {
       const isPaid = row.original.status === 'paid'
 
@@ -85,8 +87,8 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
   },
   {
     accessorKey: 'violationDate',
-    header: 'Fecha',
     size: 150,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha" />,
     cell: ({ row }) => <p>{formatDate(row.original.violationDate)}</p>,
   },
   {

@@ -113,7 +113,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       }}
-                      value={Number(field.value)}
+                      value={Number(field.value) || null}
                       disabled={createViolationMutation.isPending}
                       onValueChange={(value) => field.onChange(value?.toString() || '')}
                     >

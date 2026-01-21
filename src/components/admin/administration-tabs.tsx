@@ -21,11 +21,11 @@ export function AdministrationTabs() {
         <TabsTab value="external-users">Usuarios externos</TabsTab>
       </TabsList>
 
-      <TabsPanel value="owners">
+      <TabsPanel value="owners" keepMounted>
         <OwnersTabContent />
       </TabsPanel>
 
-      <TabsPanel value="houses">
+      <TabsPanel value="houses" keepMounted>
         <HousesTabContent />
       </TabsPanel>
 
@@ -33,11 +33,11 @@ export function AdministrationTabs() {
         <ViolationsTabContent />
       </TabsPanel>
 
-      <TabsPanel value="payments">
+      <TabsPanel value="payments" keepMounted>
         <PaymentsTabContent />
       </TabsPanel>
 
-      <TabsPanel value="external-users">
+      <TabsPanel value="external-users" keepMounted>
         <ExternalUsersTabContent />
       </TabsPanel>
     </Tabs>

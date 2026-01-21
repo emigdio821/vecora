@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { OwnerWithRelations } from '@/db/schemas/zod'
@@ -31,7 +32,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   },
   {
     accessorKey: 'firstName',
-    header: 'Nombre',
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
     size: 200,
     cell: ({ row }) => <OwnerNameCell owner={row.original} />,
     filterFn: (row, _, value: string) => {
@@ -46,19 +47,19 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   },
   {
     accessorKey: 'email',
-    header: 'Correo',
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Correo" />,
     size: 200,
     cell: ({ row }) => <p className="truncate">{row.original.email}</p>,
   },
   {
     accessorKey: 'phone',
-    header: 'Teléfono',
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Teléfono" />,
     size: 140,
     cell: ({ row }) => <p className="truncate">{row.original.phone}</p>,
   },
   {
     accessorKey: 'houses',
-    header: 'Casas',
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Casas" />,
     size: 140,
     cell: ({ row }) => {
       const houses = row.original.houses
