@@ -1,4 +1,3 @@
-import { IconMinus } from '@tabler/icons-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { HouseWithOwner } from '@/db/schemas/zod'
@@ -11,6 +10,8 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
     id: 'select',
     enablePinning: false,
     enableResizing: false,
+    enableSorting: false,
+    size: 28,
     header: ({ table }) => (
       <Checkbox
         aria-label="Seleccionar todo"
@@ -30,6 +31,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   {
     accessorKey: 'houseNumber',
     header: 'Número',
+    size: 40,
     cell: ({ row }) => <HouseNumberCell house={row.original} />,
     filterFn: (row, _, value: string) => {
       const ownerFullName = row.original.owner
@@ -49,44 +51,44 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   {
     accessorKey: 'owner',
     header: 'Propietario',
+    size: 200,
     cell: ({ row }) => {
       const owner = row.original.owner
-      return owner ? (
-        <p>
-          {owner.firstName} {owner.lastName}
-        </p>
-      ) : (
-        <IconMinus className="size-4" />
-      )
+
+      return owner && <p>{`${owner.firstName} ${owner.lastName}`}</p>
     },
   },
   {
     accessorKey: 'street',
     header: 'Calle',
-    cell: ({ row }) => <p className="tabular-nums">{row.original.street}</p>,
+    size: 220,
+    cell: ({ row }) => <p>{row.original.street}</p>,
   },
   {
     accessorKey: 'city',
     header: 'Ciudad',
+    size: 200,
     cell: ({ row }) => {
       const house = row.original
       const houseCityState = [house.city, house.state].filter(Boolean).join(', ')
 
-      return houseCityState ? <p>{houseCityState}</p> : <IconMinus className="size-4" />
+      return houseCityState && <p>{houseCityState}</p>
     },
   },
   {
     accessorKey: 'zipCode',
     header: 'Código postal',
+    size: 180,
     cell: ({ row }) => {
       const zipCode = row.original.zipCode
-      return zipCode ? <p className="tabular-nums">{zipCode}</p> : <IconMinus className="size-4" />
+      return zipCode && <p>{zipCode}</p>
     },
   },
   {
     id: 'actions',
     enablePinning: false,
     enableResizing: false,
+    size: 28,
     cell: ({ row }) => <HousesTableActions house={row.original} />,
   },
 ]

@@ -13,8 +13,8 @@ export function HouseNumberCell({ house }: HouseNumberCellProps) {
   return (
     <>
       <Badge
+        size="lg"
         variant="outline"
-        className="tabular-nums"
         render={
           <button type="button" onClick={() => setIsSheetOpen(true)}>
             {house.houseNumber}

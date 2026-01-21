@@ -84,12 +84,12 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Crear nueva casa</SheetTitle>
+          <SheetTitle>Crear casa</SheetTitle>
           <SheetDescription>Ingresa la información de la nueva casa.</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>
-          <Form id={createHouseFormId} aria-label="Crear nueva casa" onSubmit={form.handleSubmit(onSubmit)}>
+          <Form id={createHouseFormId} aria-label="Crear casa" onSubmit={form.handleSubmit(onSubmit)}>
             <Controller
               name="houseNumber"
               control={form.control}

@@ -84,7 +84,13 @@ function ComboboxInput({
           className,
         )}
         data-slot="combobox-input"
-        render={<Input className="has-disabled:opacity-100" nativeInput size={sizeValue} />}
+        render={
+          <Input
+            nativeInput
+            size={sizeValue}
+            className="ring-0 has-focus-visible:border-input has-disabled:opacity-100 has-focus-visible:ring-0"
+          />
+        }
         {...props}
       />
       {showTrigger && (

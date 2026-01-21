@@ -11,12 +11,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { InputPassword } from '@/components/ui/input-password'
 import { SITE_CONFIG } from '@/config/site'
 import { authClient } from '@/lib/auth-client'
 import { createSEOTitle } from '@/lib/seo'
 import { getServerSession } from '@/server-fns/session'
 
-const DEFAULT_ERROR = 'Ocurrió un error al iniciar sesión, intenta nuevamente.'
+const DEFAULT_ERROR = 'Error en el servidor, intenta nuevamente.'
 
 const loginSchema = z.object({
   email: z.email('Correo inválido').min(1, 'El correo es requerido'),
@@ -131,7 +132,7 @@ function RouteComponent() {
                     <FieldLabel htmlFor={field.name}>
                       Contraseña <span className="text-destructive">*</span>
                     </FieldLabel>
-                    <Input
+                    <InputPassword
                       {...field}
                       id={field.name}
                       type="password"

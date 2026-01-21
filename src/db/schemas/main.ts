@@ -12,7 +12,7 @@ export const categoryExpensesEnum = pgEnum('category_expenses', ['security', 'ma
 export const violationStatusEnum = pgEnum('violation_status', ['pending', 'paid'])
 
 // payment type enum
-export const paymentTypeEnum = pgEnum('payment_type', ['monthly_fee', 'violation'])
+export const paymentTypeEnum = pgEnum('payment_type', ['monthly_fee', 'extra', 'other'])
 
 // payment status enum
 export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'paid'])

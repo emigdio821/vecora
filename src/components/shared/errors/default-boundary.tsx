@@ -9,7 +9,9 @@ export function DefaultErrorBoundary({ error }: ErrorComponentProps) {
         <CardTitle className="text-center">Error</CardTitle>
       </CardHeader>
       <CardContent>
-        <code className="block w-full rounded-md bg-muted p-2 font-mono text-xs">{error.message}</code>
+        <code className="wrap-break-word block w-full rounded-md bg-muted p-2 font-mono text-xs">
+          {error.message}
+        </code>
       </CardContent>
       <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button className="grow" onClick={() => window.location.reload()}>

@@ -1,4 +1,3 @@
-import { IconMinus } from '@tabler/icons-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -12,6 +11,8 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     id: 'select',
     enablePinning: false,
     enableResizing: false,
+    enableSorting: false,
+    size: 28,
     header: ({ table }) => (
       <Checkbox
         aria-label="Seleccionar todo"
@@ -31,6 +32,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   {
     accessorKey: 'firstName',
     header: 'Nombre',
+    size: 200,
     cell: ({ row }) => <OwnerNameCell owner={row.original} />,
     filterFn: (row, _, value: string) => {
       const normalizedFirstName = normalizeString(row.original.firstName).toLowerCase()
@@ -45,59 +47,61 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   {
     accessorKey: 'email',
     header: 'Correo',
-    cell: ({ row }) => <span className="block max-w-36 truncate tabular-nums">{row.original.email}</span>,
+    size: 200,
+    cell: ({ row }) => <p className="truncate">{row.original.email}</p>,
   },
   {
     accessorKey: 'phone',
     header: 'Teléfono',
-    cell: ({ row }) => <p className="tabular-nums">{row.original.phone}</p>,
+    size: 140,
+    cell: ({ row }) => <p className="truncate">{row.original.phone}</p>,
   },
   {
     accessorKey: 'houses',
     header: 'Casas',
+    size: 140,
     cell: ({ row }) => {
       const houses = row.original.houses
       const houseBadges = houses.map((house) => (
-        <Badge variant="outline" className="tabular-nums" key={house.id}>
-          {house.houseNumber}
+        <Badge size="lg" variant="outline" key={house.id}>
+          <span>{house.houseNumber}</span>
         </Badge>
       ))
 
-      return (
-        <div className="flex max-w-24 flex-wrap gap-1">
-          {houseBadges.length > 0 ? houseBadges : <IconMinus className="size-4" />}
-        </div>
-      )
+      return <>{houseBadges.length > 0 && <div className="flex flex-wrap gap-1">{houseBadges}</div>}</>
     },
   },
   {
     accessorKey: 'violations',
     header: 'Infracciones',
+    size: 40,
     cell: ({ row }) => {
       const violations = row.original.violations
 
-      return violations.length > 0 ? (
-        <Badge variant="error" className="tabular-nums">
-          {violations.length}
-        </Badge>
-      ) : (
-        <IconMinus className="size-4" />
+      return (
+        violations.length > 0 && (
+          <Badge size="lg" variant="outline">
+            <span aria-hidden className="size-1.5 rounded-full bg-warning" />
+            <span>{violations.length}</span>
+          </Badge>
+        )
       )
     },
   },
   {
     accessorKey: 'payments',
     header: 'Pagos pendientes',
+    size: 40,
     cell: ({ row }) => {
-      const payments = row.original.payments.filter(
-        (p) => p.status === 'pending' && p.paymentType !== 'violation',
-      )
-      return payments.length > 0 ? (
-        <Badge variant="error" className="tabular-nums">
-          {payments.length}
-        </Badge>
-      ) : (
-        <IconMinus className="size-4" />
+      const payments = row.original.payments.filter((p) => p.status === 'pending')
+
+      return (
+        payments.length > 0 && (
+          <Badge size="lg" variant="outline">
+            <span aria-hidden className="size-1.5 rounded-full bg-warning" />
+            <span>{payments.length}</span>
+          </Badge>
+        )
       )
     },
   },
@@ -105,6 +109,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     id: 'actions',
     enablePinning: false,
     enableResizing: false,
+    size: 28,
     cell: ({ row }) => <OwnersTableActions owner={row.original} />,
   },
 ]
