@@ -1,8 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq, isNull } from 'drizzle-orm'
+import { createAuditLog } from '@/api/server-functions/audit'
 import { db } from '@/db'
 import { houses } from '@/db/schemas/main'
 import type { HouseWithOwner, InsertHouse, SelectHouse } from '@/db/schemas/zod/houses'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 import { createHouseSchema, updateHouseSchema } from '@/schemas/houses'
 
@@ -11,6 +13,18 @@ export const createHouse = createServerFn({ method: 'POST' })
   .inputValidator(createHouseSchema)
   .handler(async ({ data }) => {
     const [newHouse] = await db.insert(houses).values(data).returning()
+
+    createAuditLog({
+      data: {
+        action: 'create',
+        entityType: 'house',
+        entityId: newHouse.id,
+        newData: newHouse,
+      },
+    }).catch(console.error)
+
+    logger.debug(`House created with ID: ${newHouse.id}`)
+
     return newHouse satisfies InsertHouse
   })
 
@@ -19,7 +33,23 @@ export const updateHouse = createServerFn({ method: 'POST' })
   .inputValidator(updateHouseSchema)
   .handler(async ({ data }) => {
     const { houseId, ...updateData } = data
+
+    const [oldHouse] = await db.select().from(houses).where(eq(houses.id, houseId)).limit(1)
+
     const [updatedHouse] = await db.update(houses).set(updateData).where(eq(houses.id, houseId)).returning()
+
+    createAuditLog({
+      data: {
+        action: 'update',
+        entityType: 'house',
+        entityId: updatedHouse.id,
+        oldData: oldHouse,
+        newData: updatedHouse,
+      },
+    }).catch(console.error)
+
+    logger.debug(`House updated with ID: ${updatedHouse.id}`)
+
     return updatedHouse satisfies SelectHouse
   })
 

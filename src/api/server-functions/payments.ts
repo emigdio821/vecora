@@ -1,8 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
+import { createAuditLog } from '@/api/server-functions/audit'
 import { db } from '@/db'
 import { paymentMonths, payments } from '@/db/schemas/main'
 import type { InsertPayment, PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 import { createPaymentSchema, deletePaymentSchema, updatePaymentSchema } from '@/schemas/payments'
 
@@ -34,6 +36,17 @@ export const createPayment = createServerFn({ method: 'POST' })
       )
     }
 
+    createAuditLog({
+      data: {
+        action: 'create',
+        entityType: 'payment',
+        entityId: newPayment.id,
+        newData: { ...newPayment, months },
+      },
+    }).catch(console.error)
+
+    logger.debug(`Payment created with ID: ${newPayment.id}`)
+
     return newPayment satisfies InsertPayment
   })
 
@@ -42,6 +55,9 @@ export const updatePayment = createServerFn({ method: 'POST' })
   .inputValidator(updatePaymentSchema)
   .handler(async ({ data }) => {
     const { paymentId, ownerId, concept, amount, paymentType, year, months, status, paidAt } = data
+
+    const [oldPayment] = await db.select().from(payments).where(eq(payments.id, paymentId)).limit(1)
+    const oldMonths = await db.select().from(paymentMonths).where(eq(paymentMonths.paymentId, paymentId))
 
     const [updatedPayment] = await db
       .update(payments)
@@ -69,6 +85,18 @@ export const updatePayment = createServerFn({ method: 'POST' })
       )
     }
 
+    createAuditLog({
+      data: {
+        action: 'update',
+        entityType: 'payment',
+        entityId: updatedPayment.id,
+        oldData: { ...oldPayment, months: oldMonths.map((m) => m.month) },
+        newData: { ...updatedPayment, months },
+      },
+    }).catch(console.error)
+
+    logger.debug(`Payment updated with ID: ${updatedPayment.id}`)
+
     return updatedPayment satisfies InsertPayment
   })
 
@@ -77,7 +105,26 @@ export const deletePayment = createServerFn({ method: 'POST' })
   .inputValidator(deletePaymentSchema)
   .handler(async ({ data }) => {
     const { paymentId } = data
+
+    const [paymentToDelete] = await db.select().from(payments).where(eq(payments.id, paymentId)).limit(1)
+    const paymentMonthsToDelete = await db
+      .select()
+      .from(paymentMonths)
+      .where(eq(paymentMonths.paymentId, paymentId))
+
     const [deletedPayment] = await db.delete(payments).where(eq(payments.id, paymentId)).returning()
+
+    createAuditLog({
+      data: {
+        action: 'delete',
+        entityType: 'payment',
+        entityId: deletedPayment.id,
+        oldData: { ...paymentToDelete, months: paymentMonthsToDelete.map((m) => m.month) },
+      },
+    }).catch(console.error)
+
+    logger.debug(`Payment deleted with ID: ${deletedPayment.id}`)
+
     return deletedPayment
   })
 
