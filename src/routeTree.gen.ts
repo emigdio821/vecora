@@ -77,24 +77,24 @@ const AuthedAdminAdministrationRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthedIndexRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof AuthedMaintenanceRoute
   '/presidency': typeof AuthedPresidencyRoute
   '/security': typeof AuthedSecurityRoute
   '/settings': typeof AuthedSettingsRoute
   '/treasury': typeof AuthedTreasuryRoute
-  '/': typeof AuthedIndexRoute
   '/administration': typeof AuthedAdminAdministrationRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/': typeof AuthedIndexRoute
   '/maintenance': typeof AuthedMaintenanceRoute
   '/presidency': typeof AuthedPresidencyRoute
   '/security': typeof AuthedSecurityRoute
   '/settings': typeof AuthedSettingsRoute
   '/treasury': typeof AuthedTreasuryRoute
-  '/': typeof AuthedIndexRoute
   '/administration': typeof AuthedAdminAdministrationRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -115,24 +115,24 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/login'
     | '/maintenance'
     | '/presidency'
     | '/security'
     | '/settings'
     | '/treasury'
-    | '/'
     | '/administration'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/'
     | '/maintenance'
     | '/presidency'
     | '/security'
     | '/settings'
     | '/treasury'
-    | '/'
     | '/administration'
     | '/api/auth/$'
   id:
@@ -168,7 +168,7 @@ declare module '@tanstack/react-router' {
     '/_authed': {
       id: '/_authed'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -217,7 +217,7 @@ declare module '@tanstack/react-router' {
     '/_authed/_admin': {
       id: '/_authed/_admin'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthedAdminRouteImport
       parentRoute: typeof AuthedRoute
     }

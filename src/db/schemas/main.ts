@@ -3,12 +3,14 @@ import {
   check,
   index,
   integer,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
   primaryKey,
   text,
   timestamp,
+  unique,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core'
@@ -47,7 +49,7 @@ export const owners = pgTable('owners', {
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 20 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -61,7 +63,7 @@ export const externalUsers = pgTable('external_users', {
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 20 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -131,10 +133,15 @@ export const userRoles = pgTable(
       .notNull()
       .references(() => roles.id, { onDelete: 'cascade' }),
     assignedAt: timestamp('assigned_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (table) => [
     index('user_roles_userId_idx').on(table.userId),
     index('user_roles_roleId_idx').on(table.roleId),
+    unique('user_roles_unique').on(table.userId, table.roleId),
   ],
 )
 
@@ -148,6 +155,10 @@ export const expenses = pgTable(
     categoryExpenses: categoryExpensesEnum('category_expenses').notNull(),
     expenseDate: timestamp('expense_date', { withTimezone: true }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (table) => [
     index('expenses_category_idx').on(table.categoryExpenses),
@@ -168,6 +179,10 @@ export const violations = pgTable(
     violationDate: timestamp('violation_date', { withTimezone: true }).notNull(),
     status: violationStatusEnum('status').default('pending').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (table) => [
     index('violations_owner_idx').on(table.ownerId),
@@ -216,6 +231,49 @@ export const paymentMonths = pgTable(
     primaryKey({ columns: [table.paymentId, table.month] }),
     index('payment_months_payment_idx').on(table.paymentId),
     check('month_range', sql`${table.month} BETWEEN 1 AND 12`),
+  ],
+)
+
+// Audit Logs table - tracks all admin actions for compliance and security
+export const auditLogs = pgTable(
+  'audit_logs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+    action: varchar('action', { length: 100 }).notNull(),
+    entityType: varchar('entity_type', { length: 50 }).notNull(),
+    entityId: uuid('entity_id'),
+    changes: jsonb('changes'), // Stores { old: {...}, new: {...} }
+    ipAddress: varchar('ip_address', { length: 45 }),
+    userAgent: text('user_agent'),
+    timestamp: timestamp('timestamp', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index('audit_logs_userId_idx').on(table.userId),
+    index('audit_logs_entityType_idx').on(table.entityType),
+    index('audit_logs_entityId_idx').on(table.entityId),
+    index('audit_logs_timestamp_idx').on(table.timestamp),
+  ],
+)
+
+// Payment History table - tracks status changes for payments
+export const paymentHistory = pgTable(
+  'payment_history',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    paymentId: uuid('payment_id')
+      .notNull()
+      .references(() => payments.id, { onDelete: 'cascade' }),
+    previousStatus: paymentStatusEnum('previous_status').notNull(),
+    newStatus: paymentStatusEnum('new_status').notNull(),
+    changedBy: text('changed_by').references(() => user.id, { onDelete: 'set null' }),
+    notes: text('notes'),
+    changedAt: timestamp('changed_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index('payment_history_paymentId_idx').on(table.paymentId),
+    index('payment_history_changedBy_idx').on(table.changedBy),
+    index('payment_history_changedAt_idx').on(table.changedAt),
   ],
 )
 
@@ -287,11 +345,30 @@ export const paymentsRelations = relations(payments, ({ one, many }) => ({
     references: [owners.id],
   }),
   paymentMonths: many(paymentMonths),
+  paymentHistory: many(paymentHistory),
 }))
 
 export const paymentMonthsRelations = relations(paymentMonths, ({ one }) => ({
   payment: one(payments, {
     fields: [paymentMonths.paymentId],
     references: [payments.id],
+  }),
+}))
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  user: one(user, {
+    fields: [auditLogs.userId],
+    references: [user.id],
+  }),
+}))
+
+export const paymentHistoryRelations = relations(paymentHistory, ({ one }) => ({
+  payment: one(payments, {
+    fields: [paymentHistory.paymentId],
+    references: [payments.id],
+  }),
+  changedByUser: one(user, {
+    fields: [paymentHistory.changedBy],
+    references: [user.id],
   }),
 }))
