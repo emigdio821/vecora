@@ -3,6 +3,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
+import { deleteOwner } from '@/api/server-functions/owners'
+import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
@@ -19,8 +21,6 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
-import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
-import { deleteOwner } from '@/server-fns/owners'
 import { CreateOwnerSheet } from '../sheets/create-owner'
 
 interface OwnersDataTableHeaderProps {

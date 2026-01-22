@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+import { violationsListQueryOptions } from '@/api/tanstack-queries/violations'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { violationsListQueryOptions } from '@/lib/ts-queries/violations'
 import { violationsTableColumns } from './table/columns'
 import { ViolationsDataTableHeader } from './table/data-table-header'
 

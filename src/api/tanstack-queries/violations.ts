@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { getViolationsList } from '@/server-fns/violations'
+import { getViolationsList } from '@/api/server-functions/violations'
 
 export const VIOLATIONS_QUERY_KEY = 'violations'
 

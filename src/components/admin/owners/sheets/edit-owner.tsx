@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { updateOwner } from '@/api/server-functions/owners'
+import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -19,9 +21,7 @@ import {
 } from '@/components/ui/sheet'
 import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import { type UpdateOwnerFormData, updateOwnerSchema } from '@/schemas/owners'
-import { updateOwner } from '@/server-fns/owners'
 
 interface EditOwnerSheetProps {
   owner: OwnerWithRelations

@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { getOwners } from '@/server-fns/owners'
+import { getOwners } from '@/api/server-functions/owners'
 
 export const OWNERS_QUERY_KEY = 'owners'
 

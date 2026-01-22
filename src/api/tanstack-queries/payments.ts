@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { getPaymentsList } from '@/server-fns/payments'
+import { getPaymentsList } from '@/api/server-functions/payments'
 
 export const PAYMENTS_QUERY_KEY = 'payments'
 

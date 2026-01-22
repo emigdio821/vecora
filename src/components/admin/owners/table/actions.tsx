@@ -1,6 +1,8 @@
 import { IconDotsVertical, IconEdit, IconTrash, IconUser } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { deleteOwner } from '@/api/server-functions/owners'
+import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
@@ -23,9 +25,7 @@ import {
 } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
 import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
-import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import type { DeleteOwnerData } from '@/schemas/owners'
-import { deleteOwner } from '@/server-fns/owners'
 import { EditOwnerSheet } from '../sheets/edit-owner'
 import { OwnerDetailsSheet } from '../sheets/owner-details'
 

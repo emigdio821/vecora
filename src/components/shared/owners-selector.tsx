@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
 import {
   Select,
   SelectContent,
@@ -7,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
 import { Skeleton } from '../ui/skeleton'
 
 interface HouseSelectorProps extends React.ComponentProps<typeof Select> {

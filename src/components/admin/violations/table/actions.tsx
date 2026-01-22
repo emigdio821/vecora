@@ -1,6 +1,8 @@
 import { IconDotsVertical, IconEdit, IconFlag, IconTrash } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { deleteViolation } from '@/api/server-functions/violations'
+import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
@@ -23,9 +25,7 @@ import {
 } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
 import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
-import { VIOLATIONS_QUERY_KEY } from '@/lib/ts-queries/violations'
 import type { DeleteViolationData } from '@/schemas/violations'
-import { deleteViolation } from '@/server-fns/violations'
 import { EditViolationSheet } from '../sheets/edit-violation'
 import { ViolationDetailsSheet } from '../sheets/violation-details'
 

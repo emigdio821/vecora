@@ -2,6 +2,7 @@ import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSettings, IconSun 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'tanstack-theme-kit'
+import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import {
   Menu,
   MenuCheckboxItem,
@@ -16,7 +17,6 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { authClient } from '@/lib/auth-client'
-import { userProfileQueryOptions } from '@/lib/ts-queries/user'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar'
 import { Skeleton } from '../ui/skeleton'

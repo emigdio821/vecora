@@ -2,6 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { updateHouse } from '@/api/server-functions/houses'
+import { HOUSES_LIST_QUERY_KEY } from '@/api/tanstack-queries/houses'
+import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -27,10 +30,7 @@ import {
 } from '@/components/ui/sheet'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import { HOUSES_LIST_QUERY_KEY } from '@/lib/ts-queries/houses'
-import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
 import { type UpdateHouseFormData, updateHouseSchema } from '@/schemas/houses'
-import { updateHouse } from '@/server-fns/houses'
 
 interface EditHouseSheetProps {
   house: HouseWithOwner

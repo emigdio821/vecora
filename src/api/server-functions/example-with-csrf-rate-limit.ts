@@ -5,7 +5,7 @@
  * with TanStack Start server functions.
  */
 
-import { createServerFn } from '@tanstack/react-start/server'
+import { createServerFn } from '@tanstack/react-start'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import { csrfMiddleware } from '@/middleware/csrf'

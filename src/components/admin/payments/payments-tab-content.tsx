@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+import { paymentsListQueryOptions } from '@/api/tanstack-queries/payments'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { paymentsListQueryOptions } from '@/lib/ts-queries/payments'
 import { paymentsTableColumns } from './table/columns'
 import { PaymentsDataTableHeader } from './table/data-table-header'
 

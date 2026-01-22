@@ -1,6 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { createOwner } from '@/api/server-functions/owners'
+import { AVAILABLE_HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
+import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import { AvailableHousesSelector } from '@/components/shared/available-houses-selector'
 import { Button } from '@/components/ui/button'
@@ -19,10 +22,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import { AVAILABLE_HOUSES_QUERY_KEY } from '@/lib/ts-queries/houses'
-import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
 import { type CreateOwnerFormData, createOwnerSchema } from '@/schemas/owners'
-import { createOwner } from '@/server-fns/owners'
 
 interface CreateOwnerDialogProps {
   state: {

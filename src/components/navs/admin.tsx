@@ -1,7 +1,7 @@
 import { IconUserShield } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation } from '@tanstack/react-router'
-import { userProfileQueryOptions } from '@/lib/ts-queries/user'
+import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import {
   SidebarGroup,
   SidebarGroupContent,

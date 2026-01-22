@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import { AppHeader } from '@/components/app-header'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { userProfileQueryOptions } from '@/lib/ts-queries/user'
 import { authMiddleware } from '@/middleware/auth'
 
 export const Route = createFileRoute('/_authed')({

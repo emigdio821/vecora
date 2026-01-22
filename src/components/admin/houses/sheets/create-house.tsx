@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { createHouse } from '@/api/server-functions/houses'
+import { HOUSES_LIST_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/owners-selector'
 import { Button } from '@/components/ui/button'
@@ -18,9 +20,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import { HOUSES_LIST_QUERY_KEY } from '@/lib/ts-queries/houses'
 import { type CreateHouseFormData, createHouseSchema } from '@/schemas/houses'
-import { createHouse } from '@/server-fns/houses'
 
 interface CreateHouseDialogProps {
   state: {

@@ -2,6 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { createViolation } from '@/api/server-functions/violations'
+import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/owners-selector'
 import { Button } from '@/components/ui/button'
@@ -23,10 +25,8 @@ import {
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import { VIOLATIONS_QUERY_KEY } from '@/lib/ts-queries/violations'
 import { formatDate } from '@/lib/utils'
 import { type CreateViolationFormData, createViolationSchema } from '@/schemas/violations'
-import { createViolation } from '@/server-fns/violations'
 
 interface CreateViolationDialogProps {
   state: {

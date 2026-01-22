@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { isAdminUser } from '@/server-fns/admin'
+import { isAdminUser } from '@/api/server-functions/admin'
 
 export const Route = createFileRoute('/_authed/_admin')({
   component: RouteComponent,

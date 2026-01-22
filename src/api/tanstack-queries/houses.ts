@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { getAvailableHouses, getHouses } from '@/server-fns/houses'
+import { getAvailableHouses, getHouses } from '@/api/server-functions/houses'
 
 export const HOUSES_LIST_QUERY_KEY = 'houses'
 export const AVAILABLE_HOUSES_QUERY_KEY = 'available-houses'

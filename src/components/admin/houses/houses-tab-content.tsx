@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+import { housesListQueryOptions } from '@/api/tanstack-queries/houses'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { housesListQueryOptions } from '@/lib/ts-queries/houses'
 import { housesTableColumns } from './table/columns'
 import { HousesDataTableHeader } from './table/data-table-header'
 

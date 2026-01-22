@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { updatePayment } from '@/api/server-functions/payments'
+import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
 import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/owners-selector'
 import { Button } from '@/components/ui/button'
@@ -33,10 +35,8 @@ import {
   paymentTypeSchema,
 } from '@/db/schemas/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import { PAYMENTS_QUERY_KEY } from '@/lib/ts-queries/payments'
 import { getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
 import { type UpdatePaymentFormData, updatePaymentSchema } from '@/schemas/payments'
-import { updatePayment } from '@/server-fns/payments'
 
 interface UpdatePaymentSheetProps {
   state: {

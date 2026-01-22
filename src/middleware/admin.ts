@@ -1,5 +1,5 @@
 import { createMiddleware } from '@tanstack/react-start'
-import { isAdminUser } from '@/server-fns/admin'
+import { isAdminUser } from '@/api/server-functions/admin'
 
 export const adminOnlyMiddleware = createMiddleware().server(async ({ next }) => {
   const isAadmin = await isAdminUser()

@@ -1,6 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { createPayment } from '@/api/server-functions/payments'
+import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
 import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/owners-selector'
 import { Badge } from '@/components/ui/badge'
@@ -30,10 +32,8 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { type PaymentType, paymentTypeSchema } from '@/db/schemas/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import { PAYMENTS_QUERY_KEY } from '@/lib/ts-queries/payments'
 import { getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
 import { type CreatePaymentFormData, createPaymentSchema } from '@/schemas/payments'
-import { createPayment } from '@/server-fns/payments'
 
 interface CreatePaymentDialogProps {
   state: {
