@@ -17,7 +17,7 @@ export function NotFound() {
             <CardDescription className="text-center">Eta página no existe.</CardDescription>
           </CardHeader>
           <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button className="grow" render={<Link to="/">Inicio</Link>} />
+            <Button nativeButton={false} className="grow" render={<Link to="/">Inicio</Link>} />
           </CardFooter>
         </Card>
       </section>
