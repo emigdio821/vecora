@@ -32,6 +32,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { type PaymentType, paymentTypeSchema } from '@/db/schemas/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
+import { MAX_YEAR_OFFSET, STARTING_YEAR } from '@/lib/constants'
 import { getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
 import { type CreatePaymentFormData, createPaymentSchema } from '@/schemas/payments'
 
@@ -66,7 +67,10 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
   const watchPaymentType = form.watch('paymentType')
 
   const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: currentYear + 2 - 2020 + 1 }, (_, i) => 2020 + i)
+  const years = Array.from(
+    { length: currentYear + MAX_YEAR_OFFSET - STARTING_YEAR + 1 },
+    (_, i) => STARTING_YEAR + i,
+  )
 
   const createPaymentMutation = useEntityMutation({
     mutationFn: async (data: CreatePaymentFormData) => {

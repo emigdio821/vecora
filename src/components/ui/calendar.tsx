@@ -1,5 +1,6 @@
 import { IconChevronLeft, IconChevronRight, IconChevronUp } from '@tabler/icons-react'
 import { DayPicker, type DayPickerProps, getDefaultClassNames } from 'react-day-picker'
+import { STARTING_YEAR } from '@/lib/constants'
 import { cn, formatDate } from '@/lib/utils'
 import { buttonVariants } from './button'
 import { NativeSelect, NativeSelectOption } from './native-select'
@@ -14,9 +15,11 @@ function Calendar({
   ...props
 }: DayPickerProps) {
   const defaultClassNames = getDefaultClassNames()
+  const fromYear = new Date(STARTING_YEAR, 0)
 
   return (
     <DayPicker
+      startMonth={fromYear}
       captionLayout={captionLayout}
       showOutsideDays={showOutsideDays}
       formatters={{
