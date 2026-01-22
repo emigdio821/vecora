@@ -9,6 +9,7 @@ export const createExternalUserSchema = z.object({
     .min(1, 'El teléfono es requerido')
     .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
   email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
+  notes: z.string().max(200, 'Las notas son muy largas').optional(),
 })
 
 export type CreateExternalUserFormData = z.infer<typeof createExternalUserSchema>
@@ -22,6 +23,7 @@ export const updateExternalUserSchema = z.object({
     .min(1, 'El teléfono es requerido')
     .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
   email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
+  notes: z.string().max(200, 'Las notas son muy largas').optional(),
 })
 
 export type UpdateExternalUserFormData = z.infer<typeof updateExternalUserSchema>

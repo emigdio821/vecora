@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { and, eq } from 'drizzle-orm'
 import { db } from '@/db'
-import { roles, userRoles } from '@/db/schemas/main'
+import { profileRoles, profiles, roles } from '@/db/schemas/main'
 import { authMiddleware } from '@/middleware/auth'
 
 export const isAdminUser = createServerFn()
@@ -10,11 +10,19 @@ export const isAdminUser = createServerFn()
     const { session } = context
 
     try {
+      const profile = await db.query.profiles.findFirst({
+        where: eq(profiles.userId, session.user.id),
+      })
+
+      if (!profile) {
+        return false
+      }
+
       const adminRole = await db
         .select({ roleName: roles.name })
-        .from(userRoles)
-        .innerJoin(roles, eq(userRoles.roleId, roles.id))
-        .where(and(eq(userRoles.userId, session.user.id), eq(roles.name, 'admin')))
+        .from(profileRoles)
+        .innerJoin(roles, eq(profileRoles.roleId, roles.id))
+        .where(and(eq(profileRoles.profileId, profile.id), eq(roles.name, 'admin')))
         .limit(1)
 
       return adminRole.length > 0

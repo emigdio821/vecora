@@ -1,4 +1,4 @@
-import { IconChevronDown, IconUser } from '@tabler/icons-react'
+import { IconChevronDown, IconNotes, IconUser } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
@@ -71,6 +71,29 @@ export function ExternalUserDetailsSheet({ externalUser, state }: ExternalUserDe
                 )}
               </CollapsiblePanel>
             </Collapsible>
+          </Frame>
+
+          <Frame className="w-full">
+            {/* Notes info */}
+            {externalUser.notes && (
+              <Collapsible defaultOpen>
+                <FrameHeader className="flex-row items-center justify-between p-2">
+                  <CollapsibleTrigger
+                    className="data-panel-open:[&_svg]:rotate-180"
+                    render={<Button variant="plain" />}
+                  >
+                    <IconChevronDown className="size-4" />
+                    Notas
+                  </CollapsibleTrigger>
+                  <IconNotes className="size-4 text-muted-foreground" />
+                </FrameHeader>
+                <CollapsiblePanel className="space-y-1">
+                  <FramePanel className="flex items-center gap-2 p-2">
+                    <p className="line-clamp-2 text-muted-foreground text-sm">{externalUser.notes}</p>
+                  </FramePanel>
+                </CollapsiblePanel>
+              </Collapsible>
+            )}
           </Frame>
         </SheetPanel>
 

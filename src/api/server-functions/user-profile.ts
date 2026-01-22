@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
-import { profiles, roles, userRoles } from '@/db/schemas/main'
+import { profiles } from '@/db/schemas/main'
 import type { ProfileResponse } from '@/db/schemas/zod/profiles'
 import { authMiddleware } from '@/middleware/auth'
 
@@ -17,21 +17,17 @@ export const getUserProfile = createServerFn()
           user: true,
           owner: true,
           externalUser: true,
+          profileRoles: {
+            with: {
+              role: true,
+            },
+          },
         },
       })
 
       if (!profile) {
         throw new Error('Profile not found')
       }
-
-      const userRolesList = await db
-        .select({
-          roleId: userRoles.roleId,
-          roleName: roles.name,
-        })
-        .from(userRoles)
-        .innerJoin(roles, eq(userRoles.roleId, roles.id))
-        .where(eq(userRoles.userId, session.user.id))
 
       const response: ProfileResponse = {
         userId: profile.userId,
@@ -41,7 +37,7 @@ export const getUserProfile = createServerFn()
         profileType: profile.profileType,
         ownerId: profile.ownerId,
         externalUserId: profile.externalUserId,
-        roles: userRolesList.map((r) => r.roleName),
+        roles: profile.profileRoles.map((pr) => pr.role.name),
         image: profile.user.image,
       }
 

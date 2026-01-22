@@ -5,7 +5,7 @@ import { requiredAmountSchema } from './shared'
 export const createPaymentSchema = z
   .object({
     ownerId: z.uuid('ID de propietario inválido'),
-    concept: z.string().min(1, 'El concepto es requerido'),
+    concept: z.string().min(1, 'El concepto es requerido').max(200, 'El concepto es muy largo'),
     amount: requiredAmountSchema,
     paymentType: z.enum(paymentTypeSchema.options, 'Tipo de pago inválido'),
     year: z
@@ -32,7 +32,7 @@ export const updatePaymentSchema = z
   .object({
     paymentId: z.uuid('ID de pago inválido'),
     ownerId: z.uuid('ID de propietario inválido'),
-    concept: z.string().min(1, 'El concepto es requerido'),
+    concept: z.string().min(1, 'El concepto es requerido').max(200, 'El concepto es muy largo'),
     amount: requiredAmountSchema,
     paymentType: z.enum(paymentTypeSchema.options, 'Tipo de pago inválido'),
     year: z

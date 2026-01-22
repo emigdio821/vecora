@@ -19,13 +19,10 @@ export const getExternalUsers = createServerFn()
       with: {
         profile: {
           with: {
-            user: {
+            user: true,
+            profileRoles: {
               with: {
-                userRoles: {
-                  with: {
-                    role: true,
-                  },
-                },
+                role: true,
               },
             },
           },
@@ -34,7 +31,12 @@ export const getExternalUsers = createServerFn()
       orderBy: (externalUser, { desc }) => [desc(externalUser.updatedAt)],
     })
 
-    return externalUsersData satisfies ExternalUserWithProfileAndUser[]
+    // Filter out admin users
+    const filteredUsers = externalUsersData.filter(
+      (externalUser) => !externalUser.profile?.profileRoles.some((pr) => pr.role.name === 'admin'),
+    )
+
+    return filteredUsers satisfies ExternalUserWithProfileAndUser[]
   })
 
 export const createExternalUser = createServerFn({ method: 'POST' })
@@ -48,6 +50,7 @@ export const createExternalUser = createServerFn({ method: 'POST' })
         lastName: data.lastName,
         phone: data.phone,
         email: data.email,
+        notes: data.notes,
       })
       .returning()
 
@@ -80,6 +83,7 @@ export const updateExternalUser = createServerFn({ method: 'POST' })
         lastName: data.lastName,
         phone: data.phone,
         email: data.email,
+        notes: data.notes,
         updatedAt: new Date(),
       })
       .where(eq(externalUsers.id, data.externalUserId))

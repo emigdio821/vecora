@@ -35,7 +35,7 @@ export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'paid'])
 export const roles = pgTable('roles', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 50 }).notNull().unique(),
-  description: text('description'),
+  description: varchar('description', { length: 200 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -64,6 +64,7 @@ export const externalUsers = pgTable('external_users', {
   lastName: varchar('last_name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 20 }).notNull(),
   email: varchar('email', { length: 255 }).notNull().unique(),
+  notes: varchar('notes', { length: 200 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -121,14 +122,14 @@ export const profiles = pgTable(
   ],
 )
 
-// User Roles - junction table for many-to-many relationship between users and roles
-export const userRoles = pgTable(
-  'user_roles',
+// Profile Roles - junction table for many-to-many relationship between profiles and roles
+export const profileRoles = pgTable(
+  'profile_roles',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: text('user_id')
+    profileId: uuid('profile_id')
       .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
+      .references(() => profiles.id, { onDelete: 'cascade' }),
     roleId: uuid('role_id')
       .notNull()
       .references(() => roles.id, { onDelete: 'cascade' }),
@@ -139,9 +140,9 @@ export const userRoles = pgTable(
       .notNull(),
   },
   (table) => [
-    index('user_roles_userId_idx').on(table.userId),
-    index('user_roles_roleId_idx').on(table.roleId),
-    unique('user_roles_unique').on(table.userId, table.roleId),
+    index('profile_roles_profileId_idx').on(table.profileId),
+    index('profile_roles_roleId_idx').on(table.roleId),
+    unique('profile_roles_unique').on(table.profileId, table.roleId),
   ],
 )
 
@@ -150,7 +151,7 @@ export const expenses = pgTable(
   'expenses',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    concept: text('concept'),
+    concept: varchar('concept', { length: 200 }),
     amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
     categoryExpenses: categoryExpensesEnum('category_expenses').notNull(),
     expenseDate: timestamp('expense_date', { withTimezone: true }).notNull(),
@@ -174,7 +175,7 @@ export const violations = pgTable(
     ownerId: uuid('owner_id')
       .notNull()
       .references(() => owners.id, { onDelete: 'cascade' }),
-    concept: text('concept').notNull(),
+    concept: varchar('concept', { length: 200 }).notNull(),
     amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
     violationDate: timestamp('violation_date', { withTimezone: true }).notNull(),
     status: violationStatusEnum('status').default('pending').notNull(),
@@ -198,7 +199,7 @@ export const payments = pgTable(
     ownerId: uuid('owner_id')
       .notNull()
       .references(() => owners.id, { onDelete: 'cascade' }),
-    concept: text('concept').notNull(),
+    concept: varchar('concept', { length: 200 }).notNull(),
     amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
     paymentType: paymentTypeEnum('payment_type').notNull(),
     year: integer('year').notNull(),
@@ -267,7 +268,7 @@ export const paymentHistory = pgTable(
     previousStatus: paymentStatusEnum('previous_status').notNull(),
     newStatus: paymentStatusEnum('new_status').notNull(),
     changedBy: text('changed_by').references(() => user.id, { onDelete: 'set null' }),
-    notes: text('notes'),
+    notes: varchar('notes', { length: 200 }),
     changedAt: timestamp('changed_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
@@ -279,7 +280,7 @@ export const paymentHistory = pgTable(
 
 // Relations
 export const rolesRelations = relations(roles, ({ many }) => ({
-  userRoles: many(userRoles),
+  profileRoles: many(profileRoles),
 }))
 
 export const ownersRelations = relations(owners, ({ many, one }) => ({
@@ -306,7 +307,7 @@ export const housesRelations = relations(houses, ({ one }) => ({
   }),
 }))
 
-export const profilesRelations = relations(profiles, ({ one }) => ({
+export const profilesRelations = relations(profiles, ({ one, many }) => ({
   user: one(user, {
     fields: [profiles.userId],
     references: [user.id],
@@ -319,15 +320,16 @@ export const profilesRelations = relations(profiles, ({ one }) => ({
     fields: [profiles.externalUserId],
     references: [externalUsers.id],
   }),
+  profileRoles: many(profileRoles),
 }))
 
-export const userRolesRelations = relations(userRoles, ({ one }) => ({
-  user: one(user, {
-    fields: [userRoles.userId],
-    references: [user.id],
+export const profileRolesRelations = relations(profileRoles, ({ one }) => ({
+  profile: one(profiles, {
+    fields: [profileRoles.profileId],
+    references: [profiles.id],
   }),
   role: one(roles, {
-    fields: [userRoles.roleId],
+    fields: [profileRoles.roleId],
     references: [roles.id],
   }),
 }))

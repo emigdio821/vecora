@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from './index'
 import { user } from './schemas/auth'
-import { externalUsers, profiles, roles, userRoles } from './schemas/main'
+import { externalUsers, profileRoles, profiles, roles } from './schemas/main'
 
 async function seed() {
   console.log('Seeding database...')
@@ -48,7 +48,7 @@ async function seed() {
       body: {
         email: 'admin@resido.com',
         password: 'admin123',
-        name: 'Admin System',
+        name: 'Admin Resido',
       },
     })
 
@@ -62,40 +62,51 @@ async function seed() {
   // Step 3: Create external user profile for admin
   const existingProfile = await db.select().from(profiles).where(eq(profiles.userId, adminUserId)).limit(1)
 
-  if (existingProfile.length === 0) {
-    console.log('Creating admin profile...')
+  let adminProfileId: string
 
+  if (existingProfile.length === 0) {
     // Create external user
     const [adminExternalUser] = await db
       .insert(externalUsers)
       .values({
         firstName: 'Admin',
-        lastName: 'System',
+        lastName: 'Resido',
         email: 'admin@resido.com',
-        phone: '0000000000',
+        phone: '+528124135976', // fake number
+        notes: 'System administrator - Full access',
       })
       .returning()
 
     // Link to user profile
-    await db.insert(profiles).values({
-      userId: adminUserId,
-      profileType: 'external',
-      ownerId: null,
-      externalUserId: adminExternalUser.id,
-    })
+    const [adminProfile] = await db
+      .insert(profiles)
+      .values({
+        userId: adminUserId,
+        profileType: 'external',
+        ownerId: null,
+        externalUserId: adminExternalUser.id,
+      })
+      .returning()
+
+    adminProfileId = adminProfile.id
   } else {
     console.log('Admin profile already exists')
+    adminProfileId = existingProfile[0].id
   }
 
   const adminRole = await db.select().from(roles).where(eq(roles.name, 'admin')).limit(1)
 
   if (adminRole.length > 0) {
-    const existingRole = await db.select().from(userRoles).where(eq(userRoles.userId, adminUserId)).limit(1)
+    const existingRole = await db
+      .select()
+      .from(profileRoles)
+      .where(eq(profileRoles.profileId, adminProfileId))
+      .limit(1)
 
     if (existingRole.length === 0) {
       console.log('Assigning admin role...')
-      await db.insert(userRoles).values({
-        userId: adminUserId,
+      await db.insert(profileRoles).values({
+        profileId: adminProfileId,
         roleId: adminRole[0].id,
       })
     } else {

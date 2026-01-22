@@ -19,6 +19,7 @@ import {
   SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { Textarea } from '@/components/ui/textarea'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type CreateExternalUserFormData, createExternalUserSchema } from '@/schemas/external-users'
 
@@ -41,6 +42,7 @@ export function CreateExternalUserSheet({ state }: CreateExternalUserSheetProps)
       lastName: '',
       phone: '',
       email: '',
+      notes: '',
     },
   })
 
@@ -154,6 +156,27 @@ export function CreateExternalUserSheet({ state }: CreateExternalUserSheetProps)
                     autoComplete="email"
                     aria-invalid={fieldState.invalid}
                     disabled={createExternalUserMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="notes"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>Notas</FieldLabel>
+                  <Textarea
+                    id={field.name}
+                    value={field.value}
+                    className="max-h-40"
+                    onBlur={field.onBlur}
+                    onChange={field.onChange}
+                    aria-invalid={fieldState.invalid}
+                    disabled={createExternalUserMutation.isPending}
+                    placeholder="Breve descripción del porqué se agrega el usuario externo (opcional)"
                   />
                   <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
                 </Field>
