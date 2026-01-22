@@ -1,24 +1,22 @@
 /**
- * Example Server Function with CSRF Protection and Rate Limiting
+ * Example Server Function with Rate Limiting
  *
- * This file demonstrates how to use the CSRF and rate limiting middleware
+ * This file demonstrates how to use the rate limiting middleware
  * with TanStack Start server functions.
  */
 
 import { createServerFn } from '@tanstack/react-start'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
-import { csrfMiddleware } from '@/middleware/csrf'
 import { apiRateLimiter, authRateLimiter, strictRateLimiter } from '@/middleware/rate-limit'
 
 /**
- * Example 1: Protected route with CSRF and standard rate limiting
+ * Example 1: Protected route with standard rate limiting
  */
 export const exampleCreateEntity = createServerFn({ method: 'POST' })
   .middleware([
     authMiddleware, // Require authentication
     apiRateLimiter, // 100 requests per minute
-    csrfMiddleware, // CSRF protection
   ])
   .handler(async () => {
     // Your business logic here
@@ -33,7 +31,6 @@ export const exampleAdminAction = createServerFn({ method: 'POST' })
     authMiddleware,
     adminOnlyMiddleware, // Require admin role
     strictRateLimiter, // 5 requests per minute
-    csrfMiddleware,
   ])
   .handler(async () => {
     // Your admin logic here
@@ -46,7 +43,6 @@ export const exampleAdminAction = createServerFn({ method: 'POST' })
 export const exampleLogin = createServerFn({ method: 'POST' })
   .middleware([
     authRateLimiter, // 10 requests per minute for auth routes
-    // Note: No CSRF for login (initial auth), but use it for logout
   ])
   .handler(async () => {
     // Your login logic here
@@ -54,7 +50,7 @@ export const exampleLogin = createServerFn({ method: 'POST' })
   })
 
 /**
- * Example 4: Public route with just rate limiting (no auth, no CSRF)
+ * Example 4: Public route with just rate limiting (no auth)
  */
 export const examplePublicAPI = createServerFn({ method: 'GET' })
   .middleware([

@@ -1,104 +1,14 @@
 # Security Implementation Guide
 
-This document explains how to use the CSRF protection and rate limiting features in Resido.
+This document explains how to use the rate limiting feature in Resido.
 
 ## Table of Contents
-- [CSRF Protection](#csrf-protection)
 - [Rate Limiting](#rate-limiting)
 - [Usage Examples](#usage-examples)
 - [Production Considerations](#production-considerations)
 
 ---
 
-## CSRF Protection
-
-### What is CSRF?
-Cross-Site Request Forgery (CSRF) is an attack that forces authenticated users to execute unwanted actions. Our implementation uses the **Double Submit Cookie** pattern to prevent this.
-
-### How It Works
-1. Server generates a random token and sets it in a cookie
-2. Client reads the token and includes it in request headers
-3. Server validates both match before processing the request
-
-### Implementation Files
-- `src/middleware/csrf.ts` - CSRF middleware
-- `src/hooks/use-csrf-token.ts` - React hook to get CSRF token
-
-### Applying CSRF Protection
-
-#### Option 1: Add to Existing Server Functions
-
-Update your server functions to include the CSRF middleware:
-
-```typescript
-// src/server-fns/owners.ts
-import { csrfMiddleware } from '@/middleware/csrf'
-
-export const createOwner = createServerFn({ method: 'POST' })
-  .middleware([
-    authMiddleware,
-    csrfMiddleware,  // Add this line
-  ])
-  .inputValidator(createOwnerSchema)
-  .handler(async ({ data }) => {
-    return await db.insert(owners).values(data).returning()
-  })
-```
-
-#### Option 2: Generate CSRF Token in Root Layout
-
-In your root layout, generate and set the CSRF token cookie:
-
-```typescript
-// src/routes/__root.tsx
-import { generateCsrfToken } from '@/middleware/csrf'
-
-export default function Root() {
-  // Generate CSRF token on server
-  if (typeof window === 'undefined') {
-    const { token, cookie } = generateCsrfToken()
-    // Set cookie in response headers
-  }
-
-  return <Outlet />
-}
-```
-
-#### Option 3: Automatic CSRF Headers with Axios
-
-If you're using axios or a similar HTTP client:
-
-```typescript
-// src/lib/api-client.ts
-import axios from 'axios'
-
-const apiClient = axios.create({
-  baseURL: '/api',
-})
-
-// Add CSRF token to all requests
-apiClient.interceptors.request.use((config) => {
-  const cookies = document.cookie.split(';').map((c) => c.trim())
-  const csrfCookie = cookies.find((c) => c.startsWith('csrf_token='))
-
-  if (csrfCookie) {
-    const token = csrfCookie.split('=')[1]
-    config.headers['x-csrf-token'] = token
-  }
-
-  return config
-})
-```
-
-### Protected Routes
-
-CSRF protection should be applied to:
-- ✅ All POST, PUT, PATCH, DELETE requests
-- ✅ Any state-changing operations
-- ❌ GET requests (not needed)
-- ❌ Initial login (no session yet)
-
----
 
 ## Rate Limiting
 
@@ -178,14 +88,12 @@ Rate limit information is included in response headers:
 // src/server-fns/owners.ts
 import { createServerFn } from '@tanstack/react-start/server'
 import { authMiddleware } from '@/middleware/auth'
-import { csrfMiddleware } from '@/middleware/csrf'
 import { apiRateLimiter } from '@/middleware/rate-limit'
 
 export const createOwner = createServerFn({ method: 'POST' })
   .middleware([
     authMiddleware,      // Require authentication
     apiRateLimiter,     // 100 requests/min
-    csrfMiddleware,     // CSRF protection
   ])
   .inputValidator(createOwnerSchema)
   .handler(async ({ data }) => {
@@ -204,7 +112,6 @@ export const deleteAllUsers = createServerFn({ method: 'DELETE' })
     authMiddleware,
     adminOnlyMiddleware,
     strictRateLimiter,  // 5 requests/min
-    csrfMiddleware,
   ])
   .handler(async () => {
     // Dangerous operation - strictly rate limited
@@ -220,7 +127,6 @@ import { authRateLimiter } from '@/middleware/rate-limit'
 export const login = createServerFn({ method: 'POST' })
   .middleware([
     authRateLimiter,  // 10 requests/min
-    // No CSRF on initial login
   ])
   .handler(async ({ data }) => {
     // Login logic
@@ -264,14 +170,7 @@ const redis = createClient({ url: process.env.REDIS_URL })
 - Works with multiple server instances
 - Scales better than in-memory
 
-### 2. CSRF Token Rotation
-
-Consider rotating CSRF tokens periodically:
-- On login/logout
-- Every N hours
-- After sensitive operations
-
-### 3. IP Address Detection
+### 2. IP Address Detection
 
 Behind a reverse proxy (Nginx, Cloudflare):
 ```typescript
@@ -281,7 +180,7 @@ Behind a reverse proxy (Nginx, Cloudflare):
 
 Make sure your reverse proxy sets these headers correctly.
 
-### 4. Environment-Specific Configuration
+### 3. Environment-Specific Configuration
 
 ```typescript
 // src/config/security.ts
@@ -299,7 +198,7 @@ export const RATE_LIMITS = {
 }
 ```
 
-### 5. Monitoring
+### 4. Monitoring
 
 Add logging for security events:
 
@@ -308,14 +207,11 @@ import { logger } from '@/lib/logger'
 
 // Rate limit exceeded
 logger.warn('Rate limit exceeded', { ip, endpoint })
-
-// CSRF failed
-logger.warn('CSRF validation failed', { ip, endpoint })
 ```
 
 Integrate with your monitoring service (Sentry, DataDog, etc.).
 
-### 6. Testing Rate Limits
+### 5. Testing Rate Limits
 
 ```bash
 # Test rate limiting with curl
@@ -337,13 +233,7 @@ done
 2. Monitor logs for rate limit hits
 3. Adjust limits based on usage patterns
 
-### Phase 2: Add CSRF (Medium Risk)
-1. Generate CSRF tokens in root layout
-2. Add `csrfMiddleware` to server functions
-3. Test all forms and mutations
-4. Deploy to staging first
-
-### Phase 3: Tighten Limits (After Monitoring)
+### Phase 2: Tighten Limits (After Monitoring)
 1. Use `authRateLimiter` for auth routes
 2. Use `strictRateLimiter` for sensitive operations
 3. Monitor for false positives
@@ -351,16 +241,6 @@ done
 ---
 
 ## Troubleshooting
-
-### CSRF Token Issues
-
-**Problem**: "CSRF validation failed" errors
-
-**Solutions**:
-1. Check cookie is being set: `document.cookie` in browser console
-2. Verify token in header: Check Network tab → Request Headers → x-csrf-token
-3. Ensure SameSite=Strict cookies work (requires HTTPS in production)
-4. Check if cookie path is correct
 
 ### Rate Limiting Issues
 
@@ -393,16 +273,14 @@ createServerFn({ method: 'POST' })
     authMiddleware,           // 1. Authentication
     adminOnlyMiddleware,   // 2. Authorization
     apiRateLimiter,          // 3. Rate limiting
-    csrfMiddleware,          // 4. CSRF protection
   ])
-  .inputValidator(schema)    // 5. Input validation
-  .handler(async () => {})   // 6. Business logic
+  .inputValidator(schema)    // 4. Input validation
+  .handler(async () => {})   // 5. Business logic
 ```
 
 ### Security Checklist
 
 - [ ] Rate limiting on all endpoints
-- [ ] CSRF protection on state-changing operations
 - [ ] Authentication where needed
 - [ ] Authorization checks for admin routes
 - [ ] Input validation with Zod
