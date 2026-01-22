@@ -1,0 +1,190 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useId } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { updateExternalUser } from '@/api/server-functions/external-users'
+import { EXTERNAL_USERS_QUERY_KEY } from '@/api/tanstack-queries/external-users'
+import { LoaderIcon } from '@/components/icons'
+import { Button } from '@/components/ui/button'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Form } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetPanel,
+  SheetTitle,
+} from '@/components/ui/sheet'
+import type { SelectExternalUser } from '@/db/schemas/zod/external-users'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
+import { type UpdateExternalUserFormData, updateExternalUserSchema } from '@/schemas/external-users'
+
+interface EditExternalUserSheetProps {
+  externalUser: SelectExternalUser
+  state: {
+    isOpen: boolean
+    onOpenChange: (open: boolean) => void
+  }
+}
+
+export function EditExternalUserSheet({ externalUser, state }: EditExternalUserSheetProps) {
+  const editExternalUserFormId = useId()
+  const { isOpen, onOpenChange } = state
+
+  const form = useForm<UpdateExternalUserFormData>({
+    resolver: zodResolver(updateExternalUserSchema),
+    values: {
+      externalUserId: externalUser.id,
+      firstName: externalUser.firstName,
+      lastName: externalUser.lastName,
+      phone: externalUser.phone,
+      email: externalUser.email,
+    },
+  })
+
+  const updateExternalUserMutation = useEntityMutation({
+    mutationFn: async (data: UpdateExternalUserFormData) => {
+      return await updateExternalUser({ data })
+    },
+    invalidateKeys: [EXTERNAL_USERS_QUERY_KEY],
+    successTitle: 'Usuario externo actualizado',
+    successDescription: 'El usuario externo ha sido actualizado exitosamente.',
+    errorDescription: 'Ocurrió un error al actualizar el usuario externo, intenta nuevamente.',
+    onSuccess: () => {
+      onOpenChange(false)
+    },
+  })
+
+  function onSubmit(data: UpdateExternalUserFormData) {
+    updateExternalUserMutation.mutate(data)
+  }
+
+  function handleOpenChange(open: boolean) {
+    if (updateExternalUserMutation.isPending) return
+    onOpenChange(open)
+  }
+
+  return (
+    <Sheet
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        if (!isOpen) form.reset()
+      }}
+    >
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Editar usuario externo</SheetTitle>
+          <SheetDescription>Actualiza la información del usuario externo.</SheetDescription>
+        </SheetHeader>
+
+        <SheetPanel>
+          <Form
+            id={editExternalUserFormId}
+            aria-label="Editar usuario externo"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <Controller
+              name="firstName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Nombre <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateExternalUserMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="lastName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Apellido <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateExternalUserMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="phone"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Teléfono <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <PhoneInput
+                    id={field.name}
+                    value={field.value}
+                    onBlur={field.onBlur}
+                    disabled={updateExternalUserMutation.isPending}
+                    onChange={(value) => {
+                      field.onChange(value || '')
+                    }}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="email"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>
+                    Correo <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    type="email"
+                    id={field.name}
+                    autoComplete="email"
+                    aria-invalid={fieldState.invalid}
+                    disabled={updateExternalUserMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+          </Form>
+        </SheetPanel>
+
+        <SheetFooter>
+          <SheetClose
+            render={
+              <Button variant="outline" type="button">
+                Cancelar
+              </Button>
+            }
+          />
+          <Button type="submit" form={editExternalUserFormId} disabled={updateExternalUserMutation.isPending}>
+            Guardar cambios
+            {updateExternalUserMutation.isPending && <LoaderIcon />}
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  )
+}

@@ -1,26 +1,33 @@
-import { IconBarrierBlock } from '@tabler/icons-react'
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty'
+import { useQuery } from '@tanstack/react-query'
+import { externalUsersListQueryOptions } from '@/api/tanstack-queries/external-users'
+import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
+import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
+import { DataTable } from '@/components/table/data-table'
+import { externalUsersTableColumns } from './table/columns'
+import { ExternalUsersDataTableHeader } from './table/data-table-header'
 
 export function ExternalUsersTabContent() {
+  const { data: externalUsers = [], isLoading, error, refetch } = useQuery(externalUsersListQueryOptions())
+
+  if (error) {
+    return (
+      <TSQueryGenericError
+        refetch={refetch}
+        errorDescription="Algo salió mal al cargar los usuarios externos."
+      />
+    )
+  }
+
+  if (isLoading) {
+    return <TableGenericSkeleton />
+  }
+
   return (
-    <Empty>
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <IconBarrierBlock />
-        </EmptyMedia>
-        <EmptyTitle>Usuarios externos</EmptyTitle>
-        <EmptyDescription>Administrar usuarios externos.</EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        Esta sección está en desarrollo. Pronto podrás administrar usuarios externos desde aquí.
-      </EmptyContent>
-    </Empty>
+    <DataTable
+      data={externalUsers}
+      tableId="external-users"
+      columns={externalUsersTableColumns}
+      header={(table) => <ExternalUsersDataTableHeader table={table} />}
+    />
   )
 }
