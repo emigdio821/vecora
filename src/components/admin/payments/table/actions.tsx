@@ -1,5 +1,4 @@
 import { IconCurrencyDollar, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { deletePayment } from '@/api/server-functions/payments'
 import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
@@ -23,8 +22,8 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from '@/components/ui/menu'
-import { toastManager } from '@/components/ui/toast'
 import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { getPaymentTypeLabel } from '@/lib/utils'
 import type { DeletePaymentData } from '@/schemas/payments'
 import { EditPaymentSheet } from '../sheets/edit-payment'
@@ -38,29 +37,17 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isPaymentDetailsSheetOpen, setPaymentDetailsSheetOpen] = useState(false)
   const [isEditPaymentSheetOpen, setEditPaymentSheetOpen] = useState(false)
-  const queryClient = useQueryClient()
 
-  const deletePaymentMutation = useMutation({
+  const deletePaymentMutation = useEntityMutation({
     mutationFn: async (data: DeletePaymentData) => {
       return await deletePayment({ data })
     },
+    invalidateKeys: [PAYMENTS_QUERY_KEY],
+    successTitle: 'Pago eliminado',
+    successDescription: 'El pago ha sido eliminado exitosamente.',
+    errorDescription: 'Ocurrió un error al eliminar el pago, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [PAYMENTS_QUERY_KEY] })
       setDeleteDialogOpen(false)
-      toastManager.add({
-        type: 'success',
-        title: 'Pago eliminado',
-        description: 'El pago ha sido eliminado exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error deleting payment:', error)
-
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al eliminar el pago, intenta nuevamente.',
-      })
     },
   })
 

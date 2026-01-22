@@ -4,7 +4,6 @@ import { createAuditLog } from '@/api/server-functions/audit'
 import { db } from '@/db'
 import { violations } from '@/db/schemas/main'
 import type { InsertViolation, SelectViolation, ViolationWithOwner } from '@/db/schemas/zod/violations'
-import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 import { createViolationSchema, deleteViolationSchema, updateViolationSchema } from '@/schemas/violations'
 
@@ -22,8 +21,6 @@ export const createViolation = createServerFn({ method: 'POST' })
         newData: newViolation,
       },
     }).catch(console.error)
-
-    logger.debug(`Violation created with ID: ${newViolation.id}`)
 
     return newViolation satisfies InsertViolation
   })
@@ -52,8 +49,6 @@ export const updateViolation = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    logger.debug(`Violation updated with ID: ${updatedViolation.id}`)
-
     return updatedViolation satisfies SelectViolation
   })
 
@@ -79,8 +74,6 @@ export const deleteViolation = createServerFn({ method: 'POST' })
         oldData: violationToDelete,
       },
     }).catch(console.error)
-
-    logger.debug(`Violation deleted with ID: ${deletedViolation.id}`)
 
     return deletedViolation satisfies SelectViolation
   })

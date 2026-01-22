@@ -4,7 +4,6 @@ import { createAuditLog } from '@/api/server-functions/audit'
 import { db } from '@/db'
 import { paymentMonths, payments } from '@/db/schemas/main'
 import type { InsertPayment, PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
-import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 import { createPaymentSchema, deletePaymentSchema, updatePaymentSchema } from '@/schemas/payments'
 
@@ -44,8 +43,6 @@ export const createPayment = createServerFn({ method: 'POST' })
         newData: { ...newPayment, months },
       },
     }).catch(console.error)
-
-    logger.debug(`Payment created with ID: ${newPayment.id}`)
 
     return newPayment satisfies InsertPayment
   })
@@ -95,8 +92,6 @@ export const updatePayment = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    logger.debug(`Payment updated with ID: ${updatedPayment.id}`)
-
     return updatedPayment satisfies InsertPayment
   })
 
@@ -123,8 +118,6 @@ export const deletePayment = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    logger.debug(`Payment deleted with ID: ${deletedPayment.id}`)
-
     return deletedPayment
   })
 
@@ -138,7 +131,7 @@ export const getPaymentsList = createServerFn()
           orderBy: (paymentMonths, { asc }) => [asc(paymentMonths.month)],
         },
       },
-      orderBy: (payments, { desc }) => [desc(payments.createdAt)],
+      orderBy: (payments, { desc }) => [desc(payments.updatedAt)],
     })
 
     return allPayments satisfies PaymentWithOwnerAndMonths[]

@@ -1,5 +1,4 @@
 import { IconDotsVertical, IconEdit, IconTrash, IconUser } from '@tabler/icons-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { deleteOwner } from '@/api/server-functions/owners'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
@@ -23,8 +22,8 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from '@/components/ui/menu'
-import { toastManager } from '@/components/ui/toast'
 import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteOwnerData } from '@/schemas/owners'
 import { EditOwnerSheet } from '../sheets/edit-owner'
 import { OwnerDetailsSheet } from '../sheets/owner-details'
@@ -38,29 +37,17 @@ export function OwnersTableActions({ owner }: ActionsProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isOwnerDetailsSheetOpen, setOwnerDetailsSheetOpen] = useState(false)
   const [isEditOwnerSheetOpen, setEditOwnerSheetOpen] = useState(false)
-  const queryClient = useQueryClient()
 
-  const deleteOwnerMutation = useMutation({
+  const deleteOwnerMutation = useEntityMutation({
     mutationFn: async (data: DeleteOwnerData) => {
       return await deleteOwner({ data })
     },
+    invalidateKeys: [OWNERS_QUERY_KEY],
+    successTitle: 'Propietario eliminado',
+    successDescription: 'El propietario ha sido eliminado exitosamente.',
+    errorDescription: 'Ocurrió un error al eliminar el propietario, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
       setDeleteDialogOpen(false)
-
-      toastManager.add({
-        type: 'success',
-        title: 'Propietario eliminado',
-        description: 'El propietario ha sido eliminado exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error deleting owner:', error)
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al eliminar el propietario, intenta nuevamente.',
-      })
     },
   })
 

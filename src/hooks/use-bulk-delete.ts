@@ -1,11 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
 import { toastManager } from '@/components/ui/toast'
+import { logger } from '@/lib/logger'
 
 interface BulkDeleteConfig<TData> {
   deleteFn: (item: TData) => Promise<unknown>
   invalidateKeys: string[]
-  entityNamePlural: string
+  successTitle: React.ReactNode
+  successDescription: React.ReactNode
+  errorTitle?: React.ReactNode
+  errorDescription?: React.ReactNode
   table: Table<TData>
   onSuccess?: () => void
 }
@@ -13,7 +17,10 @@ interface BulkDeleteConfig<TData> {
 export function useBulkDelete<TData>({
   deleteFn,
   invalidateKeys,
-  entityNamePlural,
+  successTitle,
+  successDescription,
+  errorTitle,
+  errorDescription,
   table,
   onSuccess: customOnSuccess,
 }: BulkDeleteConfig<TData>) {
@@ -40,14 +47,14 @@ export function useBulkDelete<TData>({
       if (rejected === 0) {
         toastManager.add({
           type: 'success',
-          title: `${entityNamePlural} eliminados`,
-          description: `${entityNamePlural} seleccionados han sido eliminados exitosamente.`,
+          title: successTitle,
+          description: successDescription,
         })
       } else if (fulfilled === 0) {
         toastManager.add({
           type: 'error',
-          title: 'Error',
-          description: `Ocurrió un error al eliminar los ${entityNamePlural.toLowerCase()}, intenta nuevamente.`,
+          title: errorTitle || 'Error',
+          description: errorDescription || 'Ocurrió un error al eliminar los elementos, intenta nuevamente.',
         })
       } else {
         toastManager.add({
@@ -59,12 +66,14 @@ export function useBulkDelete<TData>({
 
       customOnSuccess?.()
     },
-    onError: () => {
+    onError: (error) => {
       toastManager.add({
         type: 'error',
-        title: 'Error',
-        description: `Ocurrió un error al eliminar los ${entityNamePlural.toLowerCase()}, intenta nuevamente.`,
+        title: errorTitle || 'Error',
+        description: errorDescription || 'Ocurrió un error al eliminar los elementos, intenta nuevamente.',
       })
+
+      logger.error('Bulk Delete Error', error)
     },
   })
 }

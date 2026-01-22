@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toastManager } from '@/components/ui/toast'
+import { logger } from '@/lib/logger'
 
 interface EntityMutationConfig<TData, TVariables> {
   mutationFn: (variables: TVariables) => Promise<TData>
@@ -45,6 +46,8 @@ export function useEntityMutation<TData = unknown, TVariables = unknown>({
         title: errorTitle,
         description: errorDescription,
       })
+
+      logger.error('Entity Mutation Error:', error)
 
       customOnError?.(error)
     },

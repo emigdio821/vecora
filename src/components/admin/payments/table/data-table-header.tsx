@@ -1,5 +1,4 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -18,9 +17,9 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
+import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreatePaymentSheet } from '../sheets/create-payment'
 
 interface PaymentsDataTableHeaderProps {
@@ -32,60 +31,25 @@ export function PaymentsDataTableHeader({ table }: PaymentsDataTableHeaderProps)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-payments', parseAsString.withDefault(''))
-  const queryClient = useQueryClient()
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
-  const selectedPayments = selectedRows.map((row) => row.original)
 
-  const batchDeleteMutation = useMutation({
-    mutationFn: async () => {
-      const results = await Promise.allSettled(
-        selectedPayments.map((payment) => deletePayment({ data: { paymentId: payment.id } })),
-      )
-
-      const fulfilled = results.filter((r) => r.status === 'fulfilled').length
-      const rejected = results.filter((r) => r.status === 'rejected').length
-
-      return { fulfilled, rejected }
+  const bulkDeleteMutation = useBulkDelete({
+    table,
+    successTitle: 'Propietarios eliminados',
+    successDescription: 'Los propietarios seleccionadas han sido eliminados exitosamente.',
+    deleteFn: async (payment) => {
+      await deletePayment({ data: { paymentId: payment.id } })
     },
-    onSuccess: ({ fulfilled, rejected }) => {
-      queryClient.invalidateQueries({ queryKey: [PAYMENTS_QUERY_KEY] })
-      table.resetRowSelection()
+    invalidateKeys: [PAYMENTS_QUERY_KEY],
+    onSuccess: () => {
       setDeleteDialogOpen(false)
-
-      if (rejected === 0) {
-        toastManager.add({
-          type: 'success',
-          title: 'Pagos eliminados',
-          description: 'Los pagos seleccionados han sido eliminados exitosamente.',
-        })
-      } else if (fulfilled === 0) {
-        toastManager.add({
-          type: 'error',
-          title: 'Error',
-          description: 'Ocurrió un error al eliminar los pagos, intenta nuevamente.',
-        })
-      } else {
-        toastManager.add({
-          type: 'warning',
-          title: 'Advertencia',
-          description: `${fulfilled} eliminados, ${rejected} fallaron.`,
-        })
-      }
-    },
-    onError: (error) => {
-      console.error('Error deleting payments:', error)
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al eliminar los pagos, intenta nuevamente.',
-      })
     },
   })
 
   function handleBatchDelete() {
-    batchDeleteMutation.mutate()
+    bulkDeleteMutation.mutate()
   }
 
   useEffect(() => {
@@ -114,7 +78,7 @@ export function PaymentsDataTableHeader({ table }: PaymentsDataTableHeaderProps)
             />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={batchDeleteMutation.isPending} />}>
+            <AlertDialogClose render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
               Cancelar
             </AlertDialogClose>
             <AlertDialogClose
@@ -122,12 +86,12 @@ export function PaymentsDataTableHeader({ table }: PaymentsDataTableHeaderProps)
                 <Button
                   variant="destructive"
                   onClick={handleBatchDelete}
-                  disabled={batchDeleteMutation.isPending}
+                  disabled={bulkDeleteMutation.isPending}
                 />
               }
             >
               Eliminar
-              {batchDeleteMutation.isPending && <LoaderIcon />}
+              {bulkDeleteMutation.isPending && <LoaderIcon />}
             </AlertDialogClose>
           </AlertDialogFooter>
         </AlertDialogPopup>

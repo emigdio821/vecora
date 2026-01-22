@@ -4,7 +4,6 @@ import { createAuditLog } from '@/api/server-functions/audit'
 import { db } from '@/db'
 import { houses, owners } from '@/db/schemas/main'
 import type { OwnerWithRelations, SelectOwner } from '@/db/schemas/zod/owners'
-import { logger } from '@/lib/logger'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import { createOwnerSchema, deleteOwnerSchema, updateOwnerSchema } from '@/schemas/owners'
@@ -56,8 +55,6 @@ export const createOwner = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    logger.debug(`Owner created with ID: ${newOwner.id}`)
-
     return newOwner satisfies SelectOwner
   })
 
@@ -89,8 +86,6 @@ export const updateOwner = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    logger.debug(`Owner updated with ID: ${updatedOwner.id}`)
-
     return updatedOwner satisfies SelectOwner
   })
 
@@ -112,8 +107,6 @@ export const deleteOwner = createServerFn({ method: 'POST' })
         oldData: ownerToDelete,
       },
     }).catch(console.error)
-
-    logger.debug(`Owner deleted with ID: ${deletedOwner.id}`)
 
     return deletedOwner satisfies SelectOwner
   })

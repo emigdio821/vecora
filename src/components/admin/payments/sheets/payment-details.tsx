@@ -67,6 +67,10 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                   <p className="text-muted-foreground text-sm">{getPaymentTypeLabel(payment.paymentType)}</p>
                 </FramePanel>
                 <FramePanel className="p-2">
+                  <h2 className="font-medium text-sm">Concepto</h2>
+                  <p className="text-muted-foreground text-sm">{payment.concept}</p>
+                </FramePanel>
+                <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Año</h2>
                   <p className="text-muted-foreground text-sm">{payment.year}</p>
                 </FramePanel>

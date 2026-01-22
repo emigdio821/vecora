@@ -4,9 +4,8 @@ import { createAuditLog } from '@/api/server-functions/audit'
 import { db } from '@/db'
 import { houses } from '@/db/schemas/main'
 import type { HouseWithOwner, InsertHouse, SelectHouse } from '@/db/schemas/zod/houses'
-import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
-import { createHouseSchema, updateHouseSchema } from '@/schemas/houses'
+import { createHouseSchema, deleteHouseSchema, updateHouseSchema } from '@/schemas/houses'
 
 export const createHouse = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
@@ -22,8 +21,6 @@ export const createHouse = createServerFn({ method: 'POST' })
         newData: newHouse,
       },
     }).catch(console.error)
-
-    logger.debug(`House created with ID: ${newHouse.id}`)
 
     return newHouse satisfies InsertHouse
   })
@@ -48,8 +45,6 @@ export const updateHouse = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    logger.debug(`House updated with ID: ${updatedHouse.id}`)
-
     return updatedHouse satisfies SelectHouse
   })
 
@@ -60,10 +55,29 @@ export const getHouses = createServerFn()
       with: {
         owner: true,
       },
-      orderBy: (houses, { asc }) => [asc(houses.houseNumber)],
+      orderBy: (houses, { desc }) => [desc(houses.updatedAt)],
     })
 
     return allHouses satisfies HouseWithOwner[]
+  })
+
+export const deleteHouse = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .inputValidator(deleteHouseSchema)
+  .handler(async ({ data }) => {
+    const [houseToDelete] = await db.select().from(houses).where(eq(houses.id, data.houseId)).limit(1)
+    const [deletdHouse] = await db.delete(houses).where(eq(houses.id, data.houseId)).returning()
+
+    createAuditLog({
+      data: {
+        action: 'delete',
+        entityType: 'house',
+        entityId: deletdHouse.id,
+        oldData: houseToDelete,
+      },
+    }).catch(console.error)
+
+    return houseToDelete satisfies SelectHouse
   })
 
 export const getAvailableHouses = createServerFn()

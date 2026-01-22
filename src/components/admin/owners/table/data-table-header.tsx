@@ -1,5 +1,4 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -18,9 +17,9 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
+import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateOwnerSheet } from '../sheets/create-owner'
 
 interface OwnersDataTableHeaderProps {
@@ -32,60 +31,25 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-owners', parseAsString.withDefault(''))
-  const queryClient = useQueryClient()
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
-  const selectedOwners = selectedRows.map((row) => row.original)
 
-  const batchDeleteMutation = useMutation({
-    mutationFn: async () => {
-      const results = await Promise.allSettled(
-        selectedOwners.map((owner) => deleteOwner({ data: { ownerId: owner.id } })),
-      )
-
-      const fulfilled = results.filter((r) => r.status === 'fulfilled').length
-      const rejected = results.filter((r) => r.status === 'rejected').length
-
-      return { fulfilled, rejected }
+  const bulkDeleteMutation = useBulkDelete({
+    table,
+    successTitle: 'Propietarios eliminados',
+    successDescription: 'Los propietarios seleccionadas han sido eliminados exitosamente.',
+    deleteFn: async (owner) => {
+      await deleteOwner({ data: { ownerId: owner.id } })
     },
-    onSuccess: ({ fulfilled, rejected }) => {
-      queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
-      table.resetRowSelection()
+    invalidateKeys: [OWNERS_QUERY_KEY],
+    onSuccess: () => {
       setDeleteDialogOpen(false)
-
-      if (rejected === 0) {
-        toastManager.add({
-          type: 'success',
-          title: 'Propietarios eliminados',
-          description: 'Los propietarios seleccionados han sido eliminados exitosamente.',
-        })
-      } else if (fulfilled === 0) {
-        toastManager.add({
-          type: 'error',
-          title: 'Error',
-          description: 'Ocurrió un error al eliminar los propietarios, intenta nuevamente.',
-        })
-      } else {
-        toastManager.add({
-          type: 'warning',
-          title: 'Advertencia',
-          description: `${fulfilled} eliminados, ${rejected} fallaron.`,
-        })
-      }
-    },
-    onError: (error) => {
-      console.error('Error deleting owners:', error)
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al eliminar los propietarios, intenta nuevamente.',
-      })
     },
   })
 
   function handleBatchDelete() {
-    batchDeleteMutation.mutate()
+    bulkDeleteMutation.mutate()
   }
 
   useEffect(() => {
@@ -112,7 +76,7 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
             />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={batchDeleteMutation.isPending} />}>
+            <AlertDialogClose render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
               Cancelar
             </AlertDialogClose>
             <AlertDialogClose
@@ -120,12 +84,12 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
                 <Button
                   variant="destructive"
                   onClick={handleBatchDelete}
-                  disabled={batchDeleteMutation.isPending}
+                  disabled={bulkDeleteMutation.isPending}
                 />
               }
             >
               Eliminar
-              {batchDeleteMutation.isPending && <LoaderIcon />}
+              {bulkDeleteMutation.isPending && <LoaderIcon />}
             </AlertDialogClose>
           </AlertDialogFooter>
         </AlertDialogPopup>

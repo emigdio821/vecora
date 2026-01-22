@@ -1,8 +1,7 @@
 import { IconDotsVertical, IconEdit, IconHome, IconTrash } from '@tabler/icons-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { deleteOwner } from '@/api/server-functions/owners'
-import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
+import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
@@ -23,8 +22,8 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from '@/components/ui/menu'
-import { toastManager } from '@/components/ui/toast'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteOwnerData } from '@/schemas/owners'
 import { EditHouseSheet } from '../sheets/edit-house'
 import { HouseDetailsSheet } from '../sheets/house-details'
@@ -37,34 +36,22 @@ export function HousesTableActions({ house }: ActionsProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isHouseDetailsSheetOpen, setHouseDetailsSheetOpen] = useState(false)
   const [isEditHouseSheetOpen, setEditHouseSheetOpen] = useState(false)
-  const queryClient = useQueryClient()
 
-  const deleteOwnerMutation = useMutation({
+  const deleteHouseMutation = useEntityMutation({
     mutationFn: async (data: DeleteOwnerData) => {
       return await deleteOwner({ data })
     },
+    invalidateKeys: [HOUSES_QUERY_KEY],
+    successTitle: 'Casa eliminada',
+    successDescription: 'La casa ha sido eliminada exitosamente.',
+    errorDescription: 'Ocurrió un error al eliminar la casa, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
       setDeleteDialogOpen(false)
-      toastManager.add({
-        type: 'success',
-        title: 'Casa eliminada',
-        description: 'La casa ha sido eliminada exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error deleting house:', error)
-
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al eliminar la casa, intenta nuevamente.',
-      })
     },
   })
 
   function handleDeleteOwner() {
-    deleteOwnerMutation.mutate({ ownerId: house.id })
+    deleteHouseMutation.mutate({ ownerId: house.id })
   }
 
   return (
@@ -79,7 +66,7 @@ export function HousesTableActions({ house }: ActionsProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={deleteOwnerMutation.isPending} />}>
+            <AlertDialogClose render={<Button variant="outline" disabled={deleteHouseMutation.isPending} />}>
               Cancelar
             </AlertDialogClose>
             <AlertDialogClose
@@ -87,12 +74,12 @@ export function HousesTableActions({ house }: ActionsProps) {
                 <Button
                   variant="destructive"
                   onClick={handleDeleteOwner}
-                  disabled={deleteOwnerMutation.isPending}
+                  disabled={deleteHouseMutation.isPending}
                 />
               }
             >
               Eliminar
-              {deleteOwnerMutation.isPending && <LoaderIcon />}
+              {deleteHouseMutation.isPending && <LoaderIcon />}
             </AlertDialogClose>
           </AlertDialogFooter>
         </AlertDialogPopup>

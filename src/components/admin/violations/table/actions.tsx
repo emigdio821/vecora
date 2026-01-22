@@ -1,5 +1,4 @@
 import { IconDotsVertical, IconEdit, IconFlag, IconTrash } from '@tabler/icons-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { deleteViolation } from '@/api/server-functions/violations'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
@@ -23,8 +22,8 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from '@/components/ui/menu'
-import { toastManager } from '@/components/ui/toast'
 import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteViolationData } from '@/schemas/violations'
 import { EditViolationSheet } from '../sheets/edit-violation'
 import { ViolationDetailsSheet } from '../sheets/violation-details'
@@ -37,29 +36,17 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isViolationDetailsSheetOpen, setViolationDetailsSheetOpen] = useState(false)
   const [isEditViolationSheetOpen, setEditViolationSheetOpen] = useState(false)
-  const queryClient = useQueryClient()
 
-  const deleteViolationMutation = useMutation({
+  const deleteViolationMutation = useEntityMutation({
     mutationFn: async (data: DeleteViolationData) => {
       return await deleteViolation({ data })
     },
+    invalidateKeys: [VIOLATIONS_QUERY_KEY],
+    successTitle: 'Infracción eliminada',
+    successDescription: 'La infracción ha sido eliminada exitosamente.',
+    errorDescription: 'Ocurrió un error al eliminar la infracción, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [VIOLATIONS_QUERY_KEY] })
       setDeleteDialogOpen(false)
-      toastManager.add({
-        type: 'success',
-        title: 'Infracción eliminada',
-        description: 'La infracción ha sido eliminada exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error deleting violation:', error)
-
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al eliminar la infracción, intenta nuevamente.',
-      })
     },
   })
 

@@ -53,9 +53,8 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
   const { isOpen, onOpenChange } = state
 
   const form = useForm<UpdatePaymentFormData>({
-    shouldUnregister: true,
     resolver: zodResolver(updatePaymentSchema),
-    defaultValues: {
+    values: {
       paymentId: payment.id,
       ownerId: payment.ownerId,
       concept: payment.concept,
@@ -111,7 +110,13 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        if (!isOpen) form.reset()
+      }}
+    >
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Editar pago</SheetTitle>
@@ -237,9 +242,8 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                     touched={fieldState.isTouched}
                     dirty={fieldState.isDirty}
                   >
-                    <FieldLabel>
-                      Meses{' '}
-                      {watchPaymentType === 'monthly_fee' && <span className="text-destructive">*</span>}
+                    <FieldLabel htmlFor={field.name}>
+                      Meses <span className="text-destructive">*</span>
                     </FieldLabel>
 
                     <Select multiple value={field.value} onValueChange={field.onChange}>

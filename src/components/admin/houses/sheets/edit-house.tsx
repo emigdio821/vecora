@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateHouse } from '@/api/server-functions/houses'
-import { HOUSES_LIST_QUERY_KEY } from '@/api/tanstack-queries/houses'
+import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
@@ -63,7 +63,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
     mutationFn: async (data: UpdateHouseFormData) => {
       return await updateHouse({ data })
     },
-    invalidateKeys: [HOUSES_LIST_QUERY_KEY],
+    invalidateKeys: [HOUSES_QUERY_KEY],
     successTitle: 'Casa actualizada',
     successDescription: 'La casa ha sido actualizada exitosamente.',
     errorDescription: 'Ocurrió un error al actualizar la casa, intenta nuevamente.',

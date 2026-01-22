@@ -1,10 +1,9 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
-import { deleteOwner } from '@/api/server-functions/owners'
-import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
+import { deleteHouse } from '@/api/server-functions/houses'
+import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
@@ -18,9 +17,9 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
+import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateHouseSheet } from '../sheets/create-house'
 
 interface HousesDataTableHeaderProps {
@@ -32,61 +31,25 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-houses', parseAsString.withDefault(''))
-  const queryClient = useQueryClient()
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
-  const selectedHouses = selectedRows.map((row) => row.original)
 
-  const batchDeleteMutation = useMutation({
-    mutationFn: async () => {
-      // TODO: Implement delete house server function
-      const results = await Promise.allSettled(
-        selectedHouses.map((house) => deleteOwner({ data: { ownerId: house.id } })),
-      )
-
-      const fulfilled = results.filter((r) => r.status === 'fulfilled').length
-      const rejected = results.filter((r) => r.status === 'rejected').length
-
-      return { fulfilled, rejected }
+  const bulkDeleteMutation = useBulkDelete({
+    table,
+    successTitle: 'Casas eliminadas',
+    successDescription: 'Las casas seleccionadas han sido eliminadas exitosamente.',
+    deleteFn: async (house) => {
+      await deleteHouse({ data: { houseId: house.id } })
     },
-    onSuccess: ({ fulfilled, rejected }) => {
-      queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
-      table.resetRowSelection()
+    invalidateKeys: [HOUSES_QUERY_KEY],
+    onSuccess: () => {
       setDeleteDialogOpen(false)
-
-      if (rejected === 0) {
-        toastManager.add({
-          type: 'success',
-          title: 'Casas eliminadas',
-          description: 'Las casas seleccionadas han sido eliminadas exitosamente.',
-        })
-      } else if (fulfilled === 0) {
-        toastManager.add({
-          type: 'error',
-          title: 'Error',
-          description: 'Ocurrió un error al eliminar las casas, intenta nuevamente.',
-        })
-      } else {
-        toastManager.add({
-          type: 'warning',
-          title: 'Advertencia',
-          description: `${fulfilled} eliminadas, ${rejected} fallaron.`,
-        })
-      }
-    },
-    onError: (error) => {
-      console.error('Error deleting houses:', error)
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al eliminar las casas, intenta nuevamente.',
-      })
     },
   })
 
   function handleBatchDelete() {
-    batchDeleteMutation.mutate()
+    bulkDeleteMutation.mutate()
   }
 
   useEffect(() => {
@@ -113,7 +76,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
             />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={batchDeleteMutation.isPending} />}>
+            <AlertDialogClose render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
               Cancelar
             </AlertDialogClose>
             <AlertDialogClose
@@ -121,12 +84,12 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
                 <Button
                   variant="destructive"
                   onClick={handleBatchDelete}
-                  disabled={batchDeleteMutation.isPending}
+                  disabled={bulkDeleteMutation.isPending}
                 />
               }
             >
               Eliminar
-              {batchDeleteMutation.isPending && <LoaderIcon />}
+              {bulkDeleteMutation.isPending && <LoaderIcon />}
             </AlertDialogClose>
           </AlertDialogFooter>
         </AlertDialogPopup>

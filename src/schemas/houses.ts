@@ -22,3 +22,9 @@ export const updateHouseSchema = z.object({
 })
 
 export type UpdateHouseFormData = z.infer<typeof updateHouseSchema>
+
+export const deleteHouseSchema = z.object({
+  houseId: z.uuid('ID de casa inválido'),
+})
+
+export type DeleteHouseData = z.infer<typeof deleteHouseSchema>

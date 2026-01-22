@@ -1,5 +1,4 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -18,9 +17,9 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
+import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateViolationSheet } from '../sheets/create-violation'
 
 interface ViolationsDataTableHeaderProps {
@@ -32,60 +31,25 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-violations', parseAsString.withDefault(''))
-  const queryClient = useQueryClient()
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
-  const selectedViolations = selectedRows.map((row) => row.original)
 
-  const batchDeleteMutation = useMutation({
-    mutationFn: async () => {
-      const results = await Promise.allSettled(
-        selectedViolations.map((violation) => deleteViolation({ data: { violationId: violation.id } })),
-      )
-
-      const fulfilled = results.filter((r) => r.status === 'fulfilled').length
-      const rejected = results.filter((r) => r.status === 'rejected').length
-
-      return { fulfilled, rejected }
+  const bulkDeleteMutation = useBulkDelete({
+    table,
+    successTitle: 'Infracciones eliminadas',
+    successDescription: 'Las infracciones seleccionadas han sido eliminadas exitosamente.',
+    deleteFn: async (violation) => {
+      await deleteViolation({ data: { violationId: violation.id } })
     },
-    onSuccess: ({ fulfilled, rejected }) => {
-      queryClient.invalidateQueries({ queryKey: [VIOLATIONS_QUERY_KEY] })
-      table.resetRowSelection()
+    invalidateKeys: [VIOLATIONS_QUERY_KEY],
+    onSuccess: () => {
       setDeleteDialogOpen(false)
-
-      if (rejected === 0) {
-        toastManager.add({
-          type: 'success',
-          title: 'Infracciones eliminadas',
-          description: 'Las infracciones seleccionadas han sido eliminadas exitosamente.',
-        })
-      } else if (fulfilled === 0) {
-        toastManager.add({
-          type: 'error',
-          title: 'Error',
-          description: 'Ocurrió un error al eliminar las infracciones, intenta nuevamente.',
-        })
-      } else {
-        toastManager.add({
-          type: 'warning',
-          title: 'Advertencia',
-          description: `${fulfilled} eliminadas, ${rejected} fallaron.`,
-        })
-      }
-    },
-    onError: (error) => {
-      console.error('Error deleting violations:', error)
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al eliminar las infracciones, intenta nuevamente.',
-      })
     },
   })
 
   function handleBatchDelete() {
-    batchDeleteMutation.mutate()
+    bulkDeleteMutation.mutate()
   }
 
   useEffect(() => {
@@ -114,7 +78,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
             />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={batchDeleteMutation.isPending} />}>
+            <AlertDialogClose render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
               Cancelar
             </AlertDialogClose>
             <AlertDialogClose
@@ -122,12 +86,12 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
                 <Button
                   variant="destructive"
                   onClick={handleBatchDelete}
-                  disabled={batchDeleteMutation.isPending}
+                  disabled={bulkDeleteMutation.isPending}
                 />
               }
             >
               Eliminar
-              {batchDeleteMutation.isPending && <LoaderIcon />}
+              {bulkDeleteMutation.isPending && <LoaderIcon />}
             </AlertDialogClose>
           </AlertDialogFooter>
         </AlertDialogPopup>

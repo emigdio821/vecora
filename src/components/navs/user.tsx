@@ -17,6 +17,7 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { authClient } from '@/lib/auth-client'
+import { logger } from '@/lib/logger'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar'
 import { Skeleton } from '../ui/skeleton'
@@ -36,7 +37,7 @@ export function NavUser() {
           navigate({ to: '/login', reloadDocument: true })
         },
         onError: (error) => {
-          console.error('Error during sign out:', error)
+          logger.error('Error during sign out:', error)
         },
       },
     })
