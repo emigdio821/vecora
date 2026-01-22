@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { LoaderIcon } from '@/components/icons'
@@ -25,8 +25,8 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { toastManager } from '@/components/ui/toast'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { HOUSES_LIST_QUERY_KEY } from '@/lib/ts-queries/houses'
 import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
 import { type UpdateHouseFormData, updateHouseSchema } from '@/schemas/houses'
@@ -43,7 +43,6 @@ interface EditHouseSheetProps {
 export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
   const editHouseFormId = useId()
   const { isOpen, onOpenChange } = state
-  const queryClient = useQueryClient()
 
   const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
 
@@ -60,26 +59,16 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
     },
   })
 
-  const updateHouseMutation = useMutation({
+  const updateHouseMutation = useEntityMutation({
     mutationFn: async (data: UpdateHouseFormData) => {
       return await updateHouse({ data })
     },
+    invalidateKeys: [HOUSES_LIST_QUERY_KEY],
+    successTitle: 'Casa actualizada',
+    successDescription: 'La casa ha sido actualizada exitosamente.',
+    errorDescription: 'Ocurrió un error al actualizar la casa, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [HOUSES_LIST_QUERY_KEY] })
       onOpenChange(false)
-      toastManager.add({
-        type: 'success',
-        title: 'Casa actualizada',
-        description: 'La casa ha sido actualizada exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error updating house:', error)
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al actualizar la casa, intenta nuevamente.',
-      })
     },
   })
 

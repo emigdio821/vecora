@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { LoaderIcon } from '@/components/icons'
@@ -19,10 +18,11 @@ import {
   SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { toastManager } from '@/components/ui/toast'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { AVAILABLE_HOUSES_QUERY_KEY } from '@/lib/ts-queries/houses'
 import { OWNERS_QUERY_KEY } from '@/lib/ts-queries/owners'
-import { type CreateOwnerFormData, createOwner, createOwnerSchema } from '@/server-fns/owners'
+import { type CreateOwnerFormData, createOwnerSchema } from '@/schemas/owners'
+import { createOwner } from '@/server-fns/owners'
 
 interface CreateOwnerDialogProps {
   state: {
@@ -34,7 +34,6 @@ interface CreateOwnerDialogProps {
 export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
   const createOwnerFormId = useId()
   const { isOpen, onOpenChange } = state
-  const queryClient = useQueryClient()
 
   const form = useForm<CreateOwnerFormData>({
     shouldUnregister: true,
@@ -48,28 +47,16 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
     },
   })
 
-  const createOwnerMutation = useMutation({
+  const createOwnerMutation = useEntityMutation({
     mutationFn: async (data: CreateOwnerFormData) => {
       return await createOwner({ data })
     },
+    invalidateKeys: [OWNERS_QUERY_KEY, AVAILABLE_HOUSES_QUERY_KEY],
+    successTitle: 'Propietario creado',
+    successDescription: 'El propietario ha sido creado exitosamente.',
+    errorDescription: 'Ocurrió un error al crear el propietario, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [OWNERS_QUERY_KEY] })
-      queryClient.invalidateQueries({ queryKey: [AVAILABLE_HOUSES_QUERY_KEY] })
       onOpenChange(false)
-      toastManager.add({
-        type: 'success',
-        title: 'Propietario creado',
-        description: 'El propietario ha sido creado exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error creating owner:', error)
-
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al crear el propietario, intenta nuevamente.',
-      })
     },
   })
 

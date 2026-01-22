@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { LoaderIcon } from '@/components/icons'
@@ -29,8 +28,8 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import { toastManager } from '@/components/ui/toast'
 import { type PaymentType, paymentTypeSchema } from '@/db/schemas/zod/payments'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { PAYMENTS_QUERY_KEY } from '@/lib/ts-queries/payments'
 import { getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
 import { type CreatePaymentFormData, createPaymentSchema } from '@/schemas/payments'
@@ -48,7 +47,6 @@ const MONTHS = getAllMonthsMap()
 export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
   const createPaymentFormId = useId()
   const { isOpen, onOpenChange } = state
-  const queryClient = useQueryClient()
 
   const form = useForm<CreatePaymentFormData>({
     shouldUnregister: true,
@@ -70,27 +68,16 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: currentYear + 2 - 2020 + 1 }, (_, i) => 2020 + i)
 
-  const createPaymentMutation = useMutation({
+  const createPaymentMutation = useEntityMutation({
     mutationFn: async (data: CreatePaymentFormData) => {
       return await createPayment({ data })
     },
+    invalidateKeys: [PAYMENTS_QUERY_KEY],
+    successTitle: 'Pago creado',
+    successDescription: 'El pago ha sido creado exitosamente.',
+    errorDescription: 'Ocurrió un error al crear el pago, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [PAYMENTS_QUERY_KEY] })
       onOpenChange(false)
-      toastManager.add({
-        type: 'success',
-        title: 'Pago creado',
-        description: 'El pago ha sido creado exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error creating payment:', error)
-
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al crear el pago, intenta nuevamente.',
-      })
     },
   })
 

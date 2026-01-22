@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { houses, owners } from '@/db/schemas/main'
 import type { OwnerWithRelations, SelectOwner } from '@/db/schemas/zod/owners'
-import { adminOnlyAPIMiddleware } from '@/middleware/admin'
+import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import { createOwnerSchema, deleteOwnerSchema, updateOwnerSchema } from '@/schemas/owners'
 
@@ -28,7 +28,7 @@ export const getOwners = createServerFn()
   })
 
 export const createOwner = createServerFn({ method: 'POST' })
-  .middleware([adminOnlyAPIMiddleware])
+  .middleware([adminOnlyMiddleware])
   .inputValidator(createOwnerSchema)
   .handler(async ({ data }) => {
     const [newOwner] = await db
@@ -49,7 +49,7 @@ export const createOwner = createServerFn({ method: 'POST' })
   })
 
 export const updateOwner = createServerFn({ method: 'POST' })
-  .middleware([adminOnlyAPIMiddleware])
+  .middleware([adminOnlyMiddleware])
   .inputValidator(updateOwnerSchema)
   .handler(async ({ data }) => {
     const [updatedOwner] = await db
@@ -68,7 +68,7 @@ export const updateOwner = createServerFn({ method: 'POST' })
   })
 
 export const deleteOwner = createServerFn({ method: 'POST' })
-  .middleware([adminOnlyAPIMiddleware])
+  .middleware([adminOnlyMiddleware])
   .inputValidator(deleteOwnerSchema)
   .handler(async ({ data }) => {
     await db.update(houses).set({ ownerId: null }).where(eq(houses.ownerId, data.ownerId))

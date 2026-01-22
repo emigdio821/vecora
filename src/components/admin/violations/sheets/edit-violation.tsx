@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { LoaderIcon } from '@/components/icons'
@@ -30,12 +30,12 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import { toastManager } from '@/components/ui/toast'
 import {
   type ViolationStatus,
   type ViolationWithOwner,
   violationStatusSchema,
 } from '@/db/schemas/zod/violations'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { ownersListQueryOptions } from '@/lib/ts-queries/owners'
 import { VIOLATIONS_QUERY_KEY } from '@/lib/ts-queries/violations'
 import { formatDate } from '@/lib/utils'
@@ -53,7 +53,6 @@ interface EditViolationSheetProps {
 export function EditViolationSheet({ violation, state }: EditViolationSheetProps) {
   const editViolationFormId = useId()
   const { isOpen, onOpenChange } = state
-  const queryClient = useQueryClient()
 
   const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
 
@@ -69,26 +68,16 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
     },
   })
 
-  const updateViolationMutation = useMutation({
+  const updateViolationMutation = useEntityMutation({
     mutationFn: async (data: UpdateViolationFormData) => {
       return await updateViolation({ data })
     },
+    invalidateKeys: [VIOLATIONS_QUERY_KEY],
+    successTitle: 'Infracción actualizada',
+    successDescription: 'La infracción ha sido actualizada exitosamente.',
+    errorDescription: 'Ocurrió un error al actualizar la infracción, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [VIOLATIONS_QUERY_KEY] })
       onOpenChange(false)
-      toastManager.add({
-        type: 'success',
-        title: 'Infracción actualizada',
-        description: 'La infracción ha sido actualizada exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error updating violation:', error)
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al actualizar la infracción, intenta nuevamente.',
-      })
     },
   })
 

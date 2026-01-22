@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { LoaderIcon } from '@/components/icons'
@@ -23,10 +22,11 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import { toastManager } from '@/components/ui/toast'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { VIOLATIONS_QUERY_KEY } from '@/lib/ts-queries/violations'
 import { formatDate } from '@/lib/utils'
-import { type CreateViolationFormData, createViolation, createViolationSchema } from '@/server-fns/violations'
+import { type CreateViolationFormData, createViolationSchema } from '@/schemas/violations'
+import { createViolation } from '@/server-fns/violations'
 
 interface CreateViolationDialogProps {
   state: {
@@ -38,7 +38,6 @@ interface CreateViolationDialogProps {
 export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
   const createViolationFormId = useId()
   const { isOpen, onOpenChange } = state
-  const queryClient = useQueryClient()
 
   const form = useForm<CreateViolationFormData>({
     shouldUnregister: true,
@@ -52,27 +51,16 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
     },
   })
 
-  const createViolationMutation = useMutation({
+  const createViolationMutation = useEntityMutation({
     mutationFn: async (data: CreateViolationFormData) => {
       return await createViolation({ data })
     },
+    invalidateKeys: [VIOLATIONS_QUERY_KEY],
+    successTitle: 'Infracción creada',
+    successDescription: 'La infracción ha sido creada exitosamente.',
+    errorDescription: 'Ocurrió un error al crear la infracción, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [VIOLATIONS_QUERY_KEY] })
       onOpenChange(false)
-      toastManager.add({
-        type: 'success',
-        title: 'Infracción creada',
-        description: 'La infracción ha sido creada exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error creating violation:', error)
-
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al crear la infracción, intenta nuevamente.',
-      })
     },
   })
 

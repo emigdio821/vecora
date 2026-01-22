@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { LoaderIcon } from '@/components/icons'
@@ -18,9 +17,10 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { toastManager } from '@/components/ui/toast'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { HOUSES_LIST_QUERY_KEY } from '@/lib/ts-queries/houses'
-import { type CreateHouseFormData, createHouse, createHouseSchema } from '@/server-fns/houses'
+import { type CreateHouseFormData, createHouseSchema } from '@/schemas/houses'
+import { createHouse } from '@/server-fns/houses'
 
 interface CreateHouseDialogProps {
   state: {
@@ -32,7 +32,6 @@ interface CreateHouseDialogProps {
 export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
   const createHouseFormId = useId()
   const { isOpen, onOpenChange } = state
-  const queryClient = useQueryClient()
 
   const form = useForm<CreateHouseFormData>({
     shouldUnregister: true,
@@ -47,27 +46,16 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
     },
   })
 
-  const createHouseMutation = useMutation({
+  const createHouseMutation = useEntityMutation({
     mutationFn: async (data: CreateHouseFormData) => {
       return await createHouse({ data })
     },
+    invalidateKeys: [HOUSES_LIST_QUERY_KEY],
+    successTitle: 'Casa creada',
+    successDescription: 'La casa ha sido creada exitosamente.',
+    errorDescription: 'Ocurrió un error al crear la casa, intenta nuevamente.',
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [HOUSES_LIST_QUERY_KEY] })
       onOpenChange(false)
-      toastManager.add({
-        type: 'success',
-        title: 'Casa creada',
-        description: 'La casa ha sido creada exitosamente.',
-      })
-    },
-    onError: (error) => {
-      console.error('Error creating house:', error)
-
-      toastManager.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Ocurrió un error al crear la casa, intenta nuevamente.',
-      })
     },
   })
 
