@@ -242,16 +242,15 @@ function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
 
 function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
   return (
-    <div className="overflow-y-auto">
-      <ComboboxPrimitive.List
-        className={cn(
-          'not-empty:scroll-py-1 not-empty:px-1 not-empty:py-1 in-data-has-overflow-y:pe-3',
-          className,
-        )}
-        data-slot="combobox-list"
-        {...props}
-      />
-    </div>
+    // <div className="overflow-y-auto">
+    <ComboboxPrimitive.List
+      className={cn(
+        'not-empty:scroll-py-1 overflow-y-auto not-empty:px-1 not-empty:py-1 in-data-has-overflow-y:pe-3',
+        className,
+      )}
+      data-slot="combobox-list"
+      {...props}
+    />
   )
 }
 
