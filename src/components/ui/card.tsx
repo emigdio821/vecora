@@ -49,7 +49,7 @@ function CardFrameHeader({ className, render, ...props }: useRender.ComponentPro
 
 function CardFrameTitle({ className, render, ...props }: useRender.ComponentProps<'div'>) {
   const defaultProps = {
-    className: cn('font-semibold text-sm', className),
+    className: cn('font-medium text-sm leading-none', className),
     'data-slot': 'card-frame-title',
   }
 

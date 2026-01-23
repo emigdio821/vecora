@@ -6,7 +6,7 @@ export function Footer() {
       <span className="flex h-5 items-center gap-2 text-sm">
         <span>{new Date().getFullYear()}</span>
         <div className="h-4 w-px bg-border" />
-        <span className="font-semibold">{SITE_CONFIG.title}</span>
+        <span className="font-medium">{SITE_CONFIG.title}</span>
       </span>
     </footer>
   )
