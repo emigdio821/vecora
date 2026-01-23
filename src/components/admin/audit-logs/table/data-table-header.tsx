@@ -137,7 +137,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
                 placeholder="Buscar"
                 aria-invalid="false"
                 startAddon={<IconSearch />}
-                className="w-full min-w-full rounded-sm before:rounded-[calc(var(--radius-sm)-1px)]"
+                className="rounded-sm before:rounded-[calc(var(--radius-sm)-1px)]"
               />
             </div>
             <ComboboxEmpty>Sin resultados.</ComboboxEmpty>

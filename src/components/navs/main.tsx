@@ -1,4 +1,4 @@
-import { IconPigMoney, IconPresentation, IconShield, IconTool } from '@tabler/icons-react'
+import { IconGavel, IconPigMoney, IconShield, IconTool } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
 import {
   SidebarGroup,
@@ -21,7 +21,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               isActive={pathname === '/presidency'}
               render={
                 <Link to="/presidency">
-                  <IconPresentation className="size-4" />
+                  <IconGavel className="size-4" />
                   <span>Presidencia</span>
                 </Link>
               }

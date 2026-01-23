@@ -1,15 +1,12 @@
+import {
+  IconChevronLeft,
+  IconChevronLeftPipe,
+  IconChevronRight,
+  IconChevronRightPipe,
+} from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationInitialPage,
-  PaginationItem,
-  PaginationLastPage,
-  PaginationNext,
-  PaginationPrevious,
-} from '../ui/pagination'
 
 interface DataTablePaginationProps<T> {
   table: Table<T>
@@ -17,17 +14,8 @@ interface DataTablePaginationProps<T> {
 }
 
 export const DEFAULT_TABLE_PAGE_SIZE = 10
-// const PAGE_SIZE_OPTIONS = [10, 20, 30, 40, 50] as const
 
 export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
-  // const pagination = table.getState().pagination
-  // const { pageIndex, pageSize } = pagination
-
-  // function handlePageSizeChange(value: string | null) {
-  //   if (!value) return
-  //   table.setPageSize(Number(value))
-  // }
-
   function handleFirstPage() {
     table.setPageIndex(0)
   }
@@ -73,78 +61,47 @@ export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
         </p>
       </div>
 
-      {/* <div className="flex items-center space-x-2">
-        <Label htmlFor="rows-per-page" className="font-normal">
-          Elementos por página:
-        </Label>
-        <Select name="rows-per-page" value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-          <SelectTrigger id="rows-per-page" className="w-16">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="min-w-24">
-            <SelectGroup>
-              {pageSizeOptions.map((size) => (
-                <SelectItem key={size} value={size.toString()}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div> */}
+      <div className="flex w-full items-center justify-end gap-1">
+        <Button
+          size="icon-sm"
+          variant="outline"
+          onClick={handleFirstPage}
+          aria-label="Ir a la página inicial"
+          disabled={!table.getCanPreviousPage()}
+        >
+          <IconChevronLeftPipe className="size-4" />
+        </Button>
 
-      <Pagination className="justify-end">
-        <PaginationContent>
-          <PaginationItem className="hidden sm:block">
-            <PaginationInitialPage
-              render={
-                <Button
-                  size="icon-sm"
-                  variant="outline"
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={handleFirstPage}
-                />
-              }
-            />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationPrevious
-              render={
-                <Button
-                  size="icon-sm"
-                  variant="outline"
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={() => table.previousPage()}
-                />
-              }
-            />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext
-              render={
-                <Button
-                  size="icon-sm"
-                  variant="outline"
-                  disabled={!table.getCanNextPage()}
-                  onClick={() => table.nextPage()}
-                />
-              }
-            />
-          </PaginationItem>
-          <PaginationItem className="hidden sm:block">
-            <PaginationLastPage
-              render={
-                <Button
-                  size="icon-sm"
-                  variant="outline"
-                  disabled={!table.getCanNextPage()}
-                  onClick={handleLastPage}
-                />
-              }
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+        <Button
+          size="icon-sm"
+          variant="outline"
+          onClick={() => table.previousPage()}
+          aria-label="Ir a la página anterior"
+          disabled={!table.getCanPreviousPage()}
+        >
+          <IconChevronLeft className="size-4" />
+        </Button>
+
+        <Button
+          size="icon-sm"
+          variant="outline"
+          onClick={() => table.nextPage()}
+          aria-label="Ir a la página siguiente"
+          disabled={!table.getCanNextPage()}
+        >
+          <IconChevronRight className="size-4" />
+        </Button>
+
+        <Button
+          size="icon-sm"
+          variant="outline"
+          onClick={handleLastPage}
+          aria-label="Ir a la página final"
+          disabled={!table.getCanNextPage()}
+        >
+          <IconChevronRightPipe className="size-4" />
+        </Button>
+      </div>
     </>
   )
 }

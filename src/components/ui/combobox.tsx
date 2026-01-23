@@ -41,25 +41,25 @@ function ComboboxInput({
   size?: 'sm' | 'default' | 'lg' | number
   ref?: React.Ref<HTMLInputElement>
 }) {
-  const { multiple } = React.useContext(ComboboxContext)
+  // const { multiple } = React.useContext(ComboboxContext)
   const sizeValue = (size ?? 'default') as 'sm' | 'default' | 'lg' | number
 
   // multiple mode
-  if (multiple) {
-    return (
-      <ComboboxPrimitive.Input
-        className={cn(
-          'min-w-12 flex-1 text-base outline-none sm:text-sm [[data-slot=combobox-chip]+&]:ps-0.5',
-          sizeValue === 'sm' ? 'ps-1.5' : 'ps-2',
-          className,
-        )}
-        data-size={typeof sizeValue === 'string' ? sizeValue : undefined}
-        data-slot="combobox-input"
-        size={typeof sizeValue === 'number' ? sizeValue : undefined}
-        {...props}
-      />
-    )
-  }
+  // if (multiple) {
+  //   return (
+  //     <ComboboxPrimitive.Input
+  //       className={cn(
+  //         'min-w-12 flex-1 text-base outline-none sm:text-sm [[data-slot=combobox-chip]+&]:ps-0.5',
+  //         sizeValue === 'sm' ? 'ps-1.5' : 'ps-2',
+  //         className,
+  //       )}
+  //       data-size={typeof sizeValue === 'string' ? sizeValue : undefined}
+  //       data-slot="combobox-input"
+  //       size={typeof sizeValue === 'number' ? sizeValue : undefined}
+  //       {...props}
+  //     />
+  //   )
+  // }
 
   // single mode
   return (
