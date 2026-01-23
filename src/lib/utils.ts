@@ -16,7 +16,7 @@ export function formatDate(
   date: ConstructorParameters<typeof Date>[0],
   options?: Intl.DateTimeFormatOptions,
 ): string {
-  return new Date(date).toLocaleDateString(DEFAULT_LOCALE, {
+  return new Date(date).toLocaleTimeString(DEFAULT_LOCALE, {
     year: 'numeric',
     month: 'long',
     day: '2-digit',

@@ -2,6 +2,8 @@ import { createServerFn } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 import { db } from '@/db'
 import { auditLogs } from '@/db/schemas/main'
+import type { AuditLogWithUser } from '@/db/schemas/zod/audit-logs'
+import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import { createAuditLogSchema } from '@/schemas/audit'
 
@@ -28,4 +30,17 @@ export const createAuditLog = createServerFn({ method: 'POST' })
     } catch (error) {
       console.error('Failed to create audit log:', error)
     }
+  })
+
+export const getAuditLogs = createServerFn()
+  .middleware([authMiddleware, adminOnlyMiddleware])
+  .handler(async () => {
+    const auditLogs = await db.query.auditLogs.findMany({
+      with: {
+        user: true,
+      },
+      orderBy: (auditLogs, { desc }) => [desc(auditLogs.timestamp)],
+    })
+
+    return auditLogs satisfies AuditLogWithUser[]
   })

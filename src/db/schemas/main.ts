@@ -244,7 +244,7 @@ export const auditLogs = pgTable(
     action: varchar('action', { length: 100 }).notNull(),
     entityType: varchar('entity_type', { length: 50 }).notNull(),
     entityId: uuid('entity_id'),
-    changes: jsonb('changes'), // Stores { old: {...}, new: {...} }
+    changes: jsonb('changes').$type<{}>(), // Stores { old: {...}, new: {...} }
     ipAddress: varchar('ip_address', { length: 45 }),
     userAgent: text('user_agent'),
     timestamp: timestamp('timestamp', { withTimezone: true }).defaultNow().notNull(),

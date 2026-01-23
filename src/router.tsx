@@ -17,11 +17,7 @@ export function getRouter() {
     scrollRestoration: true,
     context: { queryClient },
     defaultPreload: 'intent',
-    defaultErrorComponent: (props) => (
-      <div className="m-4">
-        <DefaultErrorBoundary {...props} />
-      </div>
-    ),
+    defaultErrorComponent: DefaultErrorBoundary,
     defaultNotFoundComponent: () => <NotFound />,
   })
   setupRouterSsrQueryIntegration({

@@ -21,11 +21,11 @@ interface DataTableProps<TData, TValue> {
   tableId?: string
   columns: ColumnDef<TData, TValue>[]
   header?: (table: TableType<TData>) => React.ReactNode
+  pageSize?: number
 }
 
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
-  const { data, tableId, header, columns } = props
-
+  const { data, tableId, header, columns, pageSize: tablePageSize = DEFAULT_TABLE_PAGE_SIZE } = props
   const paginationUrlKeys = {
     pageIndex: tableId ? `${tableId}-page` : 'page',
     pageSize: tableId ? `${tableId}-perPage` : 'perPage',
@@ -37,7 +37,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
 
   const paginationParsers = {
     pageIndex: parseAsIndex.withDefault(0),
-    pageSize: parseAsInteger.withDefault(DEFAULT_TABLE_PAGE_SIZE),
+    pageSize: parseAsInteger.withDefault(tablePageSize),
   }
 
   const [{ pageIndex, pageSize }, setPagination] = useQueryStates(paginationParsers, {
