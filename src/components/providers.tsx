@@ -1,5 +1,5 @@
+import { ThemeProvider } from 'next-themes'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
-import { ThemeProvider } from 'tanstack-theme-kit'
 import { AnchoredToastProvider, ToastProvider } from './ui/toast'
 import { TooltipProvider } from './ui/tooltip'
 

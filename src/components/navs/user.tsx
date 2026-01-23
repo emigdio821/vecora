@@ -1,7 +1,7 @@
 import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSettings, IconSun } from '@tabler/icons-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useTheme } from 'tanstack-theme-kit'
+import { useTheme } from 'next-themes'
 import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import {
   Menu,
