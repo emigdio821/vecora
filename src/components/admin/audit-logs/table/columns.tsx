@@ -78,7 +78,7 @@ export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
     accessorKey: 'timestamp',
     size: 200,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha y hora" />,
-    cell: ({ row }) => formatDate(row.original.timestamp),
+    cell: ({ row }) => formatDate(row.original.timestamp, { hour: '2-digit', minute: '2-digit' }),
     filterFn: (row, _, value: YearFacetedFilterOption[]) => {
       if (value.length === 0) return true
 

@@ -15,7 +15,7 @@ export function AuditLogEntityTypeBadge({ entityType, ...badgeProps }: AuditLogE
       case 'violation':
         return 'Infracción'
       case 'external_user':
-        return 'Usuario Externo'
+        return 'Usuario externo'
       case 'payment':
         return 'Pago'
       default:

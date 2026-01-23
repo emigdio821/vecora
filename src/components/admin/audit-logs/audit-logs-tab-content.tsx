@@ -23,7 +23,6 @@ export function AuditLogsTabContent() {
     <DataTable
       data={auditLogs}
       tableId="audit-logs"
-      pageSize={5}
       columns={auditLogsTableColumns}
       header={(table) => <AuditLogsDataTableHeader table={table} />}
     />

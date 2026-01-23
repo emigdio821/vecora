@@ -206,7 +206,7 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
           {/* Metadata */}
           <div className="flex items-center justify-between text-muted-foreground text-xs">
             <span>Fecha y hora</span>
-            <span>{formatDate(auditLog.timestamp)}</span>
+            <span>{formatDate(auditLog.timestamp, { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
         </SheetFooter>
       </SheetPopup>
