@@ -3,6 +3,7 @@ import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteHouse } from '@/api/server-functions/houses'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -42,7 +43,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
     deleteFn: async (house) => {
       await deleteHouse({ data: { houseId: house.id } })
     },
-    invalidateKeys: [HOUSES_QUERY_KEY],
+    invalidateKeys: [HOUSES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

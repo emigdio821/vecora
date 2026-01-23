@@ -1,169 +1,156 @@
-import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
+import { IconCirclePlus, IconFileExport, IconInfoCircle, IconSearch } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
-import { deleteOwner } from '@/api/server-functions/owners'
-import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
-import { LoaderIcon } from '@/components/icons'
-import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogPopup,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Combobox,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxTrigger,
+  ComboboxValue,
+} from '@/components/ui/combobox'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
-import { useBulkDelete } from '@/hooks/use-bulk-delete'
-import { CreateOwnerSheet } from '../sheets/create-owner'
+import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
+import { STARTING_YEAR } from '@/lib/constants'
 
-interface OwnersDataTableHeaderProps {
-  table: Table<OwnerWithRelations>
+interface AuditLogsDataTableHeaderProps {
+  table: Table<AuditLogWithUserAndProfile>
 }
 
-export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
-  const [openCreateOwnerDialog, setOpenCreateOwnerDialog] = useState(false)
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
+export interface YearFacetedFilterOption {
+  label: string
+  value: number
+}
+
+const currentYear = new Date().getFullYear()
+const facetedFilterYears: YearFacetedFilterOption[] = Array.from(
+  { length: currentYear - STARTING_YEAR + 1 },
+  (_, i) => ({
+    value: STARTING_YEAR + i,
+    label: (STARTING_YEAR + i).toString(),
+  }),
+)
+
+export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProps) {
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-owners', parseAsString.withDefault(''))
+  const [searchQuery, setSearchQuery] = useQueryState('search-audit-logs', parseAsString.withDefault(''))
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
 
-  const bulkDeleteMutation = useBulkDelete({
-    table,
-    successTitle: 'Propietarios eliminados',
-    successDescription: 'Los propietarios seleccionadas han sido eliminados exitosamente.',
-    deleteFn: async (owner) => {
-      await deleteOwner({ data: { ownerId: owner.id } })
-    },
-    invalidateKeys: [OWNERS_QUERY_KEY],
-    onSuccess: () => {
-      setDeleteDialogOpen(false)
-    },
-  })
+  function renderYearFacetedFilterValue(value: YearFacetedFilterOption[] | null) {
+    if (!value || value.length === 0) return 'Año'
 
-  function handleBatchDelete() {
-    bulkDeleteMutation.mutate()
+    return (
+      <>
+        <span>Año</span>
+        <Separator orientation="vertical" />
+        {value.length < 3 ? (
+          value
+            .sort((a, b) => a.value - b.value)
+            .map((option) => (
+              <Badge variant="outline" key={option.value}>
+                {option.label}
+              </Badge>
+            ))
+        ) : (
+          <Badge variant="outline">{value.length} seleccionados</Badge>
+        )}
+      </>
+    )
   }
 
   useEffect(() => {
-    table.getColumn('firstName')?.setFilterValue(searchQuery)
+    table.getColumn('user')?.setFilterValue(searchQuery)
   }, [searchQuery, table])
 
   return (
-    <>
-      <CreateOwnerSheet state={{ isOpen: openCreateOwnerDialog, onOpenChange: setOpenCreateOwnerDialog }} />
+    <div className="flex flex-col justify-between gap-2 sm:flex-row">
+      <InputGroup className="w-full sm:w-sm">
+        <InputGroupInput
+          type="search"
+          value={searchQuery}
+          aria-label="Buscar"
+          placeholder="Buscar"
+          name="search-audit-logs"
+          onChange={(e) => setSearchQuery(e.target.value || null)}
+        />
+        <InputGroupAddon>
+          <IconSearch />
+        </InputGroupAddon>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogPopup>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar propietarios?</AlertDialogTitle>
-            <AlertDialogDescription
-              render={
-                <div>
-                  <p>
-                    Propietarios seleccionados: <strong>{selectedRowsLength}</strong>.
-                  </p>
-                  <p>Esta acción no se puede deshacer.</p>
-                </div>
-              }
-            />
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
-              Cancelar
-            </AlertDialogClose>
-            <AlertDialogClose
+        <InputGroupAddon align="inline-end">
+          <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
+            <TooltipTrigger
               render={
                 <Button
-                  variant="destructive"
-                  onClick={handleBatchDelete}
-                  disabled={bulkDeleteMutation.isPending}
-                />
+                  size="icon-xs"
+                  variant="ghost"
+                  className="cursor-default"
+                  onClick={(e) => {
+                    e.preventBaseUIHandler()
+                    setSearchTooltipOpen(true)
+                  }}
+                >
+                  <IconInfoCircle className="size-4" />
+                </Button>
               }
-            >
-              Eliminar
-              {bulkDeleteMutation.isPending && <LoaderIcon />}
-            </AlertDialogClose>
-          </AlertDialogFooter>
-        </AlertDialogPopup>
-      </AlertDialog>
+            />
+            <TooltipContent>Buscar por usuario</TooltipContent>
+          </Tooltip>
+        </InputGroupAddon>
+      </InputGroup>
 
-      <div className="flex flex-col justify-between gap-2 sm:flex-row">
-        <InputGroup className="w-full sm:w-sm">
-          <InputGroupInput
-            type="search"
-            value={searchQuery}
-            aria-label="Buscar"
-            placeholder="Buscar"
-            name="search-owners"
-            onChange={(e) => setSearchQuery(e.target.value || null)}
-          />
-          <InputGroupAddon>
-            <IconSearch />
-          </InputGroupAddon>
-
-          <InputGroupAddon align="inline-end">
-            <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
-              <TooltipTrigger
-                render={
-                  <Button
-                    size="icon-xs"
-                    variant="ghost"
-                    className="cursor-default"
-                    onClick={(e) => {
-                      e.preventBaseUIHandler()
-                      setSearchTooltipOpen(true)
-                    }}
-                  >
-                    <IconInfoCircle className="size-4" />
-                  </Button>
-                }
-              />
-              <TooltipContent>Buscar por nombre</TooltipContent>
-            </Tooltip>
-          </InputGroupAddon>
-        </InputGroup>
-
-        <div className="flex gap-2">
-          {selectedRowsLength > 0 && (
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    size="icon"
-                    variant="destructive-outline"
-                    aria-label="Borrar propietario"
-                    onClick={() => setDeleteDialogOpen(true)}
-                  >
-                    <IconTrash className="size-4" />
-                  </Button>
-                }
-              />
-              <TooltipContent>Eliminar seleccionados</TooltipContent>
-            </Tooltip>
-          )}
-
-          {tableRowsLength > 0 && (
-            <Button variant="outline" disabled>
-              <IconFileExport className="size-4" />
-              <span>Exportar</span>
-              {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}
-            </Button>
-          )}
-
-          <Button onClick={() => setOpenCreateOwnerDialog(true)}>
-            <IconPlus className="size-4" />
-            Crear
+      <div className="flex gap-2">
+        {tableRowsLength > 0 && (
+          <Button variant="outline" disabled>
+            <IconFileExport className="size-4" />
+            <span>Exportar</span>
+            {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}
           </Button>
-        </div>
+        )}
+
+        <Combobox
+          multiple
+          items={facetedFilterYears}
+          onValueChange={(item) => {
+            table.getColumn('timestamp')?.setFilterValue(item)
+          }}
+        >
+          <ComboboxTrigger
+            render={<Button variant="outline" name="years-faceted-filter" className="border-dashed" />}
+          >
+            <IconCirclePlus />
+            <ComboboxValue placeholder="Año">{renderYearFacetedFilterValue}</ComboboxValue>
+          </ComboboxTrigger>
+          <ComboboxPopup align="end" aria-label="Selecciona una opción" className="[--anchor-width:120px]">
+            <div className="border-b p-1">
+              <ComboboxInput
+                showTrigger={false}
+                placeholder="Buscar"
+                aria-invalid="false"
+                startAddon={<IconSearch />}
+                className="w-full min-w-full rounded-sm before:rounded-[calc(var(--radius-sm)-1px)]"
+              />
+            </div>
+            <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
+            <ComboboxList>
+              {(item) => (
+                <ComboboxItem key={item.value} value={item}>
+                  <span>{item.label}</span>
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxPopup>
+        </Combobox>
       </div>
-    </>
+    </div>
   )
 }

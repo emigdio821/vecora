@@ -31,6 +31,18 @@ export const paymentTypeEnum = pgEnum('payment_type', ['monthly_fee', 'extra', '
 // payment status enum
 export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'paid'])
 
+// audit logs action enum
+export const auditLogActionEnum = pgEnum('audit_log_action', ['create', 'update', 'delete'])
+
+// audit logs entity type enum
+export const auditLogEntityTypeEnum = pgEnum('audit_log_entity_type', [
+  'external_user',
+  'owner',
+  'house',
+  'payment',
+  'violation',
+])
+
 // Roles table - defines all available roles in the system
 export const roles = pgTable('roles', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -241,9 +253,11 @@ export const auditLogs = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
-    action: varchar('action', { length: 100 }).notNull(),
-    entityType: varchar('entity_type', { length: 50 }).notNull(),
+    profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
+    action: auditLogActionEnum('action').notNull(),
+    entityType: auditLogEntityTypeEnum('entity_type').notNull(),
     entityId: uuid('entity_id'),
+    // biome-ignore lint/complexity/noBannedTypes: TODO: review usage of unknown
     changes: jsonb('changes').$type<{}>(), // Stores { old: {...}, new: {...} }
     ipAddress: varchar('ip_address', { length: 45 }),
     userAgent: text('user_agent'),
@@ -251,6 +265,7 @@ export const auditLogs = pgTable(
   },
   (table) => [
     index('audit_logs_userId_idx').on(table.userId),
+    index('audit_logs_profileId_idx').on(table.profileId),
     index('audit_logs_entityType_idx').on(table.entityType),
     index('audit_logs_entityId_idx').on(table.entityId),
     index('audit_logs_timestamp_idx').on(table.timestamp),
@@ -361,6 +376,10 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   user: one(user, {
     fields: [auditLogs.userId],
     references: [user.id],
+  }),
+  profile: one(profiles, {
+    fields: [auditLogs.profileId],
+    references: [profiles.id],
   }),
 }))
 

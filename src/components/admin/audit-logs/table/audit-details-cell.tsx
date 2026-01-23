@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import type { AuditLogWithUser } from '@/db/schemas/zod/audit-logs'
-import { AuditDetailsSheet } from '../sheets/audit-details'
+import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
+import { AuditLogDetailsSheet } from '../sheets/audit-log-details'
 
 interface OwnerNameCellProps {
-  auditLogs: AuditLogWithUser
+  auditLogs: AuditLogWithUserAndProfile
 }
 
 export function AuditDetailsCell({ auditLogs }: OwnerNameCellProps) {
@@ -16,7 +16,10 @@ export function AuditDetailsCell({ auditLogs }: OwnerNameCellProps) {
       <Button variant="link" className="block truncate" onClick={() => setIsSheetOpen(true)}>
         {userName}
       </Button>
-      <AuditDetailsSheet auditLog={auditLogs} state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }} />
+      <AuditLogDetailsSheet
+        auditLog={auditLogs}
+        state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }}
+      />
     </>
   )
 }

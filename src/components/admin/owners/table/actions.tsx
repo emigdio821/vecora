@@ -1,6 +1,7 @@
 import { IconDotsVertical, IconEdit, IconTrash, IconUser } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deleteOwner } from '@/api/server-functions/owners'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -42,7 +43,7 @@ export function OwnersTableActions({ owner }: ActionsProps) {
     mutationFn: async (data: DeleteOwnerData) => {
       return await deleteOwner({ data })
     },
-    invalidateKeys: [OWNERS_QUERY_KEY],
+    invalidateKeys: [OWNERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Propietario eliminado',
     successDescription: 'El propietario ha sido eliminado exitosamente.',
     errorDescription: 'Ocurrió un error al eliminar el propietario, intenta nuevamente.',

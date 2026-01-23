@@ -3,6 +3,7 @@ import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteExternalUser } from '@/api/server-functions/external-users'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { EXTERNAL_USERS_QUERY_KEY } from '@/api/tanstack-queries/external-users'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -42,7 +43,7 @@ export function ExternalUsersDataTableHeader({ table }: ExternalUsersDataTableHe
     deleteFn: async (externalUser) => {
       await deleteExternalUser({ data: { externalUserId: externalUser.id } })
     },
-    invalidateKeys: [EXTERNAL_USERS_QUERY_KEY],
+    invalidateKeys: [EXTERNAL_USERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

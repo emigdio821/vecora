@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateViolation } from '@/api/server-functions/violations'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
@@ -72,7 +73,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
     mutationFn: async (data: UpdateViolationFormData) => {
       return await updateViolation({ data })
     },
-    invalidateKeys: [VIOLATIONS_QUERY_KEY],
+    invalidateKeys: [VIOLATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Infracción actualizada',
     successDescription: 'La infracción ha sido actualizada exitosamente.',
     errorDescription: 'Ocurrió un error al actualizar la infracción, intenta nuevamente.',

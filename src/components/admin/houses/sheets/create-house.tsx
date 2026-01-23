@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createHouse } from '@/api/server-functions/houses'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/owners-selector'
@@ -50,7 +51,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
     mutationFn: async (data: CreateHouseFormData) => {
       return await createHouse({ data })
     },
-    invalidateKeys: [HOUSES_QUERY_KEY],
+    invalidateKeys: [HOUSES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Casa creada',
     successDescription: 'La casa ha sido creada exitosamente.',
     errorDescription: 'Ocurrió un error al crear la casa, intenta nuevamente.',

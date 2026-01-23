@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createOwner } from '@/api/server-functions/owners'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { AVAILABLE_HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
@@ -51,7 +52,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
     mutationFn: async (data: CreateOwnerFormData) => {
       return await createOwner({ data })
     },
-    invalidateKeys: [OWNERS_QUERY_KEY, AVAILABLE_HOUSES_QUERY_KEY],
+    invalidateKeys: [OWNERS_QUERY_KEY, AVAILABLE_HOUSES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Propietario creado',
     successDescription: 'El propietario ha sido creado exitosamente.',
     errorDescription: 'Ocurrió un error al crear el propietario, intenta nuevamente.',

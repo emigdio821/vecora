@@ -1,38 +1,42 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { AuditLogActionBadge } from '@/components/shared/audit-logs/action-badge'
+import { AuditLogEntityTypeBadge } from '@/components/shared/audit-logs/identity-type-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
-import type { AuditLogWithUser } from '@/db/schemas/zod/audit-logs'
-// import { Checkbox } from '@/components/ui/checkbox'
+import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
 import { formatDate, normalizeString } from '@/lib/utils'
 import { AuditDetailsCell } from './audit-details-cell'
+import type { YearFacetedFilterOption } from './data-table-header'
 
-export const auditLogsTableColumns: ColumnDef<AuditLogWithUser>[] = [
-  // {
-  //   id: 'select',
-  //   enablePinning: false,
-  //   enableResizing: false,
-  //   enableSorting: false,
-  //   size: 28,
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       aria-label="Seleccionar todo"
-  //       checked={table.getIsAllPageRowsSelected()}
-  //       indeterminate={table.getIsSomePageRowsSelected()}
-  //       disabled={table.getFilteredRowModel().rows.length === 0}
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       aria-label="Seleccionar elemento"
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //     />
-  //   ),
-  // },
+export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
+  {
+    id: 'select',
+    size: 28,
+    enablePinning: false,
+    enableResizing: false,
+    enableSorting: false,
+    header: ({ table }) => (
+      <Checkbox
+        aria-label="Seleccionar todo"
+        checked={table.getIsAllPageRowsSelected()}
+        indeterminate={table.getIsSomePageRowsSelected()}
+        disabled={table.getFilteredRowModel().rows.length === 0}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        aria-label="Seleccionar elemento"
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+      />
+    ),
+  },
   {
     accessorKey: 'user',
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Usuario" />,
     size: 200,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Usuario" />,
     cell: ({ row }) => <AuditDetailsCell auditLogs={row.original} />,
     filterFn: (row, _, value: string) => {
       const normalizedName = normalizeString(row.original.user?.name || '').toLowerCase()
@@ -43,19 +47,43 @@ export const auditLogsTableColumns: ColumnDef<AuditLogWithUser>[] = [
     },
   },
   {
-    accessorKey: 'action',
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Acción" />,
+    accessorKey: 'user.profile.roles',
     size: 150,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
+    cell: ({ row }) => {
+      const roles = row.original.profile?.roles || []
+
+      const roleBadges = roles.map((role) => (
+        <Badge variant="outline" key={role}>
+          <span>{role}</span>
+        </Badge>
+      ))
+
+      return <>{roleBadges.length > 0 && <div className="flex flex-wrap gap-1">{roleBadges}</div>}</>
+    },
+  },
+  {
+    accessorKey: 'action',
+    size: 150,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Acción" />,
+    cell: ({ row }) => <AuditLogActionBadge action={row.original.action} />,
   },
   {
     accessorKey: 'entityType',
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Tipo de entidad" />,
     size: 150,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Tipo de entidad" />,
+    cell: ({ row }) => <AuditLogEntityTypeBadge entityType={row.original.entityType} />,
   },
   {
     accessorKey: 'timestamp',
     size: 200,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha y hora" />,
     cell: ({ row }) => formatDate(row.original.timestamp),
+    filterFn: (row, _, value: YearFacetedFilterOption[]) => {
+      if (value.length === 0) return true
+
+      const rowYear = new Date(row.original.timestamp).getFullYear()
+      return value.some((option) => option.value === rowYear)
+    },
   },
 ]

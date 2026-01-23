@@ -3,6 +3,7 @@ import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deletePayment } from '@/api/server-functions/payments'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -42,7 +43,7 @@ export function PaymentsDataTableHeader({ table }: PaymentsDataTableHeaderProps)
     deleteFn: async (payment) => {
       await deletePayment({ data: { paymentId: payment.id } })
     },
-    invalidateKeys: [PAYMENTS_QUERY_KEY],
+    invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

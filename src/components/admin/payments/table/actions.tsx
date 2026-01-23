@@ -1,6 +1,7 @@
 import { IconCurrencyDollar, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deletePayment } from '@/api/server-functions/payments'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -42,7 +43,7 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
     mutationFn: async (data: DeletePaymentData) => {
       return await deletePayment({ data })
     },
-    invalidateKeys: [PAYMENTS_QUERY_KEY],
+    invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Pago eliminado',
     successDescription: 'El pago ha sido eliminado exitosamente.',
     errorDescription: 'Ocurrió un error al eliminar el pago, intenta nuevamente.',

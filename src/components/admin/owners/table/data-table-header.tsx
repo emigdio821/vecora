@@ -3,6 +3,7 @@ import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteOwner } from '@/api/server-functions/owners'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -42,7 +43,7 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
     deleteFn: async (owner) => {
       await deleteOwner({ data: { ownerId: owner.id } })
     },
-    invalidateKeys: [OWNERS_QUERY_KEY],
+    invalidateKeys: [OWNERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

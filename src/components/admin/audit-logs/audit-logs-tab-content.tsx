@@ -3,10 +3,10 @@ import { auditLogsListQueryOptions } from '@/api/tanstack-queries/audit-logs'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { FrameTitle } from '@/components/ui/frame'
 import { auditLogsTableColumns } from './table/columns'
+import { AuditLogsDataTableHeader } from './table/data-table-header'
 
-export function AuditLogsSectionContent() {
+export function AuditLogsTabContent() {
   const { data: auditLogs = [], isLoading, error, refetch } = useQuery(auditLogsListQueryOptions())
 
   if (error) {
@@ -25,8 +25,7 @@ export function AuditLogsSectionContent() {
       tableId="audit-logs"
       pageSize={5}
       columns={auditLogsTableColumns}
-      // header={(table) => <OwnersDataTableHeader table={table} />}
-      header={() => <FrameTitle>Registros de auditoría</FrameTitle>}
+      header={(table) => <AuditLogsDataTableHeader table={table} />}
     />
   )
 }

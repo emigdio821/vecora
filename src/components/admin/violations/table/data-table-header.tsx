@@ -3,6 +3,7 @@ import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteViolation } from '@/api/server-functions/violations'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -42,7 +43,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
     deleteFn: async (violation) => {
       await deleteViolation({ data: { violationId: violation.id } })
     },
-    invalidateKeys: [VIOLATIONS_QUERY_KEY],
+    invalidateKeys: [VIOLATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

@@ -5,6 +5,8 @@ import {
   IconUser,
   IconWind,
 } from '@tabler/icons-react'
+import { AuditLogActionBadge } from '@/components/shared/audit-logs/action-badge'
+import { AuditLogEntityTypeBadge } from '@/components/shared/audit-logs/identity-type-badge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -20,19 +22,20 @@ import {
   SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { AuditLogWithUser } from '@/db/schemas/zod/audit-logs'
+import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
 import { formatDate } from '@/lib/utils'
 
 interface AuditDetailsSheetProps {
-  auditLog: AuditLogWithUser
+  auditLog: AuditLogWithUserAndProfile
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
   }
 }
 
-export function AuditDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
+export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
   const { isOpen, onOpenChange } = state
+  const profileRoles = auditLog.profile?.roles || []
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -60,29 +63,23 @@ export function AuditDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">ID de registro</h2>
-                    <Badge variant="outline" size="lg">
-                      {auditLog.id}
-                    </Badge>
+                    <p className="font-mono text-muted-foreground text-xs">{auditLog.id}</p>
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={auditLog.id} />
                 </FramePanel>
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Acción</h2>
-                  <p className="text-muted-foreground text-sm">{auditLog.action}</p>
+                  <AuditLogActionBadge action={auditLog.action} />
                 </FramePanel>
-                <FramePanel className="p-2">
-                  <h2 className="font-medium text-sm">Tipo de entidad</h2>
-                  <p className="text-muted-foreground text-sm">{auditLog.entityType}</p>
-                </FramePanel>
-                {auditLog.entityId && (
-                  <FramePanel className="flex items-center gap-2 p-2">
-                    <div className="min-w-0 flex-1">
-                      <h2 className="font-medium text-sm">ID de entidad</h2>
-                      <p className="truncate text-muted-foreground text-sm">{auditLog.entityId}</p>
-                    </div>
+                <FramePanel className="flex items-center gap-2 p-2">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="font-medium text-sm">Tipo de entidad</h2>
+                    <AuditLogEntityTypeBadge entityType={auditLog.entityType} />
+                  </div>
+                  {auditLog.entityId && (
                     <CopyButton tooltipText="Copiar ID de entidad" value={auditLog.entityId} />
-                  </FramePanel>
-                )}
+                  )}
+                </FramePanel>
               </CollapsiblePanel>
             </Collapsible>
           </Frame>
@@ -105,8 +102,8 @@ export function AuditDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
                   <div className="space-y-1">
                     <FramePanel className="flex items-center gap-2 p-2">
                       <div className="min-w-0 flex-1">
-                        <h2 className="font-medium text-sm">ID de usuario</h2>
-                        <p className="truncate text-muted-foreground text-sm">{auditLog.user.id}</p>
+                        <h2 className="font-medium text-sm">Nombre</h2>
+                        <p className="truncate text-muted-foreground text-sm">{auditLog.user.name}</p>
                       </div>
                       <CopyButton tooltipText="Copiar ID de usuario" value={auditLog.user.id} />
                     </FramePanel>
@@ -114,6 +111,19 @@ export function AuditDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
                       <h2 className="font-medium text-sm">Correo electrónico</h2>
                       <p className="text-muted-foreground text-sm">{auditLog.user.email}</p>
                     </FramePanel>
+
+                    {profileRoles.length > 0 && (
+                      <FramePanel className="p-2">
+                        <h2 className="font-medium text-sm">Rol</h2>
+                        <div className="flex flex-wrap gap-1">
+                          {profileRoles.map((role) => (
+                            <Badge variant="outline" key={role}>
+                              {role}
+                            </Badge>
+                          ))}
+                        </div>
+                      </FramePanel>
+                    )}
                   </div>
                 ) : (
                   <FramePanel className="p-2">
@@ -147,7 +157,7 @@ export function AuditDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
                 </FrameHeader>
                 <CollapsiblePanel>
                   <FramePanel className="p-2">
-                    <pre className="overflow-x-auto rounded-md bg-muted p-2 text-xs">
+                    <pre className="overflow-x-auto font-mono text-muted-foreground text-xs">
                       {JSON.stringify(auditLog.changes, null, 2)}
                     </pre>
                   </FramePanel>
@@ -159,7 +169,7 @@ export function AuditDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
           {/* Technical details */}
           {(auditLog.ipAddress || auditLog.userAgent) && (
             <Frame className="w-full">
-              <Collapsible>
+              <Collapsible defaultOpen>
                 <FrameHeader className="flex-row items-center justify-between p-2">
                   <CollapsibleTrigger
                     className="data-panel-open:[&_svg]:rotate-180"

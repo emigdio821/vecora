@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq, isNull } from 'drizzle-orm'
-import { createAuditLog } from '@/api/server-functions/audit'
+import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { houses } from '@/db/schemas/main'
 import type { HouseWithOwner, InsertHouse, SelectHouse } from '@/db/schemas/zod/houses'

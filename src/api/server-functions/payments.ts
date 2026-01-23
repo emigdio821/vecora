@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import { createAuditLog } from '@/api/server-functions/audit'
+import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { paymentMonths, payments } from '@/db/schemas/main'
 import type { InsertPayment, PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'

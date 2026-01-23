@@ -1,6 +1,7 @@
 import { IconDotsVertical, IconEdit, IconTrash, IconUser } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deleteExternalUser } from '@/api/server-functions/external-users'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { EXTERNAL_USERS_QUERY_KEY } from '@/api/tanstack-queries/external-users'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -42,7 +43,7 @@ export function ExternalUsersTableActions({ externalUser }: ActionsProps) {
     mutationFn: async (data: DeleteExternalUserData) => {
       return await deleteExternalUser({ data })
     },
-    invalidateKeys: [EXTERNAL_USERS_QUERY_KEY],
+    invalidateKeys: [EXTERNAL_USERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Usuario externo eliminado',
     successDescription: 'El usuario externo ha sido eliminado exitosamente.',
     errorDescription: 'Ocurrió un error al eliminar el usuario externo, intenta nuevamente.',

@@ -1,6 +1,7 @@
 import { IconDotsVertical, IconEdit, IconFlag, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deleteViolation } from '@/api/server-functions/violations'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -41,7 +42,7 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
     mutationFn: async (data: DeleteViolationData) => {
       return await deleteViolation({ data })
     },
-    invalidateKeys: [VIOLATIONS_QUERY_KEY],
+    invalidateKeys: [VIOLATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Infracción eliminada',
     successDescription: 'La infracción ha sido eliminada exitosamente.',
     errorDescription: 'Ocurrió un error al eliminar la infracción, intenta nuevamente.',

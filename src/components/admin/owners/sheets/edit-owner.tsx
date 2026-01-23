@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateOwner } from '@/api/server-functions/owners'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
@@ -50,7 +51,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
     mutationFn: async (data: UpdateOwnerFormData) => {
       return await updateOwner({ data })
     },
-    invalidateKeys: [OWNERS_QUERY_KEY],
+    invalidateKeys: [OWNERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Propietario actualizado',
     successDescription: 'El propietario ha sido actualizado exitosamente.',
     errorDescription: 'Ocurrió un error al actualizar el propietario, intenta nuevamente.',

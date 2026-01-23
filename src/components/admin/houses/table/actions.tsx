@@ -1,6 +1,7 @@
 import { IconDotsVertical, IconEdit, IconHome, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deleteOwner } from '@/api/server-functions/owners'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
 import {
@@ -41,7 +42,7 @@ export function HousesTableActions({ house }: ActionsProps) {
     mutationFn: async (data: DeleteOwnerData) => {
       return await deleteOwner({ data })
     },
-    invalidateKeys: [HOUSES_QUERY_KEY],
+    invalidateKeys: [HOUSES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Casa eliminada',
     successDescription: 'La casa ha sido eliminada exitosamente.',
     errorDescription: 'Ocurrió un error al eliminar la casa, intenta nuevamente.',

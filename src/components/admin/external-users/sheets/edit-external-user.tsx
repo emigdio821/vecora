@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateExternalUser } from '@/api/server-functions/external-users'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { EXTERNAL_USERS_QUERY_KEY } from '@/api/tanstack-queries/external-users'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
@@ -50,7 +51,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
     mutationFn: async (data: UpdateExternalUserFormData) => {
       return await updateExternalUser({ data })
     },
-    invalidateKeys: [EXTERNAL_USERS_QUERY_KEY],
+    invalidateKeys: [EXTERNAL_USERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Usuario externo actualizado',
     successDescription: 'El usuario externo ha sido actualizado exitosamente.',
     errorDescription: 'Ocurrió un error al actualizar el usuario externo, intenta nuevamente.',

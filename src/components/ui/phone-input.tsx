@@ -91,7 +91,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
         </ComboboxValue>
         <IconSelector className="-me-1!" />
       </ComboboxTrigger>
-      <ComboboxPopup aria-label="Selecciona una opción" className="[--anchor-width:288px]">
+      <ComboboxPopup aria-label="Selecciona una opción" align="start" className="[--anchor-width:288px]">
         <div className="border-b p-1">
           <ComboboxInput
             showTrigger={false}

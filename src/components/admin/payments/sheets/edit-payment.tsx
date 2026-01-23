@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updatePayment } from '@/api/server-functions/payments'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
 import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/owners-selector'
@@ -76,7 +77,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
     mutationFn: async (data: UpdatePaymentFormData) => {
       return await updatePayment({ data })
     },
-    invalidateKeys: [PAYMENTS_QUERY_KEY],
+    invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Pago actualizado',
     successDescription: 'El pago ha sido actualizado exitosamente.',
     errorDescription: 'Ocurrió un error al actualizar el pago, intenta nuevamente.',

@@ -2,7 +2,6 @@ import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
 import { IconSelector, IconX } from '@tabler/icons-react'
 import * as React from 'react'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
 const ComboboxContext = React.createContext<{
@@ -125,9 +124,11 @@ function ComboboxPopup({
   className,
   children,
   sideOffset = 4,
+  align = 'center',
   ...props
 }: ComboboxPrimitive.Popup.Props & {
   sideOffset?: number
+  align?: ComboboxPrimitive.Positioner.Props['align']
 }) {
   const { chipsRef } = React.useContext(ComboboxContext)
 
@@ -138,6 +139,7 @@ function ComboboxPopup({
         className="z-50 select-none"
         data-slot="combobox-positioner"
         sideOffset={sideOffset}
+        align={align}
       >
         <span
           className={cn(
@@ -240,7 +242,7 @@ function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
 
 function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
   return (
-    <ScrollArea scrollbarGutter scrollFade>
+    <div className="overflow-y-auto">
       <ComboboxPrimitive.List
         className={cn(
           'not-empty:scroll-py-1 not-empty:px-1 not-empty:py-1 in-data-has-overflow-y:pe-3',
@@ -249,7 +251,7 @@ function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
         data-slot="combobox-list"
         {...props}
       />
-    </ScrollArea>
+    </div>
   )
 }
 
