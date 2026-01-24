@@ -12,7 +12,9 @@ const config = defineConfig({
       projects: ['./tsconfig.json'],
     }),
     tanstackStart(),
-    nitro(),
+    nitro({
+      dev: process.env.NODE_ENV === 'development',
+    }),
     viteReact(),
   ],
 })

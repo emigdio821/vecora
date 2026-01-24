@@ -136,7 +136,6 @@ function RouteComponent() {
                     <InputPassword
                       {...field}
                       id={field.name}
-                      type="password"
                       aria-invalid={fieldState.invalid}
                       disabled={isLoading}
                     />
