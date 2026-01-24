@@ -29,6 +29,10 @@ type PhoneInputProps = Omit<
   id?: string
 }
 
+function getCountryCode(country: CountrySelectOption | null) {
+  return country?.value ? `+${getCountryCallingCode(country.value)}` : 'País'
+}
+
 export function PhoneInput({ className, ...props }: PhoneInputProps) {
   return (
     <RPNInput
@@ -80,14 +84,14 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
 
   const filteredItems = useMemo(() => {
     return countries.filter((item) => contains(item, resolvedSearchValue, getItemLabel))
-  }, [contains, resolvedSearchValue, countries.filter])
+  }, [contains, resolvedSearchValue, countries])
 
   const virtualizer = useVirtualizer({
     enabled: open,
     count: filteredItems.length,
     getScrollElement: () => scrollElementRef.current,
     estimateSize: () => 32,
-    overscan: 4,
+    overscan: 10,
   })
 
   const handleScrollElementRef = useCallback(
@@ -99,10 +103,6 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
     },
     [virtualizer],
   )
-
-  const getCountryCode = useCallback((country: CountrySelectOption | null) => {
-    return country?.value ? `+${getCountryCallingCode(country.value)}` : 'País'
-  }, [])
 
   const totalSize = virtualizer.getTotalSize()
 
@@ -132,7 +132,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
 
         if (shouldScroll) {
           queueMicrotask(() => {
-            virtualizer.scrollToIndex(index, { align: isEnd ? 'start' : 'end' })
+            virtualizer.scrollToIndex(index, { align: isStart ? 'start' : 'end' })
           })
         }
       }}
@@ -160,7 +160,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
               className="h-[min(20rem,var(--total-size))] max-h-(--available-height) overflow-y-auto"
               style={{ '--total-size': `${totalSize}px` } as React.CSSProperties}
             >
-              <div role="presentation" className="relative h-(--total-size) w-full">
+              <div role="presentation" className="relative w-full" style={{ height: totalSize }}>
                 {virtualizer.getVirtualItems().map((virtualItem) => {
                   const item = filteredItems[virtualItem.index]
                   if (!item) {
