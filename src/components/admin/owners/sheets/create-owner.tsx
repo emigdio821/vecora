@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createOwner } from '@/api/server-functions/owners'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { AVAILABLE_HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
+import { AVAILABLE_HOUSES_QUERY_KEY, HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import { AvailableHousesSelector } from '@/components/shared/available-houses-selector'
@@ -35,6 +36,7 @@ interface CreateOwnerDialogProps {
 export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
   const createOwnerFormId = useId()
   const { isOpen, onOpenChange } = state
+  const queryClient = useQueryClient()
 
   const form = useForm<CreateOwnerFormData>({
     shouldUnregister: true,
@@ -44,7 +46,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
       lastName: '',
       phone: '',
       email: '',
-      houseId: null,
+      houseIds: [],
     },
   })
 
@@ -52,11 +54,16 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
     mutationFn: async (data: CreateOwnerFormData) => {
       return await createOwner({ data })
     },
-    invalidateKeys: [OWNERS_QUERY_KEY, AVAILABLE_HOUSES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    invalidateKeys: [OWNERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Propietario creado',
     successDescription: 'El propietario ha sido creado exitosamente.',
     errorDescription: 'Ocurrió un error al crear el propietario, intenta nuevamente.',
     onSuccess: () => {
+      const houseIds = form.getValues('houseIds')
+      if (houseIds.length > 0) {
+        queryClient.invalidateQueries({ queryKey: [AVAILABLE_HOUSES_QUERY_KEY] })
+        queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
+      }
       onOpenChange(false)
     },
   })
@@ -161,11 +168,11 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
             />
 
             <Controller
-              name="houseId"
+              name="houseIds"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
-                  <FieldLabel htmlFor={field.name}>Casa</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Casas</FieldLabel>
                   <AvailableHousesSelector
                     id={field.name}
                     value={field.value}

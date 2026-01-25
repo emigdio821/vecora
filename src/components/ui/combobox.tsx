@@ -33,6 +33,7 @@ function ComboboxInput({
   showClear = false,
   startAddon,
   size,
+  skipDefaultMultiple = false,
   ...props
 }: Omit<ComboboxPrimitive.Input.Props, 'size'> & {
   showTrigger?: boolean
@@ -40,30 +41,31 @@ function ComboboxInput({
   startAddon?: React.ReactNode
   size?: 'sm' | 'default' | 'lg' | number
   ref?: React.Ref<HTMLInputElement>
+  skipDefaultMultiple?: boolean
 }) {
-  // const { multiple } = React.useContext(ComboboxContext)
+  const { multiple } = React.useContext(ComboboxContext)
   const sizeValue = (size ?? 'default') as 'sm' | 'default' | 'lg' | number
 
   // multiple mode
-  // if (multiple) {
-  //   return (
-  //     <ComboboxPrimitive.Input
-  //       className={cn(
-  //         'min-w-12 flex-1 text-base outline-none sm:text-sm [[data-slot=combobox-chip]+&]:ps-0.5',
-  //         sizeValue === 'sm' ? 'ps-1.5' : 'ps-2',
-  //         className,
-  //       )}
-  //       data-size={typeof sizeValue === 'string' ? sizeValue : undefined}
-  //       data-slot="combobox-input"
-  //       size={typeof sizeValue === 'number' ? sizeValue : undefined}
-  //       {...props}
-  //     />
-  //   )
-  // }
+  if (multiple && !skipDefaultMultiple) {
+    return (
+      <ComboboxPrimitive.Input
+        className={cn(
+          'min-w-12 flex-1 text-base outline-none sm:text-sm [[data-slot=combobox-chip]+&]:ps-0.5',
+          sizeValue === 'sm' ? 'ps-1.5' : 'ps-2',
+          className,
+        )}
+        data-size={typeof sizeValue === 'string' ? sizeValue : undefined}
+        data-slot="combobox-input"
+        size={typeof sizeValue === 'number' ? sizeValue : undefined}
+        {...props}
+      />
+    )
+  }
 
   // single mode
   return (
-    <div className="relative not-has-[>*.w-full]:w-fit w-full has-disabled:opacity-64">
+    <div className="relative not-has-[>*.w-full]:w-fit w-full text-foreground has-disabled:opacity-64">
       {startAddon && (
         <div
           aria-hidden="true"
@@ -83,13 +85,7 @@ function ComboboxInput({
           className,
         )}
         data-slot="combobox-input"
-        render={
-          <Input
-            nativeInput
-            size={sizeValue}
-            className="ring-0 has-focus-visible:border-input has-disabled:opacity-100 has-focus-visible:ring-0"
-          />
-        }
+        render={<Input className="has-disabled:opacity-100" nativeInput size={sizeValue} />}
         {...props}
       />
       {showTrigger && (
@@ -148,7 +144,7 @@ function ComboboxPopup({
           )}
         >
           <ComboboxPrimitive.Popup
-            className="flex max-h-[min(var(--available-height),23rem)] w-(--anchor-width) max-w-(--available-width) flex-col"
+            className="flex max-h-[min(var(--available-height),23rem)] w-(--anchor-width) max-w-(--available-width) flex-col text-foreground"
             data-slot="combobox-popup"
             {...props}
           >
@@ -242,7 +238,6 @@ function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
 
 function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
   return (
-    // <div className="overflow-y-auto">
     <ComboboxPrimitive.List
       className={cn(
         'not-empty:scroll-py-1 overflow-y-auto not-empty:px-1 not-empty:py-1 in-data-has-overflow-y:pe-3',
@@ -285,7 +280,7 @@ function ComboboxChips({
   return (
     <ComboboxPrimitive.Chips
       className={cn(
-        'relative inline-flex min-h-9 w-full flex-wrap gap-1 rounded-lg border border-input bg-background not-dark:bg-clip-padding p-[calc(--spacing(1)-1px)] text-base shadow-xs/5 outline-none ring-ring/24 transition-shadow *:min-h-7 before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/6%)] focus-within:border-ring focus-within:ring-[3px] has-disabled:pointer-events-none has-data-[size=lg]:min-h-10 has-data-[size=sm]:min-h-8 has-aria-invalid:border-destructive/36 has-disabled:opacity-64 has-[:disabled,:focus-within,[aria-invalid]]:shadow-none focus-within:has-aria-invalid:border-destructive/64 focus-within:has-aria-invalid:ring-destructive/16 has-data-[size=lg]:*:min-h-8 has-data-[size=sm]:*:min-h-6 sm:min-h-8 sm:text-sm sm:has-data-[size=lg]:min-h-9 sm:has-data-[size=sm]:min-h-7 sm:*:min-h-6 sm:has-data-[size=lg]:*:min-h-7 sm:has-data-[size=sm]:*:min-h-5 dark:not-has-disabled:bg-input/32 dark:has-aria-invalid:ring-destructive/24 dark:not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/6%)]',
+        'relative inline-flex min-h-9 w-full flex-wrap gap-1 rounded-lg border border-input bg-background not-dark:bg-clip-padding p-[calc(--spacing(1)-1px)] text-base shadow-xs/5 outline-none ring-ring/24 transition-shadow *:min-h-7 before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/6%)] focus-within:border-ring focus-within:ring-[3px] has-disabled:pointer-events-none has-data-[size=lg]:min-h-10 has-data-[size=sm]:min-h-8 has-aria-invalid:border-destructive/36 has-disabled:opacity-64 has-[:disabled,:focus-within,[aria-invalid]]:shadow-none focus-within:has-aria-invalid:border-destructive/64 focus-within:has-aria-invalid:ring-destructive/16 has-data-[size=lg]:*:min-h-8 has-data-[size=sm]:*:min-h-6 sm:min-h-8 sm:text-sm sm:has-data-[size=lg]:min-h-9 sm:has-data-[size=sm]:min-h-7 sm:*:min-h-6 sm:has-data-[size=lg]:*:min-h-7 sm:has-data-[size=sm]:*:min-h-5 dark:bg-input/32 dark:not-has-disabled:bg-input/32 dark:has-aria-invalid:ring-destructive/24 dark:not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/6%)]',
         className,
       )}
       data-slot="combobox-chips"

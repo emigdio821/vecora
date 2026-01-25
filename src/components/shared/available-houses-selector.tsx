@@ -1,61 +1,94 @@
 import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { availableHousesQueryOptions } from '@/api/tanstack-queries/houses'
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+} from '@/components/ui/combobox'
 import { Skeleton } from '../ui/skeleton'
 
-interface HouseSelectorProps extends React.ComponentProps<typeof Select> {
+interface HouseItem {
+  label: string
+  value: string
+}
+
+interface HouseSelectorProps {
   disabled?: boolean
   invalid?: boolean
-  placeholder?: string
-  includeNoneOption?: boolean
-  noneOptionLabel?: string
-  value: string | null
+  value: string[]
+  onValueChange: (value: string[]) => void
+  id?: string
+  includeAssigned?: { id: string; houseNumber: string }[]
 }
 
 export function AvailableHousesSelector({
   disabled = false,
   invalid = false,
-  placeholder = 'Selecciona una opción',
-  includeNoneOption = true,
-  noneOptionLabel = 'Sin selección',
   value,
-  ...selectProps
+  onValueChange,
+  id,
+  includeAssigned = [],
 }: HouseSelectorProps) {
   const { data: availableHouses = [], isLoading: isLoadingAvailableHouses } = useQuery(
     availableHousesQueryOptions(),
   )
 
-  function renderAvailableHousesValue(value: string | null) {
-    if (availableHouses.length === 0) return 'No hay casas disponibles'
+  const items: HouseItem[] = useMemo(() => {
+    const assignedItems = includeAssigned.map((house) => ({ label: house.houseNumber, value: house.id }))
+    const availableItems = availableHouses.map((house) => ({ label: house.houseNumber, value: house.id }))
 
-    const house = availableHouses.find((house) => house.id === value)
-    return house ? `${house.houseNumber}` : placeholder
-  }
+    const allItems = [...assignedItems, ...availableItems]
+    const uniqueItems = allItems.filter(
+      (item, index, self) => index === self.findIndex((t) => t.value === item.value),
+    )
+
+    return uniqueItems
+  }, [availableHouses, includeAssigned])
 
   if (isLoadingAvailableHouses) return <Skeleton className="h-8 w-full rounded-lg" />
 
+  if (availableHouses.length === 0 && includeAssigned.length === 0) {
+    return (
+      <div className="flex h-9 w-full items-center rounded-lg border border-input bg-muted px-3 text-muted-foreground text-sm">
+        No hay casas disponibles
+      </div>
+    )
+  }
+
   return (
-    <Select value={value} disabled={availableHouses.length === 0 || disabled} {...selectProps}>
-      <SelectTrigger aria-invalid={invalid} className="w-full">
-        <SelectValue>{renderAvailableHousesValue(value)}</SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          {includeNoneOption && <SelectItem value={null}>{noneOptionLabel}</SelectItem>}
-          {availableHouses.map((house) => (
-            <SelectItem key={house.id} value={house.id}>
-              {house.houseNumber}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+    <Combobox
+      multiple
+      value={items.filter((item) => value.includes(item.value))}
+      onValueChange={(selectedItems: HouseItem[]) => {
+        onValueChange(selectedItems.map((item) => item.value))
+      }}
+      items={items}
+      disabled={disabled}
+    >
+      <ComboboxChips aria-invalid={invalid} id={id}>
+        {value.map((houseId) => {
+          const house =
+            availableHouses.find((h) => h.id === houseId) || includeAssigned.find((h) => h.id === houseId)
+          return house ? <ComboboxChip key={houseId}>{house.houseNumber}</ComboboxChip> : null
+        })}
+        <ComboboxInput placeholder={value.length > 0 ? undefined : 'Selecciona casas'} />
+      </ComboboxChips>
+      <ComboboxPopup>
+        <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
+        <ComboboxList>
+          {(item: HouseItem) => (
+            <ComboboxItem key={item.value} value={item}>
+              {item.label}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxPopup>
+    </Combobox>
   )
 }

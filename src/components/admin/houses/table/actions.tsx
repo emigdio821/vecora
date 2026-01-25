@@ -1,6 +1,6 @@
 import { IconDotsVertical, IconEdit, IconHome, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
-import { deleteOwner } from '@/api/server-functions/owners'
+import { deleteHouse } from '@/api/server-functions/houses'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/menu'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import type { DeleteOwnerData } from '@/schemas/owners'
+import type { DeleteHouseData } from '@/schemas/houses'
 import { EditHouseSheet } from '../sheets/edit-house'
 import { HouseDetailsSheet } from '../sheets/house-details'
 
@@ -39,8 +39,8 @@ export function HousesTableActions({ house }: ActionsProps) {
   const [isEditHouseSheetOpen, setEditHouseSheetOpen] = useState(false)
 
   const deleteHouseMutation = useEntityMutation({
-    mutationFn: async (data: DeleteOwnerData) => {
-      return await deleteOwner({ data })
+    mutationFn: async (data: DeleteHouseData) => {
+      return await deleteHouse({ data })
     },
     invalidateKeys: [HOUSES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Casa eliminada',
@@ -51,8 +51,8 @@ export function HousesTableActions({ house }: ActionsProps) {
     },
   })
 
-  function handleDeleteOwner() {
-    deleteHouseMutation.mutate({ ownerId: house.id })
+  function handleDeleteHouse() {
+    deleteHouseMutation.mutate({ houseId: house.id })
   }
 
   return (
@@ -74,7 +74,7 @@ export function HousesTableActions({ house }: ActionsProps) {
               render={
                 <Button
                   variant="destructive"
-                  onClick={handleDeleteOwner}
+                  onClick={handleDeleteHouse}
                   disabled={deleteHouseMutation.isPending}
                 />
               }

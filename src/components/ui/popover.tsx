@@ -30,7 +30,7 @@ function PopoverPopup({
       <PopoverPrimitive.Positioner
         align={align}
         alignOffset={alignOffset}
-        className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width)"
+        className="z-40 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width)"
         data-slot="popover-positioner"
         side={side}
         sideOffset={sideOffset}

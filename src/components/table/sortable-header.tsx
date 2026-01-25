@@ -26,7 +26,7 @@ export function DataTableSortableHeader<TData, TValue>({
       <Menu>
         <MenuTrigger
           render={
-            <Button variant="plain" size="sm" className="data-pressed:opacity-85">
+            <Button variant="plain" size="sm">
               <span>{title}</span>
               {isAscSorted && <IconArrowNarrowDown className="size-4" />}
               {isDescSorted && <IconArrowNarrowUp className="size-4" />}

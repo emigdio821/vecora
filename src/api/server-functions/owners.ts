@@ -42,8 +42,10 @@ export const createOwner = createServerFn({ method: 'POST' })
       })
       .returning()
 
-    if (data.houseId) {
-      await db.update(houses).set({ ownerId: newOwner.id }).where(eq(houses.id, data.houseId))
+    if (data.houseIds.length > 0) {
+      for (const houseId of data.houseIds) {
+        await db.update(houses).set({ ownerId: newOwner.id }).where(eq(houses.id, houseId))
+      }
     }
 
     createAuditLog({
@@ -75,6 +77,14 @@ export const updateOwner = createServerFn({ method: 'POST' })
       })
       .where(eq(owners.id, data.ownerId))
       .returning()
+
+    await db.update(houses).set({ ownerId: null }).where(eq(houses.ownerId, data.ownerId))
+
+    if (data.houseIds.length > 0) {
+      for (const houseId of data.houseIds) {
+        await db.update(houses).set({ ownerId: updatedOwner.id }).where(eq(houses.id, houseId))
+      }
+    }
 
     createAuditLog({
       data: {

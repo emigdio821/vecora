@@ -142,11 +142,11 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
         <IconSelector className="-me-1!" />
       </ComboboxTrigger>
       <ComboboxPopup aria-label="Selecciona una opción" align="start" className="[--anchor-width:288px]">
-        <div className="border-b p-1">
+        <div className="border-b p-1.5">
           <ComboboxInput
             showTrigger={false}
             placeholder="Buscar"
-            aria-invalid="false"
+            aria-invalid={false}
             startAddon={<IconSearch />}
             className="rounded-sm before:rounded-[calc(var(--radius-sm)-1px)]"
           />
@@ -157,7 +157,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
             <div
               role="presentation"
               ref={handleScrollElementRef}
-              className="h-[min(20rem,var(--total-size))] max-h-(--available-height) overflow-y-auto"
+              className="h-[min(16rem,var(--total-size))] max-h-(--available-height) overflow-y-auto"
               style={{ '--total-size': `${totalSize}px` } as React.CSSProperties}
             >
               <div role="presentation" className="relative w-full" style={{ height: totalSize }}>

@@ -1,4 +1,6 @@
+import { IconCurrencyDollar, IconFlag } from '@tabler/icons-react'
 import type { ColumnDef } from '@tanstack/react-table'
+import { DataTableIconHeader } from '@/components/table/icon-header'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -75,8 +77,8 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   },
   {
     accessorKey: 'violations',
-    header: 'Infracciones',
-    size: 40,
+    size: 60,
+    header: () => <DataTableIconHeader icon={<IconFlag className="size-4" />} tipContent="Infracciones" />,
     cell: ({ row }) => {
       const violations = row.original.violations
 
@@ -92,8 +94,11 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   },
   {
     accessorKey: 'payments',
-    header: 'Pagos pendientes',
-    size: 40,
+    size: 60,
+    header: () => (
+      <DataTableIconHeader icon={<IconCurrencyDollar className="size-4" />} tipContent="Pagos pendientes" />
+    ),
+
     cell: ({ row }) => {
       const payments = row.original.payments.filter((p) => p.status === 'pending')
 

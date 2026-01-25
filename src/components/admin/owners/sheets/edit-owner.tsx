@@ -1,10 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateOwner } from '@/api/server-functions/owners'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
+import { AVAILABLE_HOUSES_QUERY_KEY, HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
+import { AvailableHousesSelector } from '@/components/shared/available-houses-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
@@ -35,6 +38,7 @@ interface EditOwnerSheetProps {
 export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
   const editOwnerFormId = useId()
   const { isOpen, onOpenChange } = state
+  const queryClient = useQueryClient()
 
   const form = useForm<UpdateOwnerFormData>({
     resolver: zodResolver(updateOwnerSchema),
@@ -44,6 +48,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
       lastName: owner.lastName,
       phone: owner.phone,
       email: owner.email,
+      houseIds: owner.houses.map((house) => house.id),
     },
   })
 
@@ -56,6 +61,11 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
     successDescription: 'El propietario ha sido actualizado exitosamente.',
     errorDescription: 'Ocurrió un error al actualizar el propietario, intenta nuevamente.',
     onSuccess: () => {
+      const houseIds = form.getValues('houseIds')
+      if (houseIds.length > 0) {
+        queryClient.invalidateQueries({ queryKey: [AVAILABLE_HOUSES_QUERY_KEY] })
+        queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
+      }
       onOpenChange(false)
     },
   })
@@ -160,6 +170,25 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
                     autoComplete="email"
                     aria-invalid={fieldState.invalid}
                     disabled={updateOwnerMutation.isPending}
+                  />
+                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="houseIds"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                  <FieldLabel htmlFor={field.name}>Casas</FieldLabel>
+                  <AvailableHousesSelector
+                    id={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={updateOwnerMutation.isPending}
+                    invalid={fieldState.invalid}
+                    includeAssigned={owner.houses}
                   />
                   <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
                 </Field>

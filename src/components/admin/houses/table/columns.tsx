@@ -1,6 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
+import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { CopyButton } from '@/components/ui/copy-button'
+import { Popover, PopoverClose, PopoverPopup, PopoverTitle, PopoverTrigger } from '@/components/ui/popover'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { normalizeString } from '@/lib/utils'
 import { HousesTableActions } from './actions'
@@ -56,8 +59,40 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
     header: ({ column }) => <DataTableSortableHeader column={column} title="Propietario" />,
     cell: ({ row }) => {
       const owner = row.original.owner
+      const ownerFullName = `${owner?.firstName} ${owner?.lastName}`
 
-      return owner && <p>{`${owner.firstName} ${owner.lastName}`}</p>
+      return owner ? (
+        <Popover>
+          <PopoverTrigger render={<Button variant="plain">{ownerFullName}</Button>} />
+          <PopoverPopup className="min-w-52 max-w-60">
+            <div className="flex flex-col gap-2">
+              <PopoverTitle className="text-muted-foreground text-sm">{ownerFullName}</PopoverTitle>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-medium text-sm">Correo</h2>
+                <p className="line-clamp-2 text-muted-foreground text-sm">{owner.email}</p>
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <h2 className="font-medium text-sm">Teléfono</h2>
+                <p className="line-clamp-2 text-muted-foreground text-sm">{owner.phone}</p>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <PopoverClose
+                  render={
+                    <Button className="grow" size="sm" variant="outline">
+                      Cerrar
+                    </Button>
+                  }
+                />
+
+                <CopyButton value={owner.id} variant="outline" tooltipText="Copiar ID" />
+              </div>
+            </div>
+          </PopoverPopup>
+        </Popover>
+        // </div>
+      ) : null
     },
   },
   {

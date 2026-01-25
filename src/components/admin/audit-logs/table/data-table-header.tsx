@@ -56,12 +56,12 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
           value
             .sort((a, b) => a.value - b.value)
             .map((option) => (
-              <Badge variant="outline" key={option.value}>
+              <Badge variant="secondary" key={option.value}>
                 {option.label}
               </Badge>
             ))
         ) : (
-          <Badge variant="outline">{value.length} seleccionados</Badge>
+          <Badge variant="secondary">{value.length} seleccionados</Badge>
         )}
       </>
     )
@@ -80,6 +80,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
           aria-label="Buscar"
           placeholder="Buscar"
           name="search-audit-logs"
+          disabled={tableRowsLength === 0}
           onChange={(e) => setSearchQuery(e.target.value || null)}
         />
         <InputGroupAddon>
@@ -109,17 +110,16 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
       </InputGroup>
 
       <div className="flex gap-2">
-        {tableRowsLength > 0 && (
-          <Button variant="outline" disabled>
-            <IconFileExport className="size-4" />
-            <span>Exportar</span>
-            {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}
-          </Button>
-        )}
+        <Button variant="outline" disabled>
+          <IconFileExport className="size-4" />
+          <span>Exportar</span>
+          {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}
+        </Button>
 
         <Combobox
           multiple
           items={facetedFilterYears}
+          disabled={tableRowsLength === 0}
           onValueChange={(item) => {
             table.getColumn('timestamp')?.setFilterValue(item)
           }}
@@ -131,11 +131,12 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
             <ComboboxValue placeholder="Año">{renderYearFacetedFilterValue}</ComboboxValue>
           </ComboboxTrigger>
           <ComboboxPopup align="end" aria-label="Selecciona una opción" className="[--anchor-width:120px]">
-            <div className="border-b p-1">
+            <div className="border-b p-1.5">
               <ComboboxInput
                 showTrigger={false}
                 placeholder="Buscar"
                 aria-invalid="false"
+                skipDefaultMultiple
                 startAddon={<IconSearch />}
                 className="rounded-sm before:rounded-[calc(var(--radius-sm)-1px)]"
               />
