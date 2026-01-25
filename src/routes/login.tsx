@@ -10,8 +10,7 @@ import { LoaderIcon, ResidoIcon } from '@/components/icons'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Form } from '@/components/ui/form'
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { InputPassword } from '@/components/ui/input-password'
 import { SITE_CONFIG } from '@/config/site'
@@ -96,54 +95,56 @@ function RouteComponent() {
           </CardHeader>
 
           <CardContent>
-            <Form id={loginFormId} aria-label="Iniciar sesión" onSubmit={form.handleSubmit(onSubmit)}>
-              <Controller
-                name="email"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Correo <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      autoComplete="email"
-                      disabled={isLoading}
-                      aria-invalid={fieldState.invalid}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+            <form id={loginFormId} aria-label="Iniciar sesión" onSubmit={form.handleSubmit(onSubmit)}>
+              <FieldGroup>
+                <Controller
+                  name="email"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Correo <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        autoComplete="email"
+                        disabled={isLoading}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
 
-              <Controller
-                name="password"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Contraseña <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <InputPassword
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      disabled={isLoading}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Contraseña <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <InputPassword
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        disabled={isLoading}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
 
-              {error && (
-                <Alert variant="error">
-                  <IconAlertOctagon className="size-4" />
-                  <AlertTitle>Algo salió mal al iniciar sesión</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-            </Form>
+                {error && (
+                  <Alert variant="error">
+                    <IconAlertOctagon className="size-4" />
+                    <AlertTitle>Algo salió mal al iniciar sesión</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+              </FieldGroup>
+            </form>
           </CardContent>
 
           <CardFooter className="pt-4 text-center">
