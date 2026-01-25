@@ -10,11 +10,11 @@ import RPNInput, {
 import defaultLabels from 'react-phone-number-input/locale/es'
 import {
   Combobox,
+  ComboboxContent,
   ComboboxEmpty,
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-  ComboboxPopup,
   ComboboxTrigger,
   ComboboxValue,
 } from '@/components/ui/combobox'
@@ -141,7 +141,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
         <ComboboxValue>{getCountryCode}</ComboboxValue>
         <IconSelector className="-me-1!" />
       </ComboboxTrigger>
-      <ComboboxPopup aria-label="Selecciona una opción" align="start" className="[--anchor-width:288px]">
+      <ComboboxContent aria-label="Selecciona una opción" align="start" className="[--anchor-width:288px]">
         <div className="border-b p-1.5">
           <ComboboxInput
             showTrigger={false}
@@ -196,7 +196,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
             </div>
           )}
         </ComboboxList>
-      </ComboboxPopup>
+      </ComboboxContent>
     </Combobox>
   )
 }

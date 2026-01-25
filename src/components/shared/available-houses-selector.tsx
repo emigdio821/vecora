@@ -5,11 +5,11 @@ import {
   Combobox,
   ComboboxChip,
   ComboboxChips,
+  ComboboxContent,
   ComboboxEmpty,
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-  ComboboxPopup,
 } from '@/components/ui/combobox'
 import { Skeleton } from '../ui/skeleton'
 
@@ -79,7 +79,7 @@ export function AvailableHousesSelector({
         })}
         <ComboboxInput placeholder={value.length > 0 ? undefined : 'Selecciona casas'} />
       </ComboboxChips>
-      <ComboboxPopup>
+      <ComboboxContent>
         <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
         <ComboboxList>
           {(item: HouseItem) => (
@@ -88,7 +88,7 @@ export function AvailableHousesSelector({
             </ComboboxItem>
           )}
         </ComboboxList>
-      </ComboboxPopup>
+      </ComboboxContent>
     </Combobox>
   )
 }

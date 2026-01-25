@@ -101,11 +101,7 @@ function RouteComponent() {
                 name="email"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    invalid={fieldState.invalid}
-                    touched={fieldState.isTouched}
-                    dirty={fieldState.isDirty}
-                  >
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
                       Correo <span className="text-destructive">*</span>
                     </FieldLabel>
@@ -116,7 +112,7 @@ function RouteComponent() {
                       disabled={isLoading}
                       aria-invalid={fieldState.invalid}
                     />
-                    <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -125,11 +121,7 @@ function RouteComponent() {
                 name="password"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    invalid={fieldState.invalid}
-                    touched={fieldState.isTouched}
-                    dirty={fieldState.isDirty}
-                  >
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
                       Contraseña <span className="text-destructive">*</span>
                     </FieldLabel>
@@ -139,7 +131,7 @@ function RouteComponent() {
                       aria-invalid={fieldState.invalid}
                       disabled={isLoading}
                     />
-                    <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
