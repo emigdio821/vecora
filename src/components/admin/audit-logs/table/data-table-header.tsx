@@ -131,16 +131,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
             <ComboboxValue placeholder="Año">{renderYearFacetedFilterValue}</ComboboxValue>
           </ComboboxTrigger>
           <ComboboxContent align="end" aria-label="Selecciona una opción" className="[--anchor-width:120px]">
-            <div className="border-b p-1.5">
-              <ComboboxInput
-                showTrigger={false}
-                placeholder="Buscar"
-                aria-invalid="false"
-                skipDefaultMultiple
-                startAddon={<IconSearch />}
-                className="rounded-sm before:rounded-[calc(var(--radius-sm)-1px)]"
-              />
-            </div>
+            <ComboboxInput showTrigger={false} placeholder="Buscar" />
             <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
             <ComboboxList>
               {(item) => (

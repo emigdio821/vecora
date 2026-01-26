@@ -11,7 +11,7 @@ import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Form } from '@/components/ui/form'
+
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
@@ -119,7 +119,8 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
         </SheetHeader>
 
         <SheetPanel>
-          <Form
+          <form
+            className="space-y-4"
             id={editViolationFormId}
             aria-label="Editar infracción"
             onSubmit={form.handleSubmit(onSubmit)}
@@ -128,7 +129,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
               name="amount"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Monto <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -155,7 +156,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
                       <InputGroupText>MXN</InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -164,7 +165,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
               name="ownerId"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Propietario <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -187,7 +188,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
                     </SelectContent>
                   </Select>
 
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -196,7 +197,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
               name="violationDate"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Fecha de infracción</FieldLabel>
                   <Popover>
                     <PopoverTrigger
@@ -220,7 +221,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
                       />
                     </PopoverPopup>
                   </Popover>
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -229,7 +230,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
               name="status"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Estado</FieldLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
@@ -246,7 +247,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
                     </SelectContent>
                   </Select>
 
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -255,7 +256,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
               name="concept"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Concepto <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -269,11 +270,11 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
                     aria-invalid={fieldState.invalid}
                     disabled={updateViolationMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
-          </Form>
+          </form>
         </SheetPanel>
 
         <SheetFooter>

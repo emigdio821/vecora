@@ -95,7 +95,12 @@ function RouteComponent() {
           </CardHeader>
 
           <CardContent>
-            <form id={loginFormId} aria-label="Iniciar sesión" onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+              className="space-y-4"
+              id={loginFormId}
+              aria-label="Iniciar sesión"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
               <FieldGroup>
                 <Controller
                   name="email"
