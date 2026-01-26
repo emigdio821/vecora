@@ -6,11 +6,12 @@ import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
-  AlertDialogClose,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
@@ -59,7 +60,7 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
   return (
     <>
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogPopup>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar pago?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -67,25 +68,21 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose
+            <AlertDialogCancel
               render={<Button variant="outline" disabled={deletePaymentMutation.isPending} />}
             >
               Cancelar
-            </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  onClick={handleDeletePayment}
-                  disabled={deletePaymentMutation.isPending}
-                />
-              }
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleDeletePayment}
+              disabled={deletePaymentMutation.isPending}
             >
               Eliminar
               {deletePaymentMutation.isPending && <LoaderIcon />}
-            </AlertDialogClose>
+            </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogPopup>
+        </AlertDialogContent>
       </AlertDialog>
 
       <PaymentDetailsSheet

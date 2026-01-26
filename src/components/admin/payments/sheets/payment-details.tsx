@@ -1,7 +1,7 @@
 import { IconChevronDown, IconCurrencyDollar, IconUserHeart, IconWind } from '@tabler/icons-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
@@ -54,7 +54,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                 </CollapsibleTrigger>
                 <IconCurrencyDollar className="size-4 text-muted-foreground" />
               </FrameHeader>
-              <CollapsiblePanel className="space-y-1">
+              <CollapsibleContent className="space-y-1">
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Monto</h2>
@@ -103,7 +103,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                     <p className="text-muted-foreground text-sm">{formatDate(payment.paidAt)}</p>
                   </FramePanel>
                 )}
-              </CollapsiblePanel>
+              </CollapsibleContent>
             </Collapsible>
           </Frame>
 
@@ -120,7 +120,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                 </CollapsibleTrigger>
                 <IconUserHeart className="size-4 text-muted-foreground" />
               </FrameHeader>
-              <CollapsiblePanel>
+              <CollapsibleContent>
                 {payment.owner ? (
                   <div className="space-y-1">
                     <FramePanel className="p-2">
@@ -153,7 +153,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                     </Empty>
                   </FramePanel>
                 )}
-              </CollapsiblePanel>
+              </CollapsibleContent>
             </Collapsible>
           </Frame>
         </SheetPanel>

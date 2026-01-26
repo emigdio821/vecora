@@ -9,8 +9,7 @@ import { OwnersSelector } from '@/components/shared/owners-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 
-import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
-import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
 import {
   Select,
   SelectContent,
@@ -141,19 +140,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                   </FieldLabel>
 
                   <InputGroup>
-                    <NumberField
-                      id={field.name}
-                      format={{
-                        currency: 'MXN',
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }}
-                      value={Number(field.value) || null}
-                      disabled={updatePaymentMutation.isPending}
-                      onValueChange={(value) => field.onChange(value?.toString() || '')}
-                    >
-                      <NumberFieldInput className="text-left" />
-                    </NumberField>
+                    <InputGroupInput aria-invalid={fieldState.invalid} type="number" {...field} />
                     <InputGroupAddon>
                       <InputGroupText>$</InputGroupText>
                     </InputGroupAddon>

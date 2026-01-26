@@ -140,6 +140,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
                     id={field.name}
                     value={field.value}
                     onBlur={field.onBlur}
+                    aria-invalid={fieldState.invalid}
                     disabled={updateExternalUserMutation.isPending}
                     onChange={(value) => {
                       field.onChange(value || '')

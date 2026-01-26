@@ -1,4 +1,4 @@
-import { IconCirclePlus, IconFileExport, IconInfoCircle, IconSearch } from '@tabler/icons-react'
+import { IconFileExport, IconInfoCircle, IconSearch } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -94,6 +94,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
                 <Button
                   size="icon-xs"
                   variant="ghost"
+                  aria-label="Buscar por usuario"
                   className="cursor-default"
                   onClick={(e) => {
                     e.preventBaseUIHandler()
@@ -124,10 +125,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
             table.getColumn('timestamp')?.setFilterValue(item)
           }}
         >
-          <ComboboxTrigger
-            render={<Button variant="outline" name="years-faceted-filter" className="border-dashed" />}
-          >
-            <IconCirclePlus />
+          <ComboboxTrigger render={<Button variant="outline" name="years-faceted-filter" />}>
             <ComboboxValue placeholder="Año">{renderYearFacetedFilterValue}</ComboboxValue>
           </ComboboxTrigger>
           <ComboboxContent align="end" aria-label="Selecciona una opción" className="[--anchor-width:120px]">

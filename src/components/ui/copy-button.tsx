@@ -1,9 +1,8 @@
 import { IconCheck, IconCopy } from '@tabler/icons-react'
-import { useRef } from 'react'
-import { COPY_TIMEOUT, useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
+import { useRef, useState } from 'react'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { cn } from '@/lib/utils'
 import { Button, type ButtonProps } from './button'
-import { anchoredToastManager } from './toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip'
 
 type CopyButtonProps = ButtonProps & {
@@ -14,33 +13,18 @@ type CopyButtonProps = ButtonProps & {
 }
 
 export function CopyButton(props: CopyButtonProps) {
+  const [isOpenTooltip, setOpenTooltip] = useState(false)
   const { value, tooltipText = 'Copiar', successText = 'Copiado', iconClassName, ...btnProps } = props
   const copyButtonRef = useRef<HTMLButtonElement>(null)
 
-  const { copyToClipboard, isCopied } = useCopyToClipboard({
-    onCopy: () => {
-      if (copyButtonRef.current) {
-        anchoredToastManager.add({
-          data: {
-            tooltipStyle: true,
-          },
-          positionerProps: {
-            anchor: copyButtonRef.current,
-          },
-          timeout: COPY_TIMEOUT,
-          title: successText,
-        })
-      }
-    },
-    timeout: COPY_TIMEOUT,
-  })
+  const { copyToClipboard, isCopied } = useCopyToClipboard()
 
   function handleCopy() {
     copyToClipboard(value)
   }
 
   return (
-    <Tooltip>
+    <Tooltip open={isOpenTooltip} onOpenChange={setOpenTooltip}>
       <TooltipTrigger
         render={
           <Button
@@ -48,7 +32,11 @@ export function CopyButton(props: CopyButtonProps) {
             variant="ghost"
             disabled={isCopied}
             ref={copyButtonRef}
-            onClick={handleCopy}
+            onClick={(e) => {
+              e.preventBaseUIHandler()
+              setOpenTooltip(true)
+              handleCopy()
+            }}
             focusableWhenDisabled
             aria-label={isCopied ? successText : tooltipText}
             {...btnProps}
@@ -62,7 +50,7 @@ export function CopyButton(props: CopyButtonProps) {
         )}
       </TooltipTrigger>
       <TooltipContent>
-        <p>{tooltipText}</p>
+        <p>{isCopied ? successText : tooltipText}</p>
       </TooltipContent>
     </Tooltip>
   )

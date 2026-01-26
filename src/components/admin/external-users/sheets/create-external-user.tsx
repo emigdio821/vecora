@@ -133,6 +133,7 @@ export function CreateExternalUserSheet({ state }: CreateExternalUserSheetProps)
                   <PhoneInput
                     id={field.name}
                     onBlur={field.onBlur}
+                    aria-invalid={fieldState.invalid}
                     disabled={createExternalUserMutation.isPending}
                     onChange={(value) => {
                       field.onChange(value || '')

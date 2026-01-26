@@ -8,7 +8,7 @@ import {
 } from '@tabler/icons-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
@@ -59,7 +59,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                 </CollapsibleTrigger>
                 <IconUser className="size-4 text-muted-foreground" />
               </FrameHeader>
-              <CollapsiblePanel className="space-y-1">
+              <CollapsibleContent className="space-y-1">
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Nombre</h2>
@@ -79,7 +79,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                     <p className="line-clamp-2 text-muted-foreground text-sm">{owner.phone}</p>
                   </FramePanel>
                 )}
-              </CollapsiblePanel>
+              </CollapsibleContent>
             </Collapsible>
           </Frame>
 
@@ -96,7 +96,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                 </CollapsibleTrigger>
                 <IconHome className="size-4 text-muted-foreground" />
               </FrameHeader>
-              <CollapsiblePanel>
+              <CollapsibleContent>
                 {owner.houses.length > 0 ? (
                   <div className="space-y-1">
                     {owner.houses.map((house) => {
@@ -134,7 +134,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                     </Empty>
                   </FramePanel>
                 )}
-              </CollapsiblePanel>
+              </CollapsibleContent>
             </Collapsible>
           </Frame>
 
@@ -152,7 +152,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                 </CollapsibleTrigger>
                 <IconFlag className="size-4 text-muted-foreground" />
               </FrameHeader>
-              <CollapsiblePanel>
+              <CollapsibleContent>
                 {owner.violations.length > 0 ? (
                   <div className="space-y-1">
                     {owner.violations.map((violation) => {
@@ -197,7 +197,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                     </Empty>
                   </FramePanel>
                 )}
-              </CollapsiblePanel>
+              </CollapsibleContent>
             </Collapsible>
           </Frame>
 
@@ -215,7 +215,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                 </CollapsibleTrigger>
                 <IconCurrencyDollar className="size-4 text-muted-foreground" />
               </FrameHeader>
-              <CollapsiblePanel>
+              <CollapsibleContent>
                 {pendingPayments.length > 0 ? (
                   <div className="space-y-1">
                     {pendingPayments.map((payment) => {
@@ -261,7 +261,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                     </Empty>
                   </FramePanel>
                 )}
-              </CollapsiblePanel>
+              </CollapsibleContent>
             </Collapsible>
           </Frame>
         </SheetPanel>

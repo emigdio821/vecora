@@ -139,7 +139,9 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                   </FieldLabel>
                   <PhoneInput
                     id={field.name}
+                    value={field.value}
                     onBlur={field.onBlur}
+                    aria-invalid={fieldState.invalid}
                     disabled={createOwnerMutation.isPending}
                     onChange={(value) => {
                       field.onChange(value || '')

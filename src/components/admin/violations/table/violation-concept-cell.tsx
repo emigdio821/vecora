@@ -13,7 +13,7 @@ export function ViolationConceptCell({ violation }: ViolationConceptCellProps) {
   return (
     <div>
       <Button
-        variant="link"
+        variant="plain"
         className="line-clamp-2 whitespace-normal text-left"
         onClick={() => setIsSheetOpen(true)}
       >

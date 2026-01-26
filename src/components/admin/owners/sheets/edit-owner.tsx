@@ -150,6 +150,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
                     id={field.name}
                     value={field.value}
                     onBlur={field.onBlur}
+                    aria-invalid={fieldState.invalid}
                     disabled={updateOwnerMutation.isPending}
                     onChange={(value) => {
                       field.onChange(value || '')

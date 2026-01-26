@@ -13,7 +13,7 @@ export function OwnerNameCell({ owner }: OwnerNameCellProps) {
   return (
     <>
       <Button
-        variant="link"
+        variant="plain"
         className="line-clamp-1 whitespace-normal text-left"
         onClick={() => setIsSheetOpen(true)}
       >

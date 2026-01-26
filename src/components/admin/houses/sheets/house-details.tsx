@@ -1,7 +1,7 @@
 import { IconChevronDown, IconHome, IconUserHeart, IconWind } from '@tabler/icons-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
@@ -51,13 +51,11 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
                 </CollapsibleTrigger>
                 <IconHome className="size-4 text-muted-foreground" />
               </FrameHeader>
-              <CollapsiblePanel className="space-y-1">
+              <CollapsibleContent className="space-y-1">
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Número de casa</h2>
-                    <Badge variant="outline" size="lg">
-                      {house.houseNumber}
-                    </Badge>
+                    <Badge variant="outline">{house.houseNumber}</Badge>
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={house.id} />
                 </FramePanel>
@@ -67,7 +65,7 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
                     <p className="line-clamp-2 text-muted-foreground text-sm">{houseAddress}</p>
                   </FramePanel>
                 )}
-              </CollapsiblePanel>
+              </CollapsibleContent>
             </Collapsible>
           </Frame>
 
@@ -84,7 +82,7 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
                 </CollapsibleTrigger>
                 <IconUserHeart className="size-4 text-muted-foreground" />
               </FrameHeader>
-              <CollapsiblePanel>
+              <CollapsibleContent>
                 {house.owner ? (
                   <div className="space-y-1">
                     <FramePanel className="p-2">
@@ -117,7 +115,7 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
                     </Empty>
                   </FramePanel>
                 )}
-              </CollapsiblePanel>
+              </CollapsibleContent>
             </Collapsible>
           </Frame>
         </SheetPanel>

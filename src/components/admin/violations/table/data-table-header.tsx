@@ -8,11 +8,12 @@ import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
-  AlertDialogClose,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
@@ -64,7 +65,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
       />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogPopup>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar infracciones?</AlertDialogTitle>
             <AlertDialogDescription
@@ -79,23 +80,19 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
             />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
+            <AlertDialogCancel render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
               Cancelar
-            </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  onClick={handleBatchDelete}
-                  disabled={bulkDeleteMutation.isPending}
-                />
-              }
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleBatchDelete}
+              disabled={bulkDeleteMutation.isPending}
             >
               Eliminar
               {bulkDeleteMutation.isPending && <LoaderIcon />}
-            </AlertDialogClose>
+            </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogPopup>
+        </AlertDialogContent>
       </AlertDialog>
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">

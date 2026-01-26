@@ -6,11 +6,12 @@ import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
-  AlertDialogClose,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
@@ -58,7 +59,7 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
   return (
     <>
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogPopup>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar infracción?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -67,25 +68,21 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose
+            <AlertDialogCancel
               render={<Button variant="outline" disabled={deleteViolationMutation.isPending} />}
             >
               Cancelar
-            </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  onClick={handleDeleteViolation}
-                  disabled={deleteViolationMutation.isPending}
-                />
-              }
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleDeleteViolation}
+              disabled={deleteViolationMutation.isPending}
             >
               Eliminar
               {deleteViolationMutation.isPending && <LoaderIcon />}
-            </AlertDialogClose>
+            </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogPopup>
+        </AlertDialogContent>
       </AlertDialog>
 
       <ViolationDetailsSheet

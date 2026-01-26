@@ -6,11 +6,12 @@ import { EXTERNAL_USERS_QUERY_KEY } from '@/api/tanstack-queries/external-users'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
-  AlertDialogClose,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
@@ -59,7 +60,7 @@ export function ExternalUsersTableActions({ externalUser }: ActionsProps) {
   return (
     <>
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogPopup>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar usuario externo?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -67,25 +68,21 @@ export function ExternalUsersTableActions({ externalUser }: ActionsProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose
+            <AlertDialogCancel
               render={<Button variant="outline" disabled={deleteExternalUserMutation.isPending} />}
             >
               Cancelar
-            </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  onClick={handleDeleteExternalUser}
-                  disabled={deleteExternalUserMutation.isPending}
-                />
-              }
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleDeleteExternalUser}
+              disabled={deleteExternalUserMutation.isPending}
             >
               Eliminar
               {deleteExternalUserMutation.isPending && <LoaderIcon />}
-            </AlertDialogClose>
+            </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogPopup>
+        </AlertDialogContent>
       </AlertDialog>
 
       <ExternalUserDetailsSheet

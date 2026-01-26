@@ -8,11 +8,12 @@ import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
-  AlertDialogClose,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
@@ -62,7 +63,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
       <CreateHouseSheet state={{ isOpen: openCreateOwnerDialog, onOpenChange: setOpenCreateOwnerDialog }} />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogPopup>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar casas?</AlertDialogTitle>
             <AlertDialogDescription
@@ -77,23 +78,19 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
             />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
+            <AlertDialogCancel render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
               Cancelar
-            </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  onClick={handleBatchDelete}
-                  disabled={bulkDeleteMutation.isPending}
-                />
-              }
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleBatchDelete}
+              disabled={bulkDeleteMutation.isPending}
             >
               Eliminar
               {bulkDeleteMutation.isPending && <LoaderIcon />}
-            </AlertDialogClose>
+            </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogPopup>
+        </AlertDialogContent>
       </AlertDialog>
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">

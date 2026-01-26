@@ -2,17 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 
 export const COPY_TIMEOUT = 1000
 
-export function useCopyToClipboard({
-  timeout = COPY_TIMEOUT,
-  onCopy,
-}: {
+interface UseCopyToClipboardProps {
   timeout?: number
-  onCopy?: () => void
-} = {}) {
+}
+
+export function useCopyToClipboard({ timeout = COPY_TIMEOUT }: UseCopyToClipboardProps = {}) {
   const [isCopied, setIsCopied] = useState(false)
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
 
-  const copyToClipboard = (value: string) => {
+  function copyToClipboard(value: string) {
     if (typeof window === 'undefined' || !navigator.clipboard.writeText) {
       return
     }
@@ -24,10 +22,6 @@ export function useCopyToClipboard({
         clearTimeout(timeoutIdRef.current)
       }
       setIsCopied(true)
-
-      if (onCopy) {
-        onCopy()
-      }
 
       if (timeout !== 0) {
         timeoutIdRef.current = setTimeout(() => {

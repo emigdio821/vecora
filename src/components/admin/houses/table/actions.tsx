@@ -6,11 +6,12 @@ import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
 import {
   AlertDialog,
-  AlertDialogClose,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
@@ -58,7 +59,7 @@ export function HousesTableActions({ house }: ActionsProps) {
   return (
     <>
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogPopup>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar casa?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -67,23 +68,19 @@ export function HousesTableActions({ house }: ActionsProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" disabled={deleteHouseMutation.isPending} />}>
+            <AlertDialogCancel render={<Button variant="outline" disabled={deleteHouseMutation.isPending} />}>
               Cancelar
-            </AlertDialogClose>
-            <AlertDialogClose
-              render={
-                <Button
-                  variant="destructive"
-                  onClick={handleDeleteHouse}
-                  disabled={deleteHouseMutation.isPending}
-                />
-              }
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleDeleteHouse}
+              disabled={deleteHouseMutation.isPending}
             >
               Eliminar
               {deleteHouseMutation.isPending && <LoaderIcon />}
-            </AlertDialogClose>
+            </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogPopup>
+        </AlertDialogContent>
       </AlertDialog>
 
       <HouseDetailsSheet

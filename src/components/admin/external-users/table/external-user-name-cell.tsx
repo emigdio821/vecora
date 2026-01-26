@@ -12,7 +12,7 @@ export function ExternalUserNameCell({ externalUser }: ExternalUserNameCellProps
 
   return (
     <>
-      <Button variant="link" className="block truncate" onClick={() => setIsSheetOpen(true)}>
+      <Button variant="plain" className="block truncate" onClick={() => setIsSheetOpen(true)}>
         {`${externalUser.firstName} ${externalUser.lastName}`}
       </Button>
       <ExternalUserDetailsSheet

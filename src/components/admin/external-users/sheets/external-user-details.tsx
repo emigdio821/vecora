@@ -1,6 +1,6 @@
 import { IconChevronDown, IconNotes, IconUser } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
 import {
@@ -49,7 +49,7 @@ export function ExternalUserDetailsSheet({ externalUser, state }: ExternalUserDe
                 </CollapsibleTrigger>
                 <IconUser className="size-4 text-muted-foreground" />
               </FrameHeader>
-              <CollapsiblePanel className="space-y-1">
+              <CollapsibleContent className="space-y-1">
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Nombre</h2>
@@ -69,7 +69,7 @@ export function ExternalUserDetailsSheet({ externalUser, state }: ExternalUserDe
                     <p className="line-clamp-2 text-muted-foreground text-sm">{externalUser.phone}</p>
                   </FramePanel>
                 )}
-              </CollapsiblePanel>
+              </CollapsibleContent>
             </Collapsible>
           </Frame>
 
@@ -87,11 +87,11 @@ export function ExternalUserDetailsSheet({ externalUser, state }: ExternalUserDe
                   </CollapsibleTrigger>
                   <IconNotes className="size-4 text-muted-foreground" />
                 </FrameHeader>
-                <CollapsiblePanel className="space-y-1">
+                <CollapsibleContent className="space-y-1">
                   <FramePanel className="flex items-center gap-2 p-2">
                     <p className="line-clamp-2 text-muted-foreground text-sm">{externalUser.notes}</p>
                   </FramePanel>
-                </CollapsiblePanel>
+                </CollapsibleContent>
               </Collapsible>
             )}
           </Frame>
