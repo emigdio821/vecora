@@ -243,17 +243,14 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                 name="months"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    invalid={fieldState.invalid}
-                    touched={fieldState.isTouched}
-                    dirty={fieldState.isDirty}
-                  >
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
                       Meses <span className="text-destructive">*</span>
                     </FieldLabel>
 
                     <Select multiple value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
+                        {/* TODO: Fix text truncation */}
                         <SelectValue>{renderPaymentMonthsValue}</SelectValue>
                       </SelectTrigger>
                       <SelectContent className="max-h-96">

@@ -15,14 +15,14 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
-  Menu,
-  MenuGroup,
-  MenuGroupLabel,
-  MenuItem,
-  MenuPopup,
-  MenuSeparator,
-  MenuTrigger,
-} from '@/components/ui/menu'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteHouseData } from '@/schemas/houses'
@@ -97,39 +97,39 @@ export function HousesTableActions({ house }: ActionsProps) {
       />
 
       <div className="flex">
-        <Menu>
-          <MenuTrigger
+        <DropdownMenu>
+          <DropdownMenuTrigger
             render={
               <Button aria-label="Table actions" size="icon" variant="ghost" className="ml-auto">
                 <IconDotsVertical className="size-4" />
               </Button>
             }
           />
-          <MenuPopup align="end" className="max-w-42">
-            <MenuGroup>
-              <MenuGroupLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
+          <DropdownMenuContent align="end" className="max-w-42">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
                 {house.houseNumber}
-              </MenuGroupLabel>
+              </DropdownMenuLabel>
 
-              <MenuItem onClick={() => setHouseDetailsSheetOpen(true)}>
+              <DropdownMenuItem onClick={() => setHouseDetailsSheetOpen(true)}>
                 <IconHome className="size-4" />
                 Información
-              </MenuItem>
+              </DropdownMenuItem>
 
-              <MenuItem onClick={() => setEditHouseSheetOpen(true)}>
+              <DropdownMenuItem onClick={() => setEditHouseSheetOpen(true)}>
                 <IconEdit className="size-4" />
                 Editar
-              </MenuItem>
+              </DropdownMenuItem>
 
-              <MenuSeparator />
+              <DropdownMenuSeparator />
 
-              <MenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+              <DropdownMenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
                 <IconTrash className="size-4" />
                 Eliminar
-              </MenuItem>
-            </MenuGroup>
-          </MenuPopup>
-        </Menu>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </>
   )

@@ -240,11 +240,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
                 name="months"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    invalid={fieldState.invalid}
-                    touched={fieldState.isTouched}
-                    dirty={fieldState.isDirty}
-                  >
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel>
                       Meses <span className="text-destructive">*</span>
                     </FieldLabel>

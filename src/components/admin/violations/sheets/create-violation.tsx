@@ -13,7 +13,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
-import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Sheet,
   SheetClose,
@@ -165,14 +165,14 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
                         </Button>
                       }
                     />
-                    <PopoverPopup className="p-0">
+                    <PopoverContent className="p-0">
                       <Calendar
                         mode="single"
                         id={field.name}
                         selected={field.value}
                         onSelect={(date) => field.onChange(date || new Date())}
                       />
-                    </PopoverPopup>
+                    </PopoverContent>
                   </Popover>
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>

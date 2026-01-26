@@ -139,7 +139,7 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
                 render={
                   <Button
                     size="icon"
-                    variant="destructive-outline"
+                    variant="destructive"
                     aria-label="Borrar propietario"
                     onClick={() => setDeleteDialogOpen(true)}
                   >

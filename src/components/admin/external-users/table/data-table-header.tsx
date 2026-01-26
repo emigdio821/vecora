@@ -141,7 +141,7 @@ export function ExternalUsersDataTableHeader({ table }: ExternalUsersDataTableHe
                 render={
                   <Button
                     size="icon"
-                    variant="destructive-outline"
+                    variant="destructive"
                     aria-label="Borrar usuario externo"
                     onClick={() => setDeleteDialogOpen(true)}
                   >

@@ -139,7 +139,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
                 render={
                   <Button
                     size="icon"
-                    variant="destructive-outline"
+                    variant="destructive"
                     aria-label="Borrar casas seleccionadas"
                     onClick={() => setDeleteDialogOpen(true)}
                   >

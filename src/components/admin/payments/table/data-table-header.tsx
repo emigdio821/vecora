@@ -141,7 +141,7 @@ export function PaymentsDataTableHeader({ table }: PaymentsDataTableHeaderProps)
                 render={
                   <Button
                     size="icon"
-                    variant="destructive-outline"
+                    variant="destructive"
                     aria-label="Borrar pagos seleccionados"
                     onClick={() => setDeleteDialogOpen(true)}
                   >

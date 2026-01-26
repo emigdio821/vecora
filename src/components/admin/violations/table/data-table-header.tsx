@@ -141,7 +141,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
                 render={
                   <Button
                     size="icon"
-                    variant="destructive-outline"
+                    variant="destructive"
                     aria-label="Borrar infracciones seleccionadas"
                     onClick={() => setDeleteDialogOpen(true)}
                   >
