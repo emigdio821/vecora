@@ -1,5 +1,5 @@
 import { IconChevronDown, IconHome, IconUserHeart, IconWind } from '@tabler/icons-react'
-import { Badge } from '@/components/ui/badge'
+import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
@@ -55,7 +55,7 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Número de casa</h2>
-                    <Badge variant="outline">{house.houseNumber}</Badge>
+                    <HouseNumberBadge number={house.houseNumber} />
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={house.id} />
                 </FramePanel>

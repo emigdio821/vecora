@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Badge } from '@/components/ui/badge'
+import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { HouseDetailsSheet } from '../sheets/house-details'
 
@@ -12,9 +12,8 @@ export function HouseNumberCell({ house }: HouseNumberCellProps) {
 
   return (
     <>
-      <Badge
-        size="lg"
-        variant="outline"
+      <HouseNumberBadge
+        number={house.houseNumber}
         render={
           <button type="button" onClick={() => setIsSheetOpen(true)}>
             {house.houseNumber}

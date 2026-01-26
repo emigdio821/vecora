@@ -1,4 +1,5 @@
 import { IconChevronDown, IconCurrencyDollar, IconUserHeart, IconWind } from '@tabler/icons-react'
+import { PaymentStatusBadge } from '@/components/shared/payments/status-badge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -15,7 +16,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
-import { cn, formatDate, getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
+import { formatDate, getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
 
 interface PaymentDetailsSheetProps {
   payment: PaymentWithOwnerAndMonths
@@ -29,7 +30,6 @@ const MONTHS = getAllMonthsMap()
 
 export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps) {
   const { isOpen, onOpenChange } = state
-  const isPaid = payment.status === 'paid'
   const showMonthlyFee = payment.paymentType === 'monthly_fee' && payment.paymentMonths.length > 0
 
   return (
@@ -88,14 +88,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                 )}
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Estado</h2>
-
-                  <Badge variant="outline">
-                    <span
-                      aria-hidden
-                      className={cn('size-1.5 rounded-full', isPaid ? 'bg-success' : 'bg-warning')}
-                    />
-                    {isPaid ? 'Pagada' : 'Pendiente'}
-                  </Badge>
+                  <PaymentStatusBadge status={payment.status} />
                 </FramePanel>
                 {payment.paidAt && (
                   <FramePanel className="p-2">

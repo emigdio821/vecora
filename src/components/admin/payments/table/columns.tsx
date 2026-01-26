@@ -1,9 +1,10 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { PaymentStatusBadge } from '@/components/shared/payments/status-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
-import { cn, getAllMonthsMap, getPaymentTypeLabel, normalizeString } from '@/lib/utils'
+import { getAllMonthsMap, getPaymentTypeLabel, normalizeString } from '@/lib/utils'
 import { PaymentsTableActions } from './actions'
 import { PaymentAmountCell } from './payment-amount-cell'
 
@@ -78,16 +79,7 @@ export const paymentsTableColumns: ColumnDef<PaymentWithOwnerAndMonths>[] = [
     accessorKey: 'status',
     size: 120,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
-    cell: ({ row }) => {
-      const isPaid = row.original.status === 'paid'
-
-      return (
-        <Badge variant="outline">
-          <span aria-hidden className={cn('size-1.5 rounded-full', isPaid ? 'bg-success' : 'bg-warning')} />
-          {isPaid ? 'Pagado' : 'Pendiente'}
-        </Badge>
-      )
-    },
+    cell: ({ row }) => <PaymentStatusBadge status={row.original.status} />,
   },
   {
     accessorKey: 'paymentMonths',

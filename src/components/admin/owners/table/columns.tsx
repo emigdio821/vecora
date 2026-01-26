@@ -1,5 +1,6 @@
 import { IconCurrencyDollar, IconFlag } from '@tabler/icons-react'
 import type { ColumnDef } from '@tanstack/react-table'
+import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
 import { DataTableIconHeader } from '@/components/table/icon-header'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
@@ -67,9 +68,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     cell: ({ row }) => {
       const houses = row.original.houses
       const houseBadges = houses.map((house) => (
-        <Badge size="lg" variant="outline" key={house.id}>
-          <span>{house.houseNumber}</span>
-        </Badge>
+        <HouseNumberBadge number={house.houseNumber} key={house.id} />
       ))
 
       return <>{houseBadges.length > 0 && <div className="flex flex-wrap gap-1">{houseBadges}</div>}</>
@@ -84,8 +83,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
 
       return (
         violations.length > 0 && (
-          <Badge size="lg" variant="outline">
-            <span aria-hidden className="size-1.5 rounded-full bg-warning" />
+          <Badge variant="warning">
             <span>{violations.length}</span>
           </Badge>
         )
@@ -104,8 +102,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
 
       return (
         payments.length > 0 && (
-          <Badge size="lg" variant="outline">
-            <span aria-hidden className="size-1.5 rounded-full bg-warning" />
+          <Badge variant="warning">
             <span>{payments.length}</span>
           </Badge>
         )

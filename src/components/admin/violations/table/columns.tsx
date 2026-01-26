@@ -1,9 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { ViolationStatusBadge } from '@/components/shared/violations/status-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
-import { cn, formatDate, normalizeString } from '@/lib/utils'
+import { formatDate, normalizeString } from '@/lib/utils'
 import { ViolationsTableActions } from './actions'
 import { ViolationConceptCell } from './violation-concept-cell'
 
@@ -71,16 +71,7 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
     accessorKey: 'status',
     size: 120,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
-    cell: ({ row }) => {
-      const isPaid = row.original.status === 'paid'
-
-      return (
-        <Badge variant="outline">
-          <span aria-hidden className={cn('size-1.5 rounded-full', isPaid ? 'bg-success' : 'bg-warning')} />
-          {isPaid ? 'Pagada' : 'Pendiente'}
-        </Badge>
-      )
-    },
+    cell: ({ row }) => <ViolationStatusBadge status={row.original.status} />,
   },
   {
     accessorKey: 'violationDate',

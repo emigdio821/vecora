@@ -6,6 +6,7 @@ import {
   IconUser,
   IconWind,
 } from '@tabler/icons-react'
+import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -106,9 +107,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                         <FramePanel key={house.id} className="p-2">
                           <div className="flex items-center gap-2">
                             <div className="min-w-0 flex-1">
-                              <Badge size="lg" variant="outline">
-                                {house.houseNumber}
-                              </Badge>
+                              <HouseNumberBadge number={house.houseNumber} />
                               {houseAddress && (
                                 <p className="text-muted-foreground text-sm">{houseAddress}</p>
                               )}
