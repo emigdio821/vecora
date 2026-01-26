@@ -8,7 +8,7 @@ import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/owners-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Form } from '@/components/ui/form'
+
 import { Input } from '@/components/ui/input'
 import {
   Sheet,
@@ -78,12 +78,17 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
         </SheetHeader>
 
         <SheetPanel>
-          <Form id={createHouseFormId} aria-label="Crear casa" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            className="space-y-4"
+            id={createHouseFormId}
+            aria-label="Crear casa"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <Controller
               name="houseNumber"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Número de casa <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -93,7 +98,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={createHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -102,7 +107,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
               name="street"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Calle</FieldLabel>
                   <Input
                     {...field}
@@ -110,7 +115,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={createHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -119,7 +124,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
               name="city"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Ciudad</FieldLabel>
                   <Input
                     {...field}
@@ -127,7 +132,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={createHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -136,7 +141,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
               name="state"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Estado</FieldLabel>
                   <Input
                     {...field}
@@ -144,7 +149,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={createHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -153,7 +158,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
               name="zipCode"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Código postal</FieldLabel>
                   <Input
                     {...field}
@@ -161,7 +166,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={createHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -170,7 +175,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
               name="ownerId"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Propietario</FieldLabel>
                   <OwnersSelector
                     id={field.name}
@@ -180,11 +185,11 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
                     invalid={fieldState.invalid}
                   />
 
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
-          </Form>
+          </form>
         </SheetPanel>
 
         <SheetFooter>

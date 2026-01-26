@@ -10,10 +10,10 @@ import { OwnersSelector } from '@/components/shared/owners-selector'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Form } from '@/components/ui/form'
+
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
-import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Sheet,
   SheetClose,
@@ -83,7 +83,8 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
         </SheetHeader>
 
         <SheetPanel>
-          <Form
+          <form
+            className="space-y-4"
             id={createViolationFormId}
             aria-label="Crear infracción"
             onSubmit={form.handleSubmit(onSubmit)}
@@ -92,7 +93,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
               name="amount"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Monto <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -118,7 +119,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
                       <InputGroupText>MXN</InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -127,7 +128,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
               name="ownerId"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Propietario <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -140,7 +141,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
                     includeNoneOption={false}
                   />
 
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -149,7 +150,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
               name="violationDate"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Fecha de infracción</FieldLabel>
                   <Popover>
                     <PopoverTrigger
@@ -164,16 +165,16 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
                         </Button>
                       }
                     />
-                    <PopoverPopup className="p-0">
+                    <PopoverContent className="p-0">
                       <Calendar
                         mode="single"
                         id={field.name}
                         selected={field.value}
                         onSelect={(date) => field.onChange(date || new Date())}
                       />
-                    </PopoverPopup>
+                    </PopoverContent>
                   </Popover>
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -188,7 +189,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
               name="concept"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Concepto <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -201,11 +202,11 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={createViolationMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
-          </Form>
+          </form>
         </SheetPanel>
 
         <SheetFooter>

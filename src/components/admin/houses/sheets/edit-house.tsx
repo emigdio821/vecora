@@ -9,7 +9,7 @@ import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Form } from '@/components/ui/form'
+
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -104,12 +104,17 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
         </SheetHeader>
 
         <SheetPanel>
-          <Form id={editHouseFormId} aria-label="Editar casa" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            className="space-y-4"
+            id={editHouseFormId}
+            aria-label="Editar casa"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <Controller
               name="houseNumber"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Número de casa <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -119,7 +124,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={updateHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -128,7 +133,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
               name="street"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Calle</FieldLabel>
                   <Input
                     {...field}
@@ -136,7 +141,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={updateHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -145,7 +150,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
               name="city"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Ciudad</FieldLabel>
                   <Input
                     {...field}
@@ -153,7 +158,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={updateHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -162,7 +167,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
               name="state"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Estado</FieldLabel>
                   <Input
                     {...field}
@@ -170,7 +175,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={updateHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -179,7 +184,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
               name="zipCode"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Código postal</FieldLabel>
                   <Input
                     {...field}
@@ -187,7 +192,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={updateHouseMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -196,7 +201,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
               name="ownerId"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Propietario</FieldLabel>
                   <Select
                     value={field.value}
@@ -218,11 +223,11 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
                     </SelectContent>
                   </Select>
 
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
-          </Form>
+          </form>
         </SheetPanel>
 
         <SheetFooter>

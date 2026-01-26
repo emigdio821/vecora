@@ -1,12 +1,7 @@
-import {
-  IconChevronLeft,
-  IconChevronLeftPipe,
-  IconChevronRight,
-  IconChevronRightPipe,
-} from '@tabler/icons-react'
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface DataTablePaginationProps<T> {
   table: Table<T>
@@ -16,14 +11,6 @@ interface DataTablePaginationProps<T> {
 export const DEFAULT_TABLE_PAGE_SIZE = 10
 
 export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
-  function handleFirstPage() {
-    table.setPageIndex(0)
-  }
-
-  function handleLastPage() {
-    table.setPageIndex(table.getPageCount() - 1)
-  }
-
   return (
     <>
       <div className="flex w-full items-center gap-2">
@@ -43,7 +30,7 @@ export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
           <SelectTrigger aria-label="Select result range" className="w-fit min-w-none" size="sm">
             <SelectValue />
           </SelectTrigger>
-          <SelectPopup>
+          <SelectContent>
             {Array.from({ length: table.getPageCount() }, (_, i) => {
               const start = i * table.getState().pagination.pageSize + 1
               const end = Math.min((i + 1) * table.getState().pagination.pageSize, table.getRowCount())
@@ -54,7 +41,7 @@ export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
                 </SelectItem>
               )
             })}
-          </SelectPopup>
+          </SelectContent>
         </Select>
         <p className="text-muted-foreground text-sm">
           de <strong className="font-medium text-foreground">{table.getRowCount()}</strong> resultados
@@ -62,16 +49,6 @@ export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
       </div>
 
       <div className="flex w-full items-center justify-end gap-1">
-        <Button
-          size="icon-sm"
-          variant="outline"
-          onClick={handleFirstPage}
-          aria-label="Ir a la página inicial"
-          disabled={!table.getCanPreviousPage()}
-        >
-          <IconChevronLeftPipe className="size-4" />
-        </Button>
-
         <Button
           size="icon-sm"
           variant="outline"
@@ -90,16 +67,6 @@ export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
           disabled={!table.getCanNextPage()}
         >
           <IconChevronRight className="size-4" />
-        </Button>
-
-        <Button
-          size="icon-sm"
-          variant="outline"
-          onClick={handleLastPage}
-          aria-label="Ir a la página final"
-          disabled={!table.getCanNextPage()}
-        >
-          <IconChevronRightPipe className="size-4" />
         </Button>
       </div>
     </>

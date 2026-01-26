@@ -1,8 +1,15 @@
 import { IconArrowNarrowDown, IconArrowNarrowUp, IconArrowsSort, IconFilter2X } from '@tabler/icons-react'
 import type { Column } from '@tanstack/react-table'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { Button } from '../ui/button'
-import { Menu, MenuGroup, MenuItem, MenuPopup, MenuSeparator, MenuTrigger } from '../ui/menu'
 
 interface DataTableSortableHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
   column: Column<TData, TValue>
@@ -23,10 +30,10 @@ export function DataTableSortableHeader<TData, TValue>({
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <Menu>
-        <MenuTrigger
+      <DropdownMenu>
+        <DropdownMenuTrigger
           render={
-            <Button variant="plain" size="sm">
+            <Button variant="plain" size="sm" className="gap-1">
               <span>{title}</span>
               {isAscSorted && <IconArrowNarrowDown className="size-4" />}
               {isDescSorted && <IconArrowNarrowUp className="size-4" />}
@@ -34,30 +41,30 @@ export function DataTableSortableHeader<TData, TValue>({
             </Button>
           }
         />
-        <MenuPopup align="start" className="max-w-42">
-          <MenuGroup>
-            <MenuItem disabled={isAscSorted} onClick={() => column.toggleSorting(false)}>
+        <DropdownMenuContent align="start" className="max-w-42">
+          <DropdownMenuGroup>
+            <DropdownMenuItem disabled={isAscSorted} onClick={() => column.toggleSorting(false)}>
               <IconArrowNarrowDown className="size-4" />
               Ascendete
-            </MenuItem>
+            </DropdownMenuItem>
 
-            <MenuItem disabled={isDescSorted} onClick={() => column.toggleSorting(true)}>
+            <DropdownMenuItem disabled={isDescSorted} onClick={() => column.toggleSorting(true)}>
               <IconArrowNarrowUp className="size-4" />
               Descendente
-            </MenuItem>
+            </DropdownMenuItem>
 
             {column.getIsSorted() && (
               <>
-                <MenuSeparator />
-                <MenuItem onClick={() => column.clearSorting()}>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => column.clearSorting()}>
                   <IconFilter2X className="size-4" />
                   Restablecer
-                </MenuItem>
+                </DropdownMenuItem>
               </>
             )}
-          </MenuGroup>
-        </MenuPopup>
-      </Menu>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

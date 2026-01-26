@@ -3,7 +3,7 @@ import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { CopyButton } from '@/components/ui/copy-button'
-import { Popover, PopoverClose, PopoverPopup, PopoverTitle, PopoverTrigger } from '@/components/ui/popover'
+import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from '@/components/ui/popover'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { normalizeString } from '@/lib/utils'
 import { HousesTableActions } from './actions'
@@ -64,7 +64,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
       return owner ? (
         <Popover>
           <PopoverTrigger render={<Button variant="plain">{ownerFullName}</Button>} />
-          <PopoverPopup className="min-w-52 max-w-60">
+          <PopoverContent className="min-w-52 max-w-60">
             <div className="flex flex-col gap-2">
               <PopoverTitle className="text-muted-foreground text-sm">{ownerFullName}</PopoverTitle>
               <div className="min-w-0 flex-1">
@@ -89,7 +89,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
                 <CopyButton value={owner.id} variant="outline" tooltipText="Copiar ID" />
               </div>
             </div>
-          </PopoverPopup>
+          </PopoverContent>
         </Popover>
         // </div>
       ) : null

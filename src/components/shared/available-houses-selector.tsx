@@ -5,11 +5,13 @@ import {
   Combobox,
   ComboboxChip,
   ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxContent,
   ComboboxEmpty,
-  ComboboxInput,
   ComboboxItem,
   ComboboxList,
-  ComboboxPopup,
+  ComboboxValue,
+  useComboboxAnchor,
 } from '@/components/ui/combobox'
 import { Skeleton } from '../ui/skeleton'
 
@@ -39,6 +41,7 @@ export function AvailableHousesSelector({
     availableHousesQueryOptions(),
   )
 
+  const anchor = useComboboxAnchor()
   const items: HouseItem[] = useMemo(() => {
     const assignedItems = includeAssigned.map((house) => ({ label: house.houseNumber, value: house.id }))
     const availableItems = availableHouses.map((house) => ({ label: house.houseNumber, value: house.id }))
@@ -64,23 +67,31 @@ export function AvailableHousesSelector({
   return (
     <Combobox
       multiple
+      items={items}
+      disabled={disabled}
       value={items.filter((item) => value.includes(item.value))}
       onValueChange={(selectedItems: HouseItem[]) => {
         onValueChange(selectedItems.map((item) => item.value))
       }}
-      items={items}
-      disabled={disabled}
     >
-      <ComboboxChips aria-invalid={invalid} id={id}>
-        {value.map((houseId) => {
-          const house =
-            availableHouses.find((h) => h.id === houseId) || includeAssigned.find((h) => h.id === houseId)
-          return house ? <ComboboxChip key={houseId}>{house.houseNumber}</ComboboxChip> : null
-        })}
-        <ComboboxInput placeholder={value.length > 0 ? undefined : 'Selecciona casas'} />
+      <ComboboxChips ref={anchor} className="w-full">
+        <ComboboxValue>
+          {(values: HouseItem[]) => (
+            <>
+              {values.map((value: HouseItem) => (
+                <ComboboxChip key={value.value}>{value.label}</ComboboxChip>
+              ))}
+              <ComboboxChipsInput
+                id={id}
+                aria-invalid={invalid}
+                placeholder={value.length > 0 ? undefined : 'Selecciona casas'}
+              />
+            </>
+          )}
+        </ComboboxValue>
       </ComboboxChips>
-      <ComboboxPopup>
-        <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
+      <ComboboxContent anchor={anchor}>
+        <ComboboxEmpty>No items found.</ComboboxEmpty>
         <ComboboxList>
           {(item: HouseItem) => (
             <ComboboxItem key={item.value} value={item}>
@@ -88,7 +99,7 @@ export function AvailableHousesSelector({
             </ComboboxItem>
           )}
         </ComboboxList>
-      </ComboboxPopup>
+      </ComboboxContent>
     </Combobox>
   )
 }

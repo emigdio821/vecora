@@ -1,7 +1,7 @@
 import { useQueryState } from 'nuqs'
 import { ExternalUsersTabContent } from '@/components/admin/external-users/external-users-tab-content'
 import { OwnersTabContent } from '@/components/admin/owners/owners-tab-content'
-import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AuditLogsTabContent } from './audit-logs/audit-logs-tab-content'
 import { HousesTabContent } from './houses/houses-tab-content'
 import { PaymentsTabContent } from './payments/payments-tab-content'
@@ -15,37 +15,37 @@ export function AdministrationTabs() {
   return (
     <Tabs value={tab} onValueChange={(value) => setTab(value)}>
       <TabsList className="flex w-full justify-start overflow-hidden overflow-x-auto sm:w-fit sm:justify-center">
-        <TabsTab value="owners">Propietarios</TabsTab>
-        <TabsTab value="houses">Casas</TabsTab>
-        <TabsTab value="violations">Infracciones</TabsTab>
-        <TabsTab value="payments">Pagos</TabsTab>
-        <TabsTab value="external-users">Usuarios externos</TabsTab>
-        <TabsTab value="audit-logs">Auditoría</TabsTab>
+        <TabsTrigger value="owners">Propietarios</TabsTrigger>
+        <TabsTrigger value="houses">Casas</TabsTrigger>
+        <TabsTrigger value="violations">Infracciones</TabsTrigger>
+        <TabsTrigger value="payments">Pagos</TabsTrigger>
+        <TabsTrigger value="external-users">Usuarios externos</TabsTrigger>
+        <TabsTrigger value="audit-logs">Auditoría</TabsTrigger>
       </TabsList>
 
-      <TabsPanel value="owners" keepMounted>
+      <TabsContent value="owners" keepMounted>
         <OwnersTabContent />
-      </TabsPanel>
+      </TabsContent>
 
-      <TabsPanel value="houses" keepMounted>
+      <TabsContent value="houses" keepMounted>
         <HousesTabContent />
-      </TabsPanel>
+      </TabsContent>
 
-      <TabsPanel value="violations">
+      <TabsContent value="violations">
         <ViolationsTabContent />
-      </TabsPanel>
+      </TabsContent>
 
-      <TabsPanel value="payments" keepMounted>
+      <TabsContent value="payments" keepMounted>
         <PaymentsTabContent />
-      </TabsPanel>
+      </TabsContent>
 
-      <TabsPanel value="external-users" keepMounted>
+      <TabsContent value="external-users" keepMounted>
         <ExternalUsersTabContent />
-      </TabsPanel>
+      </TabsContent>
 
-      <TabsPanel value="audit-logs" keepMounted>
+      <TabsContent value="audit-logs" keepMounted>
         <AuditLogsTabContent />
-      </TabsPanel>
+      </TabsContent>
     </Tabs>
   )
 }

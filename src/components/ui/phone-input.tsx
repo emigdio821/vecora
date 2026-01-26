@@ -1,5 +1,5 @@
 import { Combobox as ComboboxPrimitive } from '@base-ui/react'
-import { IconSearch, IconSelector } from '@tabler/icons-react'
+import { IconSelector } from '@tabler/icons-react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
 import RPNInput, {
@@ -10,11 +10,11 @@ import RPNInput, {
 import defaultLabels from 'react-phone-number-input/locale/es'
 import {
   Combobox,
+  ComboboxContent,
   ComboboxEmpty,
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-  ComboboxPopup,
   ComboboxTrigger,
   ComboboxValue,
 } from '@/components/ui/combobox'
@@ -91,7 +91,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
     count: filteredItems.length,
     getScrollElement: () => scrollElementRef.current,
     estimateSize: () => 32,
-    overscan: 10,
+    overscan: 14,
   })
 
   const handleScrollElementRef = useCallback(
@@ -137,27 +137,24 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
         }
       }}
     >
-      <ComboboxTrigger render={<Button className="w-full max-w-20 justify-between" variant="outline" />}>
-        <ComboboxValue>{getCountryCode}</ComboboxValue>
-        <IconSelector className="-me-1!" />
-      </ComboboxTrigger>
-      <ComboboxPopup aria-label="Selecciona una opción" align="start" className="[--anchor-width:288px]">
-        <div className="border-b p-1.5">
-          <ComboboxInput
-            showTrigger={false}
-            placeholder="Buscar"
-            aria-invalid={false}
-            startAddon={<IconSearch />}
-            className="rounded-sm before:rounded-[calc(var(--radius-sm)-1px)]"
-          />
-        </div>
+      <ComboboxTrigger
+        render={
+          <Button variant="outline" className="w-full max-w-20 justify-between">
+            <ComboboxValue>{getCountryCode}</ComboboxValue>
+            <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
+          </Button>
+        }
+      />
+      <ComboboxContent align="start" className="[--anchor-width:240px]">
+        <ComboboxInput showTrigger={false} placeholder="Buscar" />
         <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
         <ComboboxList className="overflow-hidden">
           {filteredItems.length > 0 && (
             <div
               role="presentation"
               ref={handleScrollElementRef}
-              className="h-[min(16rem,var(--total-size))] max-h-(--available-height) overflow-y-auto"
+              // TODO: Fix scroll disapearing
+              className="h-[min(14rem,var(--total-size))] max-h-(--available-height) overflow-y-auto"
               style={{ '--total-size': `${totalSize}px` } as React.CSSProperties}
             >
               <div role="presentation" className="relative w-full" style={{ height: totalSize }}>
@@ -196,7 +193,99 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
             </div>
           )}
         </ComboboxList>
-      </ComboboxPopup>
+      </ComboboxContent>
     </Combobox>
+
+    // <Combobox
+    //   virtualized
+    //   items={countries}
+    //   filteredItems={filteredItems}
+    //   disabled={disabled}
+    //   value={selectedCountry ? countries.find((c) => c.value === selectedCountry) : null}
+    //   open={open}
+    //   onOpenChange={setOpen}
+    //   onValueChange={(item) => {
+    //     if (item?.value) onChange(item.value)
+    //   }}
+    //   inputValue={searchValue}
+    //   onInputValueChange={setSearchValue}
+    //   itemToStringLabel={getItemLabel}
+    //   onItemHighlighted={(item, { reason, index }) => {
+    //     if (!item) {
+    //       return
+    //     }
+
+    //     const isStart = index === 0
+    //     const isEnd = index === filteredItems.length - 1
+    //     const shouldScroll = reason === 'none' || (reason === 'keyboard' && (isStart || isEnd))
+
+    //     if (shouldScroll) {
+    //       queueMicrotask(() => {
+    //         virtualizer.scrollToIndex(index, { align: isStart ? 'start' : 'end' })
+    //       })
+    //     }
+    //   }}
+    // >
+    //   <ComboboxTrigger render={<Button className="w-full max-w-20 justify-between" variant="outline" />}>
+    //     <ComboboxValue>{getCountryCode}</ComboboxValue>
+    //     <IconSelector className="-me-1!" />
+    //   </ComboboxTrigger>
+    //   <ComboboxContent aria-label="Selecciona una opción" align="start" className="[--anchor-width:288px]">
+    //     <div className="border-b p-1.5">
+    //       <ComboboxInput
+    //         showTrigger={false}
+    //         placeholder="Buscar"
+    //         aria-invalid={false}
+    //         startAddon={<IconSearch />}
+    //         className="rounded-sm before:rounded-[calc(var(--radius-sm)-1px)]"
+    //       />
+    //     </div>
+    //     <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
+    //     <ComboboxList className="overflow-hidden">
+    //       {filteredItems.length > 0 && (
+    //         <div
+    //           role="presentation"
+    //           ref={handleScrollElementRef}
+    //           className="h-[min(16rem,var(--total-size))] max-h-(--available-height) overflow-y-auto"
+    //           style={{ '--total-size': `${totalSize}px` } as React.CSSProperties}
+    //         >
+    //           <div role="presentation" className="relative w-full" style={{ height: totalSize }}>
+    //             {virtualizer.getVirtualItems().map((virtualItem) => {
+    //               const item = filteredItems[virtualItem.index]
+    //               if (!item) {
+    //                 return null
+    //               }
+
+    //               return (
+    //                 <ComboboxItem
+    //                   key={virtualItem.key}
+    //                   index={virtualItem.index}
+    //                   data-index={virtualItem.index}
+    //                   ref={virtualizer.measureElement}
+    //                   value={item}
+    //                   aria-setsize={filteredItems.length}
+    //                   aria-posinset={virtualItem.index + 1}
+    //                   style={{
+    //                     position: 'absolute',
+    //                     top: 0,
+    //                     left: 0,
+    //                     width: '100%',
+    //                     height: virtualItem.size,
+    //                     transform: `translateY(${virtualItem.start}px)`,
+    //                   }}
+    //                 >
+    //                   <div className="inline-flex w-full items-center justify-between gap-2">
+    //                     <span>{item.label}</span>
+    //                     <span className="text-muted-foreground text-xs">{getCountryCode(item)}</span>
+    //                   </div>
+    //                 </ComboboxItem>
+    //               )
+    //             })}
+    //           </div>
+    //         </div>
+    //       )}
+    //     </ComboboxList>
+    //   </ComboboxContent>
+    // </Combobox>
   )
 }

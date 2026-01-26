@@ -15,14 +15,14 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
-  Menu,
-  MenuGroup,
-  MenuGroupLabel,
-  MenuItem,
-  MenuPopup,
-  MenuSeparator,
-  MenuTrigger,
-} from '@/components/ui/menu'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { getPaymentTypeLabel } from '@/lib/utils'
@@ -99,39 +99,39 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
       />
 
       <div className="flex">
-        <Menu>
-          <MenuTrigger
+        <DropdownMenu>
+          <DropdownMenuTrigger
             render={
               <Button aria-label="Table actions" size="icon" variant="ghost" className="ml-auto">
                 <IconDotsVertical className="size-4" />
               </Button>
             }
           />
-          <MenuPopup align="end" className="max-w-42">
-            <MenuGroup>
-              <MenuGroupLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
+          <DropdownMenuContent align="end" className="max-w-42">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="wrap-break-word my-1.5 line-clamp-2 py-0">
                 {`$${payment.amount} - ${getPaymentTypeLabel(payment.paymentType)}`}
-              </MenuGroupLabel>
+              </DropdownMenuLabel>
 
-              <MenuItem onClick={() => setPaymentDetailsSheetOpen(true)}>
+              <DropdownMenuItem onClick={() => setPaymentDetailsSheetOpen(true)}>
                 <IconCurrencyDollar className="size-4" />
                 Información
-              </MenuItem>
+              </DropdownMenuItem>
 
-              <MenuItem onClick={() => setEditPaymentSheetOpen(true)}>
+              <DropdownMenuItem onClick={() => setEditPaymentSheetOpen(true)}>
                 <IconEdit className="size-4" />
                 Editar
-              </MenuItem>
+              </DropdownMenuItem>
 
-              <MenuSeparator />
+              <DropdownMenuSeparator />
 
-              <MenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+              <DropdownMenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
                 <IconTrash className="size-4" />
                 Eliminar
-              </MenuItem>
-            </MenuGroup>
-          </MenuPopup>
-        </Menu>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </>
   )

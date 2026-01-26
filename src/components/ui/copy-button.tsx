@@ -4,7 +4,7 @@ import { COPY_TIMEOUT, useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { cn } from '@/lib/utils'
 import { Button, type ButtonProps } from './button'
 import { anchoredToastManager } from './toast'
-import { Tooltip, TooltipPopup, TooltipTrigger } from './tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip'
 
 type CopyButtonProps = ButtonProps & {
   value: string
@@ -61,9 +61,9 @@ export function CopyButton(props: CopyButtonProps) {
           <IconCopy className={cn('size-4', iconClassName)} />
         )}
       </TooltipTrigger>
-      <TooltipPopup>
+      <TooltipContent>
         <p>{tooltipText}</p>
-      </TooltipPopup>
+      </TooltipContent>
     </Tooltip>
   )
 }

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
-import { Toggle, ToggleGroup, ToggleGroupSeparator } from '@/components/ui/toggle-group'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { formatDate } from '@/lib/utils'
 
@@ -149,16 +149,15 @@ export function StatsChart() {
         </CardDescription>
         <CardAction>
           <ToggleGroup
+            multiple
             variant="outline"
             value={[timeRange]}
             onValueChange={(value) => setTimeRange(value[0])}
             className="@[767px]/card:flex hidden *:data-[slot=toggle-group-item]:px-4!"
           >
-            <Toggle value="90d">Últimos 3 meses</Toggle>
-            <ToggleGroupSeparator />
-            <Toggle value="30d">Últimos 30 días</Toggle>
-            <ToggleGroupSeparator />
-            <Toggle value="7d">Últimos 7 días</Toggle>
+            <ToggleGroupItem value="90d">Últimos 3 meses</ToggleGroupItem>
+            <ToggleGroupItem value="30d">Últimos 30 días</ToggleGroupItem>
+            <ToggleGroupItem value="7d">Últimos 7 días</ToggleGroupItem>
           </ToggleGroup>
         </CardAction>
       </CardHeader>

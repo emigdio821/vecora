@@ -10,7 +10,7 @@ import { LoaderIcon } from '@/components/icons'
 import { AvailableHousesSelector } from '@/components/shared/available-houses-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Form } from '@/components/ui/form'
+
 import { Input } from '@/components/ui/input'
 import { PhoneInput } from '@/components/ui/phone-input'
 import {
@@ -94,12 +94,17 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
         </SheetHeader>
 
         <SheetPanel>
-          <Form id={editOwnerFormId} aria-label="Editar propietario" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            className="space-y-4"
+            id={editOwnerFormId}
+            aria-label="Editar propietario"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <Controller
               name="firstName"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Nombre <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -109,7 +114,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={updateOwnerMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -118,7 +123,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
               name="lastName"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Apellido <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -128,7 +133,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={updateOwnerMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -137,7 +142,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
               name="phone"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Teléfono <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -150,7 +155,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
                       field.onChange(value || '')
                     }}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -159,7 +164,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
               name="email"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Correo <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -171,7 +176,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={updateOwnerMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -180,7 +185,7 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
               name="houseIds"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Casas</FieldLabel>
                   <AvailableHousesSelector
                     id={field.name}
@@ -190,11 +195,11 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
                     invalid={fieldState.invalid}
                     includeAssigned={owner.houses}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
-          </Form>
+          </form>
         </SheetPanel>
 
         <SheetFooter>

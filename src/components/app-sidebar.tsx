@@ -1,5 +1,4 @@
-import { IconHomeStats } from '@tabler/icons-react'
-import { Link, useLocation } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import {
   Sidebar,
   SidebarContent,
@@ -15,9 +14,6 @@ import { NavMain } from './navs/main'
 import { NavUser } from './navs/user'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const location = useLocation()
-  const { pathname } = location
-
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -41,24 +37,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               }
             />
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              isActive={pathname === '/'}
-              render={
-                <Link to="/">
-                  <IconHomeStats className="size-4" />
-                  <span>Inicio</span>
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
-        <NavAdmin />
+        <NavAdmin className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter className="mt-auto">
+      <SidebarFooter>
         <NavUser />
       </SidebarFooter>
     </Sidebar>

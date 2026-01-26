@@ -7,7 +7,7 @@ import { EXTERNAL_USERS_QUERY_KEY } from '@/api/tanstack-queries/external-users'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Form } from '@/components/ui/form'
+
 import { Input } from '@/components/ui/input'
 import { PhoneInput } from '@/components/ui/phone-input'
 import {
@@ -84,7 +84,8 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
         </SheetHeader>
 
         <SheetPanel>
-          <Form
+          <form
+            className="space-y-4"
             id={editExternalUserFormId}
             aria-label="Editar usuario externo"
             onSubmit={form.handleSubmit(onSubmit)}
@@ -93,7 +94,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
               name="firstName"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Nombre <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -103,7 +104,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
                     aria-invalid={fieldState.invalid}
                     disabled={updateExternalUserMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -112,7 +113,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
               name="lastName"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Apellido <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -122,7 +123,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
                     aria-invalid={fieldState.invalid}
                     disabled={updateExternalUserMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -131,7 +132,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
               name="phone"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Teléfono <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -144,7 +145,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
                       field.onChange(value || '')
                     }}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -153,7 +154,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
               name="email"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Correo <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -165,11 +166,11 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
                     aria-invalid={fieldState.invalid}
                     disabled={updateExternalUserMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
-          </Form>
+          </form>
         </SheetPanel>
 
         <SheetFooter>

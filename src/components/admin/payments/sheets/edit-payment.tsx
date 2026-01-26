@@ -8,7 +8,7 @@ import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/owners-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Form } from '@/components/ui/form'
+
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import {
@@ -125,12 +125,17 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
         </SheetHeader>
 
         <SheetPanel>
-          <Form id={updatePaymentFormId} aria-label="Editar pago" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            className="space-y-4"
+            id={updatePaymentFormId}
+            aria-label="Editar pago"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <Controller
               name="amount"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Monto <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -156,7 +161,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                       <InputGroupText>MXN</InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -165,7 +170,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
               name="ownerId"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Propietario <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -178,7 +183,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                     includeNoneOption={false}
                   />
 
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -187,7 +192,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
               name="paymentType"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Tipo de pago <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -206,7 +211,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                     </SelectContent>
                   </Select>
 
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -215,7 +220,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
               name="concept"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Concepto <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -228,7 +233,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={updatePaymentMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -238,17 +243,14 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                 name="months"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    invalid={fieldState.invalid}
-                    touched={fieldState.isTouched}
-                    dirty={fieldState.isDirty}
-                  >
+                  <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
                       Meses <span className="text-destructive">*</span>
                     </FieldLabel>
 
                     <Select multiple value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
+                        {/* TODO: Fix text truncation */}
                         <SelectValue>{renderPaymentMonthsValue}</SelectValue>
                       </SelectTrigger>
                       <SelectContent className="max-h-96">
@@ -261,7 +263,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                         </SelectGroup>
                       </SelectContent>
                     </Select>
-                    <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -271,7 +273,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
               name="year"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Año</FieldLabel>
                   <Select
                     value={field.value.toString()}
@@ -314,7 +316,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                 <input type="hidden" className="hidden" {...field} value={field.value?.toLocaleString()} />
               )}
             />
-          </Form>
+          </form>
         </SheetPanel>
 
         <SheetFooter>

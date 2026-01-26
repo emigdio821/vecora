@@ -1,8 +1,7 @@
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip'
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { InputProps } from './input'
 
 export function InputPassword(props: InputProps) {
@@ -19,9 +18,8 @@ export function InputPassword(props: InputProps) {
         <Tooltip>
           <TooltipTrigger
             render={
-              <Button
+              <InputGroupButton
                 size="icon-xs"
-                variant="ghost"
                 aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 onClick={() => setShowPassword((prev) => !prev)}
               />
@@ -29,7 +27,7 @@ export function InputPassword(props: InputProps) {
           >
             {showPassword ? <IconEyeOff /> : <IconEye />}
           </TooltipTrigger>
-          <TooltipPopup>{showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}</TooltipPopup>
+          <TooltipContent>{showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}</TooltipContent>
         </Tooltip>
       </InputGroupAddon>
     </InputGroup>

@@ -99,7 +99,7 @@ export function ExternalUsersDataTableHeader({ table }: ExternalUsersDataTableHe
       </AlertDialog>
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
-        <InputGroup className="w-full sm:w-sm">
+        <InputGroup className="w-full bg-background sm:w-sm">
           <InputGroupInput
             type="search"
             value={searchQuery}
@@ -141,7 +141,7 @@ export function ExternalUsersDataTableHeader({ table }: ExternalUsersDataTableHe
                 render={
                   <Button
                     size="icon"
-                    variant="destructive-outline"
+                    variant="destructive"
                     aria-label="Borrar usuario externo"
                     onClick={() => setDeleteDialogOpen(true)}
                   >

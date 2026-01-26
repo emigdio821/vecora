@@ -10,17 +10,16 @@ import { LoaderIcon } from '@/components/icons'
 import { AvailableHousesSelector } from '@/components/shared/available-houses-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PhoneInput } from '@/components/ui/phone-input'
 import {
   Sheet,
   SheetClose,
+  SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetPanel,
-  SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
@@ -79,19 +78,24 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetPopup side="right">
+      <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Crear propietario</SheetTitle>
           <SheetDescription>Ingresa la información del nuevo propietario.</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>
-          <Form id={createOwnerFormId} aria-label="Crear propietario" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            className="space-y-4"
+            id={createOwnerFormId}
+            aria-label="Crear propietario"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <Controller
               name="firstName"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Nombre <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -101,7 +105,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={createOwnerMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -110,7 +114,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
               name="lastName"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Apellido <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -120,7 +124,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={createOwnerMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -129,7 +133,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
               name="phone"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Teléfono <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -141,7 +145,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                       field.onChange(value || '')
                     }}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -150,7 +154,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
               name="email"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Correo <span className="text-destructive">*</span>
                   </FieldLabel>
@@ -162,7 +166,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                     aria-invalid={fieldState.invalid}
                     disabled={createOwnerMutation.isPending}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
@@ -171,7 +175,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
               name="houseIds"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field invalid={fieldState.invalid} touched={fieldState.isTouched} dirty={fieldState.isDirty}>
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Casas</FieldLabel>
                   <AvailableHousesSelector
                     id={field.name}
@@ -180,11 +184,11 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
                     disabled={createOwnerMutation.isPending}
                     invalid={fieldState.invalid}
                   />
-                  <FieldError match={fieldState.invalid}>{fieldState.error?.message}</FieldError>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
-          </Form>
+          </form>
         </SheetPanel>
 
         <SheetFooter>
@@ -200,7 +204,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
             {createOwnerMutation.isPending && <LoaderIcon />}
           </Button>
         </SheetFooter>
-      </SheetPopup>
+      </SheetContent>
     </Sheet>
   )
 }

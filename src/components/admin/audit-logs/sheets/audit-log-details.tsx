@@ -15,11 +15,11 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/u
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
+  SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetPanel,
-  SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
@@ -39,7 +39,7 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetPopup>
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Detalles del registro de auditoría</SheetTitle>
           <SheetDescription>Información completa y detallada del registro de auditoría</SheetDescription>
@@ -209,7 +209,7 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
             <span>{formatDate(auditLog.timestamp, { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
         </SheetFooter>
-      </SheetPopup>
+      </SheetContent>
     </Sheet>
   )
 }

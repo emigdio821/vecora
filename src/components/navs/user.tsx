@@ -4,18 +4,18 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
 import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import {
-  Menu,
-  MenuCheckboxItem,
-  MenuGroup,
-  MenuItem,
-  MenuPopup,
-  MenuPortal,
-  MenuSeparator,
-  MenuSub,
-  MenuSubPopup,
-  MenuSubTrigger,
-  MenuTrigger,
-} from '@/components/ui/menu'
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { authClient } from '@/lib/auth-client'
 import { logger } from '@/lib/logger'
 import { Avatar, AvatarFallback } from '../ui/avatar'
@@ -58,8 +58,8 @@ export function NavUser() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <Menu>
-          <MenuTrigger
+        <DropdownMenu>
+          <DropdownMenuTrigger
             render={
               <SidebarMenuButton
                 size="lg"
@@ -77,32 +77,32 @@ export function NavUser() {
               </SidebarMenuButton>
             }
           />
-          <MenuPopup className="w-(--anchor-width)" align="center">
-            <MenuGroup>
-              <MenuSub>
-                <MenuSubTrigger>
+          <DropdownMenuContent className="w-(--anchor-width)" align="center">
+            <DropdownMenuGroup>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
                   <IconMoon className="hidden size-4 dark:block" />
                   <IconSun className="size-4 dark:hidden" />
                   <span>Apariencia</span>
-                </MenuSubTrigger>
-                <MenuPortal>
-                  <MenuSubPopup>
-                    <MenuCheckboxItem checked={theme === 'light'} onClick={() => setTheme('light')}>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuCheckboxItem checked={theme === 'light'} onClick={() => setTheme('light')}>
                       Claro
-                    </MenuCheckboxItem>
-                    <MenuCheckboxItem checked={theme === 'dark'} onClick={() => setTheme('dark')}>
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem checked={theme === 'dark'} onClick={() => setTheme('dark')}>
                       Oscuro
-                    </MenuCheckboxItem>
-                    <MenuCheckboxItem checked={theme === 'system'} onClick={() => setTheme('system')}>
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem checked={theme === 'system'} onClick={() => setTheme('system')}>
                       Sistema
-                    </MenuCheckboxItem>
-                  </MenuSubPopup>
-                </MenuPortal>
-              </MenuSub>
-            </MenuGroup>
+                    </DropdownMenuCheckboxItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+            </DropdownMenuGroup>
 
-            <MenuGroup>
-              <MenuItem
+            <DropdownMenuGroup>
+              <DropdownMenuItem
                 render={
                   <Link to="/settings">
                     <IconSettings className="size-4" />
@@ -110,18 +110,18 @@ export function NavUser() {
                   </Link>
                 }
               />
-            </MenuGroup>
+            </DropdownMenuGroup>
 
-            <MenuSeparator />
+            <DropdownMenuSeparator />
 
-            <MenuGroup>
-              <MenuItem onClick={handleLogOut}>
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={handleLogOut}>
                 <IconLogout className="size-4" />
                 Cerrar sesión
-              </MenuItem>
-            </MenuGroup>
-          </MenuPopup>
-        </Menu>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
   )
