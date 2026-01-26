@@ -6,11 +6,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Combobox,
+  ComboboxContent,
   ComboboxEmpty,
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-  ComboboxPopup,
   ComboboxTrigger,
   ComboboxValue,
 } from '@/components/ui/combobox'
@@ -73,7 +73,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
 
   return (
     <div className="flex flex-col justify-between gap-2 sm:flex-row">
-      <InputGroup className="w-full sm:w-sm">
+      <InputGroup className="w-full bg-background sm:w-sm">
         <InputGroupInput
           type="search"
           value={searchQuery}
@@ -130,7 +130,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
             <IconCirclePlus />
             <ComboboxValue placeholder="Año">{renderYearFacetedFilterValue}</ComboboxValue>
           </ComboboxTrigger>
-          <ComboboxPopup align="end" aria-label="Selecciona una opción" className="[--anchor-width:120px]">
+          <ComboboxContent align="end" aria-label="Selecciona una opción" className="[--anchor-width:120px]">
             <div className="border-b p-1.5">
               <ComboboxInput
                 showTrigger={false}
@@ -149,7 +149,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
                 </ComboboxItem>
               )}
             </ComboboxList>
-          </ComboboxPopup>
+          </ComboboxContent>
         </Combobox>
       </div>
     </div>

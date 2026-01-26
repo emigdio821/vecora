@@ -7,11 +7,11 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/u
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
+  SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetPanel,
-  SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
@@ -34,7 +34,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetPopup>
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Información del pago</SheetTitle>
           <SheetDescription>Información completa y detallada del pago</SheetDescription>
@@ -173,7 +173,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
               </div>
             )}
         </SheetFooter>
-      </SheetPopup>
+      </SheetContent>
     </Sheet>
   )
 }

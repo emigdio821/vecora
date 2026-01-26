@@ -7,11 +7,11 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/u
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
+  SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetPanel,
-  SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
@@ -31,7 +31,7 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetPopup>
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Información de la casa</SheetTitle>
           <SheetDescription>Información completa y detallada de la casa</SheetDescription>
@@ -135,7 +135,7 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
             </div>
           )}
         </SheetFooter>
-      </SheetPopup>
+      </SheetContent>
     </Sheet>
   )
 }

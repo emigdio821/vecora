@@ -7,11 +7,11 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/u
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
+  SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetPanel,
-  SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
@@ -31,7 +31,7 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetPopup>
+      <SheetContent>
         <SheetHeader>
           <SheetTitle>Información de la infracción</SheetTitle>
           <SheetDescription>Información completa y detallada de la infracción</SheetDescription>
@@ -139,7 +139,7 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
             <span>{formatDate(violation.createdAt)}</span>
           </div>
         </SheetFooter>
-      </SheetPopup>
+      </SheetContent>
     </Sheet>
   )
 }

@@ -13,11 +13,11 @@ import { PhoneInput } from '@/components/ui/phone-input'
 import {
   Sheet,
   SheetClose,
+  SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetPanel,
-  SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
@@ -71,7 +71,7 @@ export function CreateExternalUserSheet({ state }: CreateExternalUserSheetProps)
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetPopup side="right">
+      <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Crear usuario externo</SheetTitle>
           <SheetDescription>Ingresa la información del nuevo usuario externo.</SheetDescription>
@@ -203,7 +203,7 @@ export function CreateExternalUserSheet({ state }: CreateExternalUserSheetProps)
             {createExternalUserMutation.isPending && <LoaderIcon />}
           </Button>
         </SheetFooter>
-      </SheetPopup>
+      </SheetContent>
     </Sheet>
   )
 }

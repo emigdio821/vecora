@@ -16,11 +16,11 @@ import { PhoneInput } from '@/components/ui/phone-input'
 import {
   Sheet,
   SheetClose,
+  SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetPanel,
-  SheetPopup,
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
@@ -79,7 +79,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetPopup side="right">
+      <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Crear propietario</SheetTitle>
           <SheetDescription>Ingresa la información del nuevo propietario.</SheetDescription>
@@ -200,7 +200,7 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
             {createOwnerMutation.isPending && <LoaderIcon />}
           </Button>
         </SheetFooter>
-      </SheetPopup>
+      </SheetContent>
     </Sheet>
   )
 }
