@@ -1,7 +1,14 @@
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface DataTablePaginationProps<T> {
   table: Table<T>
@@ -31,16 +38,18 @@ export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {Array.from({ length: table.getPageCount() }, (_, i) => {
-              const start = i * table.getState().pagination.pageSize + 1
-              const end = Math.min((i + 1) * table.getState().pagination.pageSize, table.getRowCount())
-              const pageNum = i + 1
-              return (
-                <SelectItem key={pageNum} value={pageNum}>
-                  {`${start}-${end}`}
-                </SelectItem>
-              )
-            })}
+            <SelectGroup>
+              {Array.from({ length: table.getPageCount() }, (_, i) => {
+                const start = i * table.getState().pagination.pageSize + 1
+                const end = Math.min((i + 1) * table.getState().pagination.pageSize, table.getRowCount())
+                const pageNum = i + 1
+                return (
+                  <SelectItem key={pageNum} value={pageNum}>
+                    {`${start}-${end}`}
+                  </SelectItem>
+                )
+              })}
+            </SelectGroup>
           </SelectContent>
         </Select>
         <p className="text-muted-foreground text-sm">
