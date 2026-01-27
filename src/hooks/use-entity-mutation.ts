@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toastManager } from '@/components/ui/toast'
+import { toast } from 'sonner'
 import { logger } from '@/lib/logger'
 
 interface EntityMutationConfig<TData, TVariables> {
@@ -32,18 +32,14 @@ export function useEntityMutation<TData = unknown, TVariables = unknown>({
         queryClient.invalidateQueries({ queryKey: [key] })
       })
 
-      toastManager.add({
-        type: 'success',
-        title: successTitle,
+      toast.success(successTitle, {
         description: successDescription,
       })
 
       customOnSuccess?.(data)
     },
     onError: (error) => {
-      toastManager.add({
-        type: 'error',
-        title: errorTitle,
+      toast.error(errorTitle, {
         description: errorDescription,
       })
 

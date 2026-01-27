@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Table } from '@tanstack/react-table'
-import { toastManager } from '@/components/ui/toast'
+import { toast } from 'sonner'
 import { logger } from '@/lib/logger'
 
 interface BulkDeleteConfig<TData> {
@@ -45,21 +45,15 @@ export function useBulkDelete<TData>({
       table.resetRowSelection()
 
       if (rejected === 0) {
-        toastManager.add({
-          type: 'success',
-          title: successTitle,
+        toast.success(successTitle, {
           description: successDescription,
         })
       } else if (fulfilled === 0) {
-        toastManager.add({
-          type: 'error',
-          title: errorTitle || 'Error',
+        toast.error(errorTitle || 'Error', {
           description: errorDescription || 'Ocurrió un error al eliminar los elementos, intenta nuevamente.',
         })
       } else {
-        toastManager.add({
-          type: 'warning',
-          title: 'Advertencia',
+        toast.warning('Advertencia', {
           description: `${fulfilled} eliminados, ${rejected} fallaron.`,
         })
       }
@@ -67,9 +61,7 @@ export function useBulkDelete<TData>({
       customOnSuccess?.()
     },
     onError: (error) => {
-      toastManager.add({
-        type: 'error',
-        title: errorTitle || 'Error',
+      toast.error(errorTitle || 'Error', {
         description: errorDescription || 'Ocurrió un error al eliminar los elementos, intenta nuevamente.',
       })
 
