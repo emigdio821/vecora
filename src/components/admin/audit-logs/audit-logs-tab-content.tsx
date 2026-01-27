@@ -11,7 +11,10 @@ export function AuditLogsTabContent() {
 
   if (error) {
     return (
-      <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar los propietarios." />
+      <TSQueryGenericError
+        refetch={refetch}
+        errorDescription="Algo salió mal al cargar los registros de auditoría."
+      />
     )
   }
 
