@@ -33,7 +33,7 @@ export function DataTableSortableHeader<TData, TValue>({
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button variant="plain" size="sm" className="gap-1">
+            <Button variant="ghost" size="sm" className="gap-1">
               <span>{title}</span>
               {isAscSorted && <IconArrowNarrowDown className="size-4" />}
               {isDescSorted && <IconArrowNarrowUp className="size-4" />}

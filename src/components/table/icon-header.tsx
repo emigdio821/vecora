@@ -17,7 +17,7 @@ export function DataTableIconHeader({ icon, tipContent, ...buttonProps }: DataTa
         render={
           <Button
             size="icon-xs"
-            variant="plain"
+            variant="ghost"
             className="cursor-default"
             onClick={(e) => {
               e.preventBaseUIHandler()

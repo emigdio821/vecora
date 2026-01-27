@@ -25,20 +25,15 @@ import {
 import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
 import { formatDate } from '@/lib/utils'
 
-interface AuditDetailsSheetProps {
+interface AuditDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   auditLog: AuditLogWithUserAndProfile
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
 }
 
-export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
-  const { isOpen, onOpenChange } = state
+export function AuditLogDetailsSheet({ auditLog, ...sheetProps }: AuditDetailsSheetProps) {
   const profileRoles = auditLog.profile?.roles || []
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet {...sheetProps}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Detalles del registro de auditoría</SheetTitle>
