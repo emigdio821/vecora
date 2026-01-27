@@ -1,4 +1,4 @@
-import { IconDotsVertical, IconEdit, IconFlag, IconTrash } from '@tabler/icons-react'
+import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deleteViolation } from '@/api/server-functions/violations'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -111,7 +111,7 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
               </DropdownMenuLabel>
 
               <DropdownMenuItem onClick={() => setViolationDetailsSheetOpen(true)}>
-                <IconFlag className="size-4" />
+                <IconInfoCircle className="size-4" />
                 Información
               </DropdownMenuItem>
 

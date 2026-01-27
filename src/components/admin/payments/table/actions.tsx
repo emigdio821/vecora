@@ -1,4 +1,4 @@
-import { IconCurrencyDollar, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react'
+import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deletePayment } from '@/api/server-functions/payments'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -111,7 +111,7 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
               </DropdownMenuLabel>
 
               <DropdownMenuItem onClick={() => setPaymentDetailsSheetOpen(true)}>
-                <IconCurrencyDollar className="size-4" />
+                <IconInfoCircle className="size-4" />
                 Información
               </DropdownMenuItem>
 

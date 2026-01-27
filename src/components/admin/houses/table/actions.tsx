@@ -1,4 +1,4 @@
-import { IconDotsVertical, IconEdit, IconHome, IconTrash } from '@tabler/icons-react'
+import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deleteHouse } from '@/api/server-functions/houses'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -109,7 +109,7 @@ export function HousesTableActions({ house }: ActionsProps) {
               </DropdownMenuLabel>
 
               <DropdownMenuItem onClick={() => setHouseDetailsSheetOpen(true)}>
-                <IconHome className="size-4" />
+                <IconInfoCircle className="size-4" />
                 Información
               </DropdownMenuItem>
 

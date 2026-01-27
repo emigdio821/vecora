@@ -1,4 +1,4 @@
-import { IconDotsVertical, IconEdit, IconTrash, IconUser } from '@tabler/icons-react'
+import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deleteOwner } from '@/api/server-functions/owners'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -108,7 +108,7 @@ export function OwnersTableActions({ owner }: ActionsProps) {
                 {ownerFullName}
               </DropdownMenuLabel>
               <DropdownMenuItem onClick={() => setOwnerDetailsSheetOpen(true)}>
-                <IconUser className="size-4" />
+                <IconInfoCircle className="size-4" />
                 Información
               </DropdownMenuItem>
 
