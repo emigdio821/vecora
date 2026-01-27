@@ -1,8 +1,9 @@
-import { IconGavel, IconHomeStats, IconPigMoney, IconShield, IconTool } from '@tabler/icons-react'
+import { IconGavel, IconPigMoney, IconShield, IconTool } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
 import {
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -14,20 +15,9 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
   return (
     <SidebarGroup {...props}>
+      <SidebarGroupLabel>Secciones</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              isActive={pathname === '/'}
-              render={
-                <Link to="/">
-                  <IconHomeStats className="size-4" />
-                  <span>Inicio</span>
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-
           <SidebarMenuItem>
             <SidebarMenuButton
               isActive={pathname === '/presidency'}

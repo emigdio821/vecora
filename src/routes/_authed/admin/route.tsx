@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 
-export const Route = createFileRoute('/_authed/_admin')({
+export const Route = createFileRoute('/_authed/admin')({
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
     const profile = await context.queryClient.ensureQueryData(userProfileQueryOptions())

@@ -16,7 +16,7 @@ export function getRouter() {
     routeTree,
     scrollRestoration: true,
     context: { queryClient },
-    defaultPreload: 'intent',
+    // defaultPreload: 'intent',
     defaultErrorComponent: DefaultErrorBoundary,
     defaultNotFoundComponent: () => <NotFound />,
   })

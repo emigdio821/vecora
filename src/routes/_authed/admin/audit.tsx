@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { AdministrationTabs } from '@/components/admin/administration-tabs'
+import { AuditLogsTabContent } from '@/components/admin/audit-logs/audit-logs-tab-content'
 import { createSEOTitle } from '@/lib/seo'
 
-export const Route = createFileRoute('/_authed/_admin/administration')({
+export const Route = createFileRoute('/_authed/admin/audit')({
   component: RouteComponent,
   head: () => ({
     meta: [{ title: createSEOTitle('Administración') }],
@@ -13,13 +13,13 @@ function RouteComponent() {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <h4 className="font-heading font-medium text-lg leading-none">Administración</h4>
+        <h4 className="font-heading font-medium text-lg leading-none">Auditoría</h4>
         <p className="text-muted-foreground text-sm">
-          En esta sección puedes administrar los datos de toda la aplicación.
+          En esta sección puedes ver todos los registros del sistema.
         </p>
       </div>
 
-      <AdministrationTabs />
+      <AuditLogsTabContent />
     </>
   )
 }

@@ -1,15 +1,6 @@
-import { Link } from '@tanstack/react-router'
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@/components/ui/sidebar'
-import { ResidoIcon } from './icons'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar'
 import { NavAdmin } from './navs/admin'
+import { HeaderNav } from './navs/header'
 import { NavMain } from './navs/main'
 import { NavUser } from './navs/user'
 
@@ -17,31 +8,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              render={
-                <Link to="/">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary">
-                    <ResidoIcon className="size-4 text-sidebar-primary-foreground" />
-                  </div>
-
-                  <div className="grid flex-1 text-left text-sm leading-none">
-                    <span className="truncate font-medium text-base text-sidebar-accent-foreground">
-                      Resido
-                    </span>
-                    <span className="truncate text-sidebar-foreground text-xs">Manejo residencial</span>
-                  </div>
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <HeaderNav />
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
-        <NavAdmin className="mt-auto" />
+        <NavAdmin />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
