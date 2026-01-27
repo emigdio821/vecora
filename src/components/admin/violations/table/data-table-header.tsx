@@ -98,7 +98,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full bg-background sm:w-sm">
           <InputGroupInput
-            type="file"
+            type="search"
             value={searchQuery}
             aria-label="Buscar"
             placeholder="Buscar"
