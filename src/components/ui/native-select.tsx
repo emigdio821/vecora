@@ -24,7 +24,7 @@ function NativeSelect({ className, triggerSize = 'default', ...props }: NativeSe
         {...props}
       />
       <IconSelector
-        className="pointer-events-none absolute top-1/2 right-2 -me-1 size-4.5 -translate-y-1/2 select-none opacity-80 sm:size-4"
+        className="pointer-events-none absolute top-1/2 right-2 -me-1 size-4 -translate-y-1/2 select-none text-muted-foreground opacity-80 sm:size-4"
         aria-hidden="true"
         data-slot="native-select-icon"
       />
