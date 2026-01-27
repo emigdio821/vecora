@@ -72,7 +72,7 @@
   --secondary-foreground: var(--color-neutral-900);
   --muted: --alpha(var(--color-neutral-950) / 4%);
   --muted-foreground: var(--color-neutral-500);
-  --accent: var(--color-neutral-100);
+  --accent: --alpha(var(--color-neutral-950) / 4%);
   --accent-foreground: var(--color-neutral-900);
   --border: --alpha(var(--color-neutral-950) / 6%);
   --input: var(--color-neutral-200);
