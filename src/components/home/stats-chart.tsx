@@ -149,11 +149,10 @@ export function StatsChart() {
         </CardDescription>
         <CardAction>
           <ToggleGroup
-            multiple
             variant="outline"
             value={[timeRange]}
             onValueChange={(value) => setTimeRange(value[0])}
-            className="@[767px]/card:flex hidden *:data-[slot=toggle-group-item]:px-4!"
+            className="hidden md:flex"
           >
             <ToggleGroupItem value="90d">Últimos 3 meses</ToggleGroupItem>
             <ToggleGroupItem value="30d">Últimos 30 días</ToggleGroupItem>
