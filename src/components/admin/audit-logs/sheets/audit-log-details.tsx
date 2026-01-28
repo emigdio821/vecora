@@ -7,7 +7,7 @@ import {
 } from '@tabler/icons-react'
 import { AuditLogActionBadge } from '@/components/shared/audit-logs/action-badge'
 import { AuditLogEntityTypeBadge } from '@/components/shared/audit-logs/identity-type-badge'
-import { Badge } from '@/components/ui/badge'
+import { AuditLogRoleNameBadge } from '@/components/shared/audit-logs/role-name-badge'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
@@ -34,7 +34,7 @@ interface AuditDetailsSheetProps {
 }
 
 export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
-  const profileRoles = auditLog.profile?.roles || []
+  const profileRoles = auditLog.profile?.profileRoles || []
   const { isOpen, onOpenChange } = state
 
   return (
@@ -116,10 +116,8 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
                       <FramePanel className="p-2">
                         <h2 className="font-medium text-sm">Rol</h2>
                         <div className="flex flex-wrap gap-1">
-                          {profileRoles.map((role) => (
-                            <Badge variant="outline" key={role}>
-                              {role}
-                            </Badge>
+                          {profileRoles.map(({ role }) => (
+                            <AuditLogRoleNameBadge roleName={role.name} key={role.id} />
                           ))}
                         </div>
                       </FramePanel>

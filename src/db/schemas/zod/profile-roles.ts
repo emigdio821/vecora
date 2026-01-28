@@ -12,3 +12,6 @@ export type InsertRole = z.infer<typeof insertRoleSchema>
 export type SelectRole = z.infer<typeof selectRoleSchema>
 export type InsertProfileRole = z.infer<typeof insertProfileRoleSchema>
 export type SelectProfileRole = z.infer<typeof selectProfileRoleSchema>
+export type ProfileRoleWithRole = SelectProfileRole & {
+  role: SelectRole
+}

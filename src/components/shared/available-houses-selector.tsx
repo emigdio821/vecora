@@ -58,7 +58,7 @@ export function AvailableHousesSelector({
 
   if (availableHouses.length === 0 && includeAssigned.length === 0) {
     return (
-      <div className="flex h-9 w-full items-center rounded-lg border border-input bg-muted px-3 text-muted-foreground text-sm">
+      <div className="flex h-8 w-full items-center rounded-lg border border-input bg-muted px-3 text-muted-foreground text-sm">
         No hay casas disponibles
       </div>
     )

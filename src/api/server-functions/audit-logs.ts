@@ -57,23 +57,5 @@ export const getAuditLogs = createServerFn()
       orderBy: (auditLogs, { desc }) => [desc(auditLogs.timestamp)],
     })
 
-    // Transform the data to match AuditLogWithProfile type
-    const transformedLogs = logs.map((log) => ({
-      ...log,
-      profile: log.profile
-        ? {
-            userId: log.profile.userId,
-            email: log.user?.email ?? '',
-            firstName: log.user?.name?.split(' ')[0] ?? '',
-            lastName: log.user?.name?.split(' ').slice(1).join(' ') ?? '',
-            profileType: log.profile.profileType,
-            ownerId: log.profile.ownerId,
-            externalUserId: log.profile.externalUserId,
-            roles: log.profile.profileRoles.map((pr) => pr.role.name),
-            image: log.user?.image ?? null,
-          }
-        : null,
-    }))
-
-    return transformedLogs satisfies AuditLogWithUserAndProfile[]
+    return logs satisfies AuditLogWithUserAndProfile[]
   })

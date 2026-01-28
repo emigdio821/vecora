@@ -15,8 +15,9 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
   const location = useLocation()
   const { pathname } = location
   const { data: profile, isLoading } = useQuery(userProfileQueryOptions())
+  const roles = profile?.profileRoles.map((pr) => pr.role.name) || []
 
-  if (isLoading || !profile?.roles?.includes('admin')) {
+  if (isLoading || !roles.includes('admin')) {
     return null
   }
 

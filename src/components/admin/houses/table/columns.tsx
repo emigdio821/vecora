@@ -64,29 +64,36 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
       return owner ? (
         <Popover>
           <PopoverTrigger render={<Button variant="plain">{ownerFullName}</Button>} />
-          <PopoverContent className="min-w-52 max-w-60">
+          <PopoverContent className="min-w-52 max-w-60 p-0">
             <div className="flex flex-col gap-2">
-              <PopoverTitle className="text-muted-foreground text-sm">{ownerFullName}</PopoverTitle>
-              <div className="min-w-0 flex-1">
-                <h2 className="font-medium text-sm">Correo</h2>
-                <p className="line-clamp-2 text-muted-foreground text-sm">{owner.email}</p>
+              <div className="space-y-2 p-2 pb-0">
+                <PopoverTitle className="text-muted-foreground text-sm">{ownerFullName}</PopoverTitle>
+                <div className="min-w-0 flex-1">
+                  <h2 className="font-medium text-sm">Correo</h2>
+                  <p className="line-clamp-2 text-muted-foreground text-sm">{owner.email}</p>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <h2 className="font-medium text-sm">Teléfono</h2>
+                  <p className="line-clamp-2 text-muted-foreground text-sm">{owner.phone}</p>
+                </div>
               </div>
 
-              <div className="min-w-0 flex-1">
-                <h2 className="font-medium text-sm">Teléfono</h2>
-                <p className="line-clamp-2 text-muted-foreground text-sm">{owner.phone}</p>
-              </div>
-
-              <div className="flex items-center gap-1">
+              <div className="flex w-full items-center gap-1 border-t bg-muted/50 p-2">
                 <PopoverClose
                   render={
-                    <Button className="grow" size="sm" variant="outline">
+                    <Button className="grow rounded-sm" size="sm" variant="outline">
                       Cerrar
                     </Button>
                   }
                 />
 
-                <CopyButton value={owner.id} variant="outline" tooltipText="Copiar ID" />
+                <CopyButton
+                  value={owner.id}
+                  variant="outline"
+                  className="rounded-sm"
+                  tooltipText="Copiar ID"
+                />
               </div>
             </div>
           </PopoverContent>

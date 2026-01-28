@@ -1,8 +1,8 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { AuditLogActionBadge } from '@/components/shared/audit-logs/action-badge'
 import { AuditLogEntityTypeBadge } from '@/components/shared/audit-logs/identity-type-badge'
+import { AuditLogRoleNameBadge } from '@/components/shared/audit-logs/role-name-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
 import { formatDate, normalizeString } from '@/lib/utils'
@@ -51,13 +51,8 @@ export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
     size: 150,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
     cell: ({ row }) => {
-      const roles = row.original.profile?.roles || []
-
-      const roleBadges = roles.map((role) => (
-        <Badge variant="outline" key={role}>
-          <span>{role}</span>
-        </Badge>
-      ))
+      const roles = row.original.profile?.profileRoles?.map(({ role }) => role.name) || []
+      const roleBadges = roles.map((role) => <AuditLogRoleNameBadge roleName={role} key={role} />)
 
       return <>{roleBadges.length > 0 && <div className="flex flex-wrap gap-1">{roleBadges}</div>}</>
     },

@@ -5,8 +5,9 @@ export const Route = createFileRoute('/_authed/admin')({
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
     const profile = await context.queryClient.ensureQueryData(userProfileQueryOptions())
+    const roles = profile?.profileRoles.map((pr) => pr.role.name) || []
 
-    if (!profile?.roles?.includes('admin')) {
+    if (!roles.includes('admin')) {
       throw redirect({ to: '/' })
     }
   },

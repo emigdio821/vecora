@@ -1,7 +1,7 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import { auditLogActionEnum, auditLogEntityTypeEnum, auditLogs } from '../main'
-import type { ProfileResponse } from './profiles'
+import type { ProfileWithRoles } from './profiles'
 import type { SelectUser } from './users'
 
 export const insertAuditLogSchema = createInsertSchema(auditLogs)
@@ -21,5 +21,5 @@ export type AuditLogWithUser = SelectAuditLog & {
 
 export type AuditLogWithUserAndProfile = SelectAuditLog & {
   user: SelectUser | null
-  profile: ProfileResponse | null
+  profile: ProfileWithRoles | null
 }

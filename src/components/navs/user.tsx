@@ -66,12 +66,12 @@ export function NavUser() {
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >
                 <Avatar>
-                  <AvatarFallback>{profile.firstName.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{profile.user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
 
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{profile.firstName}</p>
-                  <p className="truncate text-muted-foreground text-xs">{profile.email}</p>
+                  <p className="truncate font-medium">{profile.user.name.split(' ')[0] ?? ''}</p>
+                  <p className="truncate text-muted-foreground text-xs">{profile.user.email}</p>
                 </div>
                 <IconSelector className="ml-auto size-4" />
               </SidebarMenuButton>
