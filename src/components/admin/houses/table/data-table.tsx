@@ -3,10 +3,10 @@ import { housesListQueryOptions } from '@/api/tanstack-queries/houses'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { housesTableColumns } from './table/columns'
-import { HousesDataTableHeader } from './table/data-table-header'
+import { housesTableColumns } from './columns'
+import { HousesDataTableHeader } from './data-table-header'
 
-export function HousesTabContent() {
+export function HousesDataTable() {
   const { data: houses = [], isLoading, error, refetch } = useQuery(housesListQueryOptions())
 
   if (error) {

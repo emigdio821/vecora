@@ -1,9 +1,9 @@
 import { useQueryState } from 'nuqs'
-import { OwnersTabContent } from '@/components/admin/owners/owners-tab-content'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { HousesTabContent } from './houses/houses-tab-content'
-import { PaymentsTabContent } from './payments/payments-tab-content'
-import { ViolationsTabContent } from './violations/violations-tab-content'
+import { HousesDataTable } from './houses/table/data-table'
+import { OwnersTabDataTable } from './owners/table/data-table'
+import { PaymentsDataTable } from './payments/table/data-table'
+import { ViolationsDataTable } from './violations/table/data-table'
 
 export function AdminResidentialTabs() {
   const [tab, setTab] = useQueryState('tab', {
@@ -20,19 +20,19 @@ export function AdminResidentialTabs() {
       </TabsList>
 
       <TabsContent value="owners" keepMounted>
-        <OwnersTabContent />
+        <OwnersTabDataTable />
       </TabsContent>
 
       <TabsContent value="houses" keepMounted>
-        <HousesTabContent />
+        <HousesDataTable />
       </TabsContent>
 
       <TabsContent value="violations">
-        <ViolationsTabContent />
+        <ViolationsDataTable />
       </TabsContent>
 
       <TabsContent value="payments" keepMounted>
-        <PaymentsTabContent />
+        <PaymentsDataTable />
       </TabsContent>
     </Tabs>
   )

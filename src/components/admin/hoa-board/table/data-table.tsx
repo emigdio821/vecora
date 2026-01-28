@@ -7,7 +7,7 @@
 import { IconBarrierBlock } from '@tabler/icons-react'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 
-export function UsersTabContent() {
+export function HoaBoardDataTable() {
   // const { data: externalUsers = [], isLoading, error, refetch } = useQuery(externalUsersListQueryOptions())
 
   // if (error) {

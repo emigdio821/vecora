@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { AuditLogsTabContent } from '@/components/admin/audit-logs/audit-logs-tab-content'
+import { AuditLogsDataTable } from '@/components/admin/audit-logs/table/data-table'
 import { createSEOTitle } from '@/lib/seo'
 
 export const Route = createFileRoute('/_authed/admin/audit')({
@@ -19,7 +19,7 @@ function RouteComponent() {
         </p>
       </div>
 
-      <AuditLogsTabContent />
+      <AuditLogsDataTable />
     </>
   )
 }

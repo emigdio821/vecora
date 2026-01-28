@@ -1,8 +1,8 @@
 import { useQueryState } from 'nuqs'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ExternalUsersTabContent } from './external-users/external-users-tab-content'
-import { HoaBoardTabContent } from './hoa-board/hoa-board-tab-content'
-import { UsersTabContent } from './users/users-tab-content'
+import { ExternalUsersDataTable } from './external-users/table/data-table'
+import { HoaBoardDataTable } from './hoa-board/table/data-table'
+import { UsersDataTable } from './users/data-table'
 
 export function AdminUsersTabs() {
   const [tab, setTab] = useQueryState('tab', {
@@ -18,15 +18,15 @@ export function AdminUsersTabs() {
       </TabsList>
 
       <TabsContent value="users" keepMounted>
-        <UsersTabContent />
+        <UsersDataTable />
       </TabsContent>
 
       <TabsContent value="external-users" keepMounted>
-        <ExternalUsersTabContent />
+        <ExternalUsersDataTable />
       </TabsContent>
 
       <TabsContent value="hoa-board" keepMounted>
-        <HoaBoardTabContent />
+        <HoaBoardDataTable />
       </TabsContent>
     </Tabs>
   )

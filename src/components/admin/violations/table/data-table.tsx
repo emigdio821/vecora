@@ -3,10 +3,10 @@ import { violationsListQueryOptions } from '@/api/tanstack-queries/violations'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { violationsTableColumns } from './table/columns'
-import { ViolationsDataTableHeader } from './table/data-table-header'
+import { violationsTableColumns } from './columns'
+import { ViolationsDataTableHeader } from './data-table-header'
 
-export function ViolationsTabContent() {
+export function ViolationsDataTable() {
   const { data: violations = [], isLoading, error, refetch } = useQuery(violationsListQueryOptions())
 
   if (error) {

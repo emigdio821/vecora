@@ -3,10 +3,10 @@ import { auditLogsListQueryOptions } from '@/api/tanstack-queries/audit-logs'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { auditLogsTableColumns } from './table/columns'
-import { AuditLogsDataTableHeader } from './table/data-table-header'
+import { auditLogsTableColumns } from './columns'
+import { AuditLogsDataTableHeader } from './data-table-header'
 
-export function AuditLogsTabContent() {
+export function AuditLogsDataTable() {
   const { data: auditLogs = [], isLoading, error, refetch } = useQuery(auditLogsListQueryOptions())
 
   if (error) {

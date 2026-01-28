@@ -3,10 +3,10 @@ import { externalUsersListQueryOptions } from '@/api/tanstack-queries/external-u
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { externalUsersTableColumns } from './table/columns'
-import { ExternalUsersDataTableHeader } from './table/data-table-header'
+import { externalUsersTableColumns } from './columns'
+import { ExternalUsersDataTableHeader } from './data-table-header'
 
-export function ExternalUsersTabContent() {
+export function ExternalUsersDataTable() {
   const { data: externalUsers = [], isLoading, error, refetch } = useQuery(externalUsersListQueryOptions())
 
   if (error) {

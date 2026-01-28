@@ -3,10 +3,10 @@ import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { ownersTableColumns } from './table/columns'
-import { OwnersDataTableHeader } from './table/data-table-header'
+import { ownersTableColumns } from './columns'
+import { OwnersDataTableHeader } from './data-table-header'
 
-export function OwnersTabContent() {
+export function OwnersTabDataTable() {
   const { data: owners = [], isLoading, error, refetch } = useQuery(ownersListQueryOptions())
 
   if (error) {

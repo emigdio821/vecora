@@ -3,10 +3,10 @@ import { paymentsListQueryOptions } from '@/api/tanstack-queries/payments'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
-import { paymentsTableColumns } from './table/columns'
-import { PaymentsDataTableHeader } from './table/data-table-header'
+import { paymentsTableColumns } from './columns'
+import { PaymentsDataTableHeader } from './data-table-header'
 
-export function PaymentsTabContent() {
+export function PaymentsDataTable() {
   const { data: payments = [], isLoading, error, refetch } = useQuery(paymentsListQueryOptions())
 
   if (error) {
