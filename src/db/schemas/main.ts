@@ -118,6 +118,10 @@ export const profiles = pgTable(
     ownerId: uuid('owner_id').references(() => owners.id, { onDelete: 'cascade' }),
     externalUserId: uuid('external_user_id').references(() => externalUsers.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (table) => [
     index('profiles_userId_idx').on(table.userId),

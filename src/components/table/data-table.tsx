@@ -13,7 +13,15 @@ import {
 import { parseAsIndex, parseAsInteger, useQueryStates } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { DataTablePagination, DEFAULT_TABLE_PAGE_SIZE } from '@/components/table/pagination'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Frame, FrameFooter, FrameHeader } from '../ui/frame'
 
 interface DataTableProps<TData, TValue> {
@@ -21,11 +29,12 @@ interface DataTableProps<TData, TValue> {
   tableId?: string
   columns: ColumnDef<TData, TValue>[]
   header?: (table: TableType<TData>) => React.ReactNode
+  caption?: React.ReactNode
   pageSize?: number
 }
 
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
-  const { data, tableId, header, columns, pageSize: tablePageSize = DEFAULT_TABLE_PAGE_SIZE } = props
+  const { data, tableId, header, caption, columns, pageSize: tablePageSize = DEFAULT_TABLE_PAGE_SIZE } = props
   const paginationUrlKeys = {
     pageIndex: tableId ? `${tableId}-page` : 'page',
     pageSize: tableId ? `${tableId}-perPage` : 'perPage',
@@ -91,6 +100,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
       {header && <FrameHeader className="p-2">{header(table)}</FrameHeader>}
 
       <Table>
+        {caption && <TableCaption>{caption}</TableCaption>}
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>

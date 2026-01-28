@@ -1,10 +1,10 @@
 import { Badge } from '@/components/ui/badge'
 
-interface AuditLogRoleNameBadgeProps {
+interface RoleNameBadgeProps {
   roleName: string
 }
 
-export function AuditLogRoleNameBadge({ roleName }: AuditLogRoleNameBadgeProps) {
+export function RoleNameBadge({ roleName }: RoleNameBadgeProps) {
   function getRoleLabel() {
     switch (roleName) {
       case 'admin':
@@ -23,7 +23,7 @@ export function AuditLogRoleNameBadge({ roleName }: AuditLogRoleNameBadgeProps) 
   }
 
   return (
-    <Badge variant="outline" key={roleName}>
+    <Badge variant="outline">
       <span>{getRoleLabel()}</span>
     </Badge>
   )

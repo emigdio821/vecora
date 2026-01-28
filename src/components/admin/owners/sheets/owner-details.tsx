@@ -237,8 +237,6 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                                 {isPaymentPaid ? 'Pagada' : 'Pendiente'}
                               </Badge>
                               <h2 className="font-medium text-sm">{`$${Number(payment.amount).toFixed(2)}`}</h2>
-                              {/* TODO: Improve the month display */}
-                              {/* <p className="text-muted-foreground text-sm">{payment.mon}</p> */}
                               <p className="text-muted-foreground text-xs">{paymentLabel}</p>
                             </div>
 

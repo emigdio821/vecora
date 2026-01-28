@@ -10,6 +10,9 @@ const buttonVariants = cva(
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         outline:
           'border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
+        warning:
+          'bg-warning/10 text-warning-foreground hover:bg-warning/20 focus-visible:border-warning/40 focus-visible:ring-warning/20 dark:bg-warning/20 dark:focus-visible:ring-warning/40 dark:hover:bg-warning/30',
+        info: 'bg-info/10 text-info-foreground hover:bg-info/20 focus-visible:border-info/40 focus-visible:ring-info/20 dark:bg-info/20 dark:focus-visible:ring-info/40 dark:hover:bg-info/30',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
         ghost: 'hover:bg-accent hover:text-foreground aria-expanded:bg-accent aria-expanded:text-foreground',
