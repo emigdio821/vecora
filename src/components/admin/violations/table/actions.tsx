@@ -3,17 +3,7 @@ import { useState } from 'react'
 import { deleteViolation } from '@/api/server-functions/violations'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
-import { LoaderIcon } from '@/components/icons'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -58,32 +48,22 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
 
   return (
     <>
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar infracción?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Estás por eliminar la infracción <strong>{violation.concept}</strong>. Esta acción no se puede
-              deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              render={<Button variant="outline" disabled={deleteViolationMutation.isPending} />}
-            >
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDeleteViolation}
-              disabled={deleteViolationMutation.isPending}
-            >
-              Eliminar
-              {deleteViolationMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AlertDialogGeneric
+        state={{
+          isOpen: isDeleteDialogOpen,
+          onOpenChange: setDeleteDialogOpen,
+        }}
+        action={handleDeleteViolation}
+        variant="destructive"
+        actionLabel="Eliminar"
+        title="¿Eliminar infracción?"
+        description={
+          <p>
+            Estás por eliminar la infracción <strong>{violation.concept}</strong>. Esta acción no se puede
+            deshacer.
+          </p>
+        }
+      />
 
       <ViolationDetailsSheet
         violation={violation}

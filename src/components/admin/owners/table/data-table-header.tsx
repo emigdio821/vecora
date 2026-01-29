@@ -5,17 +5,7 @@ import { useEffect, useState } from 'react'
 import { deleteOwner } from '@/api/server-functions/owners'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
-import { LoaderIcon } from '@/components/icons'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
@@ -60,38 +50,26 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
 
   return (
     <>
-      <CreateOwnerSheet state={{ isOpen: openCreateOwnerDialog, onOpenChange: setOpenCreateOwnerDialog }} />
+      <AlertDialogGeneric
+        state={{
+          isOpen: isDeleteDialogOpen,
+          onOpenChange: setDeleteDialogOpen,
+        }}
+        action={handleBatchDelete}
+        variant="destructive"
+        actionLabel="Eliminar"
+        title="¿Eliminar propietarios?"
+        description={
+          <div>
+            <p>
+              Propietarios seleccionados: <strong>{selectedRowsLength}</strong>.
+            </p>
+            <p>Esta acción no se puede deshacer.</p>
+          </div>
+        }
+      />
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar propietarios?</AlertDialogTitle>
-            <AlertDialogDescription
-              render={
-                <div>
-                  <p>
-                    Propietarios seleccionados: <strong>{selectedRowsLength}</strong>.
-                  </p>
-                  <p>Esta acción no se puede deshacer.</p>
-                </div>
-              }
-            />
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleBatchDelete}
-              disabled={bulkDeleteMutation.isPending}
-            >
-              Eliminar
-              {bulkDeleteMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CreateOwnerSheet state={{ isOpen: openCreateOwnerDialog, onOpenChange: setOpenCreateOwnerDialog }} />
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full bg-background sm:w-sm">

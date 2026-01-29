@@ -3,17 +3,7 @@ import { useState } from 'react'
 import { deletePayment } from '@/api/server-functions/payments'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
-import { LoaderIcon } from '@/components/icons'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -59,31 +49,17 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
 
   return (
     <>
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar pago?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Estás por eliminar este pago. Esta acción no se puede deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              render={<Button variant="outline" disabled={deletePaymentMutation.isPending} />}
-            >
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDeletePayment}
-              disabled={deletePaymentMutation.isPending}
-            >
-              Eliminar
-              {deletePaymentMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AlertDialogGeneric
+        state={{
+          isOpen: isDeleteDialogOpen,
+          onOpenChange: setDeleteDialogOpen,
+        }}
+        action={handleDeletePayment}
+        variant="destructive"
+        actionLabel="Eliminar"
+        title="¿Eliminar pago?"
+        description={<p>Estás por eliminar este pago. Esta acción no se puede deshacer.</p>}
+      />
 
       <PaymentDetailsSheet
         payment={payment}

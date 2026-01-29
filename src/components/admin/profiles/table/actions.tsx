@@ -49,7 +49,6 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
 
   return (
     <>
-      {/* TODO: Use this generic dialog in all places */}
       <AlertDialogGeneric
         variant="destructive"
         actionLabel="Eliminar"

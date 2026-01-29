@@ -5,17 +5,7 @@ import { useEffect, useState } from 'react'
 import { deleteExternalUser } from '@/api/server-functions/external-users'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { EXTERNAL_USERS_QUERY_KEY } from '@/api/tanstack-queries/external-users'
-import { LoaderIcon } from '@/components/icons'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
@@ -60,40 +50,28 @@ export function ExternalUsersDataTableHeader({ table }: ExternalUsersDataTableHe
 
   return (
     <>
+      <AlertDialogGeneric
+        state={{
+          isOpen: isDeleteDialogOpen,
+          onOpenChange: setDeleteDialogOpen,
+        }}
+        action={handleBatchDelete}
+        variant="destructive"
+        actionLabel="Eliminar"
+        title="¿Eliminar usuarios externos?"
+        description={
+          <div>
+            <p>
+              Usuarios externos seleccionados: <strong>{selectedRowsLength}</strong>.
+            </p>
+            <p>Esta acción no se puede deshacer.</p>
+          </div>
+        }
+      />
+
       <CreateExternalUserSheet
         state={{ isOpen: openCreateExternalUserDialog, onOpenChange: setOpenCreateExternalUserDialog }}
       />
-
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar usuarios externos?</AlertDialogTitle>
-            <AlertDialogDescription
-              render={
-                <div>
-                  <p>
-                    Usuarios externos seleccionados: <strong>{selectedRowsLength}</strong>.
-                  </p>
-                  <p>Esta acción no se puede deshacer.</p>
-                </div>
-              }
-            />
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel render={<Button variant="outline" disabled={bulkDeleteMutation.isPending} />}>
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleBatchDelete}
-              disabled={bulkDeleteMutation.isPending}
-            >
-              Eliminar
-              {bulkDeleteMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full bg-background sm:w-sm">

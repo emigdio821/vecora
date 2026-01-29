@@ -3,17 +3,7 @@ import { useState } from 'react'
 import { deleteExternalUser } from '@/api/server-functions/external-users'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { EXTERNAL_USERS_QUERY_KEY } from '@/api/tanstack-queries/external-users'
-import { LoaderIcon } from '@/components/icons'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -59,31 +49,21 @@ export function ExternalUsersTableActions({ externalUser }: ActionsProps) {
 
   return (
     <>
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar usuario externo?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Estás por eliminar a <strong>{externalUserFullName}</strong>. Esta acción no se puede deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              render={<Button variant="outline" disabled={deleteExternalUserMutation.isPending} />}
-            >
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDeleteExternalUser}
-              disabled={deleteExternalUserMutation.isPending}
-            >
-              Eliminar
-              {deleteExternalUserMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AlertDialogGeneric
+        state={{
+          isOpen: isDeleteDialogOpen,
+          onOpenChange: setDeleteDialogOpen,
+        }}
+        action={handleDeleteExternalUser}
+        variant="destructive"
+        actionLabel="Eliminar"
+        title="¿Eliminar usuario externo?"
+        description={
+          <span>
+            Estás por eliminar a <strong>{externalUserFullName}</strong>. Esta acción no se puede deshacer.
+          </span>
+        }
+      />
 
       <ExternalUserDetailsSheet
         externalUser={externalUser}

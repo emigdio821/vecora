@@ -3,17 +3,7 @@ import { useState } from 'react'
 import { deleteHouse } from '@/api/server-functions/houses'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
-import { LoaderIcon } from '@/components/icons'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -58,30 +48,21 @@ export function HousesTableActions({ house }: ActionsProps) {
 
   return (
     <>
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar casa?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Estás por eliminar la casa <strong>{house.houseNumber}</strong>. Esta acción no se puede
-              deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel render={<Button variant="outline" disabled={deleteHouseMutation.isPending} />}>
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDeleteHouse}
-              disabled={deleteHouseMutation.isPending}
-            >
-              Eliminar
-              {deleteHouseMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AlertDialogGeneric
+        state={{
+          isOpen: isDeleteDialogOpen,
+          onOpenChange: setDeleteDialogOpen,
+        }}
+        action={handleDeleteHouse}
+        variant="destructive"
+        actionLabel="Eliminar"
+        title="¿Eliminar casa?"
+        description={
+          <div>
+            Estás por eliminar la casa <strong>{house.houseNumber}</strong>. Esta acción no se puede deshacer.
+          </div>
+        }
+      />
 
       <HouseDetailsSheet
         house={house}

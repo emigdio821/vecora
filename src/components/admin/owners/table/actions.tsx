@@ -3,17 +3,7 @@ import { useState } from 'react'
 import { deleteOwner } from '@/api/server-functions/owners'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
-import { LoaderIcon } from '@/components/icons'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -59,29 +49,21 @@ export function OwnersTableActions({ owner }: ActionsProps) {
 
   return (
     <>
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar propietario?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Estás por eliminar a <strong>{ownerFullName}</strong>. Esta acción no se puede deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel render={<Button variant="outline" disabled={deleteOwnerMutation.isPending} />}>
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDeleteOwner}
-              disabled={deleteOwnerMutation.isPending}
-            >
-              Eliminar
-              {deleteOwnerMutation.isPending && <LoaderIcon />}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <AlertDialogGeneric
+        state={{
+          isOpen: isDeleteDialogOpen,
+          onOpenChange: setDeleteDialogOpen,
+        }}
+        action={handleDeleteOwner}
+        variant="destructive"
+        actionLabel="Eliminar"
+        title="¿Eliminar propietario?"
+        description={
+          <p>
+            Estás por eliminar a <strong>{ownerFullName}</strong>. Esta acción no se puede deshacer.
+          </p>
+        }
+      />
 
       <OwnerDetailsSheet
         owner={owner}
