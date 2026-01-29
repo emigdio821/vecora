@@ -5,6 +5,7 @@ import { ProfileStatusBadge } from '@/components/shared/users/profile-status-bad
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
+import { normalizeString } from '@/lib/utils'
 import { ProfilesTableActions } from './actions'
 
 export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
@@ -32,9 +33,19 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
     ),
   },
   {
+    id: 'user-name',
     accessorKey: 'user.name',
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
     size: 200,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
+    filterFn: (row, _, value: string) => {
+      const user = row.original.user
+      const userName = user?.name || ''
+
+      const normalizeUserFullName = normalizeString(userName).toLowerCase()
+      const normalizedValue = normalizeString(value).toLowerCase()
+
+      return normalizeUserFullName.includes(normalizedValue) || false
+    },
   },
   {
     accessorKey: 'profileType',

@@ -4,6 +4,7 @@ import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/table/data-table'
 import { profilesTableColumns } from './columns'
+import { ProfilesDataTableHeader } from './data-table-header'
 
 export function ProfilesDataTable() {
   const { data: profiles = [], isLoading, error, refetch } = useQuery(profilesListQueryOptions())
@@ -21,10 +22,10 @@ export function ProfilesDataTable() {
       data={profiles}
       tableId="profiles"
       columns={profilesTableColumns}
+      header={(table) => <ProfilesDataTableHeader table={table} />}
       caption={`Estos perfiles representan a los usuarios registrados en el sistema.
         Puedes vincular un perfil aun propietario o un usuario externo.
       `}
-      // header={(table) => <ExternalUsersDataTableHeader table={table} />}
     />
   )
 }
