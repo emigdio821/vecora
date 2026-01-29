@@ -1,5 +1,8 @@
 import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash, IconUserOff } from '@tabler/icons-react'
 import { useState } from 'react'
+import { deleteProfile } from '@/api/server-functions/profiles'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
+import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,14 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-// import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
 import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
-
-// import { useEntityMutation } from '@/hooks/use-entity-mutation'
-// import type { DeletePaymentData } from '@/schemas/payments'
-
-// import { EditPaymentSheet } from '../sheets/edit-payment'
-// import { PaymentDetailsSheet } from '../sheets/payment-details'
+import { useEntityMutation } from '@/hooks/use-entity-mutation'
+import type { DeleteProfileData } from '@/schemas/profiles'
+import { EditProfileSheet } from '../sheets/edit-profile'
 
 interface ActionsProps {
   profile: ProfileWithAllRelations
@@ -27,25 +26,24 @@ interface ActionsProps {
 export function ProfilesTableActions({ profile }: ActionsProps) {
   const [isDeactivateDialogOpen, setDeactivateDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  // const [isPaymentDetailsSheetOpen, setPaymentDetailsSheetOpen] = useState(false)
-  // const [isEditPaymentSheetOpen, setEditPaymentSheetOpen] = useState(false)
+  const [isEditProfileSheetOpen, setEditProfileSheetOpen] = useState(false)
 
-  // const deletePaymentMutation = useEntityMutation({
-  //   mutationFn: async (data: DeletePaymentData) => {
-  //     return await deletePayment({ data })
-  //   },
-  //   invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
-  //   successTitle: 'Pago eliminado',
-  //   successDescription: 'El pago ha sido eliminado exitosamente.',
-  //   errorDescription: 'Ocurrió un error al eliminar el pago, intenta nuevamente.',
-  //   onSuccess: () => {
-  //     setDeleteDialogOpen(false)
-  //   },
-  // })
+  const deleteProfileMutation = useEntityMutation({
+    mutationFn: async (data: DeleteProfileData) => {
+      return await deleteProfile({ data })
+    },
+    invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    successTitle: 'Perfil eliminado',
+    successDescription: 'El perfil ha sido eliminado exitosamente.',
+    errorDescription: 'Ocurrió un error al eliminar el perfil, intenta nuevamente.',
+    onSuccess: () => {
+      setDeleteDialogOpen(false)
+    },
+  })
 
-  // function handleDeletePayment() {
-  //   // deletePaymentMutation.mutate({ paymentId: payment.id })
-  // }
+  function handleDeleteProfile() {
+    deleteProfileMutation.mutate({ profileId: profile.id })
+  }
 
   return (
     <>
@@ -54,7 +52,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
         actionLabel="Eliminar"
         title="¿Eliminar perfil?"
         description="Se eliminará de manera permanentemente. Esta acción no se puede deshacer."
-        // onAction={handleDeletePayment}
+        action={handleDeleteProfile}
         state={{ isOpen: isDeleteDialogOpen, onOpenChange: setDeleteDialogOpen }}
       />
 
@@ -63,19 +61,14 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
         actionLabel="Desactivar"
         title="¿Desactivar perfil?"
         description="El perfil será desactivado y el usuario no podrá acceder a su cuenta. Esta acción puede ser revertida."
-        // onAction={handleDeactivateProfile}
+        // action={handleDeactivateProfile}
         state={{ isOpen: isDeactivateDialogOpen, onOpenChange: setDeactivateDialogOpen }}
       />
 
-      {/* <PaymentDetailsSheet
-        payment={payment}
-        state={{ isOpen: isPaymentDetailsSheetOpen, onOpenChange: setPaymentDetailsSheetOpen }}
+      <EditProfileSheet
+        profile={profile}
+        state={{ isOpen: isEditProfileSheetOpen, onOpenChange: setEditProfileSheetOpen }}
       />
-
-      <EditPaymentSheet
-        payment={payment}
-        state={{ isOpen: isEditPaymentSheetOpen, onOpenChange: setEditPaymentSheetOpen }}
-      /> */}
 
       <div className="flex">
         <DropdownMenu>
@@ -97,7 +90,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
                 Información
               </DropdownMenuItem>
 
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setEditProfileSheetOpen(true)}>
                 <IconEdit className="size-4" />
                 Editar
               </DropdownMenuItem>

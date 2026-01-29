@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '../ui/skeleton'
 
-interface HouseSelectorProps extends React.ComponentProps<typeof Select> {
+interface OwnersSelectorProps extends React.ComponentProps<typeof Select> {
   disabled?: boolean
   invalid?: boolean
   placeholder?: string
@@ -27,17 +27,16 @@ export function OwnersSelector({
   noneOptionLabel = 'Sin selección',
   value,
   ...selectProps
-}: HouseSelectorProps) {
+}: OwnersSelectorProps) {
   const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
 
   function renderOwnerValue(value: string | null) {
+    if (isLoadingOwners) return <Skeleton className="h-2 w-1/3" />
     if (owners.length === 0) return 'No hay propietarios disponibles'
 
     const owner = owners.find((owner) => owner.id === value)
     return owner ? `${owner.firstName} ${owner.lastName}` : 'Selecciona una opción'
   }
-
-  if (isLoadingOwners) return <Skeleton className="h-8 w-full rounded-lg" />
 
   return (
     <Select value={value} disabled={owners.length === 0 || disabled} {...selectProps}>

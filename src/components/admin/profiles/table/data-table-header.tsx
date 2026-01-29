@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
+import { CreateProfileSheet } from '../sheets/create-profile'
 
 interface ProfilesDataTableHeaderProps {
   table: Table<ProfileWithAllRelations>
@@ -27,6 +28,9 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
 
   return (
     <>
+      <CreateProfileSheet
+        state={{ isOpen: openCreateProfileDialog, onOpenChange: setOpenCreateProfileDialog }}
+      />
       <AlertDialogGeneric
         variant="warning"
         state={{
