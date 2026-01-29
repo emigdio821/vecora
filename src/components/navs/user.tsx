@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { authClient } from '@/lib/auth-client'
 import { logger } from '@/lib/logger'
-import { Avatar, AvatarFallback } from '../ui/avatar'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar'
 import { Skeleton } from '../ui/skeleton'
 
@@ -65,10 +64,6 @@ export function NavUser() {
                 size="lg"
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >
-                <Avatar>
-                  <AvatarFallback>{profile.user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{profile.user.name.split(' ')[0] ?? ''}</p>
                   <p className="truncate text-muted-foreground text-xs">{profile.user.email}</p>
