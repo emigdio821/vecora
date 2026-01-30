@@ -14,4 +14,5 @@ export const profileRolesListQueryOptions = () =>
   queryOptions({
     queryKey: [ROLES_QUERY_KEY],
     queryFn: async () => await getRolesList(),
+    staleTime: Number.POSITIVE_INFINITY,
   })

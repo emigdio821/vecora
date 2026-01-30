@@ -7,4 +7,5 @@ export const externalUsersListQueryOptions = () =>
   queryOptions({
     queryKey: [EXTERNAL_USERS_QUERY_KEY],
     queryFn: async () => await getExternalUsers(),
+    staleTime: Number.POSITIVE_INFINITY,
   })

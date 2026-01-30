@@ -12,7 +12,6 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Skeleton } from '../../ui/skeleton'
 
 interface OwnersSelectorProps {
   id?: string
@@ -49,7 +48,8 @@ export function ExternalUsersSelector({
   }, [externalUsers])
 
   function renderExternalUserValue(value?: string | null) {
-    if (isLoadingExternalUsers) return <Skeleton className="h-2 w-1/3" />
+    if (isLoadingExternalUsers) return <span className="animate-pulse">Cargando datos...</span>
+
     if (externalUsers.length === 0) {
       return <span className="text-muted-foreground">No hay usuarios externos disponibles</span>
     }
@@ -99,17 +99,18 @@ export function ExternalUsersSelector({
                 </CommandItem>
               )}
 
-              {items.map((owner) => (
+              {items.map((item) => (
                 <CommandItem
-                  key={owner.value}
-                  value={owner.value}
-                  data-checked={value === owner.value}
+                  key={item.value}
+                  value={item.value}
+                  keywords={[item.label]}
+                  data-checked={value === item.value}
                   onSelect={(currentValue) => {
                     setOpen(false)
                     onValueChange?.(currentValue)
                   }}
                 >
-                  {owner.label}
+                  {item.label}
                 </CommandItem>
               ))}
             </CommandGroup>

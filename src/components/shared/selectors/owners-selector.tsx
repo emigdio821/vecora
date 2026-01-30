@@ -12,7 +12,6 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Skeleton } from '../../ui/skeleton'
 
 interface OwnersSelectorProps {
   id?: string
@@ -48,7 +47,8 @@ export function OwnersSelector({
   }, [owners])
 
   function renderOwnerValue(value?: string | null) {
-    if (isLoadingOwners) return <Skeleton className="h-2 w-1/3" />
+    if (isLoadingOwners) return <span className="animate-pulse">Cargando datos...</span>
+
     if (owners.length === 0) {
       return <span className="text-muted-foreground">No hay propietarios disponibles</span>
     }
@@ -103,6 +103,7 @@ export function OwnersSelector({
                   key={owner.value}
                   value={owner.value}
                   data-checked={value === owner.value}
+                  keywords={[owner.label]}
                   onSelect={(currentValue) => {
                     setOpen(false)
                     onValueChange?.(currentValue)

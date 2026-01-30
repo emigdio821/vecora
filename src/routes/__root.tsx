@@ -3,7 +3,7 @@ import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanst
 import { Providers } from '@/components/providers'
 import { DefaultErrorBoundary } from '@/components/shared/errors/default-boundary'
 import { NotFound } from '@/components/shared/errors/not-found'
-// import { TSDevtools } from '@/components/tanstack/devtools'
+import { TSDevtools } from '@/components/tanstack/devtools'
 import { LINK_ICONS } from '@/config/site'
 import { createSEOMeta } from '@/lib/seo'
 import appCss from '@/styles/app.css?url'
@@ -52,7 +52,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Providers>
           <main className="isolate flex min-h-dvh flex-col antialiased">{children}</main>
         </Providers>
-        {/* <TSDevtools /> */}
+        <TSDevtools />
         <Scripts />
       </body>
     </html>

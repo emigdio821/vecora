@@ -30,5 +30,5 @@ export function AvailableHousesSelector({
 
   if (isLoadingAvailableHouses) return <Skeleton className="h-8 w-full rounded-lg" />
 
-  return <ComboboxMultiSelect items={items} {...comboboxProps} />
+  return <ComboboxMultiSelect isLoading={isLoadingAvailableHouses} items={items} {...comboboxProps} />
 }

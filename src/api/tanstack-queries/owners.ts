@@ -7,4 +7,5 @@ export const ownersListQueryOptions = () =>
   queryOptions({
     queryKey: [OWNERS_QUERY_KEY],
     queryFn: async () => await getOwners(),
+    staleTime: Number.POSITIVE_INFINITY,
   })

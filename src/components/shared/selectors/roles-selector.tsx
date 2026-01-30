@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
 
 interface RolesSelectorProps extends React.ComponentProps<typeof Select> {
   disabled?: boolean
@@ -47,7 +46,8 @@ export function RolesSelector({
   }
 
   function renderRoleValue(value: string | null) {
-    if (isLoadingRoles) return <Skeleton className="h-2 w-1/3" />
+    if (isLoadingRoles) return <span className="animate-pulse">Cargando datos...</span>
+
     if (roles.length === 0) return 'No hay roles disponibles'
 
     const role = roles.find((role) => role.id === value)

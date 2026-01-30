@@ -22,6 +22,7 @@ export interface ComboboxMultiSelectProps {
   value?: string[]
   invalid?: boolean
   disabled?: boolean
+  isLoading?: boolean
   placeholder?: string
   noneOptionLabel?: string
   includeNoneOption?: boolean
@@ -33,6 +34,7 @@ export function ComboboxMultiSelect({
   id,
   value,
   items,
+  isLoading,
   onValueChange,
   invalid = false,
   disabled = false,
@@ -48,6 +50,29 @@ export function ComboboxMultiSelect({
     onValueChange(newValues)
   }
 
+  function renderValue() {
+    if (isLoading) return <span className="animate-pulse">Cargando datos...</span>
+
+    if (selectedValues.length > 0) {
+      return (
+        <span className="truncate">
+          {selectedValues.map((value) => {
+            const item = items.find((i) => i.value === value)
+            if (!item) return null
+
+            return (
+              <Badge key={value} variant="outline" className="me-1">
+                {item.label}
+              </Badge>
+            )
+          })}
+        </span>
+      )
+    }
+
+    return <span className="text-muted-foreground">{placeholder}</span>
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
@@ -57,25 +82,11 @@ export function ComboboxMultiSelect({
             role="combobox"
             variant="outline"
             aria-invalid={invalid}
-            disabled={items.length === 0 || disabled}
             aria-label="Combobox de usuarios externos"
             className="w-full justify-between font-normal"
+            disabled={items.length === 0 || isLoading || disabled}
           >
-            {selectedValues.length > 0 ? (
-              <span className="truncate">
-                {selectedValues.map((value) => {
-                  const framework = items.find((fw) => fw.value === value)
-                  if (!framework) return null
-                  return (
-                    <Badge key={value} variant="outline" className="me-1">
-                      {framework.label}
-                    </Badge>
-                  )
-                })}
-              </span>
-            ) : (
-              <span className="text-muted-foreground">{placeholder}</span>
-            )}
+            {renderValue()}
             <IconSelector className="shrink-0 text-muted-foreground/80" aria-hidden="true" />
           </Button>
         }
@@ -90,6 +101,7 @@ export function ComboboxMultiSelect({
                 <CommandItem
                   key={item.value}
                   value={item.value}
+                  keywords={[item.label]}
                   onSelect={() => toggleSelection(item.value)}
                   data-checked={selectedValues.includes(item.value)}
                 >
