@@ -269,42 +269,6 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
                     disabled={updateProfileMutation.isPending}
                     onValueChange={(value) => field.onChange([value])}
                   />
-                  {/* <Combobox
-                    multiple
-                    items={roleItems}
-                    disabled={updateProfileMutation.isPending}
-                    value={roleItems.filter((item) => field.value.includes(item.value))}
-                    onValueChange={(selectedItems: { label: string; value: string }[]) => {
-                      field.onChange(selectedItems.map((item) => item.value))
-                    }}
-                  >
-                    <ComboboxChips ref={anchor} className="w-full">
-                      <ComboboxValue>
-                        {(values: { label: string; value: string }[]) => (
-                          <>
-                            {values.map((value) => (
-                              <ComboboxChip key={value.value}>{value.label}</ComboboxChip>
-                            ))}
-                            <ComboboxChipsInput
-                              id={field.name}
-                              aria-invalid={fieldState.invalid}
-                              placeholder={field.value.length > 0 ? undefined : 'Selecciona roles'}
-                            />
-                          </>
-                        )}
-                      </ComboboxValue>
-                    </ComboboxChips>
-                    <ComboboxContent anchor={anchor}>
-                      <ComboboxEmpty>No se encontraron roles.</ComboboxEmpty>
-                      <ComboboxList>
-                        {(item: { label: string; value: string }) => (
-                          <ComboboxItem key={item.value} value={item}>
-                            {item.label}
-                          </ComboboxItem>
-                        )}
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox> */}
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}

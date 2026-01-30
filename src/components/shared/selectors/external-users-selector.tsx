@@ -1,56 +1,121 @@
+import { IconSelector } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 import { externalUsersListQueryOptions } from '@/api/tanstack-queries/external-users'
+import { Button } from '@/components/ui/button'
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Skeleton } from '../../ui/skeleton'
 
-interface ExternalUsersSelectorProps extends React.ComponentProps<typeof Select> {
+interface OwnersSelectorProps {
+  id?: string
+  value?: string | null
   invalid?: boolean
+  disabled?: boolean
   placeholder?: string
-  includeNoneOption?: boolean
   noneOptionLabel?: string
+  includeNoneOption?: boolean
+  onValueChange?: (value: string | null) => void
 }
 
 export function ExternalUsersSelector({
-  disabled = false,
+  id,
+  value,
+  onValueChange,
   invalid = false,
+  disabled = false,
   placeholder = 'Selecciona una opción',
   includeNoneOption = true,
   noneOptionLabel = 'Sin selección',
-  ...selectProps
-}: ExternalUsersSelectorProps) {
+}: OwnersSelectorProps) {
+  const [open, setOpen] = useState(false)
   const { data: externalUsers = [], isLoading: isLoadingExternalUsers } = useQuery(
     externalUsersListQueryOptions(),
   )
-  function renderOwnerValue(value: string | null) {
-    if (isLoadingExternalUsers) return <Skeleton className="h-2 w-1/3" />
-    if (externalUsers.length === 0) return 'No hay usuarios externos disponibles'
+  const items = useMemo(() => {
+    const externalUsersItems = externalUsers.map((externalUser) => ({
+      value: externalUser.id,
+      label: `${externalUser.firstName} ${externalUser.lastName}`,
+    }))
 
-    const externalUser = externalUsers.find((user) => user.id === value)
-    return externalUser ? `${externalUser.firstName} ${externalUser.lastName}` : 'Selecciona una opción'
+    return externalUsersItems
+  }, [externalUsers])
+
+  function renderExternalUserValue(value?: string | null) {
+    if (isLoadingExternalUsers) return <Skeleton className="h-2 w-1/3" />
+    if (externalUsers.length === 0) {
+      return <span className="text-muted-foreground">No hay usuarios externos disponibles</span>
+    }
+
+    const externalUser = externalUsers.find((externalUser) => externalUser.id === value)
+    return externalUser ? (
+      `${externalUser.firstName} ${externalUser.lastName}`
+    ) : (
+      <span className="text-muted-foreground">{placeholder}</span>
+    )
   }
 
   return (
-    <Select disabled={externalUsers.length === 0 || disabled} {...selectProps}>
-      <SelectTrigger aria-invalid={invalid} className="w-full">
-        <SelectValue>{renderOwnerValue}</SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          {includeNoneOption && <SelectItem value={null}>{noneOptionLabel}</SelectItem>}
-          {externalUsers.map((externalUser) => (
-            <SelectItem key={externalUser.id} value={externalUser.id}>
-              <span>{`${externalUser.firstName} ${externalUser.lastName}`}</span>
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        render={
+          <Button
+            id={id}
+            role="combobox"
+            variant="outline"
+            aria-invalid={invalid}
+            aria-label="Combobox de usuarios externos"
+            disabled={externalUsers.length === 0 || disabled}
+            className="w-full justify-between font-normal"
+          >
+            {renderExternalUserValue(value)}
+            <IconSelector className="-me-1 text-muted-foreground" />
+          </Button>
+        }
+      />
+      <PopoverContent className="w-(--anchor-width) p-0">
+        <Command>
+          {items.length > 10 && <CommandInput placeholder="Buscar" />}
+          <CommandList>
+            <CommandEmpty>Sin resultados.</CommandEmpty>
+            <CommandGroup>
+              {includeNoneOption && (
+                <CommandItem
+                  value={undefined}
+                  data-checked={!value}
+                  onSelect={() => {
+                    setOpen(false)
+                    onValueChange?.(null)
+                  }}
+                >
+                  {noneOptionLabel}
+                </CommandItem>
+              )}
+
+              {items.map((owner) => (
+                <CommandItem
+                  key={owner.value}
+                  value={owner.value}
+                  data-checked={value === owner.value}
+                  onSelect={(currentValue) => {
+                    setOpen(false)
+                    onValueChange?.(currentValue)
+                  }}
+                >
+                  {owner.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

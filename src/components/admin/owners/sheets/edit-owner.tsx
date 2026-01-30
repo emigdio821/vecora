@@ -7,7 +7,7 @@ import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { AVAILABLE_HOUSES_QUERY_KEY, HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { LoaderIcon } from '@/components/icons'
-import { AvailableHousesSelector } from '@/components/shared/available-houses-selector'
+import { AvailableHousesSelector } from '@/components/shared/selectors/available-houses-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 

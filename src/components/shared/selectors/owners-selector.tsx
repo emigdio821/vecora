@@ -12,7 +12,7 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Skeleton } from '../ui/skeleton'
+import { Skeleton } from '../../ui/skeleton'
 
 interface OwnersSelectorProps {
   id?: string
@@ -81,7 +81,7 @@ export function OwnersSelector({
       />
       <PopoverContent className="w-(--anchor-width) p-0">
         <Command>
-          <CommandInput placeholder="Buscar" />
+          {items.length > 10 && <CommandInput placeholder="Buscar" />}
           <CommandList>
             <CommandEmpty>Sin resultados.</CommandEmpty>
             <CommandGroup>

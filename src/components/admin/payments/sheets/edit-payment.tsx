@@ -5,7 +5,7 @@ import { updatePayment } from '@/api/server-functions/payments'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
 import { LoaderIcon } from '@/components/icons'
-import { OwnersSelector } from '@/components/shared/owners-selector'
+import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 

@@ -78,7 +78,7 @@ export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
       if (value.length === 0) return true
 
       const rowYear = new Date(row.original.timestamp).getFullYear()
-      return value.some((option) => option.value === rowYear)
+      return value.some((option) => option.value === rowYear.toString())
     },
   },
 ]

@@ -4,17 +4,15 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-  ComboboxValue,
-} from '@/components/ui/combobox'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
@@ -26,14 +24,14 @@ interface AuditLogsDataTableHeaderProps {
 
 export interface YearFacetedFilterOption {
   label: string
-  value: number
+  value: string
 }
 
 const currentYear = new Date().getFullYear()
 const facetedFilterYears: YearFacetedFilterOption[] = Array.from(
   { length: currentYear - STARTING_YEAR + 1 },
   (_, i) => ({
-    value: STARTING_YEAR + i,
+    value: (STARTING_YEAR + i).toString(),
     label: (STARTING_YEAR + i).toString(),
   }),
 )
@@ -54,14 +52,14 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
         <Separator orientation="vertical" />
         {value.length < 3 ? (
           value
-            .sort((a, b) => a.value - b.value)
+            .sort((a, b) => a.value.localeCompare(b.value))
             .map((option) => (
-              <Badge variant="secondary" key={option.value}>
+              <Badge variant="outline" key={option.value}>
                 {option.label}
               </Badge>
             ))
         ) : (
-          <Badge variant="secondary">{value.length} seleccionados</Badge>
+          <Badge variant="outline">{value.length} seleccionados</Badge>
         )}
       </>
     )
@@ -117,29 +115,25 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
           {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}
         </Button>
 
-        <Combobox
+        <Select
           multiple
-          items={facetedFilterYears}
-          disabled={tableRowsLength === 0}
-          onValueChange={(item) => {
-            table.getColumn('timestamp')?.setFilterValue(item)
+          onValueChange={(items) => {
+            table.getColumn('timestamp')?.setFilterValue(items)
           }}
         >
-          <ComboboxTrigger render={<Button variant="outline" name="years-faceted-filter" />}>
-            <ComboboxValue placeholder="Año">{renderYearFacetedFilterValue}</ComboboxValue>
-          </ComboboxTrigger>
-          <ComboboxContent align="end" aria-label="Selecciona una opción" className="[--anchor-width:120px]">
-            <ComboboxInput showTrigger={false} placeholder="Buscar" />
-            <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
-            <ComboboxList>
-              {(item) => (
-                <ComboboxItem key={item.value} value={item}>
-                  <span>{item.label}</span>
-                </ComboboxItem>
-              )}
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
+          <SelectTrigger name="audits-per-year-selector">
+            <SelectValue>{renderYearFacetedFilterValue}</SelectValue>
+          </SelectTrigger>
+          <SelectContent align="end" className="max-w-20">
+            <SelectGroup>
+              {facetedFilterYears.map((option) => (
+                <SelectItem key={option.value} value={option}>
+                  <span>{option.label}</span>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   )
