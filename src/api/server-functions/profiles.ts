@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: TODO: FIX THIS */
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
@@ -5,6 +6,7 @@ import { db } from '@/db'
 import { profileRoles, profiles } from '@/db/schemas/main'
 import type { SelectRole } from '@/db/schemas/zod/profile-roles'
 import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
+import { auth } from '@/lib/auth'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import { createProfileSchema, deleteProfileSchema, updateProfileSchema } from '@/schemas/profiles'
@@ -43,18 +45,59 @@ export const createProfile = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, adminOnlyMiddleware])
   .inputValidator(createProfileSchema)
   .handler(async ({ data }) => {
-    // Create the profile
+    // Step 1: Fetch owner or external user to get their email and name
+    let email: string
+    let name: string
+
+    if (data.profileType === 'owner' && data.ownerId) {
+      const owner = await db.query.owners.findFirst({
+        where: (owners, { eq }) => eq(owners.id, data.ownerId!),
+      })
+      if (!owner) {
+        throw new Error('Owner not found')
+      }
+      email = owner.email
+      name = `${owner.firstName} ${owner.lastName}`
+    } else if (data.profileType === 'external' && data.externalUserId) {
+      const externalUser = await db.query.externalUsers.findFirst({
+        where: (externalUsers, { eq }) => eq(externalUsers.id, data.externalUserId!),
+      })
+      if (!externalUser) {
+        throw new Error('External user not found')
+      }
+      email = externalUser.email
+      name = `${externalUser.firstName} ${externalUser.lastName}`
+    } else {
+      throw new Error('Invalid profile type or missing owner/external user ID')
+    }
+
+    // Step 2: Create user account using better-auth
+    const signUpResult = await auth.api.signUpEmail({
+      body: {
+        email,
+        password: data.password,
+        name,
+      },
+    })
+
+    if (!signUpResult.user) {
+      throw new Error('Failed to create user account')
+    }
+
+    const userId = signUpResult.user.id
+
+    // Step 3: Create the profile
     const [newProfile] = await db
       .insert(profiles)
       .values({
-        userId: data.userId,
+        userId,
         profileType: data.profileType,
         ownerId: data.ownerId,
         externalUserId: data.externalUserId,
       })
       .returning()
 
-    // Create profile roles
+    // Step 4: Create profile roles
     if (data.roleIds.length > 0) {
       await db.insert(profileRoles).values(
         data.roleIds.map((roleId) => ({
@@ -64,7 +107,7 @@ export const createProfile = createServerFn({ method: 'POST' })
       )
     }
 
-    // Fetch the complete profile with relations
+    // Step 5: Fetch the complete profile with relations
     const profileWithRelations = await db.query.profiles.findFirst({
       where: eq(profiles.id, newProfile.id),
       with: {
@@ -79,10 +122,14 @@ export const createProfile = createServerFn({ method: 'POST' })
       },
     })
 
+    if (!profileWithRelations) {
+      throw new Error('Failed to fetch created profile')
+    }
+
     createAuditLog({
       data: {
         action: 'create',
-        entityType: 'external_user', // Note: This might need adjustment based on profileType
+        entityType: data.profileType === 'owner' ? 'owner' : 'external_user',
         entityId: newProfile.id,
         newData: profileWithRelations,
       },
@@ -151,10 +198,14 @@ export const updateProfile = createServerFn({ method: 'POST' })
       },
     })
 
+    if (!profileWithRelations) {
+      throw new Error('Failed to fetch updated profile')
+    }
+
     createAuditLog({
       data: {
         action: 'update',
-        entityType: 'external_user', // Note: This might need adjustment based on profileType
+        entityType: data.profileType === 'owner' ? 'owner' : 'external_user',
         entityId: updatedProfile.id,
         oldData: oldProfile,
         newData: profileWithRelations,

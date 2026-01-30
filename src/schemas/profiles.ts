@@ -3,10 +3,10 @@ import { profileTypeEnum } from '@/db/schemas/main'
 
 export const createProfileSchema = z
   .object({
-    userId: z.string().min(1, 'El ID de usuario es requerido'),
+    password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
     profileType: z.enum(profileTypeEnum.enumValues, 'Tipo de perfil inválido'),
-    ownerId: z.uuid('ID de propietario inválido').nullable(),
-    externalUserId: z.uuid('ID de usuario externo inválido').nullable(),
+    ownerId: z.uuid('ID de propietario inválido').nullish(),
+    externalUserId: z.uuid('ID de usuario externo inválido').nullish(),
     roleIds: z.array(z.uuid('ID de rol inválido')).min(1, 'Debe seleccionar al menos un rol'),
   })
   .refine(
@@ -20,7 +20,7 @@ export const createProfileSchema = z
       return false
     },
     {
-      message: 'Debe seleccionar el propietario o usuario externo según el tipo de perfil',
+      message: 'Tienes que seleccionar el propietario o usuario externo según el tipo de perfil',
       path: ['profileType'],
     },
   )
@@ -32,8 +32,8 @@ export const updateProfileSchema = z
     profileId: z.uuid('ID de perfil inválido'),
     userId: z.string().min(1, 'El ID de usuario es requerido'),
     profileType: z.enum(profileTypeEnum.enumValues, 'Tipo de perfil inválido'),
-    ownerId: z.uuid('ID de propietario inválido').nullable(),
-    externalUserId: z.uuid('ID de usuario externo inválido').nullable(),
+    ownerId: z.string().uuid('ID de propietario inválido').nullish(),
+    externalUserId: z.string().uuid('ID de usuario externo inválido').nullish(),
     roleIds: z.array(z.uuid('ID de rol inválido')).min(1, 'Debe seleccionar al menos un rol'),
   })
   .refine(
@@ -47,7 +47,7 @@ export const updateProfileSchema = z
       return false
     },
     {
-      message: 'Debe seleccionar el propietario o usuario externo según el tipo de perfil',
+      message: 'Tienes que seleccionar el propietario o usuario externo según el tipo de perfil',
       path: ['profileType'],
     },
   )

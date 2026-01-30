@@ -12,6 +12,7 @@ import { ProfileTypeSelector } from '@/components/shared/selectors/profile-type-
 import { RolesSelector } from '@/components/shared/selectors/roles-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { InputPassword } from '@/components/ui/input-password'
 import {
   Sheet,
   SheetClose,
@@ -41,7 +42,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
     shouldUnregister: true,
     resolver: zodResolver(createProfileSchema),
     defaultValues: {
-      userId: '',
+      password: '',
       profileType: 'owner',
       ownerId: null,
       externalUserId: null,
@@ -87,12 +88,6 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <Controller
-              name="userId"
-              control={form.control}
-              render={({ field }) => <input type="hidden" className="hidden" {...field} />}
-            />
-
-            <Controller
               name="profileType"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -113,6 +108,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                   <FieldDescription>
                     Si el propietario o usuario externo no está listado, tienes que crear un{' '}
                     <Button
+                      nativeButton={false}
                       variant="link"
                       render={
                         <Link
@@ -127,6 +123,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                     />{' '}
                     o{' '}
                     <Button
+                      nativeButton={false}
                       variant="link"
                       render={
                         <Link
@@ -158,15 +155,15 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                     </FieldLabel>
                     <OwnersSelector
                       id={field.name}
-                      value={field.value}
+                      value={field.value || ''}
                       onValueChange={(value) => {
                         field.onChange(value)
                         form.setValue('externalUserId', null)
-                        form.setValue('ownerId', value as string)
+                        form.setValue('ownerId', value || null)
                       }}
                       disabled={createProfileMutation.isPending}
                       invalid={fieldState.invalid}
-                      includeNoneOption={false}
+                      includeNoneOption={true}
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -200,6 +197,26 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                 )}
               />
             )}
+
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Contraseña <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <InputPassword
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Mínimo 8 caracteres"
+                    disabled={createProfileMutation.isPending}
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
 
             <Controller
               name="roleIds"
