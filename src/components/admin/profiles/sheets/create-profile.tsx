@@ -1,25 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { externalUsersListQueryOptions } from '@/api/tanstack-queries/external-users'
-import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
 import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
 import { LoaderIcon } from '@/components/icons'
+import { OwnersSelector } from '@/components/shared/owners-selector'
+import { ExternalUsersSelector } from '@/components/shared/selectors/external-users-selector'
+import { ProfileTypeSelector } from '@/components/shared/selectors/profile-type-selector'
 import { RolesSelector } from '@/components/shared/selectors/roles-selector'
 import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import {
   Sheet,
   SheetClose,
@@ -30,7 +22,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Skeleton } from '@/components/ui/skeleton'
+import type { ProfileType } from '@/db/schemas/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type CreateProfileFormData, createProfileSchema } from '@/schemas/profiles'
 
@@ -44,11 +36,6 @@ interface CreateProfileSheetProps {
 export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
   const createProfileFormId = useId()
   const { isOpen, onOpenChange } = state
-
-  const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
-  const { data: externalUsers = [], isLoading: isLoadingExternalUsers } = useQuery(
-    externalUsersListQueryOptions(),
-  )
 
   const form = useForm<CreateProfileFormData>({
     shouldUnregister: true,
@@ -84,12 +71,6 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
     onOpenChange(open)
   }
 
-  function handleProfileTypeChange(value: 'owner' | 'external') {
-    form.setValue('profileType', value)
-    form.setValue('ownerId', null)
-    form.setValue('externalUserId', null)
-  }
-
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent side="right">
@@ -108,21 +89,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
             <Controller
               name="userId"
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    ID de Usuario <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    placeholder="ID del usuario de autenticación"
-                    aria-invalid={fieldState.invalid}
-                    disabled={createProfileMutation.isPending}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
+              render={({ field }) => <input type="hidden" className="hidden" {...field} />}
             />
 
             <Controller
@@ -130,30 +97,51 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Tipo de perfil <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Select
+                  <FieldLabel htmlFor={field.name}>Tipo de perfil</FieldLabel>
+                  <ProfileTypeSelector
+                    id={field.name}
                     value={field.value}
-                    onValueChange={(value) => handleProfileTypeChange(value as 'owner' | 'external')}
+                    includeNoneOption={false}
+                    invalid={fieldState.invalid}
+                    onValueChange={(value) => {
+                      field.onChange(value as ProfileType)
+                      form.setValue('ownerId', null)
+                      form.setValue('externalUserId', null)
+                    }}
                     disabled={createProfileMutation.isPending}
-                  >
-                    <SelectTrigger aria-invalid={fieldState.invalid} className="w-full">
-                      <SelectValue>
-                        {field.value === 'owner'
-                          ? 'Propietario'
-                          : field.value === 'external'
-                            ? 'Externo'
-                            : 'Selecciona un tipo'}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="owner">Propietario</SelectItem>
-                        <SelectItem value="external">Externo</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                  />
+                  <FieldDescription>
+                    Si el propietario o usuario externo no está listado, tienes que crear un{' '}
+                    <Button
+                      variant="link"
+                      render={
+                        <Link
+                          to="/admin/residential"
+                          search={{
+                            tab: 'owners',
+                          }}
+                        >
+                          propietario
+                        </Link>
+                      }
+                    />{' '}
+                    o{' '}
+                    <Button
+                      variant="link"
+                      render={
+                        <Link
+                          onClick={() => onOpenChange(false)}
+                          to="."
+                          search={{
+                            tab: 'external-users',
+                          }}
+                        >
+                          usuario externo
+                        </Link>
+                      }
+                    />
+                    , y después venir a vincularlo aquí.
+                  </FieldDescription>
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -168,34 +156,18 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                     <FieldLabel htmlFor={field.name}>
                       Propietario <span className="text-destructive">*</span>
                     </FieldLabel>
-                    {isLoadingOwners ? (
-                      <Skeleton className="h-8 w-full rounded-lg" />
-                    ) : (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={createProfileMutation.isPending || owners.length === 0}
-                      >
-                        <SelectTrigger aria-invalid={fieldState.invalid} className="w-full">
-                          <SelectValue>
-                            {owners.length === 0
-                              ? 'No hay propietarios disponibles'
-                              : field.value
-                                ? `${owners.find((o) => o.id === field.value)?.firstName} ${owners.find((o) => o.id === field.value)?.lastName}`
-                                : 'Selecciona un propietario'}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {owners.map((owner) => (
-                              <SelectItem key={owner.id} value={owner.id}>
-                                {`${owner.firstName} ${owner.lastName}`}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
+                    <OwnersSelector
+                      id={field.name}
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                        form.setValue('externalUserId', null)
+                        form.setValue('ownerId', value as string)
+                      }}
+                      disabled={createProfileMutation.isPending}
+                      invalid={fieldState.invalid}
+                      includeNoneOption={false}
+                    />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -211,34 +183,18 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                     <FieldLabel htmlFor={field.name}>
                       Usuario Externo <span className="text-destructive">*</span>
                     </FieldLabel>
-                    {isLoadingExternalUsers ? (
-                      <Skeleton className="h-8 w-full rounded-lg" />
-                    ) : (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={createProfileMutation.isPending || externalUsers.length === 0}
-                      >
-                        <SelectTrigger aria-invalid={fieldState.invalid} className="w-full">
-                          <SelectValue>
-                            {externalUsers.length === 0
-                              ? 'No hay usuarios externos disponibles'
-                              : field.value
-                                ? `${externalUsers.find((u) => u.id === field.value)?.firstName} ${externalUsers.find((u) => u.id === field.value)?.lastName}`
-                                : 'Selecciona un usuario externo'}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {externalUsers.map((user) => (
-                              <SelectItem key={user.id} value={user.id}>
-                                {`${user.firstName} ${user.lastName}`}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
+                    <ExternalUsersSelector
+                      id={field.name}
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                        form.setValue('ownerId', null)
+                        form.setValue('externalUserId', value as string)
+                      }}
+                      disabled={createProfileMutation.isPending}
+                      invalid={fieldState.invalid}
+                      includeNoneOption={false}
+                    />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -251,52 +207,16 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
-                    Roles <span className="text-destructive">*</span>
+                    Rol <span className="text-destructive">*</span>
                   </FieldLabel>
                   <RolesSelector
                     id={field.name}
-                    value={field.value[0]}
                     includeNoneOption={false}
                     invalid={fieldState.invalid}
+                    value={field.value[0] || null}
                     disabled={createProfileMutation.isPending}
                     onValueChange={(value) => field.onChange([value])}
                   />
-                  {/* <Combobox
-                    multiple
-                    items={roleItems}
-                    disabled={createProfileMutation.isPending}
-                    value={roleItems.filter((item) => field.value.includes(item.value))}
-                    onValueChange={(selectedItems: { label: string; value: string }[]) => {
-                      field.onChange(selectedItems.map((item) => item.value))
-                    }}
-                  >
-                    <ComboboxChips ref={anchor} className="w-full">
-                      <ComboboxValue>
-                        {(values: { label: string; value: string }[]) => (
-                          <>
-                            {values.map((value) => (
-                              <ComboboxChip key={value.value}>{value.label}</ComboboxChip>
-                            ))}
-                            <ComboboxChipsInput
-                              id={field.name}
-                              aria-invalid={fieldState.invalid}
-                              placeholder={field.value.length > 0 ? undefined : 'Selecciona roles'}
-                            />
-                          </>
-                        )}
-                      </ComboboxValue>
-                    </ComboboxChips>
-                    <ComboboxContent anchor={anchor}>
-                      <ComboboxEmpty>No se encontraron roles.</ComboboxEmpty>
-                      <ComboboxList>
-                        {(item: { label: string; value: string }) => (
-                          <ComboboxItem key={item.value} value={item}>
-                            {item.label}
-                          </ComboboxItem>
-                        )}
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox> */}
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}

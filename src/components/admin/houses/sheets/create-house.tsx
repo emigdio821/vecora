@@ -180,9 +180,9 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
                   <OwnersSelector
                     id={field.name}
                     value={field.value}
+                    invalid={fieldState.invalid}
                     onValueChange={field.onChange}
                     disabled={createHouseMutation.isPending}
-                    invalid={fieldState.invalid}
                   />
 
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

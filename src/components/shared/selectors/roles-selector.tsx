@@ -25,7 +25,6 @@ export function RolesSelector({
   placeholder = 'Selecciona una opción',
   includeNoneOption = true,
   noneOptionLabel = 'Sin selección',
-  value,
   ...selectProps
 }: RolesSelectorProps) {
   const { data: roles = [], isLoading: isLoadingRoles } = useQuery(profileRolesListQueryOptions())
@@ -56,9 +55,9 @@ export function RolesSelector({
   }
 
   return (
-    <Select value={value} disabled={roles.length === 0 || disabled} {...selectProps}>
+    <Select disabled={roles.length === 0 || disabled} {...selectProps}>
       <SelectTrigger aria-invalid={invalid} className="w-full">
-        <SelectValue>{renderRoleValue(value)}</SelectValue>
+        <SelectValue>{renderRoleValue}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

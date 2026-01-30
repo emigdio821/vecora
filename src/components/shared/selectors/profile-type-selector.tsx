@@ -1,5 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
-import { profileRolesListQueryOptions } from '@/api/tanstack-queries/profiles'
 import {
   Select,
   SelectContent,
@@ -8,12 +6,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
 import { profileTypeEnum } from '@/db/schemas/main'
 import type { ProfileType } from '@/db/schemas/zod/profiles'
 
 interface ProfileTypeSelectorProps extends React.ComponentProps<typeof Select> {
-  disabled?: boolean
   invalid?: boolean
   placeholder?: string
   includeNoneOption?: boolean
@@ -22,7 +18,6 @@ interface ProfileTypeSelectorProps extends React.ComponentProps<typeof Select> {
 }
 
 export function ProfileTypeSelector({
-  disabled = false,
   invalid = false,
   placeholder = 'Selecciona una opción',
   includeNoneOption = true,
@@ -42,16 +37,13 @@ export function ProfileTypeSelector({
   }
 
   function renderProfileTypeValue(value: ProfileType | null) {
-    if (roles.length === 0) return 'No hay propietarios disponibles'
-
-    const role = roles.find((role) => role.id === value)
-    return role ? getProfileTypeLabel(role.name) : 'Selecciona una opción'
+    return value ? getProfileTypeLabel(value) : placeholder
   }
 
   return (
-    <Select value={value} disabled={disabled} {...selectProps}>
+    <Select value={value} {...selectProps}>
       <SelectTrigger aria-invalid={invalid} className="w-full">
-        <SelectValue>{renderProfileTypeValue(value)}</SelectValue>
+        <SelectValue>{renderProfileTypeValue}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

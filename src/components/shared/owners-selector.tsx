@@ -11,12 +11,10 @@ import {
 import { Skeleton } from '../ui/skeleton'
 
 interface OwnersSelectorProps extends React.ComponentProps<typeof Select> {
-  disabled?: boolean
   invalid?: boolean
   placeholder?: string
   includeNoneOption?: boolean
   noneOptionLabel?: string
-  value: string | null
 }
 
 export function OwnersSelector({
@@ -25,7 +23,6 @@ export function OwnersSelector({
   placeholder = 'Selecciona una opción',
   includeNoneOption = true,
   noneOptionLabel = 'Sin selección',
-  value,
   ...selectProps
 }: OwnersSelectorProps) {
   const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
@@ -39,9 +36,9 @@ export function OwnersSelector({
   }
 
   return (
-    <Select value={value} disabled={owners.length === 0 || disabled} {...selectProps}>
+    <Select disabled={owners.length === 0 || disabled} {...selectProps}>
       <SelectTrigger aria-invalid={invalid} className="w-full">
-        <SelectValue>{renderOwnerValue(value)}</SelectValue>
+        <SelectValue>{renderOwnerValue}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
