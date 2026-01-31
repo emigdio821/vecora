@@ -42,6 +42,7 @@ export const auditLogEntityTypeEnum = pgEnum('audit_log_entity_type', [
   'payment',
   'violation',
   'profile',
+  'user',
 ])
 
 // Roles table - defines all available roles in the system
@@ -262,6 +263,7 @@ export const auditLogs = pgTable(
     action: auditLogActionEnum('action').notNull(),
     entityType: auditLogEntityTypeEnum('entity_type').notNull(),
     entityId: uuid('entity_id'),
+    entityUserId: text('entity_user_id').references(() => user.id, { onDelete: 'set null' }),
     // biome-ignore lint/complexity/noBannedTypes: TODO: review usage of unknown
     changes: jsonb('changes').$type<{}>(), // Stores { old: {...}, new: {...} }
     ipAddress: varchar('ip_address', { length: 45 }),
@@ -273,6 +275,7 @@ export const auditLogs = pgTable(
     index('audit_logs_profileId_idx').on(table.profileId),
     index('audit_logs_entityType_idx').on(table.entityType),
     index('audit_logs_entityId_idx').on(table.entityId),
+    index('audit_logs_entityUserId_idx').on(table.entityUserId),
     index('audit_logs_timestamp_idx').on(table.timestamp),
   ],
 )
@@ -385,6 +388,10 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   profile: one(profiles, {
     fields: [auditLogs.profileId],
     references: [profiles.id],
+  }),
+  entityUser: one(user, {
+    fields: [auditLogs.entityUserId],
+    references: [user.id],
   }),
 }))
 

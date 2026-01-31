@@ -25,7 +25,8 @@ export const createAuditLog = createServerFn({ method: 'POST' })
         profileId: profile?.id ?? null,
         action: data.action,
         entityType: data.entityType,
-        entityId: data.entityId,
+        entityId: data.entityId ?? null,
+        entityUserId: data.entityUserId ?? null,
         changes: {
           old: data.oldData ?? null,
           new: data.newData ?? null,
@@ -53,6 +54,7 @@ export const getAuditLogs = createServerFn()
             },
           },
         },
+        entityUser: true,
       },
       orderBy: (auditLogs, { desc }) => [desc(auditLogs.timestamp)],
     })

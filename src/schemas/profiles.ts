@@ -59,3 +59,15 @@ export const deleteProfileSchema = z.object({
 })
 
 export type DeleteProfileData = z.infer<typeof deleteProfileSchema>
+
+export const banProfileSchema = z.object({
+  userId: z.string().min(1, 'El ID de usuario es requerido'),
+  reason: z
+    .string()
+    .min(10, 'La razón debe tener al menos 10 caracteres')
+    .max(200, 'La razón no puede exceder 200 caracteres')
+    .optional(),
+  duration: z.date().optional(),
+})
+
+export type BanProfileData = z.infer<typeof banProfileSchema>

@@ -22,4 +22,5 @@ export type AuditLogWithUser = SelectAuditLog & {
 export type AuditLogWithUserAndProfile = SelectAuditLog & {
   user: SelectUser | null
   profile: ProfileWithRoles | null
+  entityUser: SelectUser | null
 }
