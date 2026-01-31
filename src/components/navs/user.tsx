@@ -1,6 +1,6 @@
-import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSettings, IconSun } from '@tabler/icons-react'
+import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSun } from '@tabler/icons-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
 import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import {
@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuSub,
@@ -18,6 +19,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { authClient } from '@/lib/auth-client'
 import { logger } from '@/lib/logger'
+import { RoleNameBadge } from '../shared/role-name-badge'
+import { Avatar, AvatarFallback } from '../ui/avatar'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar'
 import { Skeleton } from '../ui/skeleton'
 
@@ -42,6 +45,15 @@ export function NavUser() {
     })
   }
 
+  function getAvatarFallback() {
+    if (!profile) return null
+
+    const profileName = profile.user.name
+    const fallabck = `${profileName.split(' ')[0].charAt(0)}${profileName.split(' ')[1]?.charAt(0) ?? ''}`
+
+    return fallabck
+  }
+
   if (isLoading) return <Skeleton className="h-12 rounded-lg" />
 
   if (error || !profile)
@@ -64,16 +76,33 @@ export function NavUser() {
                 size="lg"
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{profile.user.name.split(' ')[0] ?? ''}</p>
-                  <p className="truncate text-muted-foreground text-xs">{profile.user.email}</p>
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                  <Avatar>
+                    <AvatarFallback>{getAvatarFallback()}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="truncate font-medium">{profile.user.name.split(' ')[0]}</p>
+                    <p className="truncate text-muted-foreground text-xs">{profile.user.email}</p>
+                  </div>
                 </div>
-                <IconSelector className="ml-auto size-4" />
+                <IconSelector className="ml-auto size-4 text-muted-foreground" />
               </SidebarMenuButton>
             }
           />
           <DropdownMenuContent className="w-(--anchor-width)" align="center">
             <DropdownMenuGroup>
+              <DropdownMenuLabel className="line-clamp-2">{profile.user.name}</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                {/* {profile.profileRoles.map(({ role }) => role.name).join(', ')} */}
+                <div className="flex flex-wrap gap-1">
+                  {profile.profileRoles.map(({ role }) => (
+                    <RoleNameBadge className="text-xs" key={role.id} roleName={role.name} />
+                  ))}
+                </div>
+              </DropdownMenuLabel>
+
+              <DropdownMenuSeparator />
+
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <IconMoon className="hidden size-4 dark:block" />
@@ -96,7 +125,7 @@ export function NavUser() {
               </DropdownMenuSub>
             </DropdownMenuGroup>
 
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem
                 render={
                   <Link to="/settings">
@@ -105,9 +134,9 @@ export function NavUser() {
                   </Link>
                 }
               />
-            </DropdownMenuGroup>
+            </DropdownMenuGroup> */}
 
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator /> */}
 
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleLogOut}>

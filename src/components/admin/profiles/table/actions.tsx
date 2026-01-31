@@ -8,7 +8,7 @@ import {
 } from '@tabler/icons-react'
 import { Link, type LinkProps } from '@tanstack/react-router'
 import { useState } from 'react'
-import { deleteProfile } from '@/api/server-functions/profiles'
+import { banProfile, deleteProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
@@ -25,7 +25,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import type { DeleteProfileData } from '@/schemas/profiles'
+import type { BanProfileData, DeleteProfileData } from '@/schemas/profiles'
 import { EditProfileSheet } from '../sheets/edit-profile'
 
 interface ActionsProps {
@@ -50,8 +50,26 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
     },
   })
 
-  function handleDeleteProfile() {
-    deleteProfileMutation.mutate({ profileId: profile.id })
+  const deactivateProfileMutation = useEntityMutation({
+    mutationFn: async (data: BanProfileData) => {
+      return await banProfile({ data })
+    },
+    invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    successTitle: 'Perfil desactivado',
+    successDescription: 'El perfil ha sido desactivado exitosamente.',
+    errorDescription: 'Ocurrió un error al desactivar el perfil, intenta nuevamente.',
+    onSuccess: () => {
+      setDeactivateDialogOpen(false)
+    },
+  })
+
+  async function handleDeleteProfile() {
+    await deleteProfileMutation.mutateAsync({ profileId: profile.id })
+  }
+
+  async function handleDeactivateProfile() {
+    // TODO: Implement reason and duration
+    await deactivateProfileMutation.mutateAsync({ userId: profile.userId })
   }
 
   function getLinkedUserNavigation(): LinkProps {
@@ -96,7 +114,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
         actionLabel="Desactivar"
         title="¿Desactivar perfil?"
         description="El perfil será desactivado y el usuario no podrá acceder a su cuenta. Esta acción puede ser revertida."
-        // action={handleDeactivateProfile}
+        action={handleDeactivateProfile}
         state={{ isOpen: isDeactivateDialogOpen, onOpenChange: setDeactivateDialogOpen }}
       />
 
@@ -110,6 +128,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
           <TooltipTrigger
             render={
               <Button
+                nativeButton={false}
                 variant="ghost"
                 render={
                   <Link {...getLinkedUserNavigation()}>

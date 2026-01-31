@@ -35,15 +35,27 @@ export function AlertDialogGeneric(props: AlertDialogGenericProps) {
   async function handleAction() {
     if (action) {
       setExecutingAction(true)
-      await action()
-      setExecutingAction(false)
+      try {
+        await action()
+      } catch (error) {
+        console.error('Error executing action:', error)
+        throw error
+      } finally {
+        setExecutingAction(false)
+      }
     } else {
       onOpenChange(false)
     }
   }
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+    <AlertDialog
+      open={isOpen}
+      onOpenChange={(isOPen) => {
+        if (isExecutingAction) return
+        onOpenChange(isOPen)
+      }}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia

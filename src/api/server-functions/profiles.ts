@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getRequestHeaders } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
@@ -8,7 +9,12 @@ import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
 import { auth } from '@/lib/auth'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
-import { createProfileSchema, deleteProfileSchema, updateProfileSchema } from '@/schemas/profiles'
+import {
+  banProfileSchema,
+  createProfileSchema,
+  deleteProfileSchema,
+  updateProfileSchema,
+} from '@/schemas/profiles'
 
 export const getProfilesList = createServerFn()
   .middleware([authMiddleware])
@@ -82,11 +88,16 @@ export const createProfile = createServerFn({ method: 'POST' })
     }
 
     // Step 2: Create user account using better-auth
-    const signUpResult = await auth.api.signUpEmail({
+    const adminRole = await db.query.roles.findFirst({
+      where: (roles, { eq }) => eq(roles.name, 'admin'),
+    })
+
+    const signUpResult = await auth.api.createUser({
       body: {
         name,
         email,
         password,
+        role: adminRole ? 'admin' : 'user',
       },
     })
 
@@ -243,7 +254,30 @@ export const deleteProfile = createServerFn({ method: 'POST' })
       },
     })
 
+    if (!oldProfile) {
+      throw new Error('Profile not found')
+    }
+
+    const userId = oldProfile.userId
+
     await db.delete(profiles).where(eq(profiles.id, data.profileId))
+
+    if (userId) {
+      const headers = getRequestHeaders()
+      await auth.api.revokeUserSessions({
+        body: {
+          userId,
+        },
+        headers,
+      })
+
+      await auth.api.removeUser({
+        body: {
+          userId,
+        },
+        headers,
+      })
+    }
 
     createAuditLog({
       data: {
@@ -253,6 +287,45 @@ export const deleteProfile = createServerFn({ method: 'POST' })
         oldData: oldProfile,
       },
     }).catch(console.error)
+  })
 
-    return { success: true }
+export const banProfile = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware, adminOnlyMiddleware])
+  .inputValidator(banProfileSchema)
+  .handler(async ({ data }) => {
+    const { userId, duration, reason } = data
+    const headers = getRequestHeaders()
+
+    function getBanExpiryDate() {
+      if (!duration) return undefined
+
+      const date = new Date(duration)
+      const millis = date.getTime()
+      const secs = Math.floor(millis / 1000)
+
+      return secs
+    }
+
+    await auth.api.banUser({
+      body: {
+        userId,
+        banReason: reason || 'Banned by admin',
+        banExpiresIn: getBanExpiryDate(),
+      },
+      headers,
+    })
+
+    createAuditLog({
+      data: {
+        action: 'update',
+        entityType: 'profile',
+        entityUserId: userId,
+        oldData: null,
+        newData: {
+          banned: true,
+          banReason: reason,
+          banExpiresIn: duration,
+        },
+      },
+    }).catch(console.error)
   })

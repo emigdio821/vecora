@@ -1,10 +1,10 @@
 import { Badge } from '@/components/ui/badge'
 
-interface RoleNameBadgeProps {
+interface RoleNameBadgeProps extends React.ComponentProps<typeof Badge> {
   roleName: string
 }
 
-export function RoleNameBadge({ roleName }: RoleNameBadgeProps) {
+export function RoleNameBadge({ roleName, ...badgeProps }: RoleNameBadgeProps) {
   function getRoleLabel() {
     switch (roleName) {
       case 'admin':
@@ -23,7 +23,7 @@ export function RoleNameBadge({ roleName }: RoleNameBadgeProps) {
   }
 
   return (
-    <Badge variant="outline">
+    <Badge variant="outline" {...badgeProps}>
       <span>{getRoleLabel()}</span>
     </Badge>
   )
