@@ -44,11 +44,12 @@ async function seed() {
     adminUserId = existingAdmin[0].id
   } else {
     // Create admin user using better-auth API
-    const signUpResult = await auth.api.signUpEmail({
+    const signUpResult = await auth.api.createUser({
       body: {
         email: 'admin@resido.com',
         password: 'admin123',
-        name: 'Admin Resido',
+        name: 'Administrador Resido',
+        role: 'admin',
       },
     })
 
@@ -69,7 +70,7 @@ async function seed() {
     const [adminExternalUser] = await db
       .insert(externalUsers)
       .values({
-        firstName: 'Admin',
+        firstName: 'Administrador',
         lastName: 'Resido',
         email: 'admin@resido.com',
         phone: '+528124135976', // fake number
