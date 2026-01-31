@@ -64,7 +64,10 @@ export function RolesSelector({
           {includeNoneOption && <SelectItem value={null}>{noneOptionLabel}</SelectItem>}
           {roles.map((role) => (
             <SelectItem key={role.id} value={role.id}>
-              <span>{getRoleLabel(role.name)}</span>
+              <div>
+                <p className="font-medium">{getRoleLabel(role.name)}</p>
+                <p className="text-muted-foreground! text-xs">{role.description}</p>
+              </div>
             </SelectItem>
           ))}
         </SelectGroup>

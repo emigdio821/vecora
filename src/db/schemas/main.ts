@@ -41,6 +41,7 @@ export const auditLogEntityTypeEnum = pgEnum('audit_log_entity_type', [
   'house',
   'payment',
   'violation',
+  'profile',
 ])
 
 // Roles table - defines all available roles in the system

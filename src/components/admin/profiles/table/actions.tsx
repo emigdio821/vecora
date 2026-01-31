@@ -1,4 +1,12 @@
-import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash, IconUserOff } from '@tabler/icons-react'
+import {
+  IconDotsVertical,
+  IconEdit,
+  IconInfoCircle,
+  IconTrash,
+  IconUserOff,
+  IconUserUp,
+} from '@tabler/icons-react'
+import { Link, type LinkProps } from '@tanstack/react-router'
 import { useState } from 'react'
 import { deleteProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -14,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteProfileData } from '@/schemas/profiles'
@@ -45,6 +54,32 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
     deleteProfileMutation.mutate({ profileId: profile.id })
   }
 
+  function getLinkedUserNavigation(): LinkProps {
+    const owner = profile.owner
+    const externalUser = profile.externalUser
+
+    if (profile.profileType === 'owner' && owner) {
+      const ownerFullName = `${owner.firstName} ${owner.lastName}`
+      return {
+        to: '/admin/residential' as const,
+        search: { tab: 'owners', 'search-owners': ownerFullName },
+      }
+    }
+
+    if (profile.profileType === 'external' && externalUser) {
+      const externalUserFullName = `${externalUser.firstName} ${externalUser.lastName}`
+      return {
+        to: '/admin/users' as const,
+        search: { tab: 'external-users', 'search-external-users': externalUserFullName },
+      }
+    }
+
+    return {
+      to: '/admin/residential' as const,
+      search: {},
+    }
+  }
+
   return (
     <>
       <AlertDialogGeneric
@@ -70,11 +105,29 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
         state={{ isOpen: isEditProfileSheetOpen, onOpenChange: setEditProfileSheetOpen }}
       />
 
-      <div className="flex">
+      <div className="flex items-center justify-end">
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                render={
+                  <Link {...getLinkedUserNavigation()}>
+                    <IconUserUp className="size-4" />
+                  </Link>
+                }
+                size="icon"
+                aria-label="Ir al usuario vinculado"
+              />
+            }
+          />
+          <TooltipContent>Ir al usuario vinculado</TooltipContent>
+        </Tooltip>
+
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <Button aria-label="Table actions" size="icon" variant="ghost" className="ml-auto">
+              <Button aria-label="Table actions" size="icon" variant="ghost">
                 <IconDotsVertical className="size-4" />
               </Button>
             }

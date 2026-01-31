@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/style/noNonNullAssertion: TODO: FIX THIS */
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
@@ -28,7 +27,12 @@ export const getProfilesList = createServerFn()
       orderBy: (profiles, { desc }) => [desc(profiles.updatedAt)],
     })
 
-    return profiles satisfies ProfileWithAllRelations[]
+    // Filter out admin users
+    const filteredProfiles = profiles.filter(
+      (profile) => !profile.profileRoles.some((pr) => pr.role.name === 'admin'),
+    )
+
+    return filteredProfiles satisfies ProfileWithAllRelations[]
   })
 
 export const getRolesList = createServerFn()
@@ -46,25 +50,31 @@ export const createProfile = createServerFn({ method: 'POST' })
   .inputValidator(createProfileSchema)
   .handler(async ({ data }) => {
     // Step 1: Fetch owner or external user to get their email and name
-    let email: string
-    let name: string
+    const { externalUserId, ownerId, profileType, password, roleIds } = data
 
-    if (data.profileType === 'owner' && data.ownerId) {
+    let email: string = ''
+    let name: string = ''
+
+    if (data.profileType === 'owner' && ownerId) {
       const owner = await db.query.owners.findFirst({
-        where: (owners, { eq }) => eq(owners.id, data.ownerId!),
+        where: (owners, { eq }) => eq(owners.id, ownerId),
       })
+
       if (!owner) {
         throw new Error('Owner not found')
       }
+
       email = owner.email
       name = `${owner.firstName} ${owner.lastName}`
-    } else if (data.profileType === 'external' && data.externalUserId) {
+    } else if (data.profileType === 'external' && externalUserId) {
       const externalUser = await db.query.externalUsers.findFirst({
-        where: (externalUsers, { eq }) => eq(externalUsers.id, data.externalUserId!),
+        where: (externalUsers, { eq }) => eq(externalUsers.id, externalUserId),
       })
+
       if (!externalUser) {
         throw new Error('External user not found')
       }
+
       email = externalUser.email
       name = `${externalUser.firstName} ${externalUser.lastName}`
     } else {
@@ -74,9 +84,9 @@ export const createProfile = createServerFn({ method: 'POST' })
     // Step 2: Create user account using better-auth
     const signUpResult = await auth.api.signUpEmail({
       body: {
-        email,
-        password: data.password,
         name,
+        email,
+        password,
       },
     })
 
@@ -91,16 +101,16 @@ export const createProfile = createServerFn({ method: 'POST' })
       .insert(profiles)
       .values({
         userId,
-        profileType: data.profileType,
-        ownerId: data.ownerId,
-        externalUserId: data.externalUserId,
+        ownerId,
+        profileType,
+        externalUserId,
       })
       .returning()
 
     // Step 4: Create profile roles
-    if (data.roleIds.length > 0) {
+    if (roleIds.length > 0) {
       await db.insert(profileRoles).values(
-        data.roleIds.map((roleId) => ({
+        roleIds.map((roleId) => ({
           profileId: newProfile.id,
           roleId,
         })),
@@ -129,7 +139,7 @@ export const createProfile = createServerFn({ method: 'POST' })
     createAuditLog({
       data: {
         action: 'create',
-        entityType: data.profileType === 'owner' ? 'owner' : 'external_user',
+        entityType: 'profile',
         entityId: newProfile.id,
         newData: profileWithRelations,
       },
@@ -205,7 +215,7 @@ export const updateProfile = createServerFn({ method: 'POST' })
     createAuditLog({
       data: {
         action: 'update',
-        entityType: data.profileType === 'owner' ? 'owner' : 'external_user',
+        entityType: 'profile',
         entityId: updatedProfile.id,
         oldData: oldProfile,
         newData: profileWithRelations,
@@ -238,7 +248,7 @@ export const deleteProfile = createServerFn({ method: 'POST' })
     createAuditLog({
       data: {
         action: 'delete',
-        entityType: 'external_user', // Note: This might need adjustment based on profileType
+        entityType: 'profile',
         entityId: data.profileId,
         oldData: oldProfile,
       },

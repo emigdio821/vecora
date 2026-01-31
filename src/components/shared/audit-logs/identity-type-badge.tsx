@@ -18,6 +18,8 @@ export function AuditLogEntityTypeBadge({ entityType, ...badgeProps }: AuditLogE
         return 'Usuario externo'
       case 'payment':
         return 'Pago'
+      case 'profile':
+        return 'Perfil'
       default:
         return type
     }

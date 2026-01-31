@@ -54,24 +54,6 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
     cell: ({ row }) => <ProfileTypeBadge type={row.original.profileType} />,
   },
   {
-    accessorKey: 'id',
-    size: 200,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Ligado a" />,
-    cell: ({ row }) => {
-      const profile = row.original
-      const owner = profile.owner
-      const externalUser = profile.externalUser
-
-      return owner ? 'Propietario' : externalUser ? 'Usuario externo' : 'N/A'
-    },
-  },
-  {
-    accessorKey: 'user.banned',
-    size: 100,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
-    cell: ({ row }) => <ProfileStatusBadge banned={row.original.user?.banned || false} />,
-  },
-  {
     accessorKey: 'profileRoles',
     size: 300,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
@@ -81,6 +63,12 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
 
       return <>{roleBadges.length > 0 && <div className="flex flex-wrap gap-1">{roleBadges}</div>}</>
     },
+  },
+  {
+    accessorKey: 'user.banned',
+    size: 100,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
+    cell: ({ row }) => <ProfileStatusBadge banned={row.original.user?.banned || false} />,
   },
   {
     id: 'actions',

@@ -90,14 +90,13 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
             <Controller
               name="profileType"
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+              render={({ field }) => (
+                <Field>
                   <FieldLabel htmlFor={field.name}>Tipo de perfil</FieldLabel>
                   <ProfileTypeSelector
                     id={field.name}
                     value={field.value}
                     includeNoneOption={false}
-                    invalid={fieldState.invalid}
                     onValueChange={(value) => {
                       field.onChange(value as ProfileType)
                       form.setValue('ownerId', null)
@@ -139,65 +138,72 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                     />
                     , y después venir a vincularlo aquí.
                   </FieldDescription>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {/* {fieldState.invalid && <FieldError errors={[fieldState.error]} />} */}
                 </Field>
               )}
             />
 
-            {form.watch('profileType') === 'owner' && (
-              <Controller
-                name="ownerId"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Propietario <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <OwnersSelector
-                      id={field.name}
-                      value={field.value || ''}
-                      onValueChange={(value) => {
-                        field.onChange(value)
-                        form.setValue('externalUserId', null)
-                        form.setValue('ownerId', value || null)
-                      }}
-                      disabled={createProfileMutation.isPending}
-                      invalid={fieldState.invalid}
-                      includeNoneOption={true}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            )}
+            <div className="space-y-2">
+              {form.watch('profileType') === 'owner' && (
+                <Controller
+                  name="ownerId"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Propietario <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <OwnersSelector
+                        id={field.name}
+                        value={field.value}
+                        onValueChange={(value) => {
+                          form.setValue('externalUserId', null)
+                          form.setValue('ownerId', value)
+                          field.onChange(value)
+                          form.trigger('profileType')
+                        }}
+                        disabled={createProfileMutation.isPending}
+                        invalid={fieldState.invalid || !!form.formState.errors.profileType}
+                        includeNoneOption={false}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              )}
 
-            {form.watch('profileType') === 'external' && (
-              <Controller
-                name="externalUserId"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Usuario Externo <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    <ExternalUsersSelector
-                      id={field.name}
-                      value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value)
-                        form.setValue('ownerId', null)
-                        form.setValue('externalUserId', value as string)
-                      }}
-                      disabled={createProfileMutation.isPending}
-                      invalid={fieldState.invalid}
-                      includeNoneOption={false}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            )}
+              {form.watch('profileType') === 'external' && (
+                <Controller
+                  name="externalUserId"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Usuario Externo <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <ExternalUsersSelector
+                        id={field.name}
+                        value={field.value}
+                        onValueChange={(value) => {
+                          form.setValue('ownerId', null)
+                          form.setValue('externalUserId', value)
+                          field.onChange(value)
+                          form.trigger('profileType')
+                        }}
+                        disabled={createProfileMutation.isPending}
+                        invalid={fieldState.invalid || !!form.formState.errors.profileType}
+                        includeNoneOption={false}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              )}
 
+              {form.formState.errors.profileType && (
+                <FieldError errors={[form.formState.errors.profileType]} />
+              )}
+            </div>
             <Controller
               name="password"
               control={form.control}

@@ -38,10 +38,13 @@ export const externalUsersTableColumns: ColumnDef<SelectExternalUser>[] = [
     filterFn: (row, _, value: string) => {
       const normalizedFirstName = normalizeString(row.original.firstName).toLowerCase()
       const normalizedLastName = normalizeString(row.original.lastName).toLowerCase()
+      const normalizedFullName = `${normalizedFirstName} ${normalizedLastName}`
       const normalizedValue = normalizeString(value).toLowerCase()
 
       return (
-        normalizedFirstName.includes(normalizedValue) || normalizedLastName.includes(normalizedValue) || false
+        normalizedFirstName.includes(normalizedValue) ||
+        normalizedLastName.includes(normalizedValue) ||
+        normalizedFullName.includes(normalizedValue)
       )
     },
   },

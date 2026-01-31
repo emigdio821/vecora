@@ -11,23 +11,23 @@ async function seed() {
   const rolesToInsert = [
     {
       name: 'admin',
-      description: 'Full system access - can manage everything',
+      description: 'Acceso completo al sistema',
     },
     {
       name: 'president',
-      description: 'Board president - oversees board decisions and operations',
+      description: 'Gestión general y representación',
     },
     {
       name: 'treasurer',
-      description: 'Financial manager - handles budgets and expenses',
+      description: 'Gestión de ingresos y gastos',
     },
     {
       name: 'maintainer',
-      description: 'Maintenance coordinator - manages property maintenance',
+      description: 'Gestión del mantenimiento y reparaciones',
     },
     {
       name: 'security',
-      description: 'Security coordinator - manages security and access control',
+      description: 'Gestión de la seguridad y vigilancia',
     },
   ]
 
