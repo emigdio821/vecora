@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { availableHousesQueryOptions } from '@/api/tanstack-queries/houses'
-import { Skeleton } from '@/components/ui/skeleton'
 import { ComboboxMultiSelect, type ComboboxMultiSelectProps } from './multi-select'
 
 interface AvailableHousesSelectorProps extends Omit<ComboboxMultiSelectProps, 'items'> {
@@ -27,8 +26,6 @@ export function AvailableHousesSelector({
 
     return uniqueItems
   }, [availableHouses, includeAssigned])
-
-  if (isLoadingAvailableHouses) return <Skeleton className="h-8 w-full rounded-lg" />
 
   return <ComboboxMultiSelect isLoading={isLoadingAvailableHouses} items={items} {...comboboxProps} />
 }

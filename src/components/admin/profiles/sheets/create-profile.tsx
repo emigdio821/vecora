@@ -72,6 +72,8 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
     onOpenChange(open)
   }
 
+  const profileType = form.watch('profileType', 'owner')
+
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent side="right">
@@ -144,7 +146,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
             />
 
             <div className="space-y-2">
-              {form.watch('profileType') === 'owner' && (
+              {profileType === 'owner' && (
                 <Controller
                   name="ownerId"
                   control={form.control}
@@ -172,7 +174,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                 />
               )}
 
-              {form.watch('profileType') === 'external' && (
+              {profileType === 'external' && (
                 <Controller
                   name="externalUserId"
                   control={form.control}
