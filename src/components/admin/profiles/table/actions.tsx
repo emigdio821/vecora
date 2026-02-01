@@ -29,6 +29,7 @@ import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { BanProfileData, DeleteProfileData, UnbanProfileData } from '@/schemas/profiles'
 import { EditProfileSheet } from '../sheets/edit-profile'
+import { ProfileDetailsSheet } from '../sheets/profile-details'
 
 interface ActionsProps {
   profile: ProfileWithAllRelations
@@ -40,6 +41,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
   const [isUnbanDialogOpen, setUnbanDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isEditProfileSheetOpen, setEditProfileSheetOpen] = useState(false)
+  const [isProfileDetailsSheetOpen, setProfileDetailsSheetOpen] = useState(false)
 
   const deleteProfileMutation = useEntityMutation({
     mutationFn: async (data: DeleteProfileData) => {
@@ -130,7 +132,6 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
       />
 
       <AlertDialogGeneric
-        variant="info"
         actionLabel="Reactivar"
         title="¿Reactivar perfil?"
         description="El perfil será reactivado y el usuario podrá acceder a su cuenta nuevamente."
@@ -157,6 +158,11 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
             />
           </div>
         }
+      />
+
+      <ProfileDetailsSheet
+        profile={profile}
+        state={{ isOpen: isProfileDetailsSheetOpen, onOpenChange: setProfileDetailsSheetOpen }}
       />
 
       <EditProfileSheet
@@ -198,7 +204,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
                 {`${profile.user?.name}`}
               </DropdownMenuLabel>
 
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setProfileDetailsSheetOpen(true)}>
                 <IconInfoCircle className="size-4" />
                 Información
               </DropdownMenuItem>

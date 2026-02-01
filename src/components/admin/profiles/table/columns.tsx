@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
 import { normalizeString } from '@/lib/utils'
 import { ProfilesTableActions } from './actions'
+import { ProfileNameCell } from './profile-name-cell'
 
 export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
   {
@@ -36,7 +37,7 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
     id: 'user-name',
     size: 200,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
-    cell: ({ row }) => row.original.user?.name || 'N/A',
+    cell: ({ row }) => <ProfileNameCell profile={row.original} />,
     filterFn: (row, _, value: string) => {
       const user = row.original.user
       const userName = user?.name || ''
