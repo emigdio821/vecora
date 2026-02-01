@@ -13,6 +13,7 @@ import {
   banProfileSchema,
   createProfileSchema,
   deleteProfileSchema,
+  unbanProfileSchema,
   updateProfileSchema,
 } from '@/schemas/profiles'
 
@@ -92,12 +93,15 @@ export const createProfile = createServerFn({ method: 'POST' })
       where: (roles, { eq }) => eq(roles.name, 'admin'),
     })
 
+    // Check if roleIds contains admin role
+    const isAdmin = adminRole ? roleIds.includes(adminRole.id) : false
+
     const signUpResult = await auth.api.createUser({
       body: {
         name,
         email,
         password,
-        role: adminRole ? 'admin' : 'user',
+        role: isAdmin ? 'admin' : 'user',
       },
     })
 
@@ -325,6 +329,33 @@ export const banProfile = createServerFn({ method: 'POST' })
           banned: true,
           banReason: reason,
           banExpiresIn: duration,
+        },
+      },
+    }).catch(console.error)
+  })
+
+export const unbanProfile = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware, adminOnlyMiddleware])
+  .inputValidator(unbanProfileSchema)
+  .handler(async ({ data }) => {
+    const { userId } = data
+    const headers = getRequestHeaders()
+
+    await auth.api.unbanUser({
+      body: {
+        userId,
+      },
+      headers,
+    })
+
+    createAuditLog({
+      data: {
+        action: 'update',
+        entityType: 'profile',
+        entityUserId: userId,
+        oldData: null,
+        newData: {
+          banned: false,
         },
       },
     }).catch(console.error)

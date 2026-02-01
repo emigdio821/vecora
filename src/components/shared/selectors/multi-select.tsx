@@ -23,6 +23,7 @@ export interface ComboboxMultiSelectProps {
   invalid?: boolean
   disabled?: boolean
   isLoading?: boolean
+  emptyLabel?: string
   placeholder?: string
   noneOptionLabel?: string
   includeNoneOption?: boolean
@@ -39,6 +40,7 @@ export function ComboboxMultiSelect({
   invalid = false,
   disabled = false,
   placeholder = 'Selecciona una opción',
+  emptyLabel = 'No hay opciones disponibles',
 }: ComboboxMultiSelectProps) {
   const [open, setOpen] = useState(false)
   const [selectedValues, setSelectedValues] = useState<string[]>(value || [])
@@ -52,6 +54,7 @@ export function ComboboxMultiSelect({
 
   function renderValue() {
     if (isLoading) return <span className="animate-pulse">Cargando datos...</span>
+    if (items.length === 0) return <span className="text-muted-foreground">{emptyLabel}</span>
 
     if (selectedValues.length > 0) {
       return (

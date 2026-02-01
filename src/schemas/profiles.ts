@@ -71,3 +71,9 @@ export const banProfileSchema = z.object({
 })
 
 export type BanProfileData = z.infer<typeof banProfileSchema>
+
+export const unbanProfileSchema = z.object({
+  userId: z.string().min(1, 'El ID de usuario es requerido'),
+})
+
+export type UnbanProfileData = z.infer<typeof unbanProfileSchema>

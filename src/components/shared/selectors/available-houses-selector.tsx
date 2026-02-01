@@ -27,5 +27,12 @@ export function AvailableHousesSelector({
     return uniqueItems
   }, [availableHouses, includeAssigned])
 
-  return <ComboboxMultiSelect isLoading={isLoadingAvailableHouses} items={items} {...comboboxProps} />
+  return (
+    <ComboboxMultiSelect
+      items={items}
+      emptyLabel="No hay casas disponibles"
+      isLoading={isLoadingAvailableHouses}
+      {...comboboxProps}
+    />
+  )
 }

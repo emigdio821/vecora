@@ -1,14 +1,15 @@
 import {
+  IconBan,
   IconDotsVertical,
   IconEdit,
   IconInfoCircle,
+  IconReload,
   IconTrash,
-  IconUserOff,
   IconUserUp,
 } from '@tabler/icons-react'
 import { Link, type LinkProps } from '@tanstack/react-router'
 import { useState } from 'react'
-import { banProfile, deleteProfile } from '@/api/server-functions/profiles'
+import { banProfile, deleteProfile, unbanProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
@@ -22,10 +23,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import type { BanProfileData, DeleteProfileData } from '@/schemas/profiles'
+import type { BanProfileData, DeleteProfileData, UnbanProfileData } from '@/schemas/profiles'
 import { EditProfileSheet } from '../sheets/edit-profile'
 
 interface ActionsProps {
@@ -33,7 +35,9 @@ interface ActionsProps {
 }
 
 export function ProfilesTableActions({ profile }: ActionsProps) {
-  const [isDeactivateDialogOpen, setDeactivateDialogOpen] = useState(false)
+  const [banReason, setBanReason] = useState('')
+  const [isBanDialogOpen, setBanDialogOpen] = useState(false)
+  const [isUnbanDialogOpen, setUnbanDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isEditProfileSheetOpen, setEditProfileSheetOpen] = useState(false)
 
@@ -50,7 +54,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
     },
   })
 
-  const deactivateProfileMutation = useEntityMutation({
+  const banProfileMutation = useEntityMutation({
     mutationFn: async (data: BanProfileData) => {
       return await banProfile({ data })
     },
@@ -59,7 +63,20 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
     successDescription: 'El perfil ha sido desactivado exitosamente.',
     errorDescription: 'Ocurrió un error al desactivar el perfil, intenta nuevamente.',
     onSuccess: () => {
-      setDeactivateDialogOpen(false)
+      setBanDialogOpen(false)
+    },
+  })
+
+  const unbanProfileMutation = useEntityMutation({
+    mutationFn: async (data: UnbanProfileData) => {
+      return await unbanProfile({ data })
+    },
+    invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    successTitle: 'Perfil reactivado',
+    successDescription: 'El perfil ha sido reactivado exitosamente.',
+    errorDescription: 'Ocurrió un error al reactivar el perfil, intenta nuevamente.',
+    onSuccess: () => {
+      setUnbanDialogOpen(false)
     },
   })
 
@@ -67,9 +84,12 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
     await deleteProfileMutation.mutateAsync({ profileId: profile.id })
   }
 
-  async function handleDeactivateProfile() {
-    // TODO: Implement reason and duration
-    await deactivateProfileMutation.mutateAsync({ userId: profile.userId })
+  async function handleBanProfile() {
+    await banProfileMutation.mutateAsync({ userId: profile.userId, reason: banReason })
+  }
+
+  async function handleUnbanProfile() {
+    await unbanProfileMutation.mutateAsync({ userId: profile.userId })
   }
 
   function getLinkedUserNavigation(): LinkProps {
@@ -110,12 +130,33 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
       />
 
       <AlertDialogGeneric
+        variant="info"
+        actionLabel="Reactivar"
+        title="¿Reactivar perfil?"
+        description="El perfil será reactivado y el usuario podrá acceder a su cuenta nuevamente."
+        action={handleUnbanProfile}
+        state={{ isOpen: isUnbanDialogOpen, onOpenChange: setUnbanDialogOpen }}
+      />
+
+      <AlertDialogGeneric
         variant="warning"
         actionLabel="Desactivar"
         title="¿Desactivar perfil?"
         description="El perfil será desactivado y el usuario no podrá acceder a su cuenta. Esta acción puede ser revertida."
-        action={handleDeactivateProfile}
-        state={{ isOpen: isDeactivateDialogOpen, onOpenChange: setDeactivateDialogOpen }}
+        action={handleBanProfile}
+        state={{ isOpen: isBanDialogOpen, onOpenChange: setBanDialogOpen }}
+        content={
+          <div>
+            <Textarea
+              name="ban-reason"
+              value={banReason}
+              className="resize-none"
+              aria-label="Razón de la desactivación"
+              onChange={(e) => setBanReason(e.target.value)}
+              placeholder="Razón de la desactivación (opcional)"
+            />
+          </div>
+        }
       />
 
       <EditProfileSheet
@@ -167,10 +208,17 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
                 Editar
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => setDeactivateDialogOpen(true)}>
-                <IconUserOff className="size-4" />
-                Desactivar
-              </DropdownMenuItem>
+              {profile.user?.banned ? (
+                <DropdownMenuItem onClick={() => setUnbanDialogOpen(true)}>
+                  <IconBan className="size-4" />
+                  <span>Reactivar</span>
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onClick={() => setBanDialogOpen(true)}>
+                  <IconReload className="size-4" />
+                  <span>Desactivar</span>
+                </DropdownMenuItem>
+              )}
 
               <DropdownMenuSeparator />
 

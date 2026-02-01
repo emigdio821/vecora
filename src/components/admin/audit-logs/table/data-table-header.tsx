@@ -117,6 +117,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
 
         <Select
           multiple
+          disabled={tableRowsLength === 0}
           onValueChange={(items) => {
             table.getColumn('timestamp')?.setFilterValue(items)
           }}

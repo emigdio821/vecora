@@ -8,7 +8,7 @@ export function ProfileStatusBadge({ banned, ...badgeProps }: ProfileStatusBadge
   function getStatusLabel() {
     switch (banned) {
       case true:
-        return 'Suspendido'
+        return 'Desactivado'
       case false:
         return 'Activo'
       default:

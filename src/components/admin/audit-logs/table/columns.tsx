@@ -47,7 +47,7 @@ export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
     },
   },
   {
-    accessorKey: 'user.profile.roles',
+    id: 'roles',
     size: 150,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
     cell: ({ row }) => {

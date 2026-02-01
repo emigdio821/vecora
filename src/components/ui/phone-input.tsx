@@ -66,7 +66,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
     count: filteredCountries.length,
     getScrollElement: () => selectedItemRef.current,
     estimateSize: () => 32,
-    overscan: 20,
+    overscan: 10,
     paddingStart: 4,
     paddingEnd: 4,
     scrollPaddingEnd: 4,

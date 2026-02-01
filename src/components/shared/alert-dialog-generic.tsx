@@ -25,10 +25,11 @@ interface AlertDialogGenericProps {
   description?: React.ReactNode
   actionLabel?: React.ReactNode
   variant?: ButtonProps['variant']
+  content?: React.ReactNode
 }
 
 export function AlertDialogGeneric(props: AlertDialogGenericProps) {
-  const { action, title, description, state, actionLabel, variant } = props
+  const { action, title, description, state, actionLabel, variant, content } = props
   const { isOpen, onOpenChange } = state
   const [isExecutingAction, setExecutingAction] = useState(false)
 
@@ -72,6 +73,7 @@ export function AlertDialogGeneric(props: AlertDialogGenericProps) {
             {description || 'Esta acción no se puede deshacer.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
+        {content}
         <AlertDialogFooter>
           <AlertDialogCancel render={<Button variant="outline" disabled={isExecutingAction} />}>
             Cancelar

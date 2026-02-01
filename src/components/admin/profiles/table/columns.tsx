@@ -34,9 +34,9 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
   },
   {
     id: 'user-name',
-    accessorKey: 'user.name',
     size: 200,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
+    cell: ({ row }) => row.original.user?.name || 'N/A',
     filterFn: (row, _, value: string) => {
       const user = row.original.user
       const userName = user?.name || ''
@@ -65,7 +65,7 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
     },
   },
   {
-    accessorKey: 'user.banned',
+    id: 'ban-status',
     size: 100,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
     cell: ({ row }) => <ProfileStatusBadge banned={row.original.user?.banned || false} />,
