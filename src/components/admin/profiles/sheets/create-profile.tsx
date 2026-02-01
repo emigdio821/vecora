@@ -163,7 +163,6 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                           form.setValue('externalUserId', null)
                           form.setValue('ownerId', value)
                           field.onChange(value)
-                          form.trigger('profileType')
                         }}
                         disabled={createProfileMutation.isPending}
                         invalid={fieldState.invalid || !!form.formState.errors.profileType}
@@ -192,7 +191,6 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                           form.setValue('ownerId', null)
                           form.setValue('externalUserId', value)
                           field.onChange(value)
-                          form.trigger('profileType')
                         }}
                         disabled={createProfileMutation.isPending}
                         invalid={fieldState.invalid || !!form.formState.errors.profileType}

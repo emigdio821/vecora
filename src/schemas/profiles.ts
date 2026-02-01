@@ -32,10 +32,14 @@ export const updateProfileSchema = z
     profileId: z.uuid('ID de perfil inválido'),
     userId: z.string().min(1, 'El ID de usuario es requerido'),
     profileType: z.enum(profileTypeEnum.enumValues, 'Tipo de perfil inválido'),
-    ownerId: z.string().uuid('ID de propietario inválido').nullish(),
-    externalUserId: z.string().uuid('ID de usuario externo inválido').nullish(),
+    ownerId: z.uuid('ID de propietario inválido').nullish(),
+    externalUserId: z.uuid('ID de usuario externo inválido').nullish(),
     roleIds: z.array(z.uuid('ID de rol inválido')).min(1, 'Debe seleccionar al menos un rol'),
-    password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres').optional(),
+    password: z
+      .string()
+      .min(8, 'La contraseña debe tener al menos 8 caracteres')
+      .or(z.literal(''))
+      .optional(),
   })
   .refine(
     (data) => {

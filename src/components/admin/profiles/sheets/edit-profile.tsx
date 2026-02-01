@@ -1,25 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { externalUsersListQueryOptions } from '@/api/tanstack-queries/external-users'
-import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
 import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
 import { LoaderIcon } from '@/components/icons'
+import { ExternalUsersSelector } from '@/components/shared/selectors/external-users-selector'
+import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
+import { ProfileTypeSelector } from '@/components/shared/selectors/profile-type-selector'
 import { RolesSelector } from '@/components/shared/selectors/roles-selector'
 import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { InputPassword } from '@/components/ui/input-password'
 import {
   Sheet,
   SheetClose,
@@ -30,8 +22,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Skeleton } from '@/components/ui/skeleton'
-import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
+import type { ProfileType, ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateProfileFormData, updateProfileSchema } from '@/schemas/profiles'
 
@@ -43,20 +34,14 @@ interface EditProfileSheetProps {
   }
 }
 
-// TODO: Finish this component
-
 export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
   const editProfileFormId = useId()
   const { isOpen, onOpenChange } = state
 
-  const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
-  const { data: externalUsers = [], isLoading: isLoadingExternalUsers } = useQuery(
-    externalUsersListQueryOptions(),
-  )
-
   const form = useForm<UpdateProfileFormData>({
     resolver: zodResolver(updateProfileSchema),
     values: {
+      password: '',
       profileId: profile.id,
       userId: profile.userId,
       profileType: profile.profileType,
@@ -88,11 +73,7 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
     onOpenChange(open)
   }
 
-  function handleProfileTypeChange(value: 'owner' | 'external') {
-    form.setValue('profileType', value)
-    form.setValue('ownerId', null)
-    form.setValue('externalUserId', null)
-  }
+  const profileType = form.watch('profileType')
 
   return (
     <Sheet
@@ -116,144 +97,104 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <Controller
-              name="userId"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    ID de Usuario <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    placeholder="ID del usuario de autenticación"
-                    aria-invalid={fieldState.invalid}
-                    disabled={updateProfileMutation.isPending}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            <Controller
               name="profileType"
               control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Tipo de perfil <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Select
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor={field.name}>Tipo de perfil</FieldLabel>
+                  <ProfileTypeSelector
+                    id={field.name}
                     value={field.value}
-                    onValueChange={(value) => handleProfileTypeChange(value as 'owner' | 'external')}
+                    includeNoneOption={false}
+                    onValueChange={(value) => {
+                      field.onChange(value as ProfileType)
+                      form.setValue('ownerId', null)
+                      form.setValue('externalUserId', null)
+                    }}
                     disabled={updateProfileMutation.isPending}
-                  >
-                    <SelectTrigger aria-invalid={fieldState.invalid} className="w-full">
-                      <SelectValue>
-                        {field.value === 'owner'
-                          ? 'Propietario'
-                          : field.value === 'external'
-                            ? 'Externo'
-                            : 'Selecciona un tipo'}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="owner">Propietario</SelectItem>
-                        <SelectItem value="external">Externo</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  />
                 </Field>
               )}
             />
 
-            {form.watch('profileType') === 'owner' && (
-              <Controller
-                name="ownerId"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Propietario <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    {isLoadingOwners ? (
-                      <Skeleton className="h-8 w-full rounded-lg" />
-                    ) : (
-                      <Select
+            <div className="space-y-2">
+              {profileType === 'owner' && (
+                <Controller
+                  name="ownerId"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Propietario <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <OwnersSelector
+                        id={field.name}
                         value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={updateProfileMutation.isPending || owners.length === 0}
-                      >
-                        <SelectTrigger aria-invalid={fieldState.invalid} className="w-full">
-                          <SelectValue>
-                            {owners.length === 0
-                              ? 'No hay propietarios disponibles'
-                              : field.value
-                                ? `${owners.find((o) => o.id === field.value)?.firstName} ${owners.find((o) => o.id === field.value)?.lastName}`
-                                : 'Selecciona un propietario'}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {owners.map((owner) => (
-                              <SelectItem key={owner.id} value={owner.id}>
-                                {`${owner.firstName} ${owner.lastName}`}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            )}
+                        onValueChange={(value) => {
+                          form.setValue('externalUserId', null)
+                          form.setValue('ownerId', value)
+                          field.onChange(value)
+                        }}
+                        disabled={updateProfileMutation.isPending}
+                        invalid={fieldState.invalid || !!form.formState.errors.profileType}
+                        includeNoneOption={false}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              )}
 
-            {form.watch('profileType') === 'external' && (
-              <Controller
-                name="externalUserId"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Usuario Externo <span className="text-destructive">*</span>
-                    </FieldLabel>
-                    {isLoadingExternalUsers ? (
-                      <Skeleton className="h-8 w-full rounded-lg" />
-                    ) : (
-                      <Select
+              {profileType === 'external' && (
+                <Controller
+                  name="externalUserId"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Usuario Externo <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <ExternalUsersSelector
+                        id={field.name}
                         value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={updateProfileMutation.isPending || externalUsers.length === 0}
-                      >
-                        <SelectTrigger aria-invalid={fieldState.invalid} className="w-full">
-                          <SelectValue>
-                            {externalUsers.length === 0
-                              ? 'No hay usuarios externos disponibles'
-                              : field.value
-                                ? `${externalUsers.find((u) => u.id === field.value)?.firstName} ${externalUsers.find((u) => u.id === field.value)?.lastName}`
-                                : 'Selecciona un usuario externo'}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {externalUsers.map((user) => (
-                              <SelectItem key={user.id} value={user.id}>
-                                {`${user.firstName} ${user.lastName}`}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            )}
+                        onValueChange={(value) => {
+                          form.setValue('ownerId', null)
+                          form.setValue('externalUserId', value)
+                          field.onChange(value)
+                        }}
+                        disabled={updateProfileMutation.isPending}
+                        invalid={fieldState.invalid || !!form.formState.errors.profileType}
+                        includeNoneOption={false}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              )}
+
+              {form.formState.errors.profileType && (
+                <FieldError errors={[form.formState.errors.profileType]} />
+              )}
+            </div>
+
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Contraseña</FieldLabel>
+                  <InputPassword
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Mínimo 8 caracteres"
+                    disabled={updateProfileMutation.isPending}
+                  />
+                  <FieldDescription>Dejar en blanco para mantener la actual</FieldDescription>
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
 
             <Controller
               name="roleIds"
@@ -261,13 +202,13 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
-                    Roles <span className="text-destructive">*</span>
+                    Rol <span className="text-destructive">*</span>
                   </FieldLabel>
                   <RolesSelector
                     id={field.name}
-                    value={field.value[0]}
                     includeNoneOption={false}
                     invalid={fieldState.invalid}
+                    value={field.value[0] || null}
                     disabled={updateProfileMutation.isPending}
                     onValueChange={(value) => field.onChange([value])}
                   />
