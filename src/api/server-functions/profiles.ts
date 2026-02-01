@@ -62,7 +62,7 @@ export const createProfile = createServerFn({ method: 'POST' })
     let email: string = ''
     let name: string = ''
 
-    if (data.profileType === 'owner' && ownerId) {
+    if (profileType === 'owner' && ownerId) {
       const owner = await db.query.owners.findFirst({
         where: (owners, { eq }) => eq(owners.id, ownerId),
       })
@@ -73,7 +73,7 @@ export const createProfile = createServerFn({ method: 'POST' })
 
       email = owner.email
       name = `${owner.firstName} ${owner.lastName}`
-    } else if (data.profileType === 'external' && externalUserId) {
+    } else if (profileType === 'external' && externalUserId) {
       const externalUser = await db.query.externalUsers.findFirst({
         where: (externalUsers, { eq }) => eq(externalUsers.id, externalUserId),
       })
@@ -167,9 +167,10 @@ export const updateProfile = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, adminOnlyMiddleware])
   .inputValidator(updateProfileSchema)
   .handler(async ({ data }) => {
+    const { externalUserId, ownerId, profileType, userId, password, profileId, roleIds } = data
     // Fetch old profile for audit log
     const oldProfile = await db.query.profiles.findFirst({
-      where: eq(profiles.id, data.profileId),
+      where: eq(profiles.id, profileId),
       with: {
         owner: true,
         externalUser: true,
@@ -182,26 +183,111 @@ export const updateProfile = createServerFn({ method: 'POST' })
       },
     })
 
+    if (!oldProfile) {
+      throw new Error('Profile not found')
+    }
+
+    // Check if owner/external user has changed
+    const ownerChanged = ownerId !== oldProfile.ownerId
+    const externalUserChanged = externalUserId !== oldProfile.externalUserId
+
+    // Update user account if owner/external user has changed
+    if (ownerChanged || externalUserChanged) {
+      let email: string = ''
+      let name: string = ''
+
+      if (profileType === 'owner' && ownerId) {
+        const owner = await db.query.owners.findFirst({
+          where: (owners, { eq }) => eq(owners.id, ownerId),
+        })
+
+        if (!owner) {
+          throw new Error('Owner not found')
+        }
+
+        email = owner.email
+        name = `${owner.firstName} ${owner.lastName}`
+      } else if (profileType === 'external' && externalUserId) {
+        const externalUser = await db.query.externalUsers.findFirst({
+          where: (externalUsers, { eq }) => eq(externalUsers.id, externalUserId),
+        })
+
+        if (!externalUser) {
+          throw new Error('External user not found')
+        }
+
+        email = externalUser.email
+        name = `${externalUser.firstName} ${externalUser.lastName}`
+      }
+
+      // Update user account using better-auth API
+      const headers = getRequestHeaders()
+      await auth.api.adminUpdateUser({
+        body: {
+          userId,
+          data: {
+            email,
+            name,
+          },
+        },
+        headers,
+      })
+    }
+
+    // Check if admin role status has changed
+    const adminRole = await db.query.roles.findFirst({
+      where: (roles, { eq }) => eq(roles.name, 'admin'),
+    })
+
+    const wasAdmin = adminRole ? oldProfile.profileRoles.some((pr) => pr.roleId === adminRole.id) : false
+    const willBeAdmin = adminRole ? roleIds.includes(adminRole.id) : false
+
+    // Update user role if admin status changed
+    if (wasAdmin !== willBeAdmin) {
+      const headers = getRequestHeaders()
+      await auth.api.adminUpdateUser({
+        body: {
+          userId,
+          data: {
+            role: willBeAdmin ? 'admin' : 'user',
+          },
+        },
+        headers,
+      })
+    }
+
+    // Update password if provided
+    if (password) {
+      const headers = getRequestHeaders()
+      await auth.api.setUserPassword({
+        body: {
+          newPassword: password,
+          userId,
+        },
+        headers,
+      })
+    }
+
     // Update the profile
     const [updatedProfile] = await db
       .update(profiles)
       .set({
-        userId: data.userId,
-        profileType: data.profileType,
-        ownerId: data.ownerId,
-        externalUserId: data.externalUserId,
+        userId: userId,
+        profileType: profileType,
+        ownerId: ownerId,
+        externalUserId: externalUserId,
         updatedAt: new Date(),
       })
-      .where(eq(profiles.id, data.profileId))
+      .where(eq(profiles.id, profileId))
       .returning()
 
     // Delete existing roles
-    await db.delete(profileRoles).where(eq(profileRoles.profileId, data.profileId))
+    await db.delete(profileRoles).where(eq(profileRoles.profileId, profileId))
 
     // Insert new roles
-    if (data.roleIds.length > 0) {
+    if (roleIds.length > 0) {
       await db.insert(profileRoles).values(
-        data.roleIds.map((roleId) => ({
+        roleIds.map((roleId) => ({
           profileId: updatedProfile.id,
           roleId,
         })),
@@ -244,8 +330,9 @@ export const deleteProfile = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, adminOnlyMiddleware])
   .inputValidator(deleteProfileSchema)
   .handler(async ({ data }) => {
+    const { profileId } = data
     const oldProfile = await db.query.profiles.findFirst({
-      where: eq(profiles.id, data.profileId),
+      where: eq(profiles.id, profileId),
       with: {
         owner: true,
         externalUser: true,
@@ -264,7 +351,7 @@ export const deleteProfile = createServerFn({ method: 'POST' })
 
     const userId = oldProfile.userId
 
-    await db.delete(profiles).where(eq(profiles.id, data.profileId))
+    await db.delete(profiles).where(eq(profiles.id, profileId))
 
     if (userId) {
       const headers = getRequestHeaders()
@@ -287,7 +374,7 @@ export const deleteProfile = createServerFn({ method: 'POST' })
       data: {
         action: 'delete',
         entityType: 'profile',
-        entityId: data.profileId,
+        entityId: profileId,
         oldData: oldProfile,
       },
     }).catch(console.error)

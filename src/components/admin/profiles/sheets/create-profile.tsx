@@ -4,6 +4,7 @@ import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
+import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
 import { LoaderIcon } from '@/components/icons'
 import { ExternalUsersSelector } from '@/components/shared/selectors/external-users-selector'
@@ -54,7 +55,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
     mutationFn: async (data: CreateProfileFormData) => {
       return await createProfile({ data })
     },
-    invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, OWNERS_QUERY_KEY],
     successTitle: 'Perfil creado',
     successDescription: 'El perfil ha sido creado exitosamente.',
     errorDescription: 'Ocurrió un error al crear el perfil, intenta nuevamente.',
@@ -167,6 +168,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                         disabled={createProfileMutation.isPending}
                         invalid={fieldState.invalid || !!form.formState.errors.profileType}
                         includeNoneOption={false}
+                        excludeWithProfiles
                       />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>

@@ -35,6 +35,7 @@ export const updateProfileSchema = z
     ownerId: z.string().uuid('ID de propietario inválido').nullish(),
     externalUserId: z.string().uuid('ID de usuario externo inválido').nullish(),
     roleIds: z.array(z.uuid('ID de rol inválido')).min(1, 'Debe seleccionar al menos un rol'),
+    password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres').optional(),
   })
   .refine(
     (data) => {

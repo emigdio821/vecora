@@ -21,6 +21,7 @@ interface OwnersSelectorProps {
   placeholder?: string
   noneOptionLabel?: string
   includeNoneOption?: boolean
+  excludeWithProfiles?: boolean
   onValueChange?: (value: string | null) => void
 }
 
@@ -30,26 +31,33 @@ export function OwnersSelector({
   onValueChange,
   invalid = false,
   disabled = false,
-  placeholder = 'Selecciona una opción',
   includeNoneOption = true,
+  excludeWithProfiles = false,
   noneOptionLabel = 'Sin selección',
+  placeholder = 'Selecciona una opción',
 }: OwnersSelectorProps) {
   const [open, setOpen] = useState(false)
   const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
 
   const items = useMemo(() => {
-    const ownersItems = owners.map((owner) => ({
+    let filteredOwners = owners
+
+    if (excludeWithProfiles) {
+      filteredOwners = owners.filter((owner) => !owner.profile)
+    }
+
+    const ownersItems = filteredOwners.map((owner) => ({
       value: owner.id,
       label: `${owner.firstName} ${owner.lastName}`,
     }))
 
     return ownersItems
-  }, [owners])
+  }, [owners, excludeWithProfiles])
 
   function renderOwnerValue(value?: string | null) {
     if (isLoadingOwners) return <span className="animate-pulse">Cargando datos...</span>
 
-    if (owners.length === 0) {
+    if (items.length === 0) {
       return <span className="text-muted-foreground">No hay propietarios disponibles</span>
     }
 
@@ -71,8 +79,8 @@ export function OwnersSelector({
             variant="outline"
             aria-invalid={invalid}
             aria-label="Combobox de propietarios"
-            disabled={owners.length === 0 || disabled}
-            className="w-full justify-between font-normal"
+            disabled={items.length === 0 || disabled}
+            className="w-full justify-between font-normal disabled:bg-input/50 disabled:*:opacity-50 disabled:dark:bg-input/80"
           >
             {renderOwnerValue(value)}
             <IconSelector className="-me-1 text-muted-foreground" />
