@@ -216,12 +216,12 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
 
               {profile.user?.banned ? (
                 <DropdownMenuItem onClick={() => setUnbanDialogOpen(true)}>
-                  <IconBan className="size-4" />
+                  <IconReload className="size-4" />
                   <span>Reactivar</span>
                 </DropdownMenuItem>
               ) : (
                 <DropdownMenuItem onClick={() => setBanDialogOpen(true)}>
-                  <IconReload className="size-4" />
+                  <IconBan className="size-4" />
                   <span>Desactivar</span>
                 </DropdownMenuItem>
               )}
