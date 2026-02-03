@@ -81,6 +81,7 @@ export function PaymentsDataTableHeader({ table }: PaymentsDataTableHeaderProps)
             aria-label="Buscar"
             placeholder="Buscar"
             name="search-payments"
+            disabled={tableRowsLength === 0}
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
           <InputGroupAddon>

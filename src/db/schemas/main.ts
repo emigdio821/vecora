@@ -43,6 +43,8 @@ export const auditLogEntityTypeEnum = pgEnum('audit_log_entity_type', [
   'violation',
   'profile',
   'user',
+  'hoa_board',
+  'hoa_board_period',
 ])
 
 // Roles table - defines all available roles in the system
@@ -253,6 +255,52 @@ export const paymentMonths = pgTable(
   ],
 )
 
+// HOA Board Periods table - defines board terms/periods
+export const hoaBoardPeriods = pgTable(
+  'hoa_board_periods',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    startDate: timestamp('start_date', { withTimezone: true }).notNull(),
+    endDate: timestamp('end_date', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index('hoa_board_periods_dates_idx').on(table.startDate, table.endDate),
+    unique('hoa_board_periods_unique').on(table.startDate, table.endDate),
+  ],
+)
+
+// HOA Board table - tracks which profiles are part of each board period
+// Stores member names to preserve historical data even if profile is deleted
+export const hoaBoard = pgTable(
+  'hoa_board',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    periodId: uuid('period_id')
+      .notNull()
+      .references(() => hoaBoardPeriods.id, { onDelete: 'cascade' }),
+    profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
+    // Denormalized fields to preserve historical data
+    firstName: varchar('first_name', { length: 100 }).notNull(),
+    lastName: varchar('last_name', { length: 100 }).notNull(),
+    email: varchar('email', { length: 255 }).notNull(),
+    profileType: profileTypeEnum('profile_type').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index('hoa_board_periodId_idx').on(table.periodId),
+    index('hoa_board_profileId_idx').on(table.profileId),
+  ],
+)
+
 // Audit Logs table - tracks all admin actions for compliance and security
 export const auditLogs = pgTable(
   'audit_logs',
@@ -344,6 +392,7 @@ export const profilesRelations = relations(profiles, ({ one, many }) => ({
     references: [externalUsers.id],
   }),
   profileRoles: many(profileRoles),
+  hoaBoardMemberships: many(hoaBoard),
 }))
 
 export const profileRolesRelations = relations(profileRoles, ({ one }) => ({
@@ -403,5 +452,20 @@ export const paymentHistoryRelations = relations(paymentHistory, ({ one }) => ({
   changedByUser: one(user, {
     fields: [paymentHistory.changedBy],
     references: [user.id],
+  }),
+}))
+
+export const hoaBoardPeriodsRelations = relations(hoaBoardPeriods, ({ many }) => ({
+  members: many(hoaBoard),
+}))
+
+export const hoaBoardRelations = relations(hoaBoard, ({ one }) => ({
+  period: one(hoaBoardPeriods, {
+    fields: [hoaBoard.periodId],
+    references: [hoaBoardPeriods.id],
+  }),
+  profile: one(profiles, {
+    fields: [hoaBoard.profileId],
+    references: [profiles.id],
   }),
 }))

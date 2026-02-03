@@ -79,6 +79,7 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
             aria-label="Buscar"
             placeholder="Buscar"
             name="search-owners"
+            disabled={tableRowsLength === 0}
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
           <InputGroupAddon>

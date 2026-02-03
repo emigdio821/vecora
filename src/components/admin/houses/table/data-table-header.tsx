@@ -79,6 +79,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
             aria-label="Buscar"
             placeholder="Buscar"
             name="search-houses"
+            disabled={tableRowsLength === 0}
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
           <InputGroupAddon>

@@ -17,6 +17,7 @@ import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
 import { Route as AuthedSecurityRouteImport } from './routes/_authed/security'
 import { Route as AuthedPresidencyRouteImport } from './routes/_authed/presidency'
 import { Route as AuthedMaintenanceRouteImport } from './routes/_authed/maintenance'
+import { Route as AuthedHoaBoardRouteImport } from './routes/_authed/hoa-board'
 import { Route as AuthedAdminRouteRouteImport } from './routes/_authed/admin/route'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthedAdminUsersRouteImport } from './routes/_authed/admin/users'
@@ -62,6 +63,11 @@ const AuthedMaintenanceRoute = AuthedMaintenanceRouteImport.update({
   path: '/maintenance',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedHoaBoardRoute = AuthedHoaBoardRouteImport.update({
+  id: '/hoa-board',
+  path: '/hoa-board',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedAdminRouteRoute = AuthedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
   '/login': typeof LoginRoute
   '/admin': typeof AuthedAdminRouteRouteWithChildren
+  '/hoa-board': typeof AuthedHoaBoardRoute
   '/maintenance': typeof AuthedMaintenanceRoute
   '/presidency': typeof AuthedPresidencyRoute
   '/security': typeof AuthedSecurityRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin': typeof AuthedAdminRouteRouteWithChildren
+  '/hoa-board': typeof AuthedHoaBoardRoute
   '/maintenance': typeof AuthedMaintenanceRoute
   '/presidency': typeof AuthedPresidencyRoute
   '/security': typeof AuthedSecurityRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authed/admin': typeof AuthedAdminRouteRouteWithChildren
+  '/_authed/hoa-board': typeof AuthedHoaBoardRoute
   '/_authed/maintenance': typeof AuthedMaintenanceRoute
   '/_authed/presidency': typeof AuthedPresidencyRoute
   '/_authed/security': typeof AuthedSecurityRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/admin'
+    | '/hoa-board'
     | '/maintenance'
     | '/presidency'
     | '/security'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/admin'
+    | '/hoa-board'
     | '/maintenance'
     | '/presidency'
     | '/security'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/_authed'
     | '/login'
     | '/_authed/admin'
+    | '/_authed/hoa-board'
     | '/_authed/maintenance'
     | '/_authed/presidency'
     | '/_authed/security'
@@ -242,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedMaintenanceRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/hoa-board': {
+      id: '/_authed/hoa-board'
+      path: '/hoa-board'
+      fullPath: '/hoa-board'
+      preLoaderRoute: typeof AuthedHoaBoardRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/admin': {
       id: '/_authed/admin'
       path: '/admin'
@@ -297,6 +316,7 @@ const AuthedAdminRouteRouteWithChildren =
 
 interface AuthedRouteChildren {
   AuthedAdminRouteRoute: typeof AuthedAdminRouteRouteWithChildren
+  AuthedHoaBoardRoute: typeof AuthedHoaBoardRoute
   AuthedMaintenanceRoute: typeof AuthedMaintenanceRoute
   AuthedPresidencyRoute: typeof AuthedPresidencyRoute
   AuthedSecurityRoute: typeof AuthedSecurityRoute
@@ -307,6 +327,7 @@ interface AuthedRouteChildren {
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedAdminRouteRoute: AuthedAdminRouteRouteWithChildren,
+  AuthedHoaBoardRoute: AuthedHoaBoardRoute,
   AuthedMaintenanceRoute: AuthedMaintenanceRoute,
   AuthedPresidencyRoute: AuthedPresidencyRoute,
   AuthedSecurityRoute: AuthedSecurityRoute,

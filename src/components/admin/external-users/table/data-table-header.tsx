@@ -81,6 +81,7 @@ export function ExternalUsersDataTableHeader({ table }: ExternalUsersDataTableHe
             aria-label="Buscar"
             placeholder="Buscar"
             name="search-external-users"
+            disabled={tableRowsLength === 0}
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
           <InputGroupAddon>

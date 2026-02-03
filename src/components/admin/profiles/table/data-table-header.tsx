@@ -27,6 +27,7 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
   const [searchQuery, setSearchQuery] = useQueryState('search-profiles', { defaultValue: '' })
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
+  const tableRowsLength = table.getCoreRowModel().rows.length
 
   const bulkProfileDeleteMutation = useBulkDelete({
     table,
@@ -127,6 +128,7 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
             aria-label="Buscar"
             placeholder="Buscar"
             name="search-profiles"
+            disabled={tableRowsLength === 0}
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
           <InputGroupAddon>

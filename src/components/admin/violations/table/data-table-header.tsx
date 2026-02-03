@@ -81,6 +81,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
             aria-label="Buscar"
             placeholder="Buscar"
             name="search-violations"
+            disabled={tableRowsLength === 0}
             onChange={(e) => setSearchQuery(e.target.value || null)}
           />
           <InputGroupAddon>
