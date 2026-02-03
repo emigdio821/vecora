@@ -2,6 +2,7 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import { profiles, profileTypeEnum } from '../main'
 import type { SelectExternalUser } from './external-users'
+import type { SelectHoaBoard } from './hoa-board'
 import type { SelectOwner } from './owners'
 import type { ProfileRoleWithRole } from './profile-roles'
 import type { SelectUser } from './users'
@@ -28,4 +29,5 @@ export type ProfileWithAllRelations = SelectProfile & {
   externalUser: SelectExternalUser | null
   profileRoles: ProfileRoleWithRole[]
   user: SelectUser | null
+  hoaBoardMemberships: SelectHoaBoard[]
 }

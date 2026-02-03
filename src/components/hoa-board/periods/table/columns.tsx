@@ -1,7 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
+import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
+import { formatDate, normalizeString } from '@/lib/utils'
 
 export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[] = [
   {
@@ -31,9 +33,16 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
     accessorKey: 'startDate',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha inicial" />,
     size: 180,
+    filterFn: (row, _, value: string) => {
+      const normalizedStartDate = normalizeString(formatDate(row.original.startDate)).toLowerCase()
+      const normalizedEndDate = normalizeString(formatDate(row.original.endDate)).toLowerCase()
+      const normalizedValue = normalizeString(value).toLowerCase()
+
+      return normalizedStartDate.includes(normalizedValue) || normalizedEndDate.includes(normalizedValue)
+    },
     cell: ({ row }) => {
       const date = new Date(row.original.startDate)
-      return <p>{date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      return <p className="line-clamp-1">{formatDate(date)}</p>
     },
   },
   {
@@ -42,7 +51,7 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
     size: 180,
     cell: ({ row }) => {
       const date = new Date(row.original.endDate)
-      return <p>{date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      return <p className="line-clamp-1">{formatDate(date)}</p>
     },
   },
   {
@@ -52,7 +61,7 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
     enableSorting: false,
     cell: ({ row }) => {
       const membersCount = row.original.members?.length ?? 0
-      return <p className="text-center">{membersCount}</p>
+      return <Badge variant="outline">{membersCount}</Badge>
     },
   },
   {

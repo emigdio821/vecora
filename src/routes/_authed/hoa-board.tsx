@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQueryState } from 'nuqs'
 import { HoaMembersDataTable } from '@/components/hoa-board/members/table/data-table'
-import { HoaPeriodsDataTable } from '@/components/hoa-board/periods/data-table'
+import { HoaPeriodsDataTable } from '@/components/hoa-board/periods/table/data-table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export const Route = createFileRoute('/_authed/hoa-board')({

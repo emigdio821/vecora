@@ -24,6 +24,7 @@ export const getProfilesList = createServerFn()
       with: {
         owner: true,
         externalUser: true,
+        hoaBoardMemberships: true,
         profileRoles: {
           with: {
             role: true,
@@ -138,6 +139,7 @@ export const createProfile = createServerFn({ method: 'POST' })
       with: {
         owner: true,
         externalUser: true,
+        hoaBoardMemberships: true,
         profileRoles: {
           with: {
             role: true,
@@ -300,6 +302,7 @@ export const updateProfile = createServerFn({ method: 'POST' })
       with: {
         owner: true,
         externalUser: true,
+        hoaBoardMemberships: true,
         profileRoles: {
           with: {
             role: true,

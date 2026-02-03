@@ -3,14 +3,15 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 interface TableGenericSkeletonProps {
   withHeader?: boolean
+  headerContent?: React.ReactNode
 }
 
-export function TableGenericSkeleton({ withHeader = true }: TableGenericSkeletonProps) {
+export function TableGenericSkeleton({ withHeader = true, headerContent }: TableGenericSkeletonProps) {
   return (
     <Frame className="w-full">
       {withHeader && (
         <FrameHeader className="p-2">
-          <Skeleton className="h-8 w-full rounded-lg sm:w-sm" />
+          {headerContent ? headerContent : <Skeleton className="h-8 w-full rounded-lg sm:w-sm" />}
         </FrameHeader>
       )}
 

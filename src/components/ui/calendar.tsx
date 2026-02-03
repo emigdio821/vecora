@@ -1,7 +1,7 @@
 import { IconChevronDown, IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
-import type * as React from 'react'
 import { DayPicker, getDefaultClassNames } from 'react-day-picker'
 import { type Button, buttonVariants } from '@/components/ui/button'
+import { STARTING_YEAR } from '@/lib/constants'
 import { cn, formatDate } from '@/lib/utils'
 import { NativeSelect, NativeSelectOption } from './native-select'
 
@@ -18,9 +18,11 @@ function Calendar({
   buttonVariant?: React.ComponentProps<typeof Button>['variant']
 }) {
   const defaultClassNames = getDefaultClassNames()
+  const fromYear = new Date(STARTING_YEAR, 0)
 
   return (
     <DayPicker
+      startMonth={fromYear}
       showOutsideDays={showOutsideDays}
       className={cn(
         'group/calendar bg-background p-1 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(7)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',

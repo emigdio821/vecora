@@ -270,7 +270,7 @@ export const hoaBoardPeriods = pgTable(
   },
   (table) => [
     index('hoa_board_periods_dates_idx').on(table.startDate, table.endDate),
-    unique('hoa_board_periods_unique').on(table.startDate, table.endDate),
+    check('hoa_board_periods_dates_order', sql`${table.endDate} > ${table.startDate}`),
   ],
 )
 

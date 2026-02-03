@@ -1,10 +1,11 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { MemberStatusBadge } from '@/components/shared/member-status-badge'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
+import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { HoaBoardMemberWithProfile } from '@/db/schemas/zod/hoa-board'
-import { normalizeString } from '@/lib/utils'
+import { cn, normalizeString } from '@/lib/utils'
 
 export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberWithProfile>[] = [
   {
@@ -41,12 +42,7 @@ export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberWithProfile>[]
 
       return (
         <div className="flex items-center gap-2">
-          <p className={isDeleted ? 'text-muted-foreground' : ''}>{fullName}</p>
-          {isDeleted && (
-            <Badge variant="outline" className="text-xs">
-              Eliminado
-            </Badge>
-          )}
+          <p className={cn(isDeleted && 'text-muted-foreground')}>{fullName}</p>
         </div>
       )
     },
@@ -64,10 +60,15 @@ export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberWithProfile>[]
     },
   },
   {
-    accessorKey: 'email',
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Correo" />,
+    accessorKey: 'profile',
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
     size: 200,
-    cell: ({ row }) => <p className="truncate">{row.original.email}</p>,
+    cell: ({ row }) => {
+      const profile = row.original.profile
+      const roleName = profile?.profileRoles[0]?.role.name || 'Sin rol'
+
+      return <RoleNameBadge roleName={roleName} />
+    },
   },
   {
     accessorKey: 'profileType',
@@ -82,7 +83,7 @@ export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberWithProfile>[]
     enableSorting: false,
     cell: ({ row }) => {
       const isActive = !!row.original.profileId
-      return <Badge variant={isActive ? 'default' : 'secondary'}>{isActive ? 'Activo' : 'Inactivo'}</Badge>
+      return <MemberStatusBadge deleted={!isActive} />
     },
   },
   {
