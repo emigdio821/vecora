@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
 import { formatDate, normalizeString } from '@/lib/utils'
+import { HoaPeriodCell } from './period-cell'
 
 export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[] = [
   {
@@ -31,6 +32,7 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
   },
   {
     accessorKey: 'startDate',
+    cell: ({ row }) => <HoaPeriodCell period={row.original} />,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha inicial" />,
     size: 180,
     filterFn: (row, _, value: string) => {
@@ -39,10 +41,6 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
       const normalizedValue = normalizeString(value).toLowerCase()
 
       return normalizedStartDate.includes(normalizedValue) || normalizedEndDate.includes(normalizedValue)
-    },
-    cell: ({ row }) => {
-      const date = new Date(row.original.startDate)
-      return <p className="line-clamp-1">{formatDate(date)}</p>
     },
   },
   {

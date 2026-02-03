@@ -5,7 +5,8 @@ import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { HoaBoardMemberWithProfile } from '@/db/schemas/zod/hoa-board'
-import { cn, normalizeString } from '@/lib/utils'
+import { normalizeString } from '@/lib/utils'
+import { HoaMemberNameCell } from './member-cell'
 
 export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberWithProfile>[] = [
   {
@@ -33,19 +34,9 @@ export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberWithProfile>[]
   },
   {
     accessorKey: 'firstName',
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
     size: 200,
-    cell: ({ row }) => {
-      const { firstName, lastName, profileId } = row.original
-      const fullName = `${firstName} ${lastName}`
-      const isDeleted = !profileId
-
-      return (
-        <div className="flex items-center gap-2">
-          <p className={cn(isDeleted && 'text-muted-foreground')}>{fullName}</p>
-        </div>
-      )
-    },
+    cell: ({ row }) => <HoaMemberNameCell member={row.original} />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
     filterFn: (row, _, value: string) => {
       const normalizedFirstName = normalizeString(row.original.firstName).toLowerCase()
       const normalizedLastName = normalizeString(row.original.lastName).toLowerCase()
