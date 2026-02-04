@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
 import { formatDate } from '@/lib/utils'
-import { PeriodDetailsSheet } from '../sheets/period-details'
+import { HoaPeriodDetailsSheet } from '../sheets/period-details'
 
 interface HoaPeriodCellProps {
   period: HoaBoardPeriodWithMembers
@@ -21,7 +21,7 @@ export function HoaPeriodCell({ period }: HoaPeriodCellProps) {
         {formatDate(period.startDate)}
       </Button>
 
-      <PeriodDetailsSheet period={period} state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }} />
+      <HoaPeriodDetailsSheet period={period} state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }} />
     </>
   )
 }

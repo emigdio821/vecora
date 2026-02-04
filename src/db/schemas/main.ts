@@ -267,9 +267,11 @@ export const hoaBoardPeriods = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    deletedAt: timestamp('deleted_at'),
   },
   (table) => [
     index('hoa_board_periods_dates_idx').on(table.startDate, table.endDate),
+    index('hoa_board_periods_deletedAt_idx').on(table.deletedAt),
     check('hoa_board_periods_dates_order', sql`${table.endDate} > ${table.startDate}`),
   ],
 )

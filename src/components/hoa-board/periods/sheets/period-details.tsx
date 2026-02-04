@@ -18,7 +18,7 @@ import {
 import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
 import { cn, formatDate } from '@/lib/utils'
 
-interface PeriodDetailsSheetProps {
+interface HoaPeriodDetailsSheetProps {
   period: HoaBoardPeriodWithMembers
   state: {
     isOpen: boolean
@@ -26,7 +26,7 @@ interface PeriodDetailsSheetProps {
   }
 }
 
-export function PeriodDetailsSheet({ period, state }: PeriodDetailsSheetProps) {
+export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetProps) {
   const { isOpen, onOpenChange } = state
   const activeMembers = period.members?.filter((member) => !member.deletedAt) || []
   const pastMembers = period.members?.filter((member) => member.deletedAt) || []

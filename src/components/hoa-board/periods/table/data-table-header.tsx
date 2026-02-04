@@ -1,11 +1,17 @@
-import { IconFileExport, IconPlus, IconSearch } from '@tabler/icons-react'
+import { IconFileExport, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
+import { deleteHoaBoardPeriod } from '@/api/server-functions/hoa-board'
+import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
+import { HOA_BOARD_MEMBERS_QUERY_KEY, HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
+import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
+import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { useUserRoles } from '@/hooks/use-user-roles'
 import { CreatePeriodSheet } from '../sheets/create-period'
 
@@ -14,6 +20,7 @@ interface PeriodsDataTableHeaderProps {
 }
 
 export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isCreatePeriodSheetOpen, setIsCreatePeriodSheetOpen] = useState(false)
   const { isAdmin } = useUserRoles()
 
@@ -26,12 +33,48 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
 
+  const bulkDeleteMutation = useBulkDelete({
+    table,
+    successTitle: 'Periodos eliminados',
+    successDescription: 'Los periodos seleccionados han sido eliminados exitosamente.',
+    deleteFn: async (period) => {
+      await deleteHoaBoardPeriod({ data: { periodId: period.id } })
+    },
+    invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, HOA_BOARD_MEMBERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    onSuccess: () => {
+      setDeleteDialogOpen(false)
+    },
+  })
+
+  async function handleBatchDelete() {
+    await bulkDeleteMutation.mutateAsync()
+  }
+
   useEffect(() => {
     table.getColumn('startDate')?.setFilterValue(searchQuery)
   }, [searchQuery, table])
 
   return (
     <>
+      <AlertDialogGeneric
+        state={{
+          isOpen: isDeleteDialogOpen,
+          onOpenChange: setDeleteDialogOpen,
+        }}
+        action={handleBatchDelete}
+        variant="destructive"
+        actionLabel="Eliminar"
+        title="¿Eliminar periodos?"
+        description={
+          <div>
+            <p>
+              Periodos seleccionados: <strong>{selectedRowsLength}</strong>.
+            </p>
+            <p>Esta acción no se puede deshacer.</p>
+          </div>
+        }
+      />
+
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full bg-background sm:w-sm">
           <InputGroupInput
@@ -49,6 +92,24 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
         </InputGroup>
 
         <div className="flex gap-2">
+          {isAdmin && selectedRowsLength > 0 && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    aria-label="Borrar casas seleccionadas"
+                    onClick={() => setDeleteDialogOpen(true)}
+                  >
+                    <IconTrash className="size-4" />
+                  </Button>
+                }
+              />
+              <TooltipContent>Eliminar periodos seleccionados</TooltipContent>
+            </Tooltip>
+          )}
+
           {tableRowsLength > 0 && (
             <Button variant="outline" disabled>
               <IconFileExport className="size-4" />

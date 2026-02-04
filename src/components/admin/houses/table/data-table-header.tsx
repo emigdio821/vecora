@@ -123,7 +123,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
                   </Button>
                 }
               />
-              <TooltipContent>Eliminar seleccionados</TooltipContent>
+              <TooltipContent>Eliminar casas seleccionadas</TooltipContent>
             </Tooltip>
           )}
 

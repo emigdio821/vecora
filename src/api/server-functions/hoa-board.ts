@@ -15,6 +15,7 @@ import {
   createHoaBoardMemberSchema,
   createHoaBoardPeriodSchema,
   deleteHoaBoardMemberSchema,
+  deleteHoaBoardPeriodSchema,
   updateHoaBoardMemberSchema,
 } from '@/schemas/hoa-board'
 
@@ -22,6 +23,7 @@ export const getHoaBoardPeriods = createServerFn()
   .middleware([authMiddleware])
   .handler(async () => {
     const periods = await db.query.hoaBoardPeriods.findMany({
+      where: (period, { isNull }) => isNull(period.deletedAt),
       with: {
         members: {
           // where: (member, { isNull }) => isNull(member.deletedAt),
@@ -52,7 +54,8 @@ export const getCurrentHoaBoardMembers = createServerFn()
 
     // Find the current period
     const currentPeriod = await db.query.hoaBoardPeriods.findFirst({
-      where: (period, { and, lte, gte }) => and(lte(period.startDate, now), gte(period.endDate, now)),
+      where: (period, { and, lte, gte, isNull }) =>
+        and(lte(period.startDate, now), gte(period.endDate, now), isNull(period.deletedAt)),
     })
 
     if (!currentPeriod) {
@@ -84,7 +87,9 @@ export const createHoaBoardPeriod = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, adminOnlyMiddleware])
   .inputValidator(createHoaBoardPeriodSchema)
   .handler(async ({ data }) => {
-    const existingPeriods = await db.query.hoaBoardPeriods.findMany()
+    const existingPeriods = await db.query.hoaBoardPeriods.findMany({
+      where: (period, { isNull }) => isNull(period.deletedAt),
+    })
 
     const hasOverlap = existingPeriods.some((period) => {
       return data.startDate < period.endDate && data.endDate > period.startDate
@@ -297,4 +302,40 @@ export const deleteHoaBoardMember = createServerFn({ method: 'POST' })
     }).catch(console.error)
 
     return memberToDelete satisfies SelectHoaBoard
+  })
+
+export const deleteHoaBoardPeriod = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware, adminOnlyMiddleware])
+  .inputValidator(deleteHoaBoardPeriodSchema)
+  .handler(async ({ data }) => {
+    const [periodToDelete] = await db
+      .select()
+      .from(hoaBoardPeriods)
+      .where(eq(hoaBoardPeriods.id, data.periodId))
+      .limit(1)
+
+    if (!periodToDelete) {
+      throw new Error('Period not found')
+    }
+
+    // Soft delete: set deletedAt timestamp instead of removing record
+    const [deletedPeriod] = await db
+      .update(hoaBoardPeriods)
+      .set({ deletedAt: new Date() })
+      .where(eq(hoaBoardPeriods.id, data.periodId))
+      .returning()
+
+    // Also soft delete all members in this period
+    await db.update(hoaBoard).set({ deletedAt: new Date() }).where(eq(hoaBoard.periodId, data.periodId))
+
+    createAuditLog({
+      data: {
+        action: 'delete',
+        entityType: 'hoa_board_period',
+        entityId: deletedPeriod.id,
+        oldData: periodToDelete,
+      },
+    }).catch(console.error)
+
+    return periodToDelete satisfies SelectHoaBoardPeriod
   })

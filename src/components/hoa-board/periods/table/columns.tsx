@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
 import { formatDate, normalizeString } from '@/lib/utils'
+import { HoaPeriodsTableActions } from './actions'
 import { HoaPeriodCell } from './period-cell'
 
 export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[] = [
@@ -69,9 +70,6 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
     enablePinning: false,
     enableResizing: false,
     enableSorting: false,
-    cell: () => {
-      // Actions will be added later
-      return null
-    },
+    cell: ({ row }) => <HoaPeriodsTableActions period={row.original} />,
   },
 ]
