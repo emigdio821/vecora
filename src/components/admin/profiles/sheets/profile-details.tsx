@@ -169,7 +169,7 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
                 <FramePanel className="p-2">
                   <Empty className="p-1">
                     <EmptyHeader>
-                      <EmptyMedia variant="icon" className="mb-1">
+                      <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
                       <EmptyDescription>
@@ -206,7 +206,7 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
                 <FramePanel className="p-2">
                   <Empty className="p-1">
                     <EmptyHeader>
-                      <EmptyMedia variant="icon" className="mb-1">
+                      <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
                       <EmptyDescription>Sin roles asignados</EmptyDescription>

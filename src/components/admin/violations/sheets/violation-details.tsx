@@ -97,7 +97,7 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
                 <FramePanel className="p-2">
                   <Empty className="p-1">
                     <EmptyHeader>
-                      <EmptyMedia variant="icon" className="mb-1">
+                      <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
                       <EmptyDescription>No tiene propietario asignado.</EmptyDescription>

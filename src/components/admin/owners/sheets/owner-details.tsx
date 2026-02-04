@@ -96,7 +96,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                 <FramePanel className="p-2">
                   <Empty className="p-1">
                     <EmptyHeader>
-                      <EmptyMedia variant="icon" className="mb-1">
+                      <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
                       <EmptyDescription>Sin casas asignadas.</EmptyDescription>
@@ -150,7 +150,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                 <FramePanel className="p-2">
                   <Empty className="p-1">
                     <EmptyHeader>
-                      <EmptyMedia variant="icon" className="mb-1">
+                      <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
                       <EmptyDescription>Sin infracciones pendientes.</EmptyDescription>
@@ -178,7 +178,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                       payment.paymentType === 'monthly_fee' ? 'Cuota mensual' : 'Infracción'
 
                     return (
-                      <FramePanel key={payment.id} className="flex items-center gap-2 p-1">
+                      <FramePanel key={payment.id} className="flex items-center gap-2 p-2">
                         <div className="min-w-0 flex-1">
                           <Badge variant="outline">
                             <span
@@ -203,7 +203,7 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
                 <FramePanel className="p-2">
                   <Empty className="p-1">
                     <EmptyHeader>
-                      <EmptyMedia variant="icon" className="mb-1">
+                      <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
                       <EmptyDescription>Sin pagos pendientes.</EmptyDescription>

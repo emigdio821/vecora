@@ -1,10 +1,10 @@
-import { IconCalendarTime, IconUsers } from '@tabler/icons-react'
+import { IconCalendarTime, IconUsers, IconWind } from '@tabler/icons-react'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { Badge } from '@/components/ui/badge'
 import { CopyButton } from '@/components/ui/copy-button'
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
 import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
@@ -99,10 +99,14 @@ export function PeriodDetailsSheet({ period, state }: PeriodDetailsSheetProps) {
                 </div>
               ) : (
                 <FramePanel className="p-2">
-                  <Empty className="p-1">
-                    <EmptyMedia className="size-8" />
-                    <EmptyHeader>Sin miembros</EmptyHeader>
-                    <EmptyDescription>Este periodo no tiene miembros asignados</EmptyDescription>
+                  <Empty className="gap-2 p-1">
+                    <EmptyMedia variant="icon" className="mb-0">
+                      <IconWind />
+                    </EmptyMedia>
+                    <EmptyContent className="gap-0">
+                      <EmptyHeader>Sin miembros</EmptyHeader>
+                      <EmptyDescription>Este periodo no tiene miembros asignados</EmptyDescription>
+                    </EmptyContent>
                   </Empty>
                 </FramePanel>
               )

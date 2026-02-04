@@ -106,7 +106,7 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
                 <FramePanel className="p-2">
                   <Empty className="p-1">
                     <EmptyHeader>
-                      <EmptyMedia variant="icon" className="mb-1">
+                      <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
                       <EmptyDescription>Usuario no disponible</EmptyDescription>
