@@ -3,9 +3,9 @@ import { IconSelector } from '@tabler/icons-react'
 import { addYears } from 'date-fns'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { createHoaBoardPeriod } from '@/api/server-functions/hoa-board'
+import { updateHoaBoardPeriod } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
+import { HOA_BOARD_MEMBERS_QUERY_KEY, HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -21,50 +21,52 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
+import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { MAX_YEAR_OFFSET } from '@/lib/constants'
 import { formatDate } from '@/lib/utils'
-import { type CreateHoaBoardPeriodFormData, createHoaBoardPeriodSchema } from '@/schemas/hoa-board'
+import { type UpdateHoaBoardPeriodFormData, updateHoaBoardPeriodSchema } from '@/schemas/hoa-board'
 
-interface CreatePeriodSheetProps {
+interface EditHoaPeriodSheetProps {
+  period: HoaBoardPeriodWithMembers
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
   }
 }
 
-export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
-  const createPeriodFormId = useId()
+export function EditHoaPeriodSheet({ period, state }: EditHoaPeriodSheetProps) {
+  const editPeriodFormId = useId()
   const { isOpen, onOpenChange } = state
 
-  const form = useForm<CreateHoaBoardPeriodFormData>({
-    shouldUnregister: true,
-    resolver: zodResolver(createHoaBoardPeriodSchema),
-    defaultValues: {
-      startDate: new Date(),
-      endDate: addYears(new Date(), 1),
+  const form = useForm<UpdateHoaBoardPeriodFormData>({
+    resolver: zodResolver(updateHoaBoardPeriodSchema),
+    values: {
+      periodId: period.id,
+      startDate: new Date(period.startDate),
+      endDate: new Date(period.endDate),
     },
   })
 
-  const createPeriodMutation = useEntityMutation({
-    mutationFn: async (data: CreateHoaBoardPeriodFormData) => {
-      return await createHoaBoardPeriod({ data })
+  const updatePeriodMutation = useEntityMutation({
+    mutationFn: async (data: UpdateHoaBoardPeriodFormData) => {
+      return await updateHoaBoardPeriod({ data })
     },
-    invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
-    successTitle: 'Periodo creado',
-    successDescription: 'El periodo ha sido creado exitosamente.',
-    errorDescription: 'Ocurrió un error al crear el periodo, intenta nuevamente.',
+    invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, HOA_BOARD_MEMBERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    successTitle: 'Periodo actualizado',
+    successDescription: 'El periodo ha sido actualizado exitosamente.',
+    errorDescription: 'Ocurrió un error al actualizar el periodo, intenta nuevamente.',
     onSuccess: () => {
       onOpenChange(false)
     },
   })
 
-  function onSubmit(data: CreateHoaBoardPeriodFormData) {
-    createPeriodMutation.mutate(data)
+  function onSubmit(data: UpdateHoaBoardPeriodFormData) {
+    updatePeriodMutation.mutate(data)
   }
 
   function handleOpenChange(open: boolean) {
-    if (createPeriodMutation.isPending) return
+    if (updatePeriodMutation.isPending) return
     onOpenChange(open)
   }
 
@@ -74,15 +76,15 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent side="right">
         <SheetHeader>
-          <SheetTitle>Crear periodo</SheetTitle>
-          <SheetDescription>Ingresa las fechas del nuevo periodo de mesa directiva.</SheetDescription>
+          <SheetTitle>Editar periodo</SheetTitle>
+          <SheetDescription>Actualiza las fechas del periodo de mesa directiva.</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>
           <form
             className="space-y-4"
-            id={createPeriodFormId}
-            aria-label="Crear periodo"
+            id={editPeriodFormId}
+            aria-label="Editar periodo"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <Controller
@@ -100,7 +102,7 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
                           id={field.name}
                           variant="outline"
                           aria-invalid={fieldState.invalid}
-                          disabled={createPeriodMutation.isPending}
+                          disabled={updatePeriodMutation.isPending}
                           className="w-full justify-between pr-2"
                         >
                           <span className="font-normal">{formatDate(field.value)}</span>
@@ -117,7 +119,7 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
                         defaultMonth={field.value}
                         endMonth={addYears(new Date(), MAX_YEAR_OFFSET)}
                         onSelect={(date) => field.onChange(date || new Date())}
-                        disabled={createPeriodMutation.isPending}
+                        disabled={updatePeriodMutation.isPending}
                       />
                     </PopoverContent>
                   </Popover>
@@ -141,7 +143,7 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
                           id={field.name}
                           variant="outline"
                           aria-invalid={fieldState.invalid}
-                          disabled={createPeriodMutation.isPending}
+                          disabled={updatePeriodMutation.isPending}
                           className="w-full justify-between pr-2"
                         >
                           <span className="font-normal">{formatDate(field.value)}</span>
@@ -159,7 +161,7 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
                         endMonth={addYears(startDate, MAX_YEAR_OFFSET)}
                         onSelect={(date) => field.onChange(date || new Date())}
                         disabled={
-                          createPeriodMutation.isPending || {
+                          updatePeriodMutation.isPending || {
                             before: startDate,
                             after: addYears(startDate, MAX_YEAR_OFFSET),
                           }
@@ -182,9 +184,9 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
               </Button>
             }
           />
-          <Button type="submit" form={createPeriodFormId} disabled={createPeriodMutation.isPending}>
-            {createPeriodMutation.isPending && <LoaderIcon />}
-            Crear
+          <Button type="submit" form={editPeriodFormId} disabled={updatePeriodMutation.isPending}>
+            {updatePeriodMutation.isPending && <LoaderIcon />}
+            Guardar
           </Button>
         </SheetFooter>
       </SheetContent>

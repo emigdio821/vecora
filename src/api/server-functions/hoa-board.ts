@@ -17,6 +17,7 @@ import {
   deleteHoaBoardMemberSchema,
   deleteHoaBoardPeriodSchema,
   updateHoaBoardMemberSchema,
+  updateHoaBoardPeriodSchema,
 } from '@/schemas/hoa-board'
 
 export const getHoaBoardPeriods = createServerFn()
@@ -119,6 +120,57 @@ export const createHoaBoardPeriod = createServerFn({ method: 'POST' })
     return newPeriod satisfies SelectHoaBoardPeriod
   })
 
+export const updateHoaBoardPeriod = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware, adminOnlyMiddleware])
+  .inputValidator(updateHoaBoardPeriodSchema)
+  .handler(async ({ data }) => {
+    const { periodId, ...updateData } = data
+
+    // Check for overlap with other periods (excluding the current one)
+    const existingPeriods = await db.query.hoaBoardPeriods.findMany({
+      where: (period, { isNull, ne, and }) => and(isNull(period.deletedAt), ne(period.id, periodId)),
+    })
+
+    const hasOverlap = existingPeriods.some((period) => {
+      return updateData.startDate < period.endDate && updateData.endDate > period.startDate
+    })
+
+    if (hasOverlap) {
+      throw new Error('Overlap detected with existing HOA board periods')
+    }
+
+    const [oldPeriod] = await db
+      .select()
+      .from(hoaBoardPeriods)
+      .where(eq(hoaBoardPeriods.id, periodId))
+      .limit(1)
+
+    if (!oldPeriod) {
+      throw new Error('Period not found')
+    }
+
+    const [updatedPeriod] = await db
+      .update(hoaBoardPeriods)
+      .set({
+        startDate: updateData.startDate,
+        endDate: updateData.endDate,
+      })
+      .where(eq(hoaBoardPeriods.id, periodId))
+      .returning()
+
+    createAuditLog({
+      data: {
+        action: 'update',
+        entityType: 'hoa_board_period',
+        entityId: updatedPeriod.id,
+        oldData: oldPeriod,
+        newData: updatedPeriod,
+      },
+    }).catch(console.error)
+
+    return updatedPeriod satisfies SelectHoaBoardPeriod
+  })
+
 export const createHoaBoardMember = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, adminOnlyMiddleware])
   .inputValidator(createHoaBoardMemberSchema)
@@ -138,15 +190,18 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
     let firstName: string
     let lastName: string
     let email: string
+    let phone: string
 
     if (profile.profileType === 'owner' && profile.owner) {
       firstName = profile.owner.firstName
       lastName = profile.owner.lastName
       email = profile.owner.email
+      phone = profile.owner.phone || ''
     } else if (profile.profileType === 'external' && profile.externalUser) {
       firstName = profile.externalUser.firstName
       lastName = profile.externalUser.lastName
       email = profile.externalUser.email
+      phone = profile.externalUser.phone || ''
     } else {
       throw new Error('Could not determine profile information')
     }
@@ -169,6 +224,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
           firstName,
           lastName,
           email,
+          phone,
           profileType: profile.profileType,
         })
         .where(eq(hoaBoard.id, existingMember.id))
@@ -198,6 +254,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
           firstName,
           lastName,
           email,
+          phone,
           profileType: profile.profileType,
         })
         .returning()
@@ -238,15 +295,18 @@ export const updateHoaBoardMember = createServerFn({ method: 'POST' })
     let firstName: string
     let lastName: string
     let email: string
+    let phone: string
 
     if (profile.profileType === 'owner' && profile.owner) {
       firstName = profile.owner.firstName
       lastName = profile.owner.lastName
       email = profile.owner.email
+      phone = profile.owner.phone || ''
     } else if (profile.profileType === 'external' && profile.externalUser) {
       firstName = profile.externalUser.firstName
       lastName = profile.externalUser.lastName
       email = profile.externalUser.email
+      phone = profile.externalUser.phone || ''
     } else {
       throw new Error('Could not determine profile information')
     }
@@ -261,6 +321,7 @@ export const updateHoaBoardMember = createServerFn({ method: 'POST' })
         firstName,
         lastName,
         email,
+        phone,
         profileType: profile.profileType,
       })
       .where(eq(hoaBoard.id, memberId))

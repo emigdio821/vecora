@@ -72,7 +72,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                 {showMonthlyFee && (
                   <FramePanel className="p-2">
                     <h2 className="font-medium text-sm">Meses pagados</h2>
-                    <div className="inline-flex flex-wrap gap-1">
+                    <div className="mt-1 inline-flex flex-wrap gap-1">
                       {payment.paymentMonths.map((month) => (
                         <Badge variant="outline" key={`${month.month}-${month.paymentId}`}>
                           <span>{MONTHS[month.month]}</span>
@@ -84,7 +84,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
 
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Estado</h2>
-                  <PaymentStatusBadge status={payment.status} />
+                  <PaymentStatusBadge className="mt-1" status={payment.status} />
                 </FramePanel>
 
                 {payment.paidAt && (

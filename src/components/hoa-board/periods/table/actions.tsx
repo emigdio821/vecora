@@ -1,4 +1,4 @@
-import { IconDotsVertical, IconInfoCircle, IconTrash } from '@tabler/icons-react'
+import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 import { deleteHoaBoardPeriod } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -19,6 +19,7 @@ import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { useUserRoles } from '@/hooks/use-user-roles'
 import { formatDate } from '@/lib/utils'
 import type { DeleteHoaBoardPeriodData } from '@/schemas/hoa-board'
+import { EditHoaPeriodSheet } from '../sheets/edit-period'
 import { HoaPeriodDetailsSheet } from '../sheets/period-details'
 
 interface ActionsProps {
@@ -27,6 +28,7 @@ interface ActionsProps {
 
 export function HoaPeriodsTableActions({ period }: ActionsProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [isEditPeriodSheetOpen, setEditPeriodSheetOpen] = useState(false)
   const [isMemberDetailsSheetOpen, setMemberDetailsSheetOpen] = useState(false)
 
   const { isAdmin } = useUserRoles()
@@ -71,10 +73,10 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
             }
           />
 
-          {/*<EditMemberSheet
-            member={member}
-            state={{ isOpen: isEditMemberSheetOpen, onOpenChange: setEditMemberSheetOpen }}
-          />*/}
+          <EditHoaPeriodSheet
+            period={period}
+            state={{ isOpen: isEditPeriodSheetOpen, onOpenChange: setEditPeriodSheetOpen }}
+          />
         </>
       )}
 
@@ -101,6 +103,11 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
               <DropdownMenuItem onClick={() => setMemberDetailsSheetOpen(true)}>
                 <IconInfoCircle className="size-4" />
                 Información
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => setEditPeriodSheetOpen(true)}>
+                <IconEdit className="size-4" />
+                Editar
               </DropdownMenuItem>
 
               {isAdmin && (

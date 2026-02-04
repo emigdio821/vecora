@@ -62,7 +62,7 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
 
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Estado</h2>
-                  <ViolationStatusBadge status={violation.status} />
+                  <ViolationStatusBadge className="mt-1" status={violation.status} />
                 </FramePanel>
               </div>
             }

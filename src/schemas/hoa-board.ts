@@ -3,11 +3,11 @@ import { z } from 'zod'
 // HOA Board Period schemas
 export const createHoaBoardPeriodSchema = z
   .object({
-    startDate: z.date('La fecha de inicio es requerida'),
-    endDate: z.date('La fecha de fin es requerida'),
+    startDate: z.date('La fecha inicial es requerida'),
+    endDate: z.date('La fecha final es requerida'),
   })
   .refine((data) => data.endDate > data.startDate, {
-    message: 'La fecha de fin debe ser posterior a la fecha de inicio',
+    message: 'La fecha final debe ser posterior a la fecha inicial',
     path: ['endDate'],
   })
 
@@ -16,11 +16,11 @@ export type CreateHoaBoardPeriodFormData = z.infer<typeof createHoaBoardPeriodSc
 export const updateHoaBoardPeriodSchema = z
   .object({
     periodId: z.uuid('ID de periodo inválido'),
-    startDate: z.date('La fecha de inicio es requerida'),
-    endDate: z.date('La fecha de fin es requerida'),
+    startDate: z.date('La fecha inicial es requerida'),
+    endDate: z.date('La fecha final es requerida'),
   })
   .refine((data) => data.endDate > data.startDate, {
-    message: 'La fecha de fin debe ser posterior a la fecha de inicio',
+    message: 'La fecha final debe ser posterior a la fecha inicial',
     path: ['endDate'],
   })
 

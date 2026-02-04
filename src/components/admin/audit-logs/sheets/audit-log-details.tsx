@@ -55,13 +55,13 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
 
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Acción</h2>
-                  <AuditLogActionBadge action={auditLog.action} />
+                  <AuditLogActionBadge className="mt-1" action={auditLog.action} />
                 </FramePanel>
 
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Tipo de entidad</h2>
-                    <AuditLogEntityTypeBadge entityType={auditLog.entityType} />
+                    <AuditLogEntityTypeBadge className="mt-1" entityType={auditLog.entityType} />
                   </div>
                   {auditLog.entityId && (
                     <CopyButton tooltipText="Copiar ID de entidad" value={auditLog.entityId} />
@@ -94,7 +94,7 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
                   {profileRoles.length > 0 && (
                     <FramePanel className="p-2">
                       <h2 className="font-medium text-sm">Rol</h2>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="mt-1 flex flex-wrap gap-1">
                         {profileRoles.map(({ role }) => (
                           <RoleNameBadge roleName={role.name} key={role.id} />
                         ))}

@@ -55,7 +55,9 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
 
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Tipo de perfil</h2>
-                  <Badge variant="outline">{profileTypeLabel}</Badge>
+                  <Badge variant="outline" className="mt-1">
+                    {profileTypeLabel}
+                  </Badge>
                 </FramePanel>
               </div>
             }
@@ -87,7 +89,7 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
 
                   <FramePanel className="p-2">
                     <h2 className="font-medium text-sm">Estado</h2>
-                    <ProfileStatusBadge banned={!!profile.user.banned} />
+                    <ProfileStatusBadge className="mt-1" banned={!!profile.user.banned} />
                     {profile.user.banReason && (
                       <p className="mt-1 text-muted-foreground text-sm">{profile.user.banReason}</p>
                     )}

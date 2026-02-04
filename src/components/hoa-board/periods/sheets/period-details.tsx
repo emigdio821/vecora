@@ -81,18 +81,22 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                     const roleName = member.profile?.profileRoles[0]?.role.name || 'Sin rol'
 
                     return (
-                      <FramePanel key={member.id} className="flex items-center gap-2 p-2">
-                        <div className="min-w-0 flex-1">
-                          <h2 className={cn('font-medium text-sm', isDeleted && 'text-muted-foreground')}>
-                            {memberFullName}
-                          </h2>
-                          <div className="flex flex-wrap gap-2">
-                            <RoleNameBadge roleName={roleName} />
-                            <ProfileTypeBadge type={member.profileType} />
-                            {isDeleted && <Badge variant="destructive">Eliminado</Badge>}
+                      <FramePanel key={member.id} className="p-0">
+                        <div className="flex items-center justify-between gap-2 p-2">
+                          <div className="min-w-0 flex-1">
+                            <h2 className={cn('font-medium text-sm', isDeleted && 'text-muted-foreground')}>
+                              {memberFullName}
+                            </h2>
+                            <p className="text-muted-foreground text-sm">{member.email}</p>
+                            <p className="text-muted-foreground text-sm">{member.phone}</p>
                           </div>
+                          <CopyButton tooltipText="Copiar ID" value={member.id} />
                         </div>
-                        <CopyButton tooltipText="Copiar ID" value={member.id} />
+                        <div className="flex flex-wrap gap-2 p-2 pt-0">
+                          <RoleNameBadge roleName={roleName} />
+                          <ProfileTypeBadge type={member.profileType} />
+                          {isDeleted && <Badge variant="destructive">Eliminado</Badge>}
+                        </div>
                       </FramePanel>
                     )
                   })}
@@ -104,7 +108,6 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                       <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
-                      <EmptyHeader>Sin miembros</EmptyHeader>
                       <EmptyDescription>Este periodo no tiene miembros asignados</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
@@ -131,6 +134,7 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                       <FramePanel key={member.id} className="flex items-center gap-2 p-2">
                         <div className="min-w-0 flex-1">
                           <h2 className="font-medium text-sm">{memberFullName}</h2>
+                          {member.phone && <p className="text-muted-foreground text-xs">{member.phone}</p>}
                           <div className="flex flex-wrap gap-2">
                             <RoleNameBadge roleName={roleName} />
                             <ProfileTypeBadge type={member.profileType} />

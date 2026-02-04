@@ -191,7 +191,9 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
                         <Button
                           id={field.name}
                           variant="outline"
-                          className="w-full justify-between pr-2 data-[invalid=true]:border-destructive/36"
+                          aria-invalid={fieldState.invalid}
+                          disabled={updateViolationMutation.isPending}
+                          className="w-full justify-between pr-2"
                         >
                           <span className="font-normal">{formatDate(field.value)}</span>
                           <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
@@ -203,6 +205,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
                         mode="single"
                         id={field.name}
                         selected={field.value}
+                        defaultMonth={field.value}
                         onSelect={(date) => field.onChange(date || new Date())}
                       />
                     </PopoverContent>

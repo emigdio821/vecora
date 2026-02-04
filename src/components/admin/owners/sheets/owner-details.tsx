@@ -1,6 +1,8 @@
 import { IconCurrencyDollar, IconFlag, IconHome, IconUser, IconWind } from '@tabler/icons-react'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
+import { PaymentStatusBadge } from '@/components/shared/payments/status-badge'
+import { ViolationStatusBadge } from '@/components/shared/violations/status-badge'
 import { Badge } from '@/components/ui/badge'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
@@ -15,7 +17,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
-import { cn, formatDate } from '@/lib/utils'
+import { formatDate, getPaymentTypeLabel } from '@/lib/utils'
 
 interface OwnerDetailsSheetProps {
   owner: OwnerWithRelations
@@ -118,33 +120,18 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
             content={
               owner.violations.length > 0 ? (
                 <div className="space-y-1">
-                  {owner.violations.map((violation) => {
-                    const isViolationPaid = violation.status === 'paid'
+                  {owner.violations.map((violation) => (
+                    <FramePanel key={violation.id} className="flex items-center gap-2 p-2">
+                      <div className="min-w-0 flex-1 leading-none">
+                        <ViolationStatusBadge className="mb-1" status={violation.status} />
+                        <h2 className="font-medium text-sm">{`$${Number(violation.amount).toFixed(2)}`}</h2>
+                        <p className="text-muted-foreground text-sm">{violation.concept}</p>
+                        <p className="text-muted-foreground text-xs">{formatDate(violation.violationDate)}</p>
+                      </div>
 
-                    return (
-                      <FramePanel key={violation.id} className="flex items-center gap-2 p-2">
-                        <div className="min-w-0 flex-1 leading-none">
-                          <Badge variant="outline">
-                            <span
-                              aria-hidden
-                              className={cn(
-                                'size-1.5 rounded-full',
-                                isViolationPaid ? 'bg-success' : 'bg-warning',
-                              )}
-                            />
-                            {isViolationPaid ? 'Pagada' : 'Pendiente'}
-                          </Badge>
-                          <h2 className="font-medium text-sm">{`$${Number(violation.amount).toFixed(2)}`}</h2>
-                          <p className="text-muted-foreground text-sm">{violation.concept}</p>
-                          <p className="text-muted-foreground text-xs">
-                            {formatDate(violation.violationDate)}
-                          </p>
-                        </div>
-
-                        <CopyButton tooltipText="Copiar ID" value={violation.id} />
-                      </FramePanel>
-                    )
-                  })}
+                      <CopyButton tooltipText="Copiar ID" value={violation.id} />
+                    </FramePanel>
+                  ))}
                 </div>
               ) : (
                 <FramePanel className="p-2">
@@ -172,32 +159,19 @@ export function OwnerDetailsSheet({ owner, state }: OwnerDetailsSheetProps) {
             content={
               pendingPayments.length > 0 ? (
                 <div className="space-y-1">
-                  {pendingPayments.map((payment) => {
-                    const isPaymentPaid = payment.status === 'paid'
-                    const paymentLabel =
-                      payment.paymentType === 'monthly_fee' ? 'Cuota mensual' : 'Infracción'
+                  {pendingPayments.map((payment) => (
+                    <FramePanel key={payment.id} className="flex items-center gap-2 p-2">
+                      <div className="min-w-0 flex-1">
+                        <PaymentStatusBadge className="mb-1" status={payment.status} />
+                        <h2 className="font-medium text-sm">{`$${Number(payment.amount).toFixed(2)}`}</h2>
+                        <p className="text-muted-foreground text-xs">
+                          {getPaymentTypeLabel(payment.paymentType)}
+                        </p>
+                      </div>
 
-                    return (
-                      <FramePanel key={payment.id} className="flex items-center gap-2 p-2">
-                        <div className="min-w-0 flex-1">
-                          <Badge variant="outline">
-                            <span
-                              aria-hidden
-                              className={cn(
-                                'size-1.5 rounded-full',
-                                isPaymentPaid ? 'bg-success' : 'bg-warning',
-                              )}
-                            />
-                            {isPaymentPaid ? 'Pagada' : 'Pendiente'}
-                          </Badge>
-                          <h2 className="font-medium text-sm">{`$${Number(payment.amount).toFixed(2)}`}</h2>
-                          <p className="text-muted-foreground text-xs">{paymentLabel}</p>
-                        </div>
-
-                        <CopyButton tooltipText="Copiar ID" value={payment.id} />
-                      </FramePanel>
-                    )
-                  })}
+                      <CopyButton tooltipText="Copiar ID" value={payment.id} />
+                    </FramePanel>
+                  ))}
                 </div>
               ) : (
                 <FramePanel className="p-2">

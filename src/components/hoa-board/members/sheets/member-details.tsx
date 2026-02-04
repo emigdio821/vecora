@@ -57,6 +57,20 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
                 </FramePanel>
 
                 <FramePanel className="p-2">
+                  <h2 className="font-medium text-sm">Correo</h2>
+                  <div className="mt-1">
+                    <p className="line-clamp-2 text-muted-foreground text-sm">{member.email}</p>
+                  </div>
+                </FramePanel>
+
+                <FramePanel className="p-2">
+                  <h2 className="font-medium text-sm">Teléfono</h2>
+                  <div className="mt-1">
+                    <p className="line-clamp-2 text-muted-foreground text-sm">{member.phone}</p>
+                  </div>
+                </FramePanel>
+
+                <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Tipo de perfil</h2>
                   <div className="mt-1">
                     <ProfileTypeBadge type={member.profileType} />
@@ -82,7 +96,10 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Rol</h2>
-                    <RoleNameBadge roleName={profile.profileRoles[0]?.role.name || 'Sin rol'} />
+                    <RoleNameBadge
+                      className="mt-1"
+                      roleName={profile.profileRoles[0]?.role.name || 'Sin rol'}
+                    />
                   </div>
                   <CopyButton tooltipText="Copiar ID del perfil asociado" value={profile.id} />
                 </FramePanel>
@@ -93,8 +110,10 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
                       <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
-                      <EmptyHeader>Sin perfil asociado</EmptyHeader>
-                      <EmptyDescription>Este miembro ha sido eliminado del sistema</EmptyDescription>
+                      <div>
+                        <EmptyHeader>Sin perfil asociado</EmptyHeader>
+                        <EmptyDescription>Este miembro ha sido eliminado del sistema</EmptyDescription>
+                      </div>
                     </EmptyHeader>
                   </Empty>
                 </FramePanel>
