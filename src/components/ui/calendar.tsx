@@ -48,12 +48,12 @@ function Calendar({
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          'size-(--cell-size) select-none p-0 aria-disabled:opacity-50',
+          'size-(--cell-size) select-none p-0 aria-disabled:opacity-70',
           defaultClassNames.button_previous,
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          'size-(--cell-size) select-none p-0 aria-disabled:opacity-50',
+          'size-(--cell-size) select-none p-0 aria-disabled:opacity-70',
           defaultClassNames.button_next,
         ),
         month_caption: cn(
@@ -106,11 +106,11 @@ function Calendar({
           defaultClassNames.today,
         ),
         outside: cn('text-muted-foreground aria-selected:text-muted-foreground', defaultClassNames.outside),
-        disabled: cn('text-muted-foreground opacity-50', defaultClassNames.disabled),
+        disabled: cn('text-muted-foreground opacity-70', defaultClassNames.disabled),
         hidden: cn('invisible', defaultClassNames.hidden),
         day_button: cn(
           buttonVariants({ variant: 'ghost', size: 'icon' }),
-          'rounded-(--cell-radius) group-data-selected/day:bg-primary group-data-today/day:font-semibold group-data-selected/day:text-primary-foreground group-data-outside/day:opacity-50 group-data-selected/day:[:hover,[data-pressed]]:bg-primary/90 group-data-selected/day:[:hover,[data-pressed]]:text-primary-foreground',
+          'rounded-(--cell-radius) group-data-selected/day:bg-primary group-data-today/day:font-semibold group-data-selected/day:text-primary-foreground group-data-outside/day:opacity-70 group-data-selected/day:[:hover,[data-pressed]]:bg-primary/90 group-data-selected/day:[:hover,[data-pressed]]:text-primary-foreground',
           'group-data-selected/day:group-data-outside/day:text-primary-foreground group-data-selected/day:bg-primary group-data-outside/day:text-muted-foreground/72 group-data-selected/day:text-primary-foreground group-data-disabled/day:line-through group-[.range-middle]/day:group-data-selected/day:bg-accent group-data-select/day:hover:bg-accent',
           defaultClassNames.day_button,
         ),

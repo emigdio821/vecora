@@ -10,7 +10,7 @@ type NativeSelectProps = React.ComponentProps<'select'> & {
 function NativeSelect({ className, triggerSize = 'default', ...props }: NativeSelectProps) {
   return (
     <div
-      className={cn('group/native-select relative w-fit has-[select:disabled]:opacity-50', className)}
+      className={cn('group/native-select relative w-fit has-[select:disabled]:opacity-70', className)}
       data-slot="native-select-wrapper"
       data-size={triggerSize}
     >

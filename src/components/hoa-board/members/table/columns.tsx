@@ -6,6 +6,7 @@ import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { HoaBoardMemberWithProfile } from '@/db/schemas/zod/hoa-board'
 import { normalizeString } from '@/lib/utils'
+import { HoaMembersTableActions } from './actions'
 import { HoaMemberNameCell } from './member-cell'
 
 export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberWithProfile>[] = [
@@ -83,9 +84,6 @@ export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberWithProfile>[]
     enablePinning: false,
     enableResizing: false,
     enableSorting: false,
-    cell: () => {
-      // Actions will be added later
-      return null
-    },
+    cell: ({ row }) => <HoaMembersTableActions member={row.original} />,
   },
 ]

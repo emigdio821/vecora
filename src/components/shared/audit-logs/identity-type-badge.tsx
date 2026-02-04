@@ -20,6 +20,12 @@ export function AuditLogEntityTypeBadge({ entityType, ...badgeProps }: AuditLogE
         return 'Pago'
       case 'profile':
         return 'Perfil'
+      case 'hoa_board':
+        return 'Mesa directiva'
+      case 'hoa_board_period':
+        return 'Período de mesa directiva'
+      case 'user':
+        return 'Usuario'
       default:
         return type
     }

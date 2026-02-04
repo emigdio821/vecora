@@ -22,6 +22,7 @@ interface ProfilesSelectorProps {
   noneOptionLabel?: string
   includeNoneOption?: boolean
   excludeWithPeriod?: boolean
+  excludeMemberId?: string
   onValueChange?: (value: string | null) => void
 }
 
@@ -33,6 +34,7 @@ export function ProfilesSelector({
   disabled = false,
   includeNoneOption = true,
   excludeWithPeriod = false,
+  excludeMemberId,
   noneOptionLabel = 'Sin selección',
   placeholder = 'Selecciona una opción',
 }: ProfilesSelectorProps) {
@@ -43,7 +45,14 @@ export function ProfilesSelector({
     let filteredProfiles = profiles
 
     if (excludeWithPeriod) {
-      filteredProfiles = profiles.filter((profile) => !profile.hoaBoardMemberships?.length)
+      filteredProfiles = profiles.filter((profile) => {
+        if (!profile.hoaBoardMemberships?.length) return true
+        // Allow the current member's profile to be selected when editing
+        if (excludeMemberId) {
+          return profile.hoaBoardMemberships.every((membership) => membership.id === excludeMemberId)
+        }
+        return false
+      })
     }
 
     const profilesItems = filteredProfiles.map((profile) => {
@@ -62,7 +71,7 @@ export function ProfilesSelector({
     })
 
     return profilesItems
-  }, [profiles, excludeWithPeriod])
+  }, [profiles, excludeWithPeriod, excludeMemberId])
 
   function renderProfileValue(value?: string | null) {
     if (isLoadingProfiles) return <span className="animate-pulse">Cargando datos...</span>
@@ -86,7 +95,7 @@ export function ProfilesSelector({
             aria-invalid={invalid}
             aria-label="Combobox de perfiles"
             disabled={items.length === 0 || disabled}
-            className="w-full justify-between font-normal disabled:*:opacity-50"
+            className="w-full justify-between font-normal disabled:*:opacity-70"
           >
             {renderProfileValue(value)}
             <IconSelector className="-me-1 text-muted-foreground" />

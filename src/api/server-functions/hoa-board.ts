@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { hoaBoard, hoaBoardPeriods } from '@/db/schemas/main'
@@ -10,7 +11,12 @@ import type {
 } from '@/db/schemas/zod/hoa-board'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
-import { createHoaBoardMemberSchema, createHoaBoardPeriodSchema } from '@/schemas/hoa-board'
+import {
+  createHoaBoardMemberSchema,
+  createHoaBoardPeriodSchema,
+  deleteHoaBoardMemberSchema,
+  updateHoaBoardMemberSchema,
+} from '@/schemas/hoa-board'
 
 export const getHoaBoardPeriods = createServerFn()
   .middleware([authMiddleware])
@@ -117,7 +123,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
     })
 
     if (!profile) {
-      throw new Error('Perfil no encontrado')
+      throw new Error('Profile not found')
     }
 
     let firstName: string
@@ -133,7 +139,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
       lastName = profile.externalUser.lastName
       email = profile.externalUser.email
     } else {
-      throw new Error('No se pudo determinar la información del perfil')
+      throw new Error('Could not determine profile information')
     }
 
     const [newMember] = await db
@@ -158,4 +164,85 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
     }).catch(console.error)
 
     return newMember satisfies SelectHoaBoard
+  })
+
+export const updateHoaBoardMember = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware, adminOnlyMiddleware])
+  .inputValidator(updateHoaBoardMemberSchema)
+  .handler(async ({ data }) => {
+    const { memberId, ...updateData } = data
+
+    const profile = await db.query.profiles.findFirst({
+      where: (profiles, { eq }) => eq(profiles.id, updateData.profileId),
+      with: {
+        owner: true,
+        externalUser: true,
+      },
+    })
+
+    if (!profile) {
+      throw new Error('Profile not found')
+    }
+
+    let firstName: string
+    let lastName: string
+    let email: string
+
+    if (profile.profileType === 'owner' && profile.owner) {
+      firstName = profile.owner.firstName
+      lastName = profile.owner.lastName
+      email = profile.owner.email
+    } else if (profile.profileType === 'external' && profile.externalUser) {
+      firstName = profile.externalUser.firstName
+      lastName = profile.externalUser.lastName
+      email = profile.externalUser.email
+    } else {
+      throw new Error('Could not determine profile information')
+    }
+
+    const [oldMember] = await db.select().from(hoaBoard).where(eq(hoaBoard.id, memberId)).limit(1)
+
+    const [updatedMember] = await db
+      .update(hoaBoard)
+      .set({
+        periodId: updateData.periodId,
+        profileId: updateData.profileId,
+        firstName,
+        lastName,
+        email,
+        profileType: profile.profileType,
+      })
+      .where(eq(hoaBoard.id, memberId))
+      .returning()
+
+    createAuditLog({
+      data: {
+        action: 'update',
+        entityType: 'hoa_board',
+        entityId: updatedMember.id,
+        oldData: oldMember,
+        newData: updatedMember,
+      },
+    }).catch(console.error)
+
+    return updatedMember satisfies SelectHoaBoard
+  })
+
+export const deleteHoaBoardMember = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware, adminOnlyMiddleware])
+  .inputValidator(deleteHoaBoardMemberSchema)
+  .handler(async ({ data }) => {
+    const [memberToDelete] = await db.select().from(hoaBoard).where(eq(hoaBoard.id, data.memberId)).limit(1)
+    const [deletedMember] = await db.delete(hoaBoard).where(eq(hoaBoard.id, data.memberId)).returning()
+
+    createAuditLog({
+      data: {
+        action: 'delete',
+        entityType: 'hoa_board',
+        entityId: deletedMember.id,
+        oldData: memberToDelete,
+      },
+    }).catch(console.error)
+
+    return memberToDelete satisfies SelectHoaBoard
   })
