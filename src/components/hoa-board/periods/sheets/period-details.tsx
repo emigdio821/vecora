@@ -4,7 +4,7 @@ import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { Badge } from '@/components/ui/badge'
 import { CopyButton } from '@/components/ui/copy-button'
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
 import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
@@ -100,13 +100,13 @@ export function PeriodDetailsSheet({ period, state }: PeriodDetailsSheetProps) {
               ) : (
                 <FramePanel className="p-2">
                   <Empty className="gap-2 p-1">
-                    <EmptyMedia variant="icon" className="mb-0">
-                      <IconWind />
-                    </EmptyMedia>
-                    <EmptyContent className="gap-0">
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon" className="mb-0">
+                        <IconWind />
+                      </EmptyMedia>
                       <EmptyHeader>Sin miembros</EmptyHeader>
                       <EmptyDescription>Este periodo no tiene miembros asignados</EmptyDescription>
-                    </EmptyContent>
+                    </EmptyHeader>
                   </Empty>
                 </FramePanel>
               )

@@ -1,4 +1,4 @@
-import { IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
+import { IconFileExport, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -6,11 +6,13 @@ import { deleteHoaBoardMember } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { HOA_BOARD_MEMBERS_QUERY_KEY, HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { HoaBoardMember } from '@/db/schemas/zod/hoa-board'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
+import { useUserRoles } from '@/hooks/use-user-roles'
 import { CreateMemberSheet } from '../sheets/create-member'
 
 interface MembersDataTableHeaderProps {
@@ -21,6 +23,8 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
   const [isCreateMemberSheetOpen, setIsCreateMemberSheetOpen] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-hoa-members', parseAsString.withDefault(''))
+
+  const { isAdmin } = useUserRoles()
 
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
@@ -91,7 +95,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
         </InputGroup>
 
         <div className="flex gap-2">
-          {selectedRowsLength > 0 && (
+          {isAdmin && selectedRowsLength > 0 && (
             <Tooltip>
               <TooltipTrigger
                 render={
@@ -103,10 +107,21 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
               <TooltipContent>Eliminar miembros seleccionados</TooltipContent>
             </Tooltip>
           )}
-          <Button onClick={() => setIsCreateMemberSheetOpen(true)}>
-            <IconPlus className="size-4" />
-            Agregar
-          </Button>
+
+          {tableRowsLength > 0 && (
+            <Button variant="outline" disabled>
+              <IconFileExport className="size-4" />
+              <span>Exportar</span>
+              {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}
+            </Button>
+          )}
+
+          {isAdmin && (
+            <Button onClick={() => setIsCreateMemberSheetOpen(true)}>
+              <IconPlus className="size-4" />
+              Agregar
+            </Button>
+          )}
         </div>
       </div>
     </>

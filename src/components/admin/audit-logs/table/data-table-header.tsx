@@ -44,11 +44,11 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
   const selectedRowsLength = selectedRows.length
 
   function renderYearFacetedFilterValue(value: YearFacetedFilterOption[] | null) {
-    if (!value || value.length === 0) return 'Año'
+    if (!value || value.length === 0) return <span className="font-medium text-foreground">Año</span>
 
     return (
       <>
-        <span>Año</span>
+        <span className="font-medium">Año</span>
         <Separator orientation="vertical" />
         {value.length < 3 ? (
           value

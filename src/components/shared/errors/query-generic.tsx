@@ -19,7 +19,7 @@ export function TSQueryGenericError(props: TSQueryGenericErrorProps) {
   const { refetch, errorTitle = 'Error', errorDescription = 'Algo salió mal.', ...emptyProps } = props
 
   return (
-    <Empty className="border border-dashed" {...emptyProps}>
+    <Empty className="flex-0 border border-dashed" {...emptyProps}>
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <IconBug />

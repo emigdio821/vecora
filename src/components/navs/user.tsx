@@ -1,8 +1,7 @@
 import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSun } from '@tabler/icons-react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
-import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -17,6 +16,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useUserRoles } from '@/hooks/use-user-roles'
 import { authClient } from '@/lib/auth-client'
 import { logger } from '@/lib/logger'
 import { RoleNameBadge } from '../shared/role-name-badge'
@@ -29,7 +29,7 @@ export function NavUser() {
   const queryClient = useQueryClient()
   const { theme, setTheme } = useTheme()
 
-  const { data: profile, isLoading, error, refetch } = useQuery(userProfileQueryOptions())
+  const { profile, isLoading, error, refetch } = useUserRoles()
 
   async function handleLogOut() {
     await authClient.signOut({

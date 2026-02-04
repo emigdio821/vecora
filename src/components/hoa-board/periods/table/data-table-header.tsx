@@ -1,10 +1,12 @@
-import { IconPlus, IconSearch } from '@tabler/icons-react'
+import { IconFileExport, IconPlus, IconSearch } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
+import { useUserRoles } from '@/hooks/use-user-roles'
 import { CreatePeriodSheet } from '../sheets/create-period'
 
 interface PeriodsDataTableHeaderProps {
@@ -12,12 +14,17 @@ interface PeriodsDataTableHeaderProps {
 }
 
 export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
+  const [isCreatePeriodSheetOpen, setIsCreatePeriodSheetOpen] = useState(false)
+  const { isAdmin } = useUserRoles()
+
   const [searchQuery, setSearchQuery] = useQueryState(
     'search-hoa-board-periods',
     parseAsString.withDefault(''),
   )
+
   const tableRowsLength = table.getCoreRowModel().rows.length
-  const [isCreatePeriodSheetOpen, setIsCreatePeriodSheetOpen] = useState(false)
+  const selectedRows = table.getFilteredSelectedRowModel().rows
+  const selectedRowsLength = selectedRows.length
 
   useEffect(() => {
     table.getColumn('startDate')?.setFilterValue(searchQuery)
@@ -42,10 +49,20 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
         </InputGroup>
 
         <div className="flex gap-2">
-          <Button className="ml-auto" onClick={() => setIsCreatePeriodSheetOpen(true)}>
-            <IconPlus className="size-4" />
-            Crear
-          </Button>
+          {tableRowsLength > 0 && (
+            <Button variant="outline" disabled>
+              <IconFileExport className="size-4" />
+              <span>Exportar</span>
+              {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}
+            </Button>
+          )}
+
+          {isAdmin && (
+            <Button className="ml-auto" onClick={() => setIsCreatePeriodSheetOpen(true)}>
+              <IconPlus className="size-4" />
+              Crear
+            </Button>
+          )}
         </div>
       </div>
 

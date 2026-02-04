@@ -34,7 +34,7 @@ export function DataTableSortableHeader<TData, TValue>({
         <DropdownMenuTrigger
           render={
             <Button variant="ghost" size="sm" className="gap-1">
-              <span>{title}</span>
+              <span className="text-sm">{title}</span>
               {isAscSorted && <IconArrowNarrowDown className="size-4" />}
               {isDescSorted && <IconArrowNarrowUp className="size-4" />}
               {!column.getIsSorted() && <IconArrowsSort className="size-4" />}

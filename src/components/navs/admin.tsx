@@ -1,7 +1,6 @@
 import { IconHomeShield, IconLogs, IconUsersGroup } from '@tabler/icons-react'
-import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation } from '@tanstack/react-router'
-import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
+import { useUserRoles } from '@/hooks/use-user-roles'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -14,10 +13,10 @@ import {
 export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
   const location = useLocation()
   const { pathname } = location
-  const { data: profile, isLoading } = useQuery(userProfileQueryOptions())
-  const roles = profile?.profileRoles.map((pr) => pr.role.name) || []
 
-  if (isLoading || !roles.includes('admin')) {
+  const { isAdmin, isLoading } = useUserRoles()
+
+  if (isLoading || !isAdmin) {
     return null
   }
 

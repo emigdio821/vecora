@@ -4,7 +4,7 @@ import { MemberStatusBadge } from '@/components/shared/member-status-badge'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { CopyButton } from '@/components/ui/copy-button'
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
 import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
@@ -78,35 +78,24 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
             title="Perfil asociado"
             icon={IconUserStar}
             content={
-              profile ? (
-                <div className="space-y-1">
-                  <FramePanel className="flex items-center gap-2 p-2">
-                    <div className="min-w-0 flex-1">
-                      <h2 className="font-medium text-sm">ID del perfil</h2>
-                      <p className="font-mono text-muted-foreground text-sm">{profile.id}</p>
-                    </div>
-                    <CopyButton tooltipText="Copiar ID del perfil" value={profile.id} />
-                  </FramePanel>
-
-                  {profile.profileRoles.length > 0 && (
-                    <FramePanel className="p-2">
-                      <h2 className="font-medium text-sm">Rol</h2>
-                      <div className="mt-1">
-                        <RoleNameBadge roleName={profile.profileRoles[0]?.role.name || 'Sin rol'} />
-                      </div>
-                    </FramePanel>
-                  )}
-                </div>
+              profile && profile.profileRoles.length > 0 ? (
+                <FramePanel className="flex items-center gap-2 p-2">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="font-medium text-sm">Rol</h2>
+                    <RoleNameBadge roleName={profile.profileRoles[0]?.role.name || 'Sin rol'} />
+                  </div>
+                  <CopyButton tooltipText="Copiar ID del perfil asociado" value={profile.id} />
+                </FramePanel>
               ) : (
                 <FramePanel className="p-2">
                   <Empty className="gap-2 p-1">
-                    <EmptyMedia variant="icon" className="mb-0">
-                      <IconWind />
-                    </EmptyMedia>
-                    <EmptyContent className="gap-0">
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon" className="mb-0">
+                        <IconWind />
+                      </EmptyMedia>
                       <EmptyHeader>Sin perfil asociado</EmptyHeader>
                       <EmptyDescription>Este miembro ha sido eliminado del sistema</EmptyDescription>
-                    </EmptyContent>
+                    </EmptyHeader>
                   </Empty>
                 </FramePanel>
               )
@@ -114,35 +103,28 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
           />
 
           {/* Period info */}
-          <CollapsibleDetails
-            title="Periodo"
-            icon={IconCalendarTime}
-            content={
-              <div className="space-y-1">
-                <FramePanel className="flex items-center gap-2 p-2">
-                  <div className="min-w-0 flex-1">
-                    <h2 className="font-medium text-sm">ID del periodo</h2>
-                    <p className="font-mono text-muted-foreground text-sm">{member.periodId}</p>
-                  </div>
-                  <CopyButton tooltipText="Copiar ID del periodo" value={member.periodId} />
-                </FramePanel>
-
-                {period && (
-                  <>
-                    <FramePanel className="p-2">
+          {period && (
+            <CollapsibleDetails
+              title="Periodo"
+              icon={IconCalendarTime}
+              content={
+                <div className="space-y-1">
+                  <FramePanel className="flex items-center gap-2 p-2">
+                    <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Fecha inicial</h2>
                       <p className="text-muted-foreground text-sm">{formatDate(period.startDate)}</p>
-                    </FramePanel>
+                    </div>
+                    <CopyButton tooltipText="Copiar ID del periodo" value={member.periodId} />
+                  </FramePanel>
 
-                    <FramePanel className="p-2">
-                      <h2 className="font-medium text-sm">Fecha final</h2>
-                      <p className="text-muted-foreground text-sm">{formatDate(period.endDate)}</p>
-                    </FramePanel>
-                  </>
-                )}
-              </div>
-            }
-          />
+                  <FramePanel className="p-2">
+                    <h2 className="font-medium text-sm">Fecha final</h2>
+                    <p className="text-muted-foreground text-sm">{formatDate(period.endDate)}</p>
+                  </FramePanel>
+                </div>
+              }
+            />
+          )}
         </SheetPanel>
 
         <SheetFooter className="block space-y-1">

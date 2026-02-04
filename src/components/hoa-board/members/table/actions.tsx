@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { HoaBoardMember } from '@/db/schemas/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
+import { useUserRoles } from '@/hooks/use-user-roles'
 import type { DeleteHoaBoardMemberData } from '@/schemas/hoa-board'
 import { EditMemberSheet } from '../sheets/edit-member'
 import { HoaMemberDetailsSheet } from '../sheets/member-details'
@@ -28,6 +29,8 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isMemberDetailsSheetOpen, setMemberDetailsSheetOpen] = useState(false)
   const [isEditMemberSheetOpen, setEditMemberSheetOpen] = useState(false)
+
+  const { isAdmin } = useUserRoles()
 
   const memberFullName = `${member.firstName} ${member.lastName}`
 
@@ -50,30 +53,35 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
 
   return (
     <>
-      <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
-        action={handleDeleteMember}
-        variant="destructive"
-        actionLabel="Eliminar"
-        title="¿Eliminar miembro?"
-        description={
-          <div>
-            Estás por eliminar al miembro <strong>{memberFullName}</strong>. Esta acción no se puede deshacer.
-          </div>
-        }
-      />
+      {isAdmin && (
+        <>
+          <AlertDialogGeneric
+            state={{
+              isOpen: isDeleteDialogOpen,
+              onOpenChange: setDeleteDialogOpen,
+            }}
+            action={handleDeleteMember}
+            variant="destructive"
+            actionLabel="Eliminar"
+            title="¿Eliminar miembro?"
+            description={
+              <div>
+                Estás por eliminar al miembro <strong>{memberFullName}</strong>. Esta acción no se puede
+                deshacer.
+              </div>
+            }
+          />
+
+          <EditMemberSheet
+            member={member}
+            state={{ isOpen: isEditMemberSheetOpen, onOpenChange: setEditMemberSheetOpen }}
+          />
+        </>
+      )}
 
       <HoaMemberDetailsSheet
         member={member}
         state={{ isOpen: isMemberDetailsSheetOpen, onOpenChange: setMemberDetailsSheetOpen }}
-      />
-
-      <EditMemberSheet
-        member={member}
-        state={{ isOpen: isEditMemberSheetOpen, onOpenChange: setEditMemberSheetOpen }}
       />
 
       <div className="flex">
@@ -96,17 +104,21 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
                 Información
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => setEditMemberSheetOpen(true)}>
-                <IconEdit className="size-4" />
-                Editar
-              </DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuItem onClick={() => setEditMemberSheetOpen(true)}>
+                    <IconEdit className="size-4" />
+                    Editar
+                  </DropdownMenuItem>
 
-              <DropdownMenuSeparator />
+                  <DropdownMenuSeparator />
 
-              <DropdownMenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
-                <IconTrash className="size-4" />
-                Eliminar
-              </DropdownMenuItem>
+                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                    <IconTrash className="size-4" />
+                    Eliminar
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
