@@ -4,12 +4,12 @@ import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { HoaBoardMemberWithProfile } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardMember } from '@/db/schemas/zod/hoa-board'
 import { normalizeString } from '@/lib/utils'
 import { HoaMembersTableActions } from './actions'
 import { HoaMemberNameCell } from './member-cell'
 
-export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberWithProfile>[] = [
+export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMember>[] = [
   {
     id: 'select',
     enablePinning: false,

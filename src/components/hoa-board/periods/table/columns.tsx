@@ -58,8 +58,9 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
     size: 100,
     enableSorting: false,
     cell: ({ row }) => {
-      const membersCount = row.original.members?.length ?? 0
-      return <Badge variant="outline">{membersCount}</Badge>
+      const activeMembers = row.original.members?.filter((member) => !member.deletedAt) || []
+
+      return <Badge variant="outline">{activeMembers.length}</Badge>
     },
   },
   {

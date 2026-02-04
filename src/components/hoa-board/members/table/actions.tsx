@@ -2,7 +2,7 @@ import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/i
 import { useState } from 'react'
 import { deleteHoaBoardMember } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOA_BOARD_MEMBERS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
+import { HOA_BOARD_MEMBERS_QUERY_KEY, HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,14 +14,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { HoaBoardMemberWithProfile } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardMember } from '@/db/schemas/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteHoaBoardMemberData } from '@/schemas/hoa-board'
 import { EditMemberSheet } from '../sheets/edit-member'
 import { HoaMemberDetailsSheet } from '../sheets/member-details'
 
 interface ActionsProps {
-  member: HoaBoardMemberWithProfile
+  member: HoaBoardMember
 }
 
 export function HoaMembersTableActions({ member }: ActionsProps) {
@@ -35,7 +35,7 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
     mutationFn: async (data: DeleteHoaBoardMemberData) => {
       return await deleteHoaBoardMember({ data })
     },
-    invalidateKeys: [HOA_BOARD_MEMBERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, HOA_BOARD_MEMBERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Miembro eliminado',
     successDescription: 'El miembro ha sido eliminado exitosamente.',
     errorDescription: 'Ocurrió un error al eliminar el miembro, intenta nuevamente.',

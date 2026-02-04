@@ -28,7 +28,8 @@ interface PeriodDetailsSheetProps {
 
 export function PeriodDetailsSheet({ period, state }: PeriodDetailsSheetProps) {
   const { isOpen, onOpenChange } = state
-  const membersCount = period.members?.length ?? 0
+  const activeMembers = period.members?.filter((member) => !member.deletedAt) || []
+  const pastMembers = period.members?.filter((member) => member.deletedAt) || []
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -67,14 +68,14 @@ export function PeriodDetailsSheet({ period, state }: PeriodDetailsSheetProps) {
           <CollapsibleDetails
             title={
               <>
-                Miembros <Badge variant="outline">{membersCount}</Badge>
+                Miembros <Badge variant="outline">{activeMembers.length}</Badge>
               </>
             }
             icon={IconUsers}
             content={
-              period.members && period.members.length > 0 ? (
+              activeMembers.length > 0 ? (
                 <div className="space-y-1">
-                  {period.members.map((member) => {
+                  {activeMembers.map((member) => {
                     const memberFullName = `${member.firstName} ${member.lastName}`.trim()
                     const isDeleted = !member.profileId
                     const roleName = member.profile?.profileRoles[0]?.role.name || 'Sin rol'
@@ -107,6 +108,38 @@ export function PeriodDetailsSheet({ period, state }: PeriodDetailsSheetProps) {
               )
             }
           />
+
+          {pastMembers.length > 0 && (
+            <CollapsibleDetails
+              title={
+                <>
+                  Miembros pasados <Badge variant="outline">{pastMembers.length}</Badge>
+                </>
+              }
+              icon={IconUsers}
+              content={
+                <div className="space-y-1">
+                  {pastMembers.map((member) => {
+                    const memberFullName = `${member.firstName} ${member.lastName}`.trim()
+                    const roleName = member.profile?.profileRoles[0]?.role.name || 'Sin rol'
+
+                    return (
+                      <FramePanel key={member.id} className="flex items-center gap-2 p-2">
+                        <div className="min-w-0 flex-1">
+                          <h2 className="font-medium text-sm">{memberFullName}</h2>
+                          <div className="flex flex-wrap gap-2">
+                            <RoleNameBadge roleName={roleName} />
+                            <ProfileTypeBadge type={member.profileType} />
+                          </div>
+                        </div>
+                        <CopyButton tooltipText="Copiar ID" value={member.id} />
+                      </FramePanel>
+                    )
+                  })}
+                </div>
+              }
+            />
+          )}
         </SheetPanel>
 
         <SheetFooter className="block space-y-1">

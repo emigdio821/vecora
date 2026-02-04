@@ -170,7 +170,7 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
                   <Empty className="p-1">
                     <EmptyHeader>
                       <EmptyMedia variant="icon" className="mb-1">
-                        <IconUser />
+                        <IconWind />
                       </EmptyMedia>
                       <EmptyDescription>
                         No hay información de{' '}

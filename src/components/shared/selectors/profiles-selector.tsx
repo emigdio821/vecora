@@ -46,11 +46,14 @@ export function ProfilesSelector({
 
     if (excludeWithPeriod) {
       filteredProfiles = profiles.filter((profile) => {
-        if (!profile.hoaBoardMemberships?.length) return true
-        // Allow the current member's profile to be selected when editing
+        const activeMemberships = profile.hoaBoardMemberships?.filter((m) => !m.deletedAt) || []
+
+        if (!activeMemberships.length) return true
+
         if (excludeMemberId) {
-          return profile.hoaBoardMemberships.every((membership) => membership.id === excludeMemberId)
+          return activeMemberships.every((membership) => membership.id === excludeMemberId)
         }
+
         return false
       })
     }

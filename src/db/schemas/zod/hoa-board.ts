@@ -17,10 +17,11 @@ export type SelectHoaBoard = z.infer<typeof selectHoaBoardSchema>
 
 // Type for HOA board periods with members
 export type HoaBoardPeriodWithMembers = SelectHoaBoardPeriod & {
-  members: HoaBoardMemberWithProfile[]
+  members: HoaBoardMember[]
 }
 
 // Type for HOA board members with profile
-export type HoaBoardMemberWithProfile = SelectHoaBoard & {
+export type HoaBoardMember = SelectHoaBoard & {
+  period: SelectHoaBoardPeriod | null
   profile: ProfileWithRoles | null
 }

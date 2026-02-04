@@ -40,8 +40,8 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
     },
   })
 
-  function handleBatchDelete() {
-    bulkDeleteMutation.mutate()
+  async function handleBatchDelete() {
+    await bulkDeleteMutation.mutateAsync()
   }
 
   useEffect(() => {

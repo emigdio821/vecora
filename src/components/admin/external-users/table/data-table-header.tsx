@@ -40,8 +40,8 @@ export function ExternalUsersDataTableHeader({ table }: ExternalUsersDataTableHe
     },
   })
 
-  function handleBatchDelete() {
-    bulkDeleteMutation.mutate()
+  async function handleBatchDelete() {
+    await bulkDeleteMutation.mutateAsync()
   }
 
   useEffect(() => {

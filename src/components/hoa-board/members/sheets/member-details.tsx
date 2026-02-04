@@ -15,11 +15,11 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HoaBoardMemberWithProfile } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardMember } from '@/db/schemas/zod/hoa-board'
 import { formatDate } from '@/lib/utils'
 
 interface MemberDetailsSheetProps {
-  member: HoaBoardMemberWithProfile
+  member: HoaBoardMember
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -30,6 +30,8 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
   const { isOpen, onOpenChange } = state
   const memberFullName = `${member.firstName} ${member.lastName}`.trim()
   const isActive = !!member.profileId
+  const period = member.period
+  const profile = member.profile
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -76,21 +78,21 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
             title="Perfil asociado"
             icon={IconUserStar}
             content={
-              member.profile ? (
+              profile ? (
                 <div className="space-y-1">
                   <FramePanel className="flex items-center gap-2 p-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">ID del perfil</h2>
-                      <p className="font-mono text-muted-foreground text-sm">{member.profile.id}</p>
+                      <p className="font-mono text-muted-foreground text-sm">{profile.id}</p>
                     </div>
-                    <CopyButton tooltipText="Copiar ID del perfil" value={member.profile.id} />
+                    <CopyButton tooltipText="Copiar ID del perfil" value={profile.id} />
                   </FramePanel>
 
-                  {member.profile.profileRoles.length > 0 && (
+                  {profile.profileRoles.length > 0 && (
                     <FramePanel className="p-2">
                       <h2 className="font-medium text-sm">Rol</h2>
                       <div className="mt-1">
-                        <RoleNameBadge roleName={member.profile.profileRoles[0]?.role.name || 'Sin rol'} />
+                        <RoleNameBadge roleName={profile.profileRoles[0]?.role.name || 'Sin rol'} />
                       </div>
                     </FramePanel>
                   )}
@@ -112,13 +114,29 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
             title="Periodo"
             icon={IconCalendarTime}
             content={
-              <FramePanel className="flex items-center gap-2 p-2">
-                <div className="min-w-0 flex-1">
-                  <h2 className="font-medium text-sm">ID del periodo</h2>
-                  <p className="font-mono text-muted-foreground text-sm">{member.periodId}</p>
-                </div>
-                <CopyButton tooltipText="Copiar ID del periodo" value={member.periodId} />
-              </FramePanel>
+              <div className="space-y-1">
+                <FramePanel className="flex items-center gap-2 p-2">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="font-medium text-sm">ID del periodo</h2>
+                    <p className="font-mono text-muted-foreground text-sm">{member.periodId}</p>
+                  </div>
+                  <CopyButton tooltipText="Copiar ID del periodo" value={member.periodId} />
+                </FramePanel>
+
+                {period && (
+                  <>
+                    <FramePanel className="p-2">
+                      <h2 className="font-medium text-sm">Fecha inicial</h2>
+                      <p className="text-muted-foreground text-sm">{formatDate(period.startDate)}</p>
+                    </FramePanel>
+
+                    <FramePanel className="p-2">
+                      <h2 className="font-medium text-sm">Fecha final</h2>
+                      <p className="text-muted-foreground text-sm">{formatDate(period.endDate)}</p>
+                    </FramePanel>
+                  </>
+                )}
+              </div>
             }
           />
         </SheetPanel>

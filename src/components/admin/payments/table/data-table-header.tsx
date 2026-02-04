@@ -40,8 +40,8 @@ export function PaymentsDataTableHeader({ table }: PaymentsDataTableHeaderProps)
     },
   })
 
-  function handleBatchDelete() {
-    bulkDeleteMutation.mutate()
+  async function handleBatchDelete() {
+    await bulkDeleteMutation.mutateAsync()
   }
 
   useEffect(() => {

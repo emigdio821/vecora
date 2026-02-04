@@ -1,10 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { hoaBoard, hoaBoardPeriods } from '@/db/schemas/main'
 import type {
-  HoaBoardMemberWithProfile,
+  HoaBoardMember,
   HoaBoardPeriodWithMembers,
   SelectHoaBoard,
   SelectHoaBoardPeriod,
@@ -24,7 +24,9 @@ export const getHoaBoardPeriods = createServerFn()
     const periods = await db.query.hoaBoardPeriods.findMany({
       with: {
         members: {
+          // where: (member, { isNull }) => isNull(member.deletedAt),
           with: {
+            period: true,
             profile: {
               with: {
                 profileRoles: {
@@ -57,10 +59,12 @@ export const getCurrentHoaBoardMembers = createServerFn()
       return []
     }
 
-    // Get members for the current period
+    // Get members for the current period (exclude deleted members)
     const members = await db.query.hoaBoard.findMany({
-      where: (board, { eq }) => eq(board.periodId, currentPeriod.id),
+      where: (board, { eq, isNull, and }) =>
+        and(eq(board.periodId, currentPeriod.id), isNull(board.deletedAt)),
       with: {
+        period: true,
         profile: {
           with: {
             profileRoles: {
@@ -73,7 +77,7 @@ export const getCurrentHoaBoardMembers = createServerFn()
       },
     })
 
-    return members satisfies HoaBoardMemberWithProfile[]
+    return members satisfies HoaBoardMember[]
   })
 
 export const createHoaBoardPeriod = createServerFn({ method: 'POST' })
@@ -142,28 +146,70 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
       throw new Error('Could not determine profile information')
     }
 
-    const [newMember] = await db
-      .insert(hoaBoard)
-      .values({
-        periodId: data.periodId,
-        profileId: data.profileId,
-        firstName,
-        lastName,
-        email,
-        profileType: profile.profileType,
-      })
-      .returning()
+    // Check if a soft-deleted member already exists for this profile and period
+    const [existingMember] = await db
+      .select()
+      .from(hoaBoard)
+      .where(and(eq(hoaBoard.periodId, data.periodId), eq(hoaBoard.profileId, data.profileId)))
+      .limit(1)
 
-    createAuditLog({
-      data: {
-        action: 'create',
-        entityType: 'hoa_board',
-        entityId: newMember.id,
-        newData: newMember,
-      },
-    }).catch(console.error)
+    let member: SelectHoaBoard
 
-    return newMember satisfies SelectHoaBoard
+    if (existingMember?.deletedAt) {
+      // Restore the soft-deleted member and update their info
+      const [restoredMember] = await db
+        .update(hoaBoard)
+        .set({
+          deletedAt: null,
+          firstName,
+          lastName,
+          email,
+          profileType: profile.profileType,
+        })
+        .where(eq(hoaBoard.id, existingMember.id))
+        .returning()
+
+      member = restoredMember
+
+      createAuditLog({
+        data: {
+          action: 'update',
+          entityType: 'hoa_board',
+          entityId: member.id,
+          oldData: existingMember,
+          newData: restoredMember,
+        },
+      }).catch(console.error)
+    } else if (existingMember) {
+      // Member already exists and is not deleted
+      throw new Error('Member already exists in this period')
+    } else {
+      // Create new member
+      const [newMember] = await db
+        .insert(hoaBoard)
+        .values({
+          periodId: data.periodId,
+          profileId: data.profileId,
+          firstName,
+          lastName,
+          email,
+          profileType: profile.profileType,
+        })
+        .returning()
+
+      member = newMember
+
+      createAuditLog({
+        data: {
+          action: 'create',
+          entityType: 'hoa_board',
+          entityId: member.id,
+          newData: newMember,
+        },
+      }).catch(console.error)
+    }
+
+    return member satisfies SelectHoaBoard
   })
 
 export const updateHoaBoardMember = createServerFn({ method: 'POST' })
@@ -233,7 +279,13 @@ export const deleteHoaBoardMember = createServerFn({ method: 'POST' })
   .inputValidator(deleteHoaBoardMemberSchema)
   .handler(async ({ data }) => {
     const [memberToDelete] = await db.select().from(hoaBoard).where(eq(hoaBoard.id, data.memberId)).limit(1)
-    const [deletedMember] = await db.delete(hoaBoard).where(eq(hoaBoard.id, data.memberId)).returning()
+
+    // Soft delete: set deletedAt timestamp instead of removing record
+    const [deletedMember] = await db
+      .update(hoaBoard)
+      .set({ deletedAt: new Date() })
+      .where(eq(hoaBoard.id, data.memberId))
+      .returning()
 
     createAuditLog({
       data: {

@@ -40,8 +40,8 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
     },
   })
 
-  function handleBatchDelete() {
-    bulkDeleteMutation.mutate()
+  async function handleBatchDelete() {
+    await bulkDeleteMutation.mutateAsync()
   }
 
   useEffect(() => {

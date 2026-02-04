@@ -40,8 +40,8 @@ export function OwnersDataTableHeader({ table }: OwnersDataTableHeaderProps) {
     },
   })
 
-  function handleBatchDelete() {
-    bulkDeleteMutation.mutate()
+  async function handleBatchDelete() {
+    await bulkDeleteMutation.mutateAsync()
   }
 
   useEffect(() => {

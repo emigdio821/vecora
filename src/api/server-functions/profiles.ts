@@ -24,7 +24,9 @@ export const getProfilesList = createServerFn()
       with: {
         owner: true,
         externalUser: true,
-        hoaBoardMemberships: true,
+        hoaBoardMemberships: {
+          where: (membership, { isNull }) => isNull(membership.deletedAt),
+        },
         profileRoles: {
           with: {
             role: true,
@@ -139,7 +141,9 @@ export const createProfile = createServerFn({ method: 'POST' })
       with: {
         owner: true,
         externalUser: true,
-        hoaBoardMemberships: true,
+        hoaBoardMemberships: {
+          where: (membership, { isNull }) => isNull(membership.deletedAt),
+        },
         profileRoles: {
           with: {
             role: true,
@@ -302,7 +306,9 @@ export const updateProfile = createServerFn({ method: 'POST' })
       with: {
         owner: true,
         externalUser: true,
-        hoaBoardMemberships: true,
+        hoaBoardMemberships: {
+          where: (membership, { isNull }) => isNull(membership.deletedAt),
+        },
         profileRoles: {
           with: {
             role: true,

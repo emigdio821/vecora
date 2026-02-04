@@ -20,12 +20,12 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HoaBoardMemberWithProfile } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardMember } from '@/db/schemas/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateHoaBoardMemberFormData, updateHoaBoardMemberSchema } from '@/schemas/hoa-board'
 
 interface EditMemberSheetProps {
-  member: HoaBoardMemberWithProfile
+  member: HoaBoardMember
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void

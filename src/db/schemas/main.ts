@@ -294,10 +294,12 @@ export const hoaBoard = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    deletedAt: timestamp('deleted_at'),
   },
   (table) => [
     index('hoa_board_periodId_idx').on(table.periodId),
     index('hoa_board_profileId_idx').on(table.profileId),
+    index('hoa_board_deletedAt_idx').on(table.deletedAt),
   ],
 )
 
