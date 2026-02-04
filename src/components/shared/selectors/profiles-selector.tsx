@@ -86,7 +86,7 @@ export function ProfilesSelector({
             aria-invalid={invalid}
             aria-label="Combobox de perfiles"
             disabled={items.length === 0 || disabled}
-            className="w-full justify-between font-normal disabled:bg-input/50 disabled:*:opacity-50 disabled:dark:bg-input/80"
+            className="w-full justify-between font-normal disabled:*:opacity-50"
           >
             {renderProfileValue(value)}
             <IconSelector className="-me-1 text-muted-foreground" />

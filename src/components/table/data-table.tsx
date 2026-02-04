@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Frame, FrameFooter, FrameHeader } from '../ui/frame'
+import { Frame } from '../ui/frame'
 
 interface DataTableProps<TData, TValue> {
   data: TData[]
@@ -96,54 +96,54 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
   }, [data.length, pageIndex, pageSize, setPagination])
 
   return (
-    <Frame className="w-full">
-      {header && <FrameHeader className="p-2">{header(table)}</FrameHeader>}
+    <div className="space-y-2">
+      {header && <div>{header(table)}</div>}
 
-      <Table>
-        {caption && <TableCaption>{caption}</TableCaption>}
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow data-state={row.getIsSelected() && 'selected'} key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      <Frame className="w-full">
+        <Table>
+          {caption && <TableCaption>{caption}</TableCaption>}
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell className="h-24 text-center" colSpan={columns.length}>
-                Sin resultados.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow data-state={row.getIsSelected() && 'selected'} key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell className="h-24 text-center" colSpan={columns.length}>
+                  Sin resultados.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Frame>
 
       {rowLength > DEFAULT_TABLE_PAGE_SIZE && (
-        <FrameFooter className="p-2">
-          <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
-            <DataTablePagination table={table} />
-          </div>
-        </FrameFooter>
+        <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
+          <DataTablePagination table={table} />
+        </div>
       )}
-    </Frame>
+    </div>
   )
 }

@@ -1,8 +1,7 @@
-import { IconChevronDown, IconNotes, IconUser } from '@tabler/icons-react'
-import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { IconNotes, IconUser } from '@tabler/icons-react'
+import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { CopyButton } from '@/components/ui/copy-button'
-import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
+import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
@@ -37,19 +36,11 @@ export function ExternalUserDetailsSheet({ externalUser, state }: ExternalUserDe
 
         <SheetPanel className="space-y-4">
           {/* Personal info */}
-          <Frame className="w-full">
-            <Collapsible defaultOpen>
-              <FrameHeader className="flex-row items-center justify-between p-2">
-                <CollapsibleTrigger
-                  className="data-panel-open:[&_svg]:rotate-180"
-                  render={<Button variant="plain" />}
-                >
-                  <IconChevronDown className="size-4" />
-                  Información personal
-                </CollapsibleTrigger>
-                <IconUser className="size-4 text-muted-foreground" />
-              </FrameHeader>
-              <CollapsibleContent className="space-y-1">
+          <CollapsibleDetails
+            title="Información personal"
+            icon={IconUser}
+            content={
+              <div className="space-y-1">
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Nombre</h2>
@@ -69,32 +60,22 @@ export function ExternalUserDetailsSheet({ externalUser, state }: ExternalUserDe
                     <p className="line-clamp-2 text-muted-foreground text-sm">{externalUser.phone}</p>
                   </FramePanel>
                 )}
-              </CollapsibleContent>
-            </Collapsible>
-          </Frame>
+              </div>
+            }
+          />
 
-          <Frame className="w-full">
-            {/* Notes info */}
-            {externalUser.notes && (
-              <Collapsible defaultOpen>
-                <FrameHeader className="flex-row items-center justify-between p-2">
-                  <CollapsibleTrigger
-                    className="data-panel-open:[&_svg]:rotate-180"
-                    render={<Button variant="plain" />}
-                  >
-                    <IconChevronDown className="size-4" />
-                    Notas
-                  </CollapsibleTrigger>
-                  <IconNotes className="size-4 text-muted-foreground" />
-                </FrameHeader>
-                <CollapsibleContent className="space-y-1">
-                  <FramePanel className="flex items-center gap-2 p-2">
-                    <p className="line-clamp-2 text-muted-foreground text-sm">{externalUser.notes}</p>
-                  </FramePanel>
-                </CollapsibleContent>
-              </Collapsible>
-            )}
-          </Frame>
+          {/* Notes info */}
+          {externalUser.notes && (
+            <CollapsibleDetails
+              title="Notas"
+              icon={IconNotes}
+              content={
+                <FramePanel className="p-2">
+                  <p className="line-clamp-2 text-muted-foreground text-sm">{externalUser.notes}</p>
+                </FramePanel>
+              }
+            />
+          )}
         </SheetPanel>
 
         <SheetFooter className="block space-y-1">

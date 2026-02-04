@@ -70,7 +70,9 @@ function SheetContent({
 }
 
 function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div data-slot="sheet-header" className={cn('flex flex-col gap-0.5 p-4', className)} {...props} />
+  return (
+    <div data-slot="sheet-header" className={cn('flex flex-col gap-0.5 p-4 pb-0', className)} {...props} />
+  )
 }
 
 function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
@@ -104,9 +106,7 @@ function SheetDescription({ className, ...props }: SheetPrimitive.Description.Pr
 }
 
 function SheetPanel({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-4" data-slot="sheet-panel" {...props} />
-  )
+  return <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4" data-slot="sheet-panel" {...props} />
 }
 
 const SheetCreateHandle = SheetPrimitive.createHandle

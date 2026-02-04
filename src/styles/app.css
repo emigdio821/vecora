@@ -1,13 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@fontsource-variable/geist";
-@import "@fontsource-variable/geist-mono";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-sans: "Geist Variable", sans-serif;
-  --font-mono: "Geist Mono Variable", monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -67,12 +65,12 @@
   --popover: var(--color-white);
   --popover-foreground: var(--color-neutral-900);
   --primary: var(--color-emerald-700);
-  --primary-foreground: var(--color-neutral-100);
+  --primary-foreground: var(--color-neutral-50);
   --secondary: var(--color-neutral-100);
   --secondary-foreground: var(--color-neutral-900);
-  --muted: --alpha(var(--color-neutral-950) / 4%);
+  --muted: var(--color-neutral-100);
   --muted-foreground: var(--color-neutral-500);
-  --accent: --alpha(var(--color-neutral-950) / 4%);
+  --accent: var(--color-neutral-100);
   --accent-foreground: var(--color-neutral-900);
   --border: var(--color-neutral-200);
   --input: var(--color-neutral-200);
@@ -85,10 +83,10 @@
   --chart-5: var(--color-amber-500);
 
   --sidebar: var(--color-neutral-50);
-  --sidebar-foreground: var(--color-neutral-900);
+  --sidebar-foreground: var(--color-neutral-800);
   --sidebar-primary: var(--color-emerald-700);
   --sidebar-primary-foreground: var(--color-neutral-50);
-  --sidebar-accent: --alpha(var(--color-neutral-950) / 4%);
+  --sidebar-accent: var(--color-neutral-100);
   --sidebar-accent-foreground: var(--color-neutral-900);
   --sidebar-border: var(--color-neutral-200);
   --sidebar-ring: var(--color-neutral-400);
@@ -104,7 +102,7 @@
 }
 
 .dark {
-  --background: var(--color-neutral-900);
+  --background: var(--color-neutral-950);
   --foreground: var(--color-neutral-50);
   --card: var(--color-neutral-900);
   --card-foreground: var(--color-neutral-50);
@@ -114,7 +112,7 @@
   --primary-foreground: var(--color-neutral-900);
   --secondary: var(--color-neutral-800);
   --secondary-foreground: var(--color-neutral-50);
-  --muted: --alpha(var(--color-neutral-100) / 4%);
+  --muted: var(--color-neutral-800);
   --muted-foreground: var(--color-neutral-400);
   --accent: var(--color-neutral-800);
   --accent-foreground: var(--color-neutral-50);
@@ -128,12 +126,12 @@
   --chart-4: var(--color-sky-500);
   --chart-5: var(--color-amber-500);
 
-  --sidebar: var(--color-neutral-950);
-  --sidebar-foreground: var(--color-neutral-200);
+  --sidebar: var(--color-neutral-900);
+  --sidebar-foreground: var(--color-neutral-300);
   --sidebar-primary: var(--color-emerald-500);
-  --sidebar-primary-foreground: var(--color-neutral-950);
-  --sidebar-accent: var(--color-neutral-900);
-  --sidebar-accent-foreground: var(--color-neutral-200);
+  --sidebar-primary-foreground: var(--color-neutral-900);
+  --sidebar-accent: var(--color-neutral-800);
+  --sidebar-accent-foreground: var(--color-neutral-50);
   --sidebar-border: var(--color-neutral-800);
   --sidebar-ring: var(--color-neutral-500);
 

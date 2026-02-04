@@ -1,12 +1,11 @@
-import { IconCalendarTime, IconChevronDown, IconUsers } from '@tabler/icons-react'
+import { IconCalendarTime, IconUsers } from '@tabler/icons-react'
+import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
-import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
+import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
@@ -43,19 +42,11 @@ export function PeriodDetailsSheet({ period, state }: PeriodDetailsSheetProps) {
 
         <SheetPanel className="space-y-4">
           {/* Period info */}
-          <Frame className="w-full">
-            <Collapsible defaultOpen>
-              <FrameHeader className="flex-row items-center justify-between p-2">
-                <CollapsibleTrigger
-                  className="data-panel-open:[&_svg]:rotate-180"
-                  render={<Button variant="plain" />}
-                >
-                  <IconChevronDown className="size-4" />
-                  Información del periodo
-                </CollapsibleTrigger>
-                <IconCalendarTime className="size-4 text-muted-foreground" />
-              </FrameHeader>
-              <CollapsibleContent className="space-y-1">
+          <CollapsibleDetails
+            title="Información del periodo"
+            icon={IconCalendarTime}
+            content={
+              <div className="space-y-1">
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Fecha inicial</h2>
@@ -63,68 +54,59 @@ export function PeriodDetailsSheet({ period, state }: PeriodDetailsSheetProps) {
                   </div>
                   <CopyButton tooltipText="Copiar ID del periodo" value={period.id} />
                 </FramePanel>
+
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Fecha final</h2>
                   <p className="text-muted-foreground text-sm">{formatDate(period.endDate)}</p>
                 </FramePanel>
-              </CollapsibleContent>
-            </Collapsible>
-          </Frame>
+              </div>
+            }
+          />
 
           {/* Members info */}
-          <Frame className="w-full">
-            <Collapsible defaultOpen>
-              <FrameHeader className="flex-row items-center justify-between p-2">
-                <CollapsibleTrigger
-                  className="data-panel-open:[&_svg]:rotate-180"
-                  render={<Button variant="plain" />}
-                >
-                  <IconChevronDown className="size-4" />
-                  Miembros <Badge variant="outline">{membersCount}</Badge>
-                </CollapsibleTrigger>
-                <IconUsers className="size-4 text-muted-foreground" />
-              </FrameHeader>
-              <CollapsibleContent>
-                {period.members && period.members.length > 0 ? (
-                  <div className="space-y-1">
-                    {period.members.map((member) => {
-                      const memberFullName = `${member.firstName} ${member.lastName}`.trim()
-                      const isDeleted = !member.profileId
-                      const roleName = member.profile?.profileRoles[0]?.role.name || 'Sin rol'
+          <CollapsibleDetails
+            title={
+              <>
+                Miembros <Badge variant="outline">{membersCount}</Badge>
+              </>
+            }
+            icon={IconUsers}
+            content={
+              period.members && period.members.length > 0 ? (
+                <div className="space-y-1">
+                  {period.members.map((member) => {
+                    const memberFullName = `${member.firstName} ${member.lastName}`.trim()
+                    const isDeleted = !member.profileId
+                    const roleName = member.profile?.profileRoles[0]?.role.name || 'Sin rol'
 
-                      return (
-                        <FramePanel key={member.id} className="p-2">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <div className="min-w-0 flex-1">
-                                <h2
-                                  className={cn('font-medium text-sm', isDeleted && 'text-muted-foreground')}
-                                >
-                                  {memberFullName}
-                                </h2>
-                              </div>
-                              <CopyButton tooltipText="Copiar ID" value={member.id} />
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              <RoleNameBadge roleName={roleName} />
-                              <ProfileTypeBadge type={member.profileType} />
-                              {isDeleted && <Badge variant="destructive">Eliminado</Badge>}
-                            </div>
+                    return (
+                      <FramePanel key={member.id} className="flex items-center gap-2 p-2">
+                        <div className="min-w-0 flex-1">
+                          <h2 className={cn('font-medium text-sm', isDeleted && 'text-muted-foreground')}>
+                            {memberFullName}
+                          </h2>
+                          <div className="flex flex-wrap gap-2">
+                            <RoleNameBadge roleName={roleName} />
+                            <ProfileTypeBadge type={member.profileType} />
+                            {isDeleted && <Badge variant="destructive">Eliminado</Badge>}
                           </div>
-                        </FramePanel>
-                      )
-                    })}
-                  </div>
-                ) : (
-                  <Empty className="py-4">
+                        </div>
+                        <CopyButton tooltipText="Copiar ID" value={member.id} />
+                      </FramePanel>
+                    )
+                  })}
+                </div>
+              ) : (
+                <FramePanel className="p-2">
+                  <Empty className="p-1">
                     <EmptyMedia className="size-8" />
                     <EmptyHeader>Sin miembros</EmptyHeader>
                     <EmptyDescription>Este periodo no tiene miembros asignados</EmptyDescription>
                   </Empty>
-                )}
-              </CollapsibleContent>
-            </Collapsible>
-          </Frame>
+                </FramePanel>
+              )
+            }
+          />
         </SheetPanel>
 
         <SheetFooter className="block space-y-1">

@@ -80,7 +80,7 @@ export function OwnersSelector({
             aria-invalid={invalid}
             aria-label="Combobox de propietarios"
             disabled={items.length === 0 || disabled}
-            className="w-full justify-between font-normal disabled:bg-input/50 disabled:*:opacity-50 disabled:dark:bg-input/80"
+            className="w-full justify-between font-normal disabled:*:opacity-50"
           >
             {renderOwnerValue(value)}
             <IconSelector className="-me-1 text-muted-foreground" />

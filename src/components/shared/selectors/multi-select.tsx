@@ -90,7 +90,7 @@ export function ComboboxMultiSelect({
             disabled={items.length === 0 || isLoading || disabled}
           >
             {renderValue()}
-            <IconSelector className="shrink-0 text-muted-foreground/80" aria-hidden="true" />
+            <IconSelector className="shrink-0 text-muted-foreground" aria-hidden="true" />
           </Button>
         }
       />

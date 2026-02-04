@@ -25,7 +25,7 @@ export function ProfilesDataTable() {
       header={(table) => <ProfilesDataTableHeader table={table} />}
       caption={`Estos perfiles representan a los usuarios registrados en el sistema.
         Puedes vincular un perfil a un propietario o un usuario externo.
-      `}
+        `}
     />
   )
 }

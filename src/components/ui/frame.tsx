@@ -4,7 +4,7 @@ function Frame({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       className={cn(
-        'relative flex flex-col overflow-clip rounded-2xl bg-muted/75 p-1',
+        'relative flex flex-col overflow-clip rounded-2xl bg-muted/50 p-1',
         '*:[[data-slot=frame-panel]+[data-slot=frame-panel]]:mt-1',
         className,
       )}
@@ -17,7 +17,7 @@ function Frame({ className, ...props }: React.ComponentProps<'div'>) {
 function FramePanel({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      className={cn('relative rounded-xl border bg-background bg-clip-padding p-5 shadow-xs', className)}
+      className={cn('relative rounded-xl border bg-background bg-clip-padding p-5 shadow-xs/5', className)}
       data-slot="frame-panel"
       {...props}
     />
