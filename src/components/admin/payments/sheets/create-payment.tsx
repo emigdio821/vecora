@@ -3,13 +3,13 @@ import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createPayment } from '@/api/server-functions/payments'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
+import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
 import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
 import {
   Select,
@@ -76,7 +76,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
     mutationFn: async (data: CreatePaymentFormData) => {
       return await createPayment({ data })
     },
-    invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, OWNERS_QUERY_KEY],
     successTitle: 'Pago creado',
     successDescription: 'El pago ha sido creado exitosamente.',
     errorDescription: 'Ocurrió un error al crear el pago, intenta nuevamente.',

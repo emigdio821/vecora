@@ -1,4 +1,4 @@
-import { IconFileExport, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
+import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -20,6 +20,7 @@ interface PeriodsDataTableHeaderProps {
 }
 
 export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
+  const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isCreatePeriodSheetOpen, setIsCreatePeriodSheetOpen] = useState(false)
   const { isAdmin } = useUserRoles()
@@ -88,6 +89,28 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
           />
           <InputGroupAddon>
             <IconSearch className="size-4" />
+          </InputGroupAddon>
+
+          <InputGroupAddon align="inline-end">
+            <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
+              <TooltipTrigger
+                render={
+                  <Button
+                    size="icon-xs"
+                    variant="ghost"
+                    aria-label="Buscar por fecha inicial"
+                    className="cursor-default"
+                    onClick={(e) => {
+                      e.preventBaseUIHandler()
+                      setSearchTooltipOpen(true)
+                    }}
+                  >
+                    <IconInfoCircle className="size-4" />
+                  </Button>
+                }
+              />
+              <TooltipContent>Buscar por fecha inicial</TooltipContent>
+            </Tooltip>
           </InputGroupAddon>
         </InputGroup>
 

@@ -4,13 +4,13 @@ import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createViolation } from '@/api/server-functions/violations'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
+import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
@@ -55,7 +55,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
     mutationFn: async (data: CreateViolationFormData) => {
       return await createViolation({ data })
     },
-    invalidateKeys: [VIOLATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    invalidateKeys: [VIOLATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, OWNERS_QUERY_KEY],
     successTitle: 'Infracción creada',
     successDescription: 'La infracción ha sido creada exitosamente.',
     errorDescription: 'Ocurrió un error al crear la infracción, intenta nuevamente.',

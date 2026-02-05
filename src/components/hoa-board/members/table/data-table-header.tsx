@@ -1,4 +1,4 @@
-import { IconFileExport, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
+import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -20,6 +20,7 @@ interface MembersDataTableHeaderProps {
 }
 
 export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
+  const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isCreateMemberSheetOpen, setIsCreateMemberSheetOpen] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-hoa-members', parseAsString.withDefault(''))
@@ -91,6 +92,28 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
           />
           <InputGroupAddon>
             <IconSearch className="size-4" />
+          </InputGroupAddon>
+
+          <InputGroupAddon align="inline-end">
+            <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
+              <TooltipTrigger
+                render={
+                  <Button
+                    size="icon-xs"
+                    variant="ghost"
+                    aria-label="Buscar por nombre"
+                    className="cursor-default"
+                    onClick={(e) => {
+                      e.preventBaseUIHandler()
+                      setSearchTooltipOpen(true)
+                    }}
+                  >
+                    <IconInfoCircle className="size-4" />
+                  </Button>
+                }
+              />
+              <TooltipContent>Buscar por nombre</TooltipContent>
+            </Tooltip>
           </InputGroupAddon>
         </InputGroup>
 

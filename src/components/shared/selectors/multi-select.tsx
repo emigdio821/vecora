@@ -94,27 +94,30 @@ export function ComboboxMultiSelect({
           </Button>
         }
       />
-      <PopoverContent className="w-(--anchor-width) p-0">
-        <Command>
-          {items.length > 10 && <CommandInput placeholder="Buscar" />}
-          <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
-            <CommandGroup>
-              {items.map((item) => (
-                <CommandItem
-                  key={item.value}
-                  value={item.value}
-                  keywords={[item.label]}
-                  onSelect={() => toggleSelection(item.value)}
-                  data-checked={selectedValues.includes(item.value)}
-                >
-                  <span className="truncate">{item.label}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
+      <PopoverContent
+        className="w-(--anchor-width) p-0"
+        render={
+          <Command>
+            {items.length > 10 && <CommandInput placeholder="Buscar" />}
+            <CommandList>
+              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandGroup>
+                {items.map((item) => (
+                  <CommandItem
+                    key={item.value}
+                    value={item.value}
+                    keywords={[item.label]}
+                    onSelect={() => toggleSelection(item.value)}
+                    data-checked={selectedValues.includes(item.value)}
+                  >
+                    <span className="truncate">{item.label}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        }
+      />
     </Popover>
   )
 }

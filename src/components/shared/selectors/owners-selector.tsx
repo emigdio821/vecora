@@ -87,43 +87,46 @@ export function OwnersSelector({
           </Button>
         }
       />
-      <PopoverContent className="w-(--anchor-width) p-0">
-        <Command>
-          {items.length > 10 && <CommandInput placeholder="Buscar" />}
-          <CommandList>
-            <CommandEmpty>Sin resultados.</CommandEmpty>
-            <CommandGroup>
-              {includeNoneOption && (
-                <CommandItem
-                  value={undefined}
-                  data-checked={!value}
-                  onSelect={() => {
-                    setOpen(false)
-                    onValueChange?.(null)
-                  }}
-                >
-                  {noneOptionLabel}
-                </CommandItem>
-              )}
+      <PopoverContent
+        className="w-(--anchor-width) p-0"
+        render={
+          <Command>
+            {items.length > 10 && <CommandInput placeholder="Buscar" />}
+            <CommandList>
+              <CommandEmpty>Sin resultados.</CommandEmpty>
+              <CommandGroup>
+                {includeNoneOption && (
+                  <CommandItem
+                    value={undefined}
+                    data-checked={!value}
+                    onSelect={() => {
+                      setOpen(false)
+                      onValueChange?.(null)
+                    }}
+                  >
+                    {noneOptionLabel}
+                  </CommandItem>
+                )}
 
-              {items.map((owner) => (
-                <CommandItem
-                  key={owner.value}
-                  value={owner.value}
-                  data-checked={value === owner.value}
-                  keywords={[owner.label]}
-                  onSelect={(currentValue) => {
-                    setOpen(false)
-                    onValueChange?.(currentValue)
-                  }}
-                >
-                  {owner.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
+                {items.map((owner) => (
+                  <CommandItem
+                    key={owner.value}
+                    value={owner.value}
+                    data-checked={value === owner.value}
+                    keywords={[owner.label]}
+                    onSelect={(currentValue) => {
+                      setOpen(false)
+                      onValueChange?.(currentValue)
+                    }}
+                  >
+                    {owner.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        }
+      />
     </Popover>
   )
 }
