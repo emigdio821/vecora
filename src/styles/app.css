@@ -59,21 +59,25 @@
 :root {
   --radius: 0.625rem;
   --background: var(--color-white);
-  --foreground: var(--color-neutral-900);
+  --foreground: var(--color-neutral-800);
   --card: var(--color-white);
-  --card-foreground: var(--color-neutral-900);
+  --card-foreground: var(--color-neutral-800);
   --popover: var(--color-white);
-  --popover-foreground: var(--color-neutral-900);
+  --popover-foreground: var(--color-neutral-800);
   --primary: var(--color-emerald-700);
   --primary-foreground: var(--color-neutral-50);
-  --secondary: var(--color-neutral-100);
-  --secondary-foreground: var(--color-neutral-900);
-  --muted: var(--color-neutral-100);
-  --muted-foreground: var(--color-neutral-500);
-  --accent: var(--color-neutral-100);
-  --accent-foreground: var(--color-neutral-900);
-  --border: var(--color-neutral-200);
-  --input: var(--color-neutral-200);
+  --secondary: --alpha(var(--color-black) / 4%);
+  --secondary-foreground: var(--color-neutral-800);
+  --muted: --alpha(var(--color-black) / 4%);
+  --muted-foreground: color-mix(
+    in srgb,
+    var(--color-neutral-500) 90%,
+    var(--color-black)
+  );
+  --accent: --alpha(var(--color-black) / 4%);
+  --accent-foreground: var(--color-neutral-800);
+  --border: --alpha(var(--color-black) / 8%);
+  --input: --alpha(var(--color-black) / 10%);
   --ring: var(--color-neutral-400);
 
   --chart-1: var(--color-emerald-700);
@@ -86,9 +90,9 @@
   --sidebar-foreground: var(--color-neutral-800);
   --sidebar-primary: var(--color-emerald-700);
   --sidebar-primary-foreground: var(--color-neutral-50);
-  --sidebar-accent: var(--color-neutral-100);
+  --sidebar-accent: --alpha(var(--color-black) / 4%);
   --sidebar-accent-foreground: var(--color-neutral-900);
-  --sidebar-border: var(--color-neutral-200);
+  --sidebar-border: --alpha(var(--color-black) / 6%);
   --sidebar-ring: var(--color-neutral-400);
 
   --info: var(--color-blue-500);
@@ -102,37 +106,49 @@
 }
 
 .dark {
-  --background: var(--color-neutral-950);
+  --background: color-mix(
+    in srgb,
+    var(--color-neutral-950) 95%,
+    var(--color-white)
+  );
   --foreground: var(--color-neutral-50);
-  --card: var(--color-neutral-900);
+  --card: color-mix(in srgb, var(--background) 98%, var(--color-white));
   --card-foreground: var(--color-neutral-50);
-  --popover: var(--color-neutral-900);
+  --popover: color-mix(in srgb, var(--background) 98%, var(--color-white));
   --popover-foreground: var(--color-neutral-50);
   --primary: var(--color-emerald-500);
   --primary-foreground: var(--color-neutral-900);
-  --secondary: var(--color-neutral-800);
+  --secondary: --alpha(var(--color-white) / 4%);
   --secondary-foreground: var(--color-neutral-50);
-  --muted: var(--color-neutral-800);
-  --muted-foreground: var(--color-neutral-400);
-  --accent: var(--color-neutral-800);
+  --muted: --alpha(var(--color-white) / 4%);
+  --muted-foreground: color-mix(
+    in srgb,
+    var(--color-neutral-500) 90%,
+    var(--color-white)
+  );
+  --accent: --alpha(var(--color-white) / 4%);
   --accent-foreground: var(--color-neutral-50);
-  --border: var(--color-neutral-800);
-  --input: var(--color-neutral-700);
+  --border: --alpha(var(--color-white) / 6%);
+  --input: --alpha(var(--color-white) / 8%);
   --ring: var(--color-neutral-500);
 
-  --chart-1: var(--color-emerald-700);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-orange-500);
-  --chart-4: var(--color-sky-500);
-  --chart-5: var(--color-amber-500);
+  --chart-1: var(--color-blue-700);
+  --chart-2: var(--color-emerald-500);
+  --chart-3: var(--color-amber-500);
+  --chart-4: var(--color-purple-500);
+  --chart-5: var(--color-rose-500);
 
-  --sidebar: var(--color-neutral-900);
+  --sidebar: color-mix(
+    in srgb,
+    var(--color-neutral-950) 97%,
+    var(--color-white)
+  );
   --sidebar-foreground: var(--color-neutral-300);
   --sidebar-primary: var(--color-emerald-500);
   --sidebar-primary-foreground: var(--color-neutral-900);
-  --sidebar-accent: var(--color-neutral-800);
+  --sidebar-accent: --alpha(var(--color-white) / 4%);
   --sidebar-accent-foreground: var(--color-neutral-50);
-  --sidebar-border: var(--color-neutral-800);
+  --sidebar-border: --alpha(var(--color-white) / 5%);
   --sidebar-ring: var(--color-neutral-500);
 
   --info: var(--color-blue-500);
