@@ -132,7 +132,7 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
               </CardHeader>
               <CardFooter className="flex items-center justify-between text-muted-foreground text-xs">
                 <div>
-                  <p className="truncate">{profile.name}</p>
+                  <p className="line-clamp-2 whitespace-normal">{profile.name}</p>
                   <p>{formatDate(date)}</p>
                 </div>
                 <RoleNameBadge roleName={profile.roles[0]} />
