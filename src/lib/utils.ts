@@ -44,3 +44,20 @@ export function getPaymentTypeLabel(type: PaymentType): string {
 
   return typeLabels[type] || type
 }
+
+export function getRoleLabel(roleName: string): string {
+  switch (roleName) {
+    case 'admin':
+      return 'Administrador'
+    case 'president':
+      return 'Presidente'
+    case 'treasurer':
+      return 'Tesorero'
+    case 'maintainer':
+      return 'Mantenimiento'
+    case 'security':
+      return 'Seguridad'
+    default:
+      return roleName
+  }
+}
