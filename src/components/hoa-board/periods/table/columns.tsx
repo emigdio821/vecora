@@ -35,7 +35,7 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
     accessorKey: 'startDate',
     cell: ({ row }) => <HoaPeriodCell period={row.original} />,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha inicial" />,
-    size: 180,
+    size: 200,
     filterFn: (row, _, value: string) => {
       const normalizedStartDate = normalizeString(formatDate(row.original.startDate)).toLowerCase()
       const normalizedEndDate = normalizeString(formatDate(row.original.endDate)).toLowerCase()
@@ -47,7 +47,7 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
   {
     accessorKey: 'endDate',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha final" />,
-    size: 180,
+    size: 200,
     cell: ({ row }) => {
       const date = new Date(row.original.endDate)
       return <p className="line-clamp-1">{formatDate(date)}</p>
@@ -66,7 +66,7 @@ export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[]
   },
   {
     id: 'actions',
-    size: 48,
+    size: 55,
     enablePinning: false,
     enableResizing: false,
     enableSorting: false,

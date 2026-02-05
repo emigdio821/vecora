@@ -73,11 +73,15 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                   <FramePanel className="p-2">
                     <h2 className="font-medium text-sm">Meses pagados</h2>
                     <div className="mt-1 inline-flex flex-wrap gap-1">
-                      {payment.paymentMonths.map((month) => (
-                        <Badge variant="outline" key={`${month.month}-${month.paymentId}`}>
-                          <span>{MONTHS[month.month]}</span>
-                        </Badge>
-                      ))}
+                      {payment.paymentMonths.length === 12 ? (
+                        <Badge variant="outline">Todo el año</Badge>
+                      ) : (
+                        payment.paymentMonths.map((month) => (
+                          <Badge variant="outline" key={`${month.month}-${month.paymentId}`}>
+                            <span>{MONTHS[month.month]}</span>
+                          </Badge>
+                        ))
+                      )}
                     </div>
                   </FramePanel>
                 )}

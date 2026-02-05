@@ -33,7 +33,7 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
   },
   {
     accessorKey: 'concept',
-    size: 280,
+    size: 300,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Concepto" />,
     cell: ({ row }) => <ViolationConceptCell violation={row.original} />,
     filterFn: (row, _, value: string) => {
@@ -53,7 +53,7 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
   },
   {
     accessorKey: 'owner',
-    size: 200,
+    size: 280,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Propietario" />,
     cell: ({ row }) => {
       const owner = row.original.owner
@@ -62,7 +62,7 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
   },
   {
     accessorKey: 'amount',
-    size: 100,
+    size: 120,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Monto" />,
     sortingFn: (rowA, rowB) => Number(rowA.original.amount) - Number(rowB.original.amount),
     cell: ({ row }) => <p>${row.original.amount}</p>,
@@ -83,7 +83,7 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
     id: 'actions',
     enablePinning: false,
     enableResizing: false,
-    size: 28,
+    size: 55,
     cell: ({ row }) => <ViolationsTableActions violation={row.original} />,
   },
 ]

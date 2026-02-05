@@ -12,7 +12,7 @@ export function AdminResidentialTabs() {
 
   return (
     <Tabs value={tab} onValueChange={(value) => setTab(value)}>
-      <TabsList className="flex w-full justify-start overflow-hidden overflow-x-auto sm:w-fit sm:justify-center">
+      <TabsList className="flex justify-start overflow-hidden overflow-x-auto sm:w-fit sm:justify-center">
         <TabsTrigger value="owners">Propietarios</TabsTrigger>
         <TabsTrigger value="houses">Casas</TabsTrigger>
         <TabsTrigger value="violations">Infracciones</TabsTrigger>

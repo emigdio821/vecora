@@ -21,7 +21,7 @@ function RouteComponent() {
       </p>
 
       <Tabs value={tab} onValueChange={(value) => setTab(value)}>
-        <TabsList className="flex w-full justify-start overflow-hidden overflow-x-auto sm:w-fit sm:justify-center">
+        <TabsList className="flex justify-start overflow-hidden overflow-x-auto sm:w-fit sm:justify-center">
           <TabsTrigger value="hoa-board-members">Miembros</TabsTrigger>
           <TabsTrigger value="hoa-board-periods">Periodos</TabsTrigger>
         </TabsList>

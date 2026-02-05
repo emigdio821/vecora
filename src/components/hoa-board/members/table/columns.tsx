@@ -35,7 +35,7 @@ export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMember>[] = [
   },
   {
     accessorKey: 'firstName',
-    size: 200,
+    size: 300,
     cell: ({ row }) => <HoaMemberNameCell member={row.original} />,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
     filterFn: (row, _, value: string) => {
@@ -54,7 +54,7 @@ export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMember>[] = [
   {
     accessorKey: 'profile',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
-    size: 200,
+    size: 120,
     cell: ({ row }) => {
       const profile = row.original.profile
       const roleName = profile?.profileRoles[0]?.role.name || 'Sin rol'
@@ -80,7 +80,7 @@ export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMember>[] = [
   },
   {
     id: 'actions',
-    size: 48,
+    size: 55,
     enablePinning: false,
     enableResizing: false,
     enableSorting: false,

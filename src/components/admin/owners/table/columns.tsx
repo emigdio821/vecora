@@ -37,7 +37,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
   {
     accessorKey: 'firstName',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
-    size: 200,
+    size: 300,
     cell: ({ row }) => <OwnerNameCell owner={row.original} />,
     filterFn: (row, _, value: string) => {
       const normalizedFirstName = normalizeString(row.original.firstName).toLowerCase()
@@ -56,13 +56,13 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     accessorKey: 'email',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Correo" />,
     size: 200,
-    cell: ({ row }) => <p className="truncate">{row.original.email}</p>,
+    cell: ({ row }) => <p className="line-clamp-1 whitespace-normal text-left">{row.original.email}</p>,
   },
   {
     accessorKey: 'phone',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Teléfono" />,
     size: 140,
-    cell: ({ row }) => <p className="truncate">{row.original.phone}</p>,
+    cell: ({ row }) => <p className="line-clamp-1 whitespace-normal text-left">{row.original.phone}</p>,
   },
   {
     accessorKey: 'houses',
@@ -116,7 +116,7 @@ export const ownersTableColumns: ColumnDef<OwnerWithRelations>[] = [
     id: 'actions',
     enablePinning: false,
     enableResizing: false,
-    size: 28,
+    size: 50,
     cell: ({ row }) => <OwnersTableActions owner={row.original} />,
   },
 ]

@@ -33,7 +33,7 @@ export const externalUsersTableColumns: ColumnDef<SelectExternalUser>[] = [
   {
     accessorKey: 'firstName',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
-    size: 200,
+    size: 300,
     cell: ({ row }) => <ExternalUserNameCell externalUser={row.original} />,
     filterFn: (row, _, value: string) => {
       const normalizedFirstName = normalizeString(row.original.firstName).toLowerCase()
@@ -58,13 +58,13 @@ export const externalUsersTableColumns: ColumnDef<SelectExternalUser>[] = [
     accessorKey: 'phone',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Teléfono" />,
     size: 140,
-    cell: ({ row }) => <p className="truncate">{row.original.phone}</p>,
+    cell: ({ row }) => <p className="line-clamp-1 whitespace-normal text-left">{row.original.phone}</p>,
   },
   {
     id: 'actions',
     enablePinning: false,
     enableResizing: false,
-    size: 28,
+    size: 55,
     cell: ({ row }) => <ExternalUsersTableActions externalUser={row.original} />,
   },
 ]

@@ -13,7 +13,11 @@ export function AuditDetailsCell({ auditLogs }: OwnerNameCellProps) {
 
   return (
     <>
-      <Button variant="plain" className="block truncate" onClick={() => setIsSheetOpen(true)}>
+      <Button
+        variant="plain"
+        className="line-clamp-2 whitespace-normal text-left"
+        onClick={() => setIsSheetOpen(true)}
+      >
         {userName}
       </Button>
 

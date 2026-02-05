@@ -1,9 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
-import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { CopyButton } from '@/components/ui/copy-button'
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from '@/components/ui/popover'
 import type { HouseWithOwner } from '@/db/schemas/zod/houses'
 import { normalizeString } from '@/lib/utils'
 import { HousesTableActions } from './actions'
@@ -35,7 +32,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   },
   {
     accessorKey: 'houseNumber',
-    size: 40,
+    size: 80,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Casa" />,
     cell: ({ row }) => <HouseNumberCell house={row.original} />,
     filterFn: (row, _, value: string) => {
@@ -55,63 +52,25 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
   },
   {
     accessorKey: 'owner',
-    size: 200,
+    size: 300,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Propietario" />,
     cell: ({ row }) => {
       const owner = row.original.owner
       const ownerFullName = `${owner?.firstName} ${owner?.lastName}`
 
-      return owner ? (
-        <Popover>
-          <PopoverTrigger render={<Button variant="plain">{ownerFullName}</Button>} />
-          <PopoverContent className="min-w-52 max-w-60 p-0">
-            <div className="flex flex-col gap-2">
-              <div className="space-y-2 p-2 pb-0">
-                <PopoverTitle className="text-muted-foreground text-sm">{ownerFullName}</PopoverTitle>
-                <div className="min-w-0 flex-1">
-                  <h2 className="font-medium text-sm">Correo</h2>
-                  <p className="line-clamp-2 text-muted-foreground text-sm">{owner.email}</p>
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <h2 className="font-medium text-sm">Teléfono</h2>
-                  <p className="line-clamp-2 text-muted-foreground text-sm">{owner.phone}</p>
-                </div>
-              </div>
-
-              <div className="flex w-full items-center gap-1 border-t bg-muted/50 p-2">
-                <PopoverClose
-                  render={
-                    <Button className="grow rounded-sm" size="sm" variant="outline">
-                      Cerrar
-                    </Button>
-                  }
-                />
-
-                <CopyButton
-                  value={owner.id}
-                  variant="outline"
-                  className="rounded-sm"
-                  tooltipText="Copiar ID"
-                />
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-        // </div>
-      ) : null
+      return owner ? <p className="line-clamp-2 whitespace-normal text-left">{ownerFullName}</p> : null
     },
   },
   {
     accessorKey: 'street',
     size: 220,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Calle" />,
-    cell: ({ row }) => <p>{row.original.street}</p>,
+    cell: ({ row }) => <p className="line-clamp-2 whitespace-normal text-left">{row.original.street}</p>,
   },
   {
     accessorKey: 'city',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Ciudad" />,
-    size: 200,
+    size: 180,
     sortingFn: (rowA, rowB) => {
       const rowACity = [rowA.original.city, rowA.original.state].filter(Boolean).join(', ')
       const rowBCity = [rowB.original.city, rowB.original.state].filter(Boolean).join(', ')
@@ -122,7 +81,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
       const house = row.original
       const houseCityState = [house.city, house.state].filter(Boolean).join(', ')
 
-      return houseCityState && <p>{houseCityState}</p>
+      return houseCityState && <p className="line-clamp-2 whitespace-normal text-left">{houseCityState}</p>
     },
   },
   {
@@ -138,7 +97,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
     id: 'actions',
     enablePinning: false,
     enableResizing: false,
-    size: 28,
+    size: 50,
     cell: ({ row }) => <HousesTableActions house={row.original} />,
   },
 ]

@@ -35,7 +35,7 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
   },
   {
     id: 'user-name',
-    size: 200,
+    size: 300,
     accessorKey: 'user.name',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
     cell: ({ row }) => <ProfileNameCell profile={row.original} />,
@@ -57,7 +57,7 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
   },
   {
     accessorKey: 'profileRoles',
-    size: 300,
+    size: 150,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
     cell: ({ row }) => {
       const roles = row.original.profileRoles?.map(({ role }) => role.name) || []
@@ -77,7 +77,7 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
     id: 'actions',
     enablePinning: false,
     enableResizing: false,
-    size: 28,
+    size: 55,
     cell: ({ row }) => <ProfilesTableActions profile={row.original} />,
   },
 ]

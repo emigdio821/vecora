@@ -106,7 +106,7 @@ export function ProfilesSelector({
         }
       />
       <PopoverContent
-        className="w-(--anchor-width) p-0"
+        className="w-(--anchor-width) gap-0 rounded-lg p-0"
         render={
           <Command>
             {items.length > 10 && <CommandInput placeholder="Buscar" />}

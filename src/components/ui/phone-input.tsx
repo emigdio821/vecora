@@ -135,7 +135,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
           </Button>
         }
       />
-      <PopoverContent align="start" className="w-72 p-0">
+      <PopoverContent align="start" className="w-64 p-0 sm:w-72">
         <Command shouldFilter={false}>
           <CommandInput placeholder="Buscar" onValueChange={handleCountryFilter} />
           <CommandList className="overflow-hidden">

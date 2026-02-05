@@ -16,7 +16,7 @@ export function HoaMemberNameCell({ member }: HoaMemberNameCellProps) {
     <>
       <Button
         variant="plain"
-        className="line-clamp-1 whitespace-normal text-left"
+        className="line-clamp-2 whitespace-normal text-left"
         onClick={() => setIsSheetOpen(true)}
       >
         {fullName}

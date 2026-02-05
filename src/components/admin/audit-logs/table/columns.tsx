@@ -35,7 +35,7 @@ export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
   },
   {
     accessorKey: 'user',
-    size: 200,
+    size: 180,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Usuario" />,
     cell: ({ row }) => <AuditDetailsCell auditLogs={row.original} />,
     filterFn: (row, _, value: string) => {
@@ -65,15 +65,17 @@ export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
   },
   {
     accessorKey: 'entityType',
-    size: 150,
+    size: 160,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Tipo de entidad" />,
     cell: ({ row }) => <AuditLogEntityTypeBadge entityType={row.original.entityType} />,
   },
   {
     accessorKey: 'timestamp',
-    size: 200,
+    size: 240,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha y hora" />,
-    cell: ({ row }) => formatDate(row.original.timestamp, { hour: '2-digit', minute: '2-digit' }),
+    cell: ({ row }) => (
+      <p className="text-sm">{formatDate(row.original.timestamp, { hour: '2-digit', minute: '2-digit' })}</p>
+    ),
     filterFn: (row, _, value: YearFacetedFilterOption[]) => {
       if (value.length === 0) return true
 

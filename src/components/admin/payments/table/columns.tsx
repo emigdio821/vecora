@@ -36,7 +36,7 @@ export const paymentsTableColumns: ColumnDef<PaymentWithOwnerAndMonths>[] = [
   },
   {
     accessorKey: 'amount',
-    size: 200,
+    size: 140,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Monto" />,
     sortingFn: (rowA, rowB) => Number(rowA.original.amount) - Number(rowB.original.amount),
     cell: ({ row }) => <PaymentAmountCell payment={row.original} />,
@@ -57,7 +57,7 @@ export const paymentsTableColumns: ColumnDef<PaymentWithOwnerAndMonths>[] = [
   },
   {
     accessorKey: 'owner',
-    size: 200,
+    size: 300,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Propietario" />,
     cell: ({ row }) => {
       const owner = row.original.owner
@@ -83,13 +83,14 @@ export const paymentsTableColumns: ColumnDef<PaymentWithOwnerAndMonths>[] = [
   },
   {
     accessorKey: 'paymentMonths',
-    size: 200,
+    size: 240,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Meses" />,
     cell: ({ row }) => {
       const paymentMonths = row.original.paymentMonths
       const showMonthlyFee = row.original.paymentType === 'monthly_fee' && paymentMonths.length > 0
 
       if (!showMonthlyFee) return null
+      if (paymentMonths.length === 12) return <Badge variant="outline">Todo el año</Badge>
 
       const paymentMonthsBadges = paymentMonths.map((month) => (
         <Badge variant="outline" key={`${month.month}-${month.paymentId}`}>
@@ -108,7 +109,7 @@ export const paymentsTableColumns: ColumnDef<PaymentWithOwnerAndMonths>[] = [
   },
   {
     accessorKey: 'year',
-    size: 100,
+    size: 80,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Año" />,
     cell: ({ row }) => <p>{row.original.year}</p>,
   },
@@ -116,7 +117,7 @@ export const paymentsTableColumns: ColumnDef<PaymentWithOwnerAndMonths>[] = [
     id: 'actions',
     enablePinning: false,
     enableResizing: false,
-    size: 28,
+    size: 55,
     cell: ({ row }) => <PaymentsTableActions payment={row.original} />,
   },
 ]

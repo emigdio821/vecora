@@ -15,7 +15,7 @@ export function ProfileNameCell({ profile }: ProfileNameCellProps) {
     <>
       <Button
         variant="plain"
-        className="line-clamp-1 whitespace-normal text-left"
+        className="line-clamp-2 whitespace-normal text-left"
         onClick={() => setIsSheetOpen(true)}
       >
         {profileName}
