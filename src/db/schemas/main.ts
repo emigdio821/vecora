@@ -204,10 +204,12 @@ export const violations = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    deletedAt: timestamp('deleted_at'),
   },
   (table) => [
     index('violations_owner_idx').on(table.ownerId),
     index('violations_status_idx').on(table.status),
+    index('violations_deletedAt_idx').on(table.deletedAt),
   ],
 )
 
@@ -230,12 +232,14 @@ export const payments = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    deletedAt: timestamp('deleted_at'),
   },
   (table) => [
     index('payments_owner_idx').on(table.ownerId),
     index('payments_type_idx').on(table.paymentType),
     index('payments_year_idx').on(table.year),
     index('payments_status_idx').on(table.status),
+    index('payments_deletedAt_idx').on(table.deletedAt),
   ],
 )
 
