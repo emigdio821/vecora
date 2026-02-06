@@ -24,3 +24,7 @@ export type PaymentWithOwnerAndMonths = SelectPayment & {
   owner: SelectOwner | null
   paymentMonths: SelectPaymentMonth[]
 }
+
+export type PaymentWithMonths = SelectPayment & {
+  paymentMonths: SelectPaymentMonth[]
+}

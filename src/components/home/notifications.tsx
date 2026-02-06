@@ -1,11 +1,12 @@
 import { IconBell, IconBellOff } from '@tabler/icons-react'
 import { useState } from 'react'
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardDescription, CardFrameFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDate } from '@/lib/utils'
 import { AllNotificationsSheet } from '../shared/notifications/all-notifications-sheet'
 import { RoleNameBadge } from '../shared/role-name-badge'
 import { Button } from '../ui/button'
 import { Empty, EmptyContent, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
+import { Frame } from '../ui/frame'
 
 const dummyNotifications = [
   {
@@ -105,6 +106,8 @@ export function HomeNotifications() {
   const maxDisplayed = 3
   const hasMore = notifications.length > maxDisplayed
   const displayedNotifications = notifications.slice(0, maxDisplayed)
+  const remainingNotifications = notifications.length - maxDisplayed
+  const notifText = remainingNotifications === 1 ? 'notificación' : 'notificaciones'
 
   if (notifications.length === 0) {
     return (
@@ -133,32 +136,41 @@ export function HomeNotifications() {
 
       <div className="columns-1 gap-4 sm:columns-2 xl:columns-4">
         {displayedNotifications.map(({ date, description, id, profile, title }) => (
-          <Card key={id} className="mb-4">
-            <CardHeader>
-              <CardTitle>{title}</CardTitle>
-              <CardDescription>{description}</CardDescription>
-            </CardHeader>
-            <CardFooter className="flex items-center justify-between text-muted-foreground text-xs">
+          <Frame key={id} className="mb-4 break-inside-avoid">
+            <Card>
+              <CardHeader className="py-2">
+                <CardTitle className="text-sm">{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <CardFrameFooter className="flex items-center justify-between text-muted-foreground text-xs">
               <div>
                 <p className="line-clamp-2 whitespace-normal">{profile.name}</p>
                 <p>{formatDate(date)}</p>
               </div>
               <RoleNameBadge roleName={profile.roles[0]} />
-            </CardFooter>
-          </Card>
+            </CardFrameFooter>
+          </Frame>
         ))}
         {hasMore && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Notificaciones</CardTitle>
-            </CardHeader>
-            <CardFooter>
+          <Frame>
+            <Card>
+              <CardHeader className="gap-0">
+                <CardTitle className="text-sm">Notificaciones</CardTitle>
+                <CardDescription>
+                  Hay {remainingNotifications} {notifText} más
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <CardFrameFooter>
               <Button onClick={() => setAllNotificationsOpen(true)}>
                 <IconBell />
                 Ver todas
               </Button>
-            </CardFooter>
-          </Card>
+            </CardFrameFooter>
+          </Frame>
         )}
       </div>
     </>

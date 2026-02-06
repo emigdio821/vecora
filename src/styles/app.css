@@ -77,10 +77,10 @@
   --ring: var(--color-neutral-400);
 
   --chart-1: var(--color-emerald-700);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-orange-500);
-  --chart-4: var(--color-sky-500);
-  --chart-5: var(--color-amber-500);
+  --chart-2: var(--color-red-500);
+  --chart-3: var(--color-blue-500);
+  --chart-4: var(--color-amber-500);
+  --chart-5: var(--color-violet-500);
 
   --sidebar: var(--color-neutral-50);
   --sidebar-foreground: var(--color-neutral-800);
@@ -120,11 +120,11 @@
   --input: --alpha(var(--color-white) / 8%);
   --ring: var(--color-neutral-500);
 
-  --chart-1: var(--color-blue-700);
-  --chart-2: var(--color-emerald-500);
-  --chart-3: var(--color-amber-500);
-  --chart-4: var(--color-purple-500);
-  --chart-5: var(--color-rose-500);
+  --chart-1: var(--color-emerald-500);
+  --chart-2: var(--color-red-500);
+  --chart-3: var(--color-blue-500);
+  --chart-4: var(--color-amber-500);
+  --chart-5: var(--color-violet-500);
 
   --sidebar: color-mix(in srgb, var(--color-neutral-950) 97%, var(--color-white));
   --sidebar-foreground: var(--color-neutral-300);

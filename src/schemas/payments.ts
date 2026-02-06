@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { paymentStatusSchema, paymentTypeSchema } from '@/db/schemas/zod/payments'
+import { MAX_YEAR_OFFSET, STARTING_YEAR } from '@/lib/constants'
 import { requiredAmountSchema } from './shared'
 
 export const createPaymentSchema = z
@@ -60,3 +61,12 @@ export const deletePaymentSchema = z.object({
 })
 
 export type DeletePaymentData = z.infer<typeof deletePaymentSchema>
+
+export const paymentsByYearSchema = z.object({
+  year: z
+    .number()
+    .min(STARTING_YEAR, `El año no puede ser anterior a ${STARTING_YEAR}`)
+    .max(new Date().getFullYear() + MAX_YEAR_OFFSET, 'Año inválido'),
+})
+
+export type PaymentsByYearData = z.infer<typeof paymentsByYearSchema>

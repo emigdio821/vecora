@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardDescription, CardFrameFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Frame } from '@/components/ui/frame'
 import {
   Sheet,
   SheetClose,
@@ -123,21 +124,24 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
           <SheetDescription>{dummyNotifications.length} notificaciones en total</SheetDescription>
         </SheetHeader>
 
-        <SheetPanel>
+        <SheetPanel className="space-y-2">
           {dummyNotifications.map(({ date, description, id, profile, title }) => (
-            <Card key={id} size="sm" className="shadow-xs/5">
-              <CardHeader>
-                <CardTitle>{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
-              </CardHeader>
-              <CardFooter className="flex items-center justify-between text-muted-foreground text-xs">
+            <Frame key={id}>
+              <Card>
+                <CardHeader className="py-2">
+                  <CardTitle className="text-sm">{title}</CardTitle>
+                  <CardDescription>{description}</CardDescription>
+                </CardHeader>
+              </Card>
+
+              <CardFrameFooter className="flex items-center justify-between text-muted-foreground text-xs">
                 <div>
                   <p className="line-clamp-2 whitespace-normal">{profile.name}</p>
                   <p>{formatDate(date)}</p>
                 </div>
                 <RoleNameBadge roleName={profile.roles[0]} />
-              </CardFooter>
-            </Card>
+              </CardFrameFooter>
+            </Frame>
           ))}
         </SheetPanel>
 

@@ -1,0 +1,178 @@
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
+import { paymentsByYearQueryOptions } from '@/api/tanstack-queries/payments'
+import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
+import { Card, CardContent } from '@/components/ui/card'
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { Frame, FrameDescription, FrameHeader, FrameTitle } from '@/components/ui/frame'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+const chartData = [
+  { month: 'January', desktop: 342, mobile: 245 },
+  { month: 'February', desktop: 876, mobile: 654 },
+  { month: 'March', desktop: 512, mobile: 387 },
+  { month: 'April', desktop: 629, mobile: 521 },
+  { month: 'May', desktop: 458, mobile: 412 },
+  { month: 'June', desktop: 781, mobile: 598 },
+  { month: 'July', desktop: 394, mobile: 312 },
+  { month: 'August', desktop: 925, mobile: 0 },
+  { month: 'September', desktop: 647, mobile: 489 },
+  { month: 'October', desktop: 532, mobile: 476 },
+  { month: 'November', desktop: 803, mobile: 687 },
+  { month: 'December', desktop: 271, mobile: 198 },
+]
+
+const chartConfig = {
+  desktop: {
+    label: 'Pagado',
+    color: 'var(--chart-1)',
+  },
+  mobile: {
+    label: 'Pendiente',
+    color: 'var(--chart-2)',
+  },
+} satisfies ChartConfig
+
+export function PaymentsChart() {
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const {
+    data: payments = [],
+    error,
+    isLoading,
+    refetch,
+  } = useQuery(paymentsByYearQueryOptions(selectedYear))
+
+  function renderChartContent() {
+    if (isLoading) {
+      return (
+        <div className="flex size-full items-center justify-center">
+          <span className="animate-pulse text-sm">Cargando datos...</span>
+        </div>
+      )
+    } else if (error) {
+      return (
+        <TSQueryGenericError
+          refetch={refetch}
+          className="size-full flex-1 border-none"
+          errorDescription="Algo salió mal al cargar la información de los pagos."
+        />
+      )
+    }
+
+    return (
+      <AreaChart
+        accessibilityLayer
+        data={chartData}
+        margin={{
+          left: 12,
+          right: 12,
+        }}
+      >
+        <CartesianGrid vertical={false} strokeDasharray="3 3" />
+        <XAxis
+          dataKey="month"
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          tickFormatter={(value) => value.slice(0, 3)}
+        />
+        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+        <defs>
+          <DottedBackgroundPattern config={chartConfig} />
+        </defs>
+        <Area
+          dataKey="mobile"
+          type="natural"
+          fill="url(#dotted-background-pattern-mobile)"
+          fillOpacity={0.4}
+          stroke="var(--color-mobile)"
+          stackId="a"
+          strokeWidth={0.8}
+        />
+        <Area
+          dataKey="desktop"
+          type="natural"
+          fill="url(#dotted-background-pattern-desktop)"
+          fillOpacity={0.4}
+          stroke="var(--color-desktop)"
+          stackId="a"
+          strokeWidth={0.8}
+        />
+      </AreaChart>
+    )
+  }
+
+  return (
+    <Frame className="mt-4">
+      <FrameHeader className="flex flex-row items-center justify-between gap-2">
+        <div>
+          <FrameTitle>Pagos</FrameTitle>
+          <FrameDescription>
+            Mostrando el total de pagos en el año <span className="font-medium">{selectedYear}</span>
+          </FrameDescription>
+        </div>
+
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Label htmlFor="payments-chart-year">Año</Label>
+          <Select
+            disabled={isLoading}
+            value={selectedYear}
+            onValueChange={(value) => value && setSelectedYear(value)}
+          >
+            <SelectTrigger id="payments-chart-year" className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectGroup>
+                <SelectLabel>Año</SelectLabel>
+                <SelectItem value={2024}>2024</SelectItem>
+                <SelectItem value={2025}>2025</SelectItem>
+                <SelectItem value={2026}>2026</SelectItem>
+                <SelectItem value={2027}>2027</SelectItem>
+                <SelectItem value={2028}>2028</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </FrameHeader>
+      <Card>
+        <CardContent>
+          <ChartContainer config={chartConfig} className="max-h-80 min-h-52 w-full">
+            {renderChartContent()}
+          </ChartContainer>
+        </CardContent>
+      </Card>
+    </Frame>
+  )
+}
+
+const DottedBackgroundPattern = ({ config }: { config: ChartConfig }) => {
+  const items = Object.fromEntries(Object.entries(config).map(([key, value]) => [key, value.color]))
+  return (
+    <>
+      {Object.entries(items).map(([key, value]) => (
+        <pattern
+          key={key}
+          id={`dotted-background-pattern-${key}`}
+          x="0"
+          y="0"
+          width="7"
+          height="7"
+          patternUnits="userSpaceOnUse"
+        >
+          <circle cx="5" cy="5" r="1.5" fill={value} opacity={0.5} />
+        </pattern>
+      ))}
+    </>
+  )
+}
