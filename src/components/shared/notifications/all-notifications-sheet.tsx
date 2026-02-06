@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFrameFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Frame } from '@/components/ui/frame'
 import {
   Sheet,
   SheetClose,
@@ -126,13 +125,11 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
 
         <SheetPanel className="space-y-2">
           {dummyNotifications.map(({ date, description, id, profile, title }) => (
-            <Frame key={id}>
-              <Card>
-                <CardHeader className="py-2">
-                  <CardTitle className="text-sm">{title}</CardTitle>
-                  <CardDescription>{description}</CardDescription>
-                </CardHeader>
-              </Card>
+            <Card key={id}>
+              <CardHeader>
+                <CardTitle className="text-sm">{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
+              </CardHeader>
 
               <CardFrameFooter className="flex items-center justify-between text-muted-foreground text-xs">
                 <div>
@@ -141,7 +138,7 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
                 </div>
                 <RoleNameBadge roleName={profile.roles[0]} />
               </CardFrameFooter>
-            </Frame>
+            </Card>
           ))}
         </SheetPanel>
 

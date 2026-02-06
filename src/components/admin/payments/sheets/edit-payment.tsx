@@ -140,7 +140,12 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                   </FieldLabel>
 
                   <InputGroup>
-                    <InputGroupInput aria-invalid={fieldState.invalid} type="number" {...field} />
+                    <InputGroupInput
+                      type="number"
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      {...field}
+                    />
                     <InputGroupAddon>
                       <InputGroupText>$</InputGroupText>
                     </InputGroupAddon>

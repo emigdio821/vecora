@@ -60,7 +60,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
       year: new Date().getFullYear(),
       months: [],
       status: 'pending',
-      paidAt: new Date(),
+      paidAt: undefined,
     },
   })
 
@@ -137,7 +137,12 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
                   </FieldLabel>
 
                   <InputGroup>
-                    <InputGroupInput aria-invalid={fieldState.invalid} type="number" {...field} />
+                    <InputGroupInput
+                      type="number"
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      {...field}
+                    />
                     <InputGroupAddon>
                       <InputGroupText>$</InputGroupText>
                     </InputGroupAddon>

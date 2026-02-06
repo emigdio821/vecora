@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { paymentMonths, payments } from '@/db/schemas/main'
-import type { InsertPayment, PaymentWithMonths, PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
+import type { InsertPayment, PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
 import { authMiddleware } from '@/middleware/auth'
 import {
   createPaymentSchema,
@@ -151,11 +151,12 @@ export const getPaymentsByYear = createServerFn({ method: 'POST' })
     const yearPayments = await db.query.payments.findMany({
       where: eq(payments.year, year),
       with: {
+        owner: true,
         paymentMonths: {
           orderBy: (paymentMonths, { asc }) => [asc(paymentMonths.month)],
         },
       },
     })
 
-    return yearPayments satisfies PaymentWithMonths[]
+    return yearPayments satisfies PaymentWithOwnerAndMonths[]
   })

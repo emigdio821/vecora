@@ -154,7 +154,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
                         </Button>
                       }
                     />
-                    <PopoverContent className="p-0">
+                    <PopoverContent className="p-1">
                       <Calendar
                         mode="single"
                         id={field.name}

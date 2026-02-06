@@ -110,7 +110,7 @@ export function EditHoaPeriodSheet({ period, state }: EditHoaPeriodSheetProps) {
                         </Button>
                       }
                     />
-                    <PopoverContent className="p-0">
+                    <PopoverContent className="p-1">
                       <Calendar
                         mode="single"
                         id={field.name}
@@ -151,7 +151,7 @@ export function EditHoaPeriodSheet({ period, state }: EditHoaPeriodSheetProps) {
                         </Button>
                       }
                     />
-                    <PopoverContent className="p-0">
+                    <PopoverContent className="p-1">
                       <Calendar
                         mode="single"
                         id={field.name}
