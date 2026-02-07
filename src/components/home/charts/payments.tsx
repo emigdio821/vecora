@@ -1,23 +1,24 @@
 import { IconWind } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
-import { Bar, BarChart, XAxis } from 'recharts'
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
 import { paymentsByYearQueryOptions } from '@/api/tanstack-queries/payments'
+import { ChartDottedBackgroundPattern } from '@/components/shared/charts/dotted-bg'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
+import { TextGenericSkeleton } from '@/components/shared/skeletons/text-generic'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import {
-  Frame,
-  FrameDescription,
-  FrameFooter,
-  FrameHeader,
-  FramePanel,
-  FrameTitle,
-} from '@/components/ui/frame'
+import { Frame, FrameDescription, FrameFooter, FrameHeader, FrameTitle } from '@/components/ui/frame'
 import { Label } from '@/components/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverTitle,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -32,11 +33,11 @@ import { getAllMonthsMap } from '@/lib/utils'
 const chartConfig = {
   paid: {
     label: 'Pagado',
-    color: 'var(--chart-1)',
+    color: 'var(--color-success)',
   },
   pending: {
     label: 'Pendiente',
-    color: 'var(--chart-2)',
+    color: 'var(--color-warning)',
   },
 } satisfies ChartConfig
 
@@ -102,20 +103,10 @@ export function PaymentsChart() {
     }
   }, [payments])
 
-  // if (isLoading) return <TextGenericSkeleton />
-
-  // if (error) {
-  //   return (
-  //     <TSQueryGenericError
-  //       refetch={refetch}
-  //       className="size-full flex-1 border-none"
-  //       errorDescription="Algo salió mal al cargar la información de los pagos."
-  //     />
-  //   )
-  // }
-
   function renderChartContent() {
-    if (error && !isLoading) {
+    if (isLoading) {
+      return <TextGenericSkeleton />
+    } else if (error) {
       return (
         <TSQueryGenericError
           refetch={refetch}
@@ -123,7 +114,7 @@ export function PaymentsChart() {
           errorDescription="Algo salió mal al cargar la información de los pagos."
         />
       )
-    } else if (payments.length === 0 && !isLoading) {
+    } else if (payments.length === 0) {
       return (
         <Empty className="size-full">
           <EmptyHeader>
@@ -138,22 +129,41 @@ export function PaymentsChart() {
     }
 
     return (
-      <BarChart accessibilityLayer data={chartData}>
-        <rect x="0" y="0" width="100%" height="85%" fill="url(#default-multiple-pattern-dots)" />
-        <defs>
-          <DottedBackgroundPattern />
-        </defs>
+      <AreaChart accessibilityLayer data={chartData}>
+        <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis
           dataKey="month"
           tickLine={false}
-          tickMargin={10}
           axisLine={false}
+          tickMargin={8}
           tickFormatter={(value) => value.slice(0, 3)}
         />
-        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" hideLabel />} />
-        <Bar dataKey="paid" fill="var(--chart-1)" shape={<CustomHatchedBar />} radius={4} />
-        <Bar dataKey="pending" fill="var(--chart-2)" shape={<CustomHatchedBar />} radius={4} />
-      </BarChart>
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent valueFormatFn={(value) => `$${Number(value).toLocaleString()}`} />}
+        />
+        <defs>
+          <ChartDottedBackgroundPattern config={chartConfig} />
+        </defs>
+        <Area
+          dataKey="paid"
+          type="natural"
+          fill="url(#dotted-background-pattern-paid)"
+          fillOpacity={0.4}
+          stroke="var(--color-success)"
+          stackId="a"
+          strokeWidth={0.8}
+        />
+        <Area
+          dataKey="pending"
+          type="natural"
+          fill="url(#dotted-background-pattern-pending)"
+          fillOpacity={0.4}
+          stroke="var(--color-warning)"
+          stackId="a"
+          strokeWidth={0.8}
+        />
+      </AreaChart>
     )
   }
 
@@ -196,108 +206,56 @@ export function PaymentsChart() {
           </ChartContainer>
         </CardContent>
       </Card>
-      <FrameFooter className="flex items-center justify-between gap-4 text-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="size-3 shrink-0 rounded-[2px] border bg-chart-1" />
-            <span className="text-muted-foreground">
-              Pagado:{' '}
-              <span className="font-medium text-foreground">{paymentStats.paidPercentage.toFixed(1)}%</span>
-            </span>
-          </div>
+      {paymentStats.total > 0 && (
+        <FrameFooter className="flex items-center justify-between gap-4 text-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="size-3 shrink-0 rounded-[2px] border bg-success" />
+              <span className="text-muted-foreground">
+                Pagado:{' '}
+                <span className="font-medium text-foreground">{paymentStats.paidPercentage.toFixed(1)}%</span>
+              </span>
+            </div>
 
-          <Popover>
-            <PopoverTrigger
-              render={
-                <Button variant="plain">
-                  <div className="size-3 shrink-0 rounded-[2px] border bg-chart-2" />
-                  <span className="text-muted-foreground">
-                    Pendiente:{' '}
-                    <span className="font-medium text-foreground">
-                      {paymentStats.pendingPercentage.toFixed(1)}%
+            <Popover>
+              <PopoverTrigger
+                render={
+                  <Button variant="plain">
+                    <div className="size-3 shrink-0 rounded-[2px] border bg-warning" />
+                    <span className="text-muted-foreground">
+                      Pendiente:{' '}
+                      <span className="font-medium text-foreground">
+                        {paymentStats.pendingPercentage.toFixed(1)}%
+                      </span>
                     </span>
-                  </span>
-                </Button>
-              }
-            />
-            <PopoverContent align="start" className="max-w-80 overflow-y-auto p-0">
-              <Frame className="w-full">
-                <FrameHeader className="p-2">
-                  <FrameTitle className="text-sm">Pagos pendientes</FrameTitle>
-                  <FrameDescription>
+                  </Button>
+                }
+              />
+              <PopoverContent align="start" className="max-w-80 p-0">
+                <div className="p-2 pb-0">
+                  <PopoverTitle className="text-sm">Pagos pendientes</PopoverTitle>
+                  <PopoverDescription>
                     Propietarios con pagos pendientes en <span className="font-medium">{selectedYear}</span>
-                  </FrameDescription>
-                </FrameHeader>
-                <div className="max-h-96 space-y-1 overflow-y-auto">
+                  </PopoverDescription>
+                </div>
+                <div className="max-h-72 space-y-1 overflow-y-auto p-2 pt-0">
                   {paymentStats.pendingPayments.map((payment) => (
-                    <FramePanel className="flex gap-2 rounded-sm p-2" key={payment.id}>
-                      <div className="flex-1">
-                        <h2 className="font-medium text-sm">{`${payment.owner?.firstName} ${payment.owner?.lastName}`}</h2>
-                        <p className="line-clamp-2 text-muted-foreground text-sm">{payment.concept}</p>
-                      </div>
-
-                      <span className="font-medium text-sm">${Number(payment.amount).toFixed(2)}</span>
-                    </FramePanel>
+                    <Card key={payment.id} className="rounded-sm">
+                      <CardHeader className="gap-0 px-2.5 py-2">
+                        <CardTitle className="text-sm">{`${payment.owner?.firstName} ${payment.owner?.lastName}`}</CardTitle>
+                        <CardDescription className="text-sm">{payment.concept}</CardDescription>
+                        <CardAction>
+                          <span className="font-medium text-sm">${Number(payment.amount).toFixed(2)}</span>
+                        </CardAction>
+                      </CardHeader>
+                    </Card>
                   ))}
                 </div>
-              </Frame>
-            </PopoverContent>
-          </Popover>
-        </div>
-      </FrameFooter>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </FrameFooter>
+      )}
     </Frame>
-  )
-}
-
-const CustomHatchedBar = (
-  props: React.SVGProps<SVGRectElement> & {
-    dataKey?: string
-    isHatched?: boolean
-  },
-) => {
-  const { fill, x, y, width, height, dataKey } = props
-  const isHatched = props.isHatched ?? true
-
-  return (
-    <>
-      <rect
-        rx={4}
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        stroke="none"
-        fill={isHatched ? `url(#hatched-bar-pattern-${dataKey})` : fill}
-      />
-      <defs>
-        <pattern
-          key={dataKey}
-          id={`hatched-bar-pattern-${dataKey}`}
-          x="0"
-          y="0"
-          width="5"
-          height="5"
-          patternUnits="userSpaceOnUse"
-          patternTransform="rotate(-45)"
-        >
-          <rect width="10" height="10" opacity={0.5} fill={fill} />
-          <rect width="1" height="10" fill={fill} />
-        </pattern>
-      </defs>
-    </>
-  )
-}
-const DottedBackgroundPattern = () => {
-  return (
-    <pattern
-      id="default-multiple-pattern-dots"
-      x="0"
-      y="0"
-      width="10"
-      height="10"
-      patternUnits="userSpaceOnUse"
-    >
-      <circle className="text-muted dark:text-muted/40" cx="2" cy="2" r="1" fill="currentColor" />
-    </pattern>
   )
 }

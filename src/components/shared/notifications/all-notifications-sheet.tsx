@@ -114,7 +114,7 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
+      <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Todas las notificaciones</SheetTitle>
           <SheetDescription>{dummyNotifications.length} notificaciones en total</SheetDescription>
@@ -122,7 +122,7 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
 
         <SheetPanel className="space-y-2">
           {dummyNotifications.map(({ date, description, id, profile, title }) => (
-            <Card key={id}>
+            <Card key={id} className="rounded-md">
               <CardHeader>
                 <CardTitle className="text-sm">{title}</CardTitle>
                 <CardDescription>{description}</CardDescription>
