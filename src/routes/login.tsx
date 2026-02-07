@@ -9,8 +9,9 @@ import { Footer } from '@/components/footer'
 import { LoaderIcon, ResidoIcon } from '@/components/icons'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Frame, FrameDescription, FrameHeader, FrameTitle } from '@/components/ui/frame'
 import { Input } from '@/components/ui/input'
 import { InputPassword } from '@/components/ui/input-password'
 import { SITE_CONFIG } from '@/config/site'
@@ -78,7 +79,7 @@ function RouteComponent() {
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center">
-      <div className="m-6 flex w-full max-w-sm flex-col gap-6">
+      <div className="flex w-full max-w-sm flex-col gap-6 px-2 py-6">
         <div className="flex items-center gap-2 self-center">
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <ResidoIcon className="size-4" />
@@ -86,79 +87,78 @@ function RouteComponent() {
           <span className="font-medium text-base text-foreground">{SITE_CONFIG.title}</span>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center text-lg">Iniciar sesión</CardTitle>
-            <CardDescription className="text-center">
-              Ingresa tus credenciales para acceder a tu cuenta.
-            </CardDescription>
-          </CardHeader>
+        <Frame className="w-full max-w-sm">
+          <FrameHeader>
+            <FrameTitle>Iniciar sesión</FrameTitle>
+            <FrameDescription>Ingresa tus credenciales para acceder a tu cuenta.</FrameDescription>
+          </FrameHeader>
+          <Card>
+            <CardContent>
+              <form
+                className="space-y-4"
+                id={loginFormId}
+                aria-label="Iniciar sesión"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
+                <FieldGroup>
+                  <Controller
+                    name="email"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor={field.name}>
+                          Correo <span className="text-destructive">*</span>
+                        </FieldLabel>
+                        <Input
+                          {...field}
+                          id={field.name}
+                          autoComplete="email"
+                          disabled={isLoading}
+                          aria-invalid={fieldState.invalid}
+                        />
+                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      </Field>
+                    )}
+                  />
 
-          <CardContent>
-            <form
-              className="space-y-4"
-              id={loginFormId}
-              aria-label="Iniciar sesión"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <FieldGroup>
-                <Controller
-                  name="email"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Correo <span className="text-destructive">*</span>
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        autoComplete="email"
-                        disabled={isLoading}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
+                  <Controller
+                    name="password"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor={field.name}>
+                          Contraseña <span className="text-destructive">*</span>
+                        </FieldLabel>
+                        <InputPassword
+                          {...field}
+                          id={field.name}
+                          aria-invalid={fieldState.invalid}
+                          disabled={isLoading}
+                        />
+                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      </Field>
+                    )}
+                  />
+
+                  {error && (
+                    <Alert variant="error">
+                      <IconAlertOctagon className="size-4" />
+                      <AlertTitle>Algo salió mal al iniciar sesión</AlertTitle>
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
                   )}
-                />
+                </FieldGroup>
+              </form>
+            </CardContent>
 
-                <Controller
-                  name="password"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Contraseña <span className="text-destructive">*</span>
-                      </FieldLabel>
-                      <InputPassword
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        disabled={isLoading}
-                      />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  )}
-                />
-
-                {error && (
-                  <Alert variant="error">
-                    <IconAlertOctagon className="size-4" />
-                    <AlertTitle>Algo salió mal al iniciar sesión</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-              </FieldGroup>
-            </form>
-          </CardContent>
-
-          <CardFooter className="pt-4 text-center">
-            <Button type="submit" form={loginFormId} className="w-full" disabled={isLoading}>
-              Iniciar sesión
-              {isLoading && <LoaderIcon />}
-            </Button>
-          </CardFooter>
-        </Card>
+            <CardFooter className="pt-4 text-center">
+              <Button type="submit" form={loginFormId} className="w-full" disabled={isLoading}>
+                Iniciar sesión
+                {isLoading && <LoaderIcon />}
+              </Button>
+            </CardFooter>
+          </Card>
+        </Frame>
       </div>
 
       <Footer />
