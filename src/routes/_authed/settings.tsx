@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_authed/settings')({
 function RouteComponent() {
   return (
     <div className="flex flex-col gap-2">
-      <h4 className="font-heading font-medium text-lg leading-none">Configuración</h4>
+      <h1 className="font-heading font-medium text-lg leading-none">Configuración</h1>
       <p className="text-muted-foreground text-sm">
         En esta sección puedes ver las configuraciones de la aplicación.
       </p>

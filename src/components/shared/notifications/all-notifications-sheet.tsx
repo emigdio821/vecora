@@ -1,11 +1,8 @@
-import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFrameFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetPanel,
   SheetTitle,
@@ -141,10 +138,6 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
             </Card>
           ))}
         </SheetPanel>
-
-        <SheetFooter>
-          <SheetClose render={<Button>Cerrar</Button>} />
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   )

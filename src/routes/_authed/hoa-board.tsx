@@ -15,7 +15,7 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-2">
-      <h4 className="font-heading font-medium text-lg leading-none">Mesa directiva</h4>
+      <h1 className="font-heading font-medium text-lg leading-none">Mesa directiva</h1>
       <p className="text-muted-foreground text-sm">
         En esta sección puedes ver a los miembros, así como los periodos de la mesa directiva.
       </p>

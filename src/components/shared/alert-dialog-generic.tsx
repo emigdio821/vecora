@@ -2,13 +2,11 @@ import { IconAlertTriangle } from '@tabler/icons-react'
 import { useState } from 'react'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
+  AlertDialogClose,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogMedia,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button, type ButtonProps } from '@/components/ui/button'
@@ -57,31 +55,33 @@ export function AlertDialogGeneric(props: AlertDialogGenericProps) {
         onOpenChange(isOPen)
       }}
     >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogMedia
-            className={cn({
-              'bg-warning/10 text-warning-foreground': variant === 'warning',
+      <AlertDialogContent className="sm:max-w-sm">
+        <div className="flex items-center justify-center p-4 pb-0 sm:justify-normal">
+          <div
+            className={cn('flex rounded-md bg-muted p-2 text-muted-foreground', {
               'bg-info/10 text-info-foreground': variant === 'info',
+              'bg-warning/10 text-warning-foreground': variant === 'warning',
               'bg-destructive/10 text-destructive-foreground': variant === 'destructive',
             })}
           >
-            <IconAlertTriangle />
-          </AlertDialogMedia>
+            <IconAlertTriangle className="size-6" />
+          </div>
+        </div>
+        <AlertDialogHeader>
           <AlertDialogTitle>{title || '¿Proceder?'}</AlertDialogTitle>
           <AlertDialogDescription>
             {description || 'Esta acción no se puede deshacer.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        {content}
+        {content && <div className="px-4 pb-4">{content}</div>}
         <AlertDialogFooter>
-          <AlertDialogCancel render={<Button variant="outline" disabled={isExecutingAction} />}>
+          <AlertDialogClose render={<Button variant="outline" disabled={isExecutingAction} />}>
             Cancelar
-          </AlertDialogCancel>
-          <AlertDialogAction variant={variant} onClick={handleAction} disabled={isExecutingAction}>
+          </AlertDialogClose>
+          <Button variant={variant} onClick={handleAction} disabled={isExecutingAction}>
             {actionLabel || 'Proceder'}
             {isExecutingAction && <LoaderIcon />}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

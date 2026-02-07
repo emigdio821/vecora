@@ -13,7 +13,7 @@ function RouteComponent() {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <h4 className="font-heading font-medium text-lg leading-none">Administración residencial</h4>
+        <h1 className="font-heading font-medium text-lg leading-none">Administración residencial</h1>
         <p className="text-muted-foreground text-sm">
           En esta sección puedes administrar los datos relacionados con la gestión residencial.
         </p>
