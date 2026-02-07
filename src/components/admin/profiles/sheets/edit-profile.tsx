@@ -73,7 +73,7 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
     onOpenChange(open)
   }
 
-  const profileType = form.watch('profileType')
+  const profileType = form.watch('profileType', profile.profileType || 'owner')
 
   return (
     <Sheet

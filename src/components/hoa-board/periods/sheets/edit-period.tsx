@@ -70,7 +70,7 @@ export function EditHoaPeriodSheet({ period, state }: EditHoaPeriodSheetProps) {
     onOpenChange(open)
   }
 
-  const startDate = form.watch('startDate')
+  const startDate = form.watch('startDate', new Date(period.startDate) || new Date())
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>

@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import type { PaymentType } from '@/db/schemas/zod/payments'
+import type { PaymentStatus, PaymentType } from '@/db/schemas/zod/payments'
 
 const DEFAULT_LOCALE: Intl.LocalesArgument = 'es-MX'
 
@@ -59,5 +59,16 @@ export function getRoleLabel(roleName: string): string {
       return 'Seguridad'
     default:
       return roleName
+  }
+}
+
+export function getPaymentStatusLabel(status: PaymentStatus): string {
+  switch (status) {
+    case 'paid':
+      return 'Pagado'
+    case 'pending':
+      return 'Pendiente'
+    default:
+      return status
   }
 }

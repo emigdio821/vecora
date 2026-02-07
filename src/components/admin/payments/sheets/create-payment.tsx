@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconSelector } from '@tabler/icons-react'
 import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createPayment } from '@/api/server-functions/payments'
@@ -9,8 +10,10 @@ import { LoaderIcon } from '@/components/icons'
 import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -30,10 +33,10 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import { type PaymentType, paymentTypeSchema } from '@/db/schemas/zod/payments'
+import { type PaymentType, paymentStatusSchema, paymentTypeSchema } from '@/db/schemas/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { MAX_YEAR_OFFSET, STARTING_YEAR } from '@/lib/constants'
-import { getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
+import { formatDate, getAllMonthsMap, getPaymentStatusLabel, getPaymentTypeLabel } from '@/lib/utils'
 import { type CreatePaymentFormData, createPaymentSchema } from '@/schemas/payments'
 
 interface CreatePaymentDialogProps {
@@ -60,11 +63,12 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
       year: new Date().getFullYear(),
       months: [],
       status: 'pending',
-      paidAt: undefined,
+      paidAt: null,
     },
   })
 
-  const watchPaymentType = form.watch('paymentType')
+  const watchPaymentType = form.watch('paymentType', 'monthly_fee')
+  const watchPaymentStatus = form.watch('status', 'pending')
 
   const currentYear = new Date().getFullYear()
   const years = Array.from(
@@ -227,11 +231,14 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
               )}
             />
 
-            <Activity name="months-activity" mode={watchPaymentType === 'monthly_fee' ? 'visible' : 'hidden'}>
-              <Controller
-                name="months"
-                control={form.control}
-                render={({ field, fieldState }) => (
+            <Controller
+              name="months"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Activity
+                  name="months-activity"
+                  mode={watchPaymentType === 'monthly_fee' ? 'visible' : 'hidden'}
+                >
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>
                       Meses <span className="text-destructive">*</span>
@@ -253,9 +260,9 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
                     </Select>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
-                )}
-              />
-            </Activity>
+                </Activity>
+              )}
+            />
 
             <Controller
               name="year"
@@ -292,10 +299,86 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
             />
 
             <Controller
+              name="status"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Estatus</FieldLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      if (value) {
+                        if (value === 'pending') {
+                          form.setValue('paidAt', null)
+                        } else if (value === 'paid' && !form.getValues('paidAt')) {
+                          form.setValue('paidAt', new Date())
+                        }
+                        field.onChange(value)
+                      }
+                    }}
+                  >
+                    <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
+                      <SelectValue placeholder="Selecciona una opción">
+                        {getPaymentStatusLabel(field.value)}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {paymentStatusSchema.options.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {getPaymentStatusLabel(status)}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {fieldState.error?.message && <FieldError>{fieldState.error?.message}</FieldError>}
+                </Field>
+              )}
+            />
+
+            <Controller
               name="paidAt"
               control={form.control}
-              render={({ field }) => (
-                <input type="hidden" className="hidden" {...field} value={field.value?.toLocaleString()} />
+              render={({ field, fieldState }) => (
+                <Popover>
+                  <Activity
+                    name="paid-at-activity"
+                    mode={watchPaymentStatus === 'paid' ? 'visible' : 'hidden'}
+                  >
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>Fecha de pago</FieldLabel>
+                      <PopoverTrigger
+                        render={
+                          <Button
+                            id={field.name}
+                            variant="outline"
+                            aria-invalid={fieldState.invalid}
+                            className="w-full justify-between pr-2"
+                            disabled={createPaymentMutation.isPending}
+                          >
+                            <span className="font-normal">{formatDate(field.value || new Date())}</span>
+                            <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
+                          </Button>
+                        }
+                      />
+                      <PopoverContent className="p-1">
+                        <Calendar
+                          mode="single"
+                          id={field.name}
+                          selected={field.value || new Date()}
+                          disabled={
+                            createPaymentMutation.isPending || {
+                              after: new Date(),
+                            }
+                          }
+                          onSelect={(date) => field.onChange(date || new Date())}
+                        />
+                      </PopoverContent>
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  </Activity>
+                </Popover>
               )}
             />
           </form>

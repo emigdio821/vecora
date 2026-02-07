@@ -60,38 +60,45 @@ export function PaymentsChart() {
     const allMonths = getAllMonthsMap()
     const monthsMap = new Map<number, { month: string; paid: number; pending: number }>()
 
+    for (let i = 1; i <= 12; i++) {
+      monthsMap.set(i, { month: allMonths[i], paid: 0, pending: 0 })
+    }
+
     for (const payment of payments) {
       const monthIndex = new Date(payment.createdAt).getMonth() + 1
       const amount = Number(payment.amount)
-
-      const entry = monthsMap.get(monthIndex) ?? { month: allMonths[monthIndex], paid: 0, pending: 0 }
+      const entry = monthsMap.get(monthIndex)
+      if (!entry) continue
 
       if (payment.status === 'paid') {
         entry.paid += amount
       } else {
         entry.pending += amount
       }
-
-      monthsMap.set(monthIndex, entry)
     }
 
-    return Array.from(monthsMap.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([, data]) => data)
+    return Array.from(monthsMap.values())
   }, [payments])
 
   const paymentStats = useMemo(() => {
-    const totalPaid = payments
-      .filter((p) => p.status === 'paid')
-      .reduce((sum, p) => sum + Number(p.amount), 0)
-    const totalPending = payments
-      .filter((p) => p.status === 'pending')
-      .reduce((sum, p) => sum + Number(p.amount), 0)
+    const pendingPayments: typeof payments = []
+    let totalPaid = 0
+    let totalPending = 0
+
+    for (const payment of payments) {
+      const amount = Number(payment.amount)
+
+      if (payment.status === 'paid') {
+        totalPaid += amount
+      } else {
+        totalPending += amount
+        pendingPayments.push(payment)
+      }
+    }
 
     const total = totalPaid + totalPending
     const paidPercentage = total > 0 ? (totalPaid / total) * 100 : 0
     const pendingPercentage = total > 0 ? (totalPending / total) * 100 : 0
-    const pendingPayments = payments.filter((p) => p.status === 'pending')
 
     return {
       totalPaid,
@@ -129,7 +136,14 @@ export function PaymentsChart() {
     }
 
     return (
-      <AreaChart accessibilityLayer data={chartData}>
+      <AreaChart
+        accessibilityLayer
+        data={chartData}
+        margin={{
+          left: 12,
+          right: 12,
+        }}
+      >
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis
           dataKey="month"

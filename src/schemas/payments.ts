@@ -14,14 +14,22 @@ export const createPaymentSchema = z
       .min(2000)
       .max(new Date().getFullYear() + 2, 'Año inválido'),
     months: z.array(z.number().min(1).max(12)).optional(),
-    status: z.enum(paymentStatusSchema.options, 'Estado de pago inválido'),
-    paidAt: z.date('Fecha de pago inválida').optional(),
+    status: z.enum(paymentStatusSchema.options, 'Estatus de pago inválido'),
+    paidAt: z.date('Fecha de pago inválida').nullable(),
   })
   .superRefine((data, ctx) => {
     if (data.paymentType === 'monthly_fee' && (!data.months || data.months.length === 0)) {
       ctx.addIssue({
         path: ['months'],
         message: 'Al menos un mes es requerido para pagos de cuota mensual',
+        code: 'custom',
+      })
+    }
+
+    if (data.status === 'paid' && !data.paidAt) {
+      ctx.addIssue({
+        path: ['paidAt'],
+        message: 'La fecha de pago es requerida cuando el estatus es "pagado"',
         code: 'custom',
       })
     }
@@ -41,14 +49,22 @@ export const updatePaymentSchema = z
       .min(2000)
       .max(new Date().getFullYear() + 2, 'Año inválido'),
     months: z.array(z.number().min(1).max(12)).optional(),
-    status: z.enum(paymentStatusSchema.options, 'Estado de pago inválido'),
-    paidAt: z.date('Fecha de pago inválida').optional(),
+    status: z.enum(paymentStatusSchema.options, 'Estatus de pago inválido'),
+    paidAt: z.date('Fecha de pago inválida').nullable(),
   })
   .superRefine((data, ctx) => {
     if (data.paymentType === 'monthly_fee' && (!data.months || data.months.length === 0)) {
       ctx.addIssue({
         path: ['months'],
         message: 'Al menos un mes es requerido para pagos de cuota mensual',
+        code: 'custom',
+      })
+    }
+
+    if (data.status === 'paid' && !data.paidAt) {
+      ctx.addIssue({
+        path: ['paidAt'],
+        message: 'La fecha de pago es requerida cuando el estatus es "pagado"',
         code: 'custom',
       })
     }
