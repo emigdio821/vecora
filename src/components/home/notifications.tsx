@@ -119,7 +119,7 @@ export function HomeNotifications() {
           </Card>
         ))}
         {hasMore && (
-          <Card>
+          <Card className="mb-4 break-inside-avoid">
             <CardHeader className="gap-0 py-2 pb-0">
               <CardTitle className="text-sm">Notificaciones</CardTitle>
               <CardDescription>
