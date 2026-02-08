@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 function Card({ className, render, ...props }: useRender.ComponentProps<'div'>) {
   const defaultProps = {
     className: cn(
-      'relative flex flex-col rounded-2xl border bg-card not-dark:bg-clip-padding text-card-foreground shadow-xs/5',
+      'relative flex flex-col overflow-clip rounded-2xl border bg-card not-dark:bg-clip-padding text-card-foreground shadow-xs/5 before:pointer-events-none before:absolute before:inset-0',
       className,
     ),
     'data-slot': 'card',
@@ -21,7 +21,7 @@ function Card({ className, render, ...props }: useRender.ComponentProps<'div'>) 
 function CardFrame({ className, render, ...props }: useRender.ComponentProps<'div'>) {
   const defaultProps = {
     className: cn(
-      'relative flex flex-col rounded-2xl border bg-card not-dark:bg-clip-padding text-card-foreground shadow-xs/5 *:data-[slot=card]:[clip-path:inset(-1rem_1px)] *:data-[slot=card]:last:[clip-path:inset(-1rem_1px_1px_1px_round_calc(var(--radius-2xl)-1px))] *:data-[slot=card]:first:[clip-path:inset(1px_1px_-1rem_1px_round_calc(var(--radius-2xl)-1px))]',
+      'relative flex flex-col overflow-clip rounded-2xl border bg-card not-dark:bg-clip-padding text-card-foreground shadow-xs/5 before:pointer-events-none before:absolute before:inset-0 before:bg-muted/72 *:data-[slot=card]:-m-px *:not-first:data-[slot=card]:rounded-t-xl *:not-last:data-[slot=card]:rounded-b-xl *:data-[slot=card]:bg-clip-padding *:data-[slot=card]:shadow-none *:data-[slot=card]:before:hidden *:not-first:data-[slot=card]:before:rounded-t-[calc(var(--radius-xl)-1px)] *:not-last:data-[slot=card]:before:rounded-b-[calc(var(--radius-xl)-1px)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)] *:data-[slot=card]:[clip-path:inset(-1rem_1px)] *:data-[slot=card]:last:[clip-path:inset(-1rem_1px_1px_1px_round_calc(var(--radius-2xl)-1px))] *:data-[slot=card]:first:[clip-path:inset(1px_1px_-1rem_1px_round_calc(var(--radius-2xl)-1px))]',
       className,
     ),
     'data-slot': 'card-frame',
@@ -49,7 +49,7 @@ function CardFrameHeader({ className, render, ...props }: useRender.ComponentPro
 
 function CardFrameTitle({ className, render, ...props }: useRender.ComponentProps<'div'>) {
   const defaultProps = {
-    className: cn('font-medium text-base text-sm', className),
+    className: cn('font-medium text-base', className),
     'data-slot': 'card-frame-title',
   }
 

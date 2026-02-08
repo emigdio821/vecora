@@ -106,7 +106,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       className={cn(
-        'flex flex-col gap-2 p-4 in-[[data-slot=sheet-popup]:has([data-slot=sheet-panel])]:pb-3 max-sm:pb-4',
+        'flex flex-col gap-2 p-4 in-[[data-slot=sheet-popup]:has([data-slot=sheet-panel])]:pb-3 sm:p-6 sm:pb-4',
         className,
       )}
       data-slot="sheet-header"
@@ -125,7 +125,7 @@ function SheetFooter({
   return (
     <div
       className={cn(
-        'flex flex-col-reverse gap-2 px-4 sm:flex-row sm:justify-end',
+        'flex flex-col-reverse gap-2 px-4 sm:flex-row sm:justify-end sm:px-6',
         variant === 'default' && 'border-t bg-muted/72 py-4',
         variant === 'bare' && 'in-[[data-slot=sheet-popup]:has([data-slot=sheet-panel])]:pt-3 pt-4 pb-6',
         className,
@@ -139,8 +139,8 @@ function SheetFooter({
 function SheetTitle({ className, ...props }: SheetPrimitive.Title.Props) {
   return (
     <SheetPrimitive.Title
-      data-slot="sheet-title"
       className={cn('font-heading font-medium text-base leading-none', className)}
+      data-slot="sheet-title"
       {...props}
     />
   )
@@ -163,7 +163,7 @@ function SheetPanel({
 }: React.ComponentProps<'div'> & { scrollFade?: boolean }) {
   return (
     <div
-      className={cn('min-h-0 flex-1 space-y-4 overflow-y-auto p-4', className)}
+      className={cn('min-h-0 flex-1 space-y-4 overflow-y-auto p-4 sm:p-6', className)}
       data-slot="sheet-panel"
       {...props}
     />

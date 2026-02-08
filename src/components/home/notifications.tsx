@@ -3,12 +3,12 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { notificationsListQueryOptions } from '@/api/tanstack-queries/notifications'
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
-import { TextGenericSkeleton } from '@/components/shared/skeletons/text-generic'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import type { NotificationWithRelations } from '@/db/schemas/zod/notifications'
 import { formatDate } from '@/lib/utils'
 import { AllNotificationsSheet } from '../shared/notifications/all-notifications-sheet'
 import { RoleNameBadge } from '../shared/role-name-badge'
+import { NotificationsSkeleton } from '../shared/skeletons/notifications'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
@@ -30,7 +30,7 @@ export function HomeNotifications() {
   const notifText = remainingNotifications === 1 ? 'notificación' : 'notificaciones'
 
   if (isLoading) {
-    return <TextGenericSkeleton />
+    return <NotificationsSkeleton />
   }
 
   if (error) {
@@ -92,7 +92,7 @@ export function HomeNotifications() {
       <div className="columns-1 gap-4 sm:columns-2 xl:columns-4">
         {displayedNotifications.map((notification) => (
           <Card key={notification.id} className="mb-4 break-inside-avoid">
-            <CardHeader className="gap-0 py-2 pb-0">
+            <CardHeader>
               <CardTitle className="text-sm">{notification.title}</CardTitle>
               <CardDescription>{notification.message}</CardDescription>
             </CardHeader>

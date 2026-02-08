@@ -7,11 +7,13 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '../ui/sidebar'
 
 export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
   const location = useLocation()
   const { pathname } = location
+  const { setOpenMobile } = useSidebar()
 
   return (
     <SidebarGroup {...props}>
@@ -20,6 +22,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setOpenMobile(false)}
               isActive={pathname === '/presidency'}
               render={
                 <Link to="/presidency">
@@ -32,6 +35,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setOpenMobile(false)}
               isActive={pathname === '/treasury'}
               render={
                 <Link to="/treasury">
@@ -44,6 +48,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setOpenMobile(false)}
               isActive={pathname === '/maintenance'}
               render={
                 <Link to="/maintenance">
@@ -56,6 +61,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setOpenMobile(false)}
               isActive={pathname === '/security'}
               render={
                 <Link to="/security">
@@ -68,6 +74,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setOpenMobile(false)}
               isActive={pathname === '/hoa-board'}
               render={
                 <Link to="/hoa-board">

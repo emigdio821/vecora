@@ -8,11 +8,13 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '../ui/sidebar'
 
 export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
   const location = useLocation()
   const { pathname } = location
+  const { setOpenMobile } = useSidebar()
 
   const { isAdmin, isLoading } = useUserRoles()
 
@@ -27,6 +29,7 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setOpenMobile(false)}
               isActive={pathname === '/admin/users'}
               render={
                 <Link to="/admin/users">
@@ -39,6 +42,7 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
 
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setOpenMobile(false)}
               isActive={pathname === '/admin/residential'}
               render={
                 <Link to="/admin/residential">
@@ -51,6 +55,7 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
 
           <SidebarMenuItem>
             <SidebarMenuButton
+              onClick={() => setOpenMobile(false)}
               isActive={pathname === '/admin/audit'}
               render={
                 <Link to="/admin/audit">

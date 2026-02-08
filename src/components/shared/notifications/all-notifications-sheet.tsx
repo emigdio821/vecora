@@ -56,7 +56,7 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
         <SheetPanel className="space-y-2">
           {notifications.map((notification) => (
             <Card key={notification.id} className="rounded-md">
-              <CardHeader className="gap-0 py-2 pb-0">
+              <CardHeader>
                 <CardTitle className="text-sm">{notification.title}</CardTitle>
                 <CardDescription>{notification.message}</CardDescription>
               </CardHeader>

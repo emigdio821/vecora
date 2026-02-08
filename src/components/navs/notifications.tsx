@@ -9,12 +9,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '../ui/sidebar'
 
 export function NavNotifications({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
   const [isCreateNotificationSheetOpen, setCreateNotificationSheetOpen] = useState(false)
   const location = useLocation()
   const { pathname } = location
+  const { setOpenMobile } = useSidebar()
 
   return (
     <>
@@ -38,6 +40,7 @@ export function NavNotifications({ ...props }: React.ComponentProps<typeof Sideb
 
             <SidebarMenuItem>
               <SidebarMenuButton
+                onClick={() => setOpenMobile(false)}
                 isActive={pathname === '/notifications'}
                 render={
                   <Link to="/notifications">

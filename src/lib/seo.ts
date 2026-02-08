@@ -45,7 +45,7 @@ export function createSEOMeta(options?: SEOOptions) {
     {
       name: 'theme-color',
       media: '(prefers-color-scheme: dark)',
-      content: '#09090b',
+      content: '#171717',
     },
     { name: 'keywords', content: SITE_CONFIG.keywords.join(',') },
     // Twitter Card

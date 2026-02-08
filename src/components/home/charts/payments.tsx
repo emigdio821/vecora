@@ -7,10 +7,21 @@ import { ChartDottedBackgroundPattern } from '@/components/shared/charts/dotted-
 import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
 import { TextGenericSkeleton } from '@/components/shared/skeletons/text-generic'
 import { Button } from '@/components/ui/button'
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFrame,
+  CardFrameDescription,
+  CardFrameFooter,
+  CardFrameHeader,
+  CardFrameTitle,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { Frame, FrameDescription, FrameFooter, FrameHeader, FrameTitle } from '@/components/ui/frame'
 import { Label } from '@/components/ui/label'
 import {
   Popover,
@@ -150,6 +161,7 @@ export function PaymentsChart() {
           tickLine={false}
           axisLine={false}
           tickMargin={8}
+          className="text-[10px] sm:text-xs"
           tickFormatter={(value) => value.slice(0, 3)}
         />
         <ChartTooltip
@@ -160,6 +172,7 @@ export function PaymentsChart() {
           <ChartDottedBackgroundPattern config={chartConfig} />
         </defs>
         <Area
+          isAnimationActive={false}
           dataKey="paid"
           type="natural"
           fill="url(#dotted-background-pattern-paid)"
@@ -169,6 +182,7 @@ export function PaymentsChart() {
           strokeWidth={0.8}
         />
         <Area
+          isAnimationActive={false}
           dataKey="pending"
           type="natural"
           fill="url(#dotted-background-pattern-pending)"
@@ -182,15 +196,14 @@ export function PaymentsChart() {
   }
 
   return (
-    <Frame>
-      <FrameHeader className="flex flex-row items-center justify-between gap-2">
+    <CardFrame>
+      <CardFrameHeader className="flex flex-row items-center justify-between gap-2">
         <div>
-          <FrameTitle>Pagos</FrameTitle>
-          <FrameDescription>
+          <CardFrameTitle>Pagos</CardFrameTitle>
+          <CardFrameDescription>
             Mostrando el total de pagos en el año <span className="font-medium">{selectedYear}</span>
-          </FrameDescription>
+          </CardFrameDescription>
         </div>
-
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Label htmlFor="payments-chart-year">Año</Label>
           <Select
@@ -212,16 +225,16 @@ export function PaymentsChart() {
             </SelectContent>
           </Select>
         </div>
-      </FrameHeader>
+      </CardFrameHeader>
       <Card>
         <CardContent>
-          <ChartContainer config={chartConfig} className="max-h-80 min-h-52 w-full">
+          <ChartContainer config={chartConfig} className="h-40 w-full sm:h-60 lg:h-80">
             {renderChartContent()}
           </ChartContainer>
         </CardContent>
       </Card>
       {paymentStats.total > 0 && (
-        <FrameFooter className="flex items-center justify-between gap-4 text-sm">
+        <CardFrameFooter className="flex items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="size-3 shrink-0 rounded-[2px] border bg-success" />
@@ -268,8 +281,8 @@ export function PaymentsChart() {
               </PopoverContent>
             </Popover>
           </div>
-        </FrameFooter>
+        </CardFrameFooter>
       )}
-    </Frame>
+    </CardFrame>
   )
 }
