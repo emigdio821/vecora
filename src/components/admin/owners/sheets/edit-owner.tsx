@@ -212,8 +212,8 @@ export function EditOwnerSheet({ owner, state }: EditOwnerSheetProps) {
             }
           />
           <Button type="submit" form={editOwnerFormId} disabled={updateOwnerMutation.isPending}>
-            Guardar cambios
             {updateOwnerMutation.isPending && <LoaderIcon />}
+            Guardar cambios
           </Button>
         </SheetFooter>
       </SheetContent>

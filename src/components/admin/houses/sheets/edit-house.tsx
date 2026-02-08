@@ -239,8 +239,8 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
             }
           />
           <Button type="submit" form={editHouseFormId} disabled={updateHouseMutation.isPending}>
-            Guardar cambios
             {updateHouseMutation.isPending && <LoaderIcon />}
+            Guardar cambios
           </Button>
         </SheetFooter>
       </SheetContent>

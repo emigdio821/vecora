@@ -26,6 +26,8 @@ export function AuditLogEntityTypeBadge({ entityType, ...badgeProps }: AuditLogE
         return 'Período de mesa directiva'
       case 'user':
         return 'Usuario'
+      case 'notification':
+        return 'Notificación'
       default:
         return type
     }

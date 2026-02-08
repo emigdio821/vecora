@@ -393,8 +393,8 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
             }
           />
           <Button type="submit" form={createPaymentFormId} disabled={createPaymentMutation.isPending}>
-            Crear pago
             {createPaymentMutation.isPending && <LoaderIcon />}
+            Crear pago
           </Button>
         </SheetFooter>
       </SheetContent>

@@ -258,8 +258,8 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
             }
           />
           <Button type="submit" form={createProfileFormId} disabled={createProfileMutation.isPending}>
-            Crear perfil
             {createProfileMutation.isPending && <LoaderIcon />}
+            Crear perfil
           </Button>
         </SheetFooter>
       </SheetContent>

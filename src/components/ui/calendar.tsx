@@ -88,6 +88,7 @@ function Calendar({
   return (
     <DayPicker
       startMonth={fromYear}
+      disabled={{ before: fromYear }}
       className={cn(
         'w-fit [--cell-radius:var(--radius-md)] [--cell-size:--spacing(9)] sm:[--cell-size:--spacing(8)]',
         className,
@@ -100,6 +101,11 @@ function Calendar({
         formatMonthDropdown: (date) => {
           const month = formatDate(date, { month: 'short', day: undefined, year: undefined })
           return month.charAt(0).toUpperCase() + month.slice(1)
+        },
+        formatCaption: (date) => {
+          const month = formatDate(date, { month: 'long', day: undefined, year: undefined })
+          const year = formatDate(date, { month: undefined, day: undefined, year: 'numeric' })
+          return `${month.charAt(0).toUpperCase() + month.slice(1)} ${year}`
         },
         formatWeekdayName: (date) => {
           const weekday = formatDate(date, {

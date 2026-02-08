@@ -201,8 +201,8 @@ export function CreateExternalUserSheet({ state }: CreateExternalUserSheetProps)
             form={createExternalUserFormId}
             disabled={createExternalUserMutation.isPending}
           >
-            Crear usuario externo
             {createExternalUserMutation.isPending && <LoaderIcon />}
+            Crear usuario externo
           </Button>
         </SheetFooter>
       </SheetContent>

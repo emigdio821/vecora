@@ -93,7 +93,6 @@ export function NavUser() {
             <DropdownMenuGroup>
               <DropdownMenuLabel className="line-clamp-2">{profile.user.name}</DropdownMenuLabel>
               <DropdownMenuLabel>
-                {/* {profile.profileRoles.map(({ role }) => role.name).join(', ')} */}
                 <div className="flex flex-wrap gap-1">
                   {profile.profileRoles.map(({ role }) => (
                     <RoleNameBadge className="text-xs" key={role.id} roleName={role.name} />

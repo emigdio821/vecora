@@ -45,6 +45,7 @@ export const auditLogEntityTypeEnum = pgEnum('audit_log_entity_type', [
   'user',
   'hoa_board',
   'hoa_board_period',
+  'notification',
 ])
 
 // Roles table - defines all available roles in the system
@@ -358,6 +359,32 @@ export const paymentHistory = pgTable(
   ],
 )
 
+// Notifications table - system notifications for users
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
+    title: varchar('title', { length: 255 }).notNull(),
+    message: varchar('message', { length: 500 }).notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index('notifications_createdBy_idx').on(table.createdBy),
+    index('notifications_profileId_idx').on(table.profileId),
+    index('notifications_expiresAt_idx').on(table.expiresAt),
+    index('notifications_createdAt_idx').on(table.createdAt),
+  ],
+)
+
 // Relations
 export const rolesRelations = relations(roles, ({ many }) => ({
   profileRoles: many(profileRoles),
@@ -475,6 +502,17 @@ export const hoaBoardRelations = relations(hoaBoard, ({ one }) => ({
   }),
   profile: one(profiles, {
     fields: [hoaBoard.profileId],
+    references: [profiles.id],
+  }),
+}))
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  creator: one(user, {
+    fields: [notifications.createdBy],
+    references: [user.id],
+  }),
+  profile: one(profiles, {
+    fields: [notifications.profileId],
     references: [profiles.id],
   }),
 }))

@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
-import type { DropdownProps } from 'react-day-picker'
 import { Controller, useForm } from 'react-hook-form'
 import { updateViolation } from '@/api/server-functions/violations'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -275,8 +274,8 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
             }
           />
           <Button type="submit" form={editViolationFormId} disabled={updateViolationMutation.isPending}>
-            Guardar cambios
             {updateViolationMutation.isPending && <LoaderIcon />}
+            Guardar cambios
           </Button>
         </SheetFooter>
       </SheetContent>

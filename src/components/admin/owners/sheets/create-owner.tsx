@@ -202,8 +202,8 @@ export function CreateOwnerSheet({ state }: CreateOwnerDialogProps) {
             }
           />
           <Button type="submit" form={createOwnerFormId} disabled={createOwnerMutation.isPending}>
-            Crear propietario
             {createOwnerMutation.isPending && <LoaderIcon />}
+            Crear propietario
           </Button>
         </SheetFooter>
       </SheetContent>

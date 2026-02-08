@@ -208,8 +208,8 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
             }
           />
           <Button type="submit" form={createViolationFormId} disabled={createViolationMutation.isPending}>
-            Crear infracción
             {createViolationMutation.isPending && <LoaderIcon />}
+            Crear infracción
           </Button>
         </SheetFooter>
       </SheetContent>

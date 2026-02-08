@@ -1,112 +1,46 @@
-import { IconBell, IconBellOff } from '@tabler/icons-react'
+import { IconBell, IconBellOff, IconCalendarOff, IconCalendarWeek, IconUser } from '@tabler/icons-react'
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { notificationsListQueryOptions } from '@/api/tanstack-queries/notifications'
+import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
+import { TextGenericSkeleton } from '@/components/shared/skeletons/text-generic'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import type { NotificationWithRelations } from '@/db/schemas/zod/notifications'
 import { formatDate } from '@/lib/utils'
 import { AllNotificationsSheet } from '../shared/notifications/all-notifications-sheet'
 import { RoleNameBadge } from '../shared/role-name-badge'
+import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { Empty, EmptyContent, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
-
-const dummyNotifications = [
-  {
-    id: 1,
-    title: 'Pago al jardinero',
-    description: 'Se le pagó al jardinero todo el mes de junio.',
-    date: new Date(),
-    profile: {
-      id: 123,
-      name: 'Juan Pérez',
-      roles: ['maintainer'],
-    },
-  },
-  {
-    id: 2,
-    title: 'Cámara de seguridad rota',
-    description: 'La cámara de seguridad en la entrada principal está rota y necesita reparación.',
-    date: new Date(),
-    profile: {
-      id: 321,
-      name: 'John Doe',
-      roles: ['security'],
-    },
-  },
-  {
-    id: 3,
-    title: 'Junta de emergencia',
-    description:
-      'Se convoca a una junta de emergencia para discutir el aumento de las cuotas de mantenimiento.',
-    date: new Date(),
-    profile: {
-      id: 321,
-      name: 'Frida Kahlo',
-      roles: ['president'],
-    },
-  },
-  {
-    id: 4,
-    title: 'Aviso de mantenimiento',
-    description: 'El sistema estará en mantenimiento el próximo lunes de 10 PM a 2 AM.',
-    date: new Date(),
-    profile: {
-      id: 3211,
-      name: 'Emigdio Torres',
-      roles: ['admin'],
-    },
-  },
-  {
-    id: 5,
-    title: 'Dinero de Febrero',
-    description: 'Se ha registrado el dinero correspondiente a febrero sin incidencias.',
-    date: new Date(),
-    profile: {
-      id: 3211123,
-      name: 'Miguel Hidalgo y Costilla',
-      roles: ['treasurer'],
-    },
-  },
-  {
-    id: 6,
-    title: 'Dinero de Febrero',
-    description: 'Se ha registrado el dinero correspondiente a febrero sin incidencias.',
-    date: new Date(),
-    profile: {
-      id: 3211123,
-      name: 'Miguel Hidalgo y Costilla',
-      roles: ['treasurer'],
-    },
-  },
-  {
-    id: 7,
-    title: 'Dinero de Febrero',
-    description: 'Se ha registrado el dinero correspondiente a febrero sin incidencias.',
-    date: new Date(),
-    profile: {
-      id: 3211123,
-      name: 'Miguel Hidalgo y Costilla',
-      roles: ['treasurer'],
-    },
-  },
-  {
-    id: 8,
-    title: 'Dinero de Febrero',
-    description: 'Se ha registrado el dinero correspondiente a febrero sin incidencias.',
-    date: new Date(),
-    profile: {
-      id: 3211123,
-      name: 'Miguel Hidalgo y Costilla',
-      roles: ['treasurer'],
-    },
-  },
-]
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
 
 export function HomeNotifications() {
   const [isAllNotificationsOpen, setAllNotificationsOpen] = useState(false)
-  const notifications = dummyNotifications
+  const {
+    data: notifications = [],
+    error,
+    isLoading,
+    refetch,
+    isFetching,
+  } = useQuery(notificationsListQueryOptions())
+
   const maxDisplayed = 3
   const hasMore = notifications.length > maxDisplayed
   const displayedNotifications = notifications.slice(0, maxDisplayed)
   const remainingNotifications = notifications.length - maxDisplayed
   const notifText = remainingNotifications === 1 ? 'notificación' : 'notificaciones'
+
+  if (isLoading) {
+    return <TextGenericSkeleton />
+  }
+
+  if (error) {
+    return (
+      <TSQueryGenericError
+        refetch={refetch}
+        errorDescription="Algo salió mal al cargar las notificaciones."
+      />
+    )
+  }
 
   if (notifications.length === 0) {
     return (
@@ -115,12 +49,34 @@ export function HomeNotifications() {
           <EmptyMedia variant="icon">
             <IconBellOff />
           </EmptyMedia>
-          <EmptyTitle>Aún no hay notificaciones</EmptyTitle>
+          <EmptyTitle>Estás al día</EmptyTitle>
+          <EmptyDescription>No hay notificaciones pendientes.</EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          <Button onClick={() => {}}>Recargar</Button>
+          <Button disabled={isLoading || isFetching} onClick={() => refetch()}>
+            Recargar
+          </Button>
         </EmptyContent>
       </Empty>
+    )
+  }
+
+  function getProfileName(notification: NotificationWithRelations) {
+    const profile = notification.profile
+    return profile?.user?.name ?? 'Sistema'
+  }
+
+  function renderRoles(notification: NotificationWithRelations) {
+    const profile = notification.profile
+
+    if (!profile) return <Badge variant="outline">Administración</Badge>
+
+    return (
+      <div className="flex flex-wrap gap-1">
+        {profile?.profileRoles.map(({ role }) => (
+          <RoleNameBadge className="text-xs" key={role.id} roleName={role.name} />
+        ))}
+      </div>
     )
   }
 
@@ -134,25 +90,37 @@ export function HomeNotifications() {
       />
 
       <div className="columns-1 gap-4 sm:columns-2 xl:columns-4">
-        {displayedNotifications.map(({ date, description, id, profile, title }) => (
-          <Card key={id} className="mb-4 break-inside-avoid">
-            <CardHeader className="py-2">
-              <CardTitle className="text-sm">{title}</CardTitle>
-              <CardDescription>{description}</CardDescription>
+        {displayedNotifications.map((notification) => (
+          <Card key={notification.id} className="mb-4 break-inside-avoid">
+            <CardHeader className="gap-0 py-2 pb-0">
+              <CardTitle className="text-sm">{notification.title}</CardTitle>
+              <CardDescription>{notification.message}</CardDescription>
             </CardHeader>
 
             <CardFooter className="flex items-center justify-between text-muted-foreground text-xs">
               <div>
-                <p className="line-clamp-2 whitespace-normal">{profile.name}</p>
-                <p>{formatDate(date)}</p>
+                <p className="flex items-center gap-1">
+                  <IconUser className="size-4" />
+                  <span className="line-clamp-2 flex-1">{getProfileName(notification)}</span>
+                </p>
+                <p className="flex items-center gap-1">
+                  <IconCalendarWeek className="size-4" />
+                  {formatDate(notification.createdAt)}
+                </p>
+                {notification.expiresAt && (
+                  <p className="flex items-center gap-1">
+                    <IconCalendarOff className="size-4" />
+                    {formatDate(notification.expiresAt)}
+                  </p>
+                )}
               </div>
-              <RoleNameBadge roleName={profile.roles[0]} />
+              {renderRoles(notification)}
             </CardFooter>
           </Card>
         ))}
         {hasMore && (
           <Card>
-            <CardHeader>
+            <CardHeader className="gap-0 py-2 pb-0">
               <CardTitle className="text-sm">Notificaciones</CardTitle>
               <CardDescription>
                 Hay {remainingNotifications} {notifText} más

@@ -16,6 +16,7 @@ import { Route as AuthedTreasuryRouteImport } from './routes/_authed/treasury'
 import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
 import { Route as AuthedSecurityRouteImport } from './routes/_authed/security'
 import { Route as AuthedPresidencyRouteImport } from './routes/_authed/presidency'
+import { Route as AuthedNotificationsRouteImport } from './routes/_authed/notifications'
 import { Route as AuthedMaintenanceRouteImport } from './routes/_authed/maintenance'
 import { Route as AuthedHoaBoardRouteImport } from './routes/_authed/hoa-board'
 import { Route as AuthedAdminRouteRouteImport } from './routes/_authed/admin/route'
@@ -56,6 +57,11 @@ const AuthedSecurityRoute = AuthedSecurityRouteImport.update({
 const AuthedPresidencyRoute = AuthedPresidencyRouteImport.update({
   id: '/presidency',
   path: '/presidency',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedNotificationsRoute = AuthedNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedMaintenanceRoute = AuthedMaintenanceRouteImport.update({
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthedAdminRouteRouteWithChildren
   '/hoa-board': typeof AuthedHoaBoardRoute
   '/maintenance': typeof AuthedMaintenanceRoute
+  '/notifications': typeof AuthedNotificationsRoute
   '/presidency': typeof AuthedPresidencyRoute
   '/security': typeof AuthedSecurityRoute
   '/settings': typeof AuthedSettingsRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthedAdminRouteRouteWithChildren
   '/hoa-board': typeof AuthedHoaBoardRoute
   '/maintenance': typeof AuthedMaintenanceRoute
+  '/notifications': typeof AuthedNotificationsRoute
   '/presidency': typeof AuthedPresidencyRoute
   '/security': typeof AuthedSecurityRoute
   '/settings': typeof AuthedSettingsRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/_authed/admin': typeof AuthedAdminRouteRouteWithChildren
   '/_authed/hoa-board': typeof AuthedHoaBoardRoute
   '/_authed/maintenance': typeof AuthedMaintenanceRoute
+  '/_authed/notifications': typeof AuthedNotificationsRoute
   '/_authed/presidency': typeof AuthedPresidencyRoute
   '/_authed/security': typeof AuthedSecurityRoute
   '/_authed/settings': typeof AuthedSettingsRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/hoa-board'
     | '/maintenance'
+    | '/notifications'
     | '/presidency'
     | '/security'
     | '/settings'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/hoa-board'
     | '/maintenance'
+    | '/notifications'
     | '/presidency'
     | '/security'
     | '/settings'
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/_authed/admin'
     | '/_authed/hoa-board'
     | '/_authed/maintenance'
+    | '/_authed/notifications'
     | '/_authed/presidency'
     | '/_authed/security'
     | '/_authed/settings'
@@ -245,6 +257,13 @@ declare module '@tanstack/react-router' {
       path: '/presidency'
       fullPath: '/presidency'
       preLoaderRoute: typeof AuthedPresidencyRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/notifications': {
+      id: '/_authed/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthedNotificationsRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/maintenance': {
@@ -318,6 +337,7 @@ interface AuthedRouteChildren {
   AuthedAdminRouteRoute: typeof AuthedAdminRouteRouteWithChildren
   AuthedHoaBoardRoute: typeof AuthedHoaBoardRoute
   AuthedMaintenanceRoute: typeof AuthedMaintenanceRoute
+  AuthedNotificationsRoute: typeof AuthedNotificationsRoute
   AuthedPresidencyRoute: typeof AuthedPresidencyRoute
   AuthedSecurityRoute: typeof AuthedSecurityRoute
   AuthedSettingsRoute: typeof AuthedSettingsRoute
@@ -329,6 +349,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedAdminRouteRoute: AuthedAdminRouteRouteWithChildren,
   AuthedHoaBoardRoute: AuthedHoaBoardRoute,
   AuthedMaintenanceRoute: AuthedMaintenanceRoute,
+  AuthedNotificationsRoute: AuthedNotificationsRoute,
   AuthedPresidencyRoute: AuthedPresidencyRoute,
   AuthedSecurityRoute: AuthedSecurityRoute,
   AuthedSettingsRoute: AuthedSettingsRoute,

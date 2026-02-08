@@ -79,8 +79,8 @@ export function AlertDialogGeneric(props: AlertDialogGenericProps) {
             Cancelar
           </AlertDialogClose>
           <Button variant={variant} onClick={handleAction} disabled={isExecutingAction}>
-            {actionLabel || 'Proceder'}
             {isExecutingAction && <LoaderIcon />}
+            {actionLabel || 'Proceder'}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

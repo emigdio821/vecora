@@ -200,8 +200,8 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
             }
           />
           <Button type="submit" form={createHouseFormId} disabled={createHouseMutation.isPending}>
-            Crear casa
             {createHouseMutation.isPending && <LoaderIcon />}
+            Crear casa
           </Button>
         </SheetFooter>
       </SheetContent>

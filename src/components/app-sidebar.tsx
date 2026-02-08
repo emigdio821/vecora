@@ -2,6 +2,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/compone
 import { NavAdmin } from './navs/admin'
 import { HeaderNav } from './navs/header'
 import { NavMain } from './navs/main'
+import { NavNotifications } from './navs/notifications'
 import { NavUser } from './navs/user'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -12,6 +13,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
+        <NavNotifications />
         <NavAdmin />
       </SidebarContent>
       <SidebarFooter>
