@@ -1,4 +1,4 @@
-import { IconGavel, IconHomeShield, IconPigMoney, IconShield, IconTool } from '@tabler/icons-react'
+import { IconBell, IconGavel, IconHomeShield, IconPigMoney, IconShield, IconTool } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
 import {
   SidebarGroup,
@@ -80,6 +80,19 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
                 <Link to="/hoa-board">
                   <IconHomeShield className="size-4" />
                   <span>Mesa directiva</span>
+                </Link>
+              }
+            />
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => setOpenMobile(false)}
+              isActive={pathname === '/notifications'}
+              render={
+                <Link to="/notifications">
+                  <IconBell className="size-4" />
+                  <span>Notificaciones</span>
                 </Link>
               }
             />
