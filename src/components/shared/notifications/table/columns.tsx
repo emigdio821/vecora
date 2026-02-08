@@ -33,7 +33,7 @@ export const notificationsTableColumns: ColumnDef<SelectNotification>[] = [
   {
     accessorKey: 'title',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Título" />,
-    size: 250,
+    size: 200,
     cell: ({ row }) => <NotificationTitleCell notification={row.original} />,
     filterFn: (row, _, value: string) => {
       const normalizedTitle = normalizeString(row.original.title).toLowerCase()

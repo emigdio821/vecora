@@ -33,6 +33,30 @@ export const getNotificationsList = createServerFn()
     return userNotifications satisfies NotificationWithRelations[]
   })
 
+export const getMyNotificationsList = createServerFn()
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    const { session } = context
+
+    const myNotifications = await db.query.notifications.findMany({
+      where: eq(notifications.createdBy, session.user.id),
+      with: {
+        profile: {
+          with: {
+            user: true,
+            profileRoles: {
+              with: {
+                role: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: (notifications, { desc }) => [desc(notifications.createdAt)],
+    })
+    return myNotifications satisfies NotificationWithRelations[]
+  })
+
 export const createNotification = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
   .inputValidator(createNotificationSchema)

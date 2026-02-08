@@ -4,7 +4,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteNotification } from '@/api/server-functions/notifications'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { NOTIFICATIONS_QUERY_KEY } from '@/api/tanstack-queries/notifications'
+import { MY_NOTIFICATIONS_QUERY_KEY, NOTIFICATIONS_QUERY_KEY } from '@/api/tanstack-queries/notifications'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
@@ -33,7 +33,7 @@ export function NotificationsDataTableHeader({ table }: NotificationsDataTableHe
     deleteFn: async (notification) => {
       await deleteNotification({ data: { notificationId: notification.id } })
     },
-    invalidateKeys: [NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    invalidateKeys: [NOTIFICATIONS_QUERY_KEY, MY_NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

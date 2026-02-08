@@ -2,7 +2,7 @@ import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/i
 import { useState } from 'react'
 import { deleteNotification } from '@/api/server-functions/notifications'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { NOTIFICATIONS_QUERY_KEY } from '@/api/tanstack-queries/notifications'
+import { MY_NOTIFICATIONS_QUERY_KEY, NOTIFICATIONS_QUERY_KEY } from '@/api/tanstack-queries/notifications'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,7 +33,7 @@ export function NotificationsTableActions({ notification }: ActionsProps) {
     mutationFn: async (data: DeleteNotificationData) => {
       return await deleteNotification({ data })
     },
-    invalidateKeys: [NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    invalidateKeys: [NOTIFICATIONS_QUERY_KEY, MY_NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Notificación eliminada',
     successDescription: 'La notificación ha sido eliminada exitosamente.',
     errorDescription: 'Ocurrió un error al eliminar la notificación, intenta nuevamente.',

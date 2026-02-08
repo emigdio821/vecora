@@ -5,7 +5,7 @@ import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateNotification } from '@/api/server-functions/notifications'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { NOTIFICATIONS_QUERY_KEY } from '@/api/tanstack-queries/notifications'
+import { MY_NOTIFICATIONS_QUERY_KEY, NOTIFICATIONS_QUERY_KEY } from '@/api/tanstack-queries/notifications'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -54,7 +54,7 @@ export function EditNotificationSheet({ notification, state }: EditNotificationS
     mutationFn: async (data: UpdateNotificationData) => {
       return await updateNotification({ data })
     },
-    invalidateKeys: [NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    invalidateKeys: [NOTIFICATIONS_QUERY_KEY, MY_NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Notificación actualizada',
     successDescription: 'La notificación ha sido actualizada exitosamente.',
     errorDescription: 'Ocurrió un error al actualizar la notificación, intenta nuevamente.',
