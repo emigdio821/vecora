@@ -396,7 +396,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
           />
           <Button type="submit" form={updatePaymentFormId} disabled={updatePaymentMutation.isPending}>
             {updatePaymentMutation.isPending && <LoaderIcon />}
-            Actualizar pago
+            Guardar
           </Button>
         </SheetFooter>
       </SheetContent>

@@ -3,7 +3,7 @@ import { IconSelector } from '@tabler/icons-react'
 import { addMonths } from 'date-fns'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { createNotification } from '@/api/server-functions/notifications'
+import { updateNotification } from '@/api/server-functions/notifications'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { NOTIFICATIONS_QUERY_KEY } from '@/api/tanstack-queries/notifications'
 import { LoaderIcon } from '@/components/icons'
@@ -23,68 +23,74 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
+import type { SelectNotification } from '@/db/schemas/zod/notifications'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate } from '@/lib/utils'
-import { type CreateNotificationData, createNotificationSchema } from '@/schemas/notifications'
+import { type UpdateNotificationData, updateNotificationSchema } from '@/schemas/notifications'
 
-interface CreateNotificationSheetProps {
+interface EditNotificationSheetProps {
+  notification: SelectNotification
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
   }
 }
 
-export function CreateNotificationSheet({ state }: CreateNotificationSheetProps) {
-  const createNotificationFormId = useId()
+export function EditNotificationSheet({ notification, state }: EditNotificationSheetProps) {
+  const editNotificationFormId = useId()
   const { isOpen, onOpenChange } = state
 
-  const form = useForm<CreateNotificationData>({
-    shouldUnregister: true,
-    resolver: zodResolver(createNotificationSchema),
-    defaultValues: {
-      title: '',
-      message: '',
-      expiresAt: null,
+  const form = useForm<UpdateNotificationData>({
+    resolver: zodResolver(updateNotificationSchema),
+    values: {
+      notificationId: notification.id,
+      title: notification.title,
+      message: notification.message,
+      expiresAt: notification.expiresAt ? new Date(notification.expiresAt) : null,
     },
   })
 
-  const createNotificationMutation = useEntityMutation({
-    mutationFn: async (data: CreateNotificationData) => {
-      return await createNotification({ data })
+  const updateNotificationMutation = useEntityMutation({
+    mutationFn: async (data: UpdateNotificationData) => {
+      return await updateNotification({ data })
     },
     invalidateKeys: [NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
-    successTitle: 'Notificación creada',
-    successDescription: 'La notificación ha sido enviada exitosamente.',
-    errorDescription: 'Ocurrió un error al crear la notificación, intenta nuevamente.',
+    successTitle: 'Notificación actualizada',
+    successDescription: 'La notificación ha sido actualizada exitosamente.',
+    errorDescription: 'Ocurrió un error al actualizar la notificación, intenta nuevamente.',
     onSuccess: () => {
       onOpenChange(false)
     },
   })
 
-  function onSubmit(data: CreateNotificationData) {
-    createNotificationMutation.mutate(data)
+  function onSubmit(data: UpdateNotificationData) {
+    updateNotificationMutation.mutate(data)
   }
 
   function handleOpenChange(open: boolean) {
-    if (createNotificationMutation.isPending) return
+    if (updateNotificationMutation.isPending) return
     onOpenChange(open)
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        if (!isOpen) form.reset()
+      }}
+    >
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Crear notificación</SheetTitle>
-          <SheetDescription>
-            Ingresa la información de la notificación. Esta será visible para todos los usuarios.
-          </SheetDescription>
+          <SheetTitle>Editar notificación</SheetTitle>
+          <SheetDescription>Actualiza la información de la notificación.</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>
           <form
             className="space-y-4"
-            id={createNotificationFormId}
-            aria-label="Crear notificación"
+            id={editNotificationFormId}
+            aria-label="Editar notificación"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <Controller
@@ -101,7 +107,7 @@ export function CreateNotificationSheet({ state }: CreateNotificationSheetProps)
                     onBlur={field.onBlur}
                     onChange={field.onChange}
                     aria-invalid={fieldState.invalid}
-                    disabled={createNotificationMutation.isPending}
+                    disabled={updateNotificationMutation.isPending}
                     placeholder="Ingresa el título"
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -124,7 +130,7 @@ export function CreateNotificationSheet({ state }: CreateNotificationSheetProps)
                     onBlur={field.onBlur}
                     onChange={field.onChange}
                     aria-invalid={fieldState.invalid}
-                    disabled={createNotificationMutation.isPending}
+                    disabled={updateNotificationMutation.isPending}
                     placeholder="Ingresa el mensaje"
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -146,7 +152,7 @@ export function CreateNotificationSheet({ state }: CreateNotificationSheetProps)
                           variant="outline"
                           aria-invalid={fieldState.invalid}
                           className="w-full justify-between pr-2"
-                          disabled={createNotificationMutation.isPending}
+                          disabled={updateNotificationMutation.isPending}
                         >
                           <span className="font-normal">
                             {field.value ? formatDate(field.value) : 'Sin expiración'}
@@ -161,11 +167,11 @@ export function CreateNotificationSheet({ state }: CreateNotificationSheetProps)
                         id={field.name}
                         captionLayout="label"
                         startMonth={new Date()}
-                        defaultMonth={new Date()}
+                        defaultMonth={field.value || new Date()}
                         endMonth={addMonths(new Date(), 2)}
                         selected={field.value || undefined}
                         disabled={
-                          createNotificationMutation.isPending || {
+                          updateNotificationMutation.isPending || {
                             before: new Date(),
                             after: addMonths(new Date(), 2),
                           }
@@ -192,13 +198,9 @@ export function CreateNotificationSheet({ state }: CreateNotificationSheetProps)
               </Button>
             }
           />
-          <Button
-            type="submit"
-            form={createNotificationFormId}
-            disabled={createNotificationMutation.isPending}
-          >
-            {createNotificationMutation.isPending && <LoaderIcon />}
-            Crear
+          <Button type="submit" form={editNotificationFormId} disabled={updateNotificationMutation.isPending}>
+            {updateNotificationMutation.isPending && <LoaderIcon />}
+            Guardar
           </Button>
         </SheetFooter>
       </SheetContent>

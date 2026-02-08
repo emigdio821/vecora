@@ -368,8 +368,8 @@ export const notifications = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     profileId: uuid('profile_id').references(() => profiles.id, { onDelete: 'set null' }),
-    title: varchar('title', { length: 255 }).notNull(),
-    message: varchar('message', { length: 500 }).notNull(),
+    title: varchar('title', { length: 50 }).notNull(),
+    message: varchar('message', { length: 200 }).notNull(),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')

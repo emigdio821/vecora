@@ -5,7 +5,11 @@ import { db } from '@/db'
 import { notifications, profiles } from '@/db/schemas/main'
 import type { NotificationWithRelations, SelectNotification } from '@/db/schemas/zod/notifications'
 import { authMiddleware } from '@/middleware/auth'
-import { createNotificationSchema, deleteNotificationSchema } from '@/schemas/notifications'
+import {
+  createNotificationSchema,
+  deleteNotificationSchema,
+  updateNotificationSchema,
+} from '@/schemas/notifications'
 
 export const getNotificationsList = createServerFn()
   .middleware([authMiddleware])
@@ -62,6 +66,51 @@ export const createNotification = createServerFn({ method: 'POST' })
     }).catch(console.error)
 
     return newNotification satisfies SelectNotification
+  })
+
+export const updateNotification = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .inputValidator(updateNotificationSchema)
+  .handler(async ({ context, data }) => {
+    const { session } = context
+    const { notificationId, title, message, expiresAt } = data
+
+    const [notificationToUpdate] = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.id, notificationId))
+      .limit(1)
+
+    if (!notificationToUpdate) {
+      throw new Error('Notificación no encontrada')
+    }
+
+    // Only allow the creator to update the notification
+    if (notificationToUpdate.createdBy !== session.user.id) {
+      throw new Error('No tienes permiso para editar esta notificación')
+    }
+
+    const [updatedNotification] = await db
+      .update(notifications)
+      .set({
+        title,
+        message,
+        expiresAt: expiresAt ?? null,
+      })
+      .where(eq(notifications.id, notificationId))
+      .returning()
+
+    createAuditLog({
+      data: {
+        action: 'update',
+        entityType: 'notification',
+        entityId: notificationId,
+        oldData: notificationToUpdate,
+        newData: updatedNotification,
+      },
+    }).catch(console.error)
+
+    return updatedNotification satisfies SelectNotification
   })
 
 export const deleteNotification = createServerFn({ method: 'POST' })

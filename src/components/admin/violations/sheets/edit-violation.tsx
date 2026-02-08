@@ -275,7 +275,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
           />
           <Button type="submit" form={editViolationFormId} disabled={updateViolationMutation.isPending}>
             {updateViolationMutation.isPending && <LoaderIcon />}
-            Guardar cambios
+            Guardar
           </Button>
         </SheetFooter>
       </SheetContent>

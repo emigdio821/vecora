@@ -184,7 +184,7 @@ export function EditExternalUserSheet({ externalUser, state }: EditExternalUserS
           />
           <Button type="submit" form={editExternalUserFormId} disabled={updateExternalUserMutation.isPending}>
             {updateExternalUserMutation.isPending && <LoaderIcon />}
-            Guardar cambios
+            Guardar
           </Button>
         </SheetFooter>
       </SheetContent>

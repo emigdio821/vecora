@@ -163,7 +163,7 @@ export function EditMemberSheet({ member, state }: EditMemberSheetProps) {
           />
           <Button type="submit" form={editMemberFormId} disabled={updateMemberMutation.isPending}>
             {updateMemberMutation.isPending && <LoaderIcon />}
-            Actualizar
+            Guardar
           </Button>
         </SheetFooter>
       </SheetContent>

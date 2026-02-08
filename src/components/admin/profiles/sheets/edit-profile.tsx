@@ -229,7 +229,7 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
           />
           <Button type="submit" form={editProfileFormId} disabled={updateProfileMutation.isPending}>
             {updateProfileMutation.isPending && <LoaderIcon />}
-            Guardar cambios
+            Guardar
           </Button>
         </SheetFooter>
       </SheetContent>

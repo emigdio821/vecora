@@ -202,7 +202,7 @@ export function CreateExternalUserSheet({ state }: CreateExternalUserSheetProps)
             disabled={createExternalUserMutation.isPending}
           >
             {createExternalUserMutation.isPending && <LoaderIcon />}
-            Crear usuario externo
+            Crear
           </Button>
         </SheetFooter>
       </SheetContent>
