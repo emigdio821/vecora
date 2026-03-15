@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
+import type { ViolationWithOwner } from '@/db/schema/zod/violations'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteViolationData } from '@/schemas/violations'
 import { EditViolationSheet } from '../sheets/edit-violation'

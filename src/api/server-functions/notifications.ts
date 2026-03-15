@@ -2,8 +2,8 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq, gt, isNull, or } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
-import { notifications, profiles } from '@/db/schemas/main'
-import type { NotificationWithRelations, SelectNotification } from '@/db/schemas/zod/notifications'
+import { notifications, profiles } from '@/db/schema'
+import type { NotificationWithRelations, SelectNotification } from '@/db/schema/zod/notifications'
 import { authMiddleware } from '@/middleware/auth'
 import {
   createNotificationSchema,

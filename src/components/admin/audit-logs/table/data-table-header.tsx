@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
+import type { AuditLogWithUserAndProfile } from '@/db/schema/zod/audit-logs'
 import { STARTING_YEAR } from '@/lib/constants'
 
 interface AuditLogsDataTableHeaderProps {

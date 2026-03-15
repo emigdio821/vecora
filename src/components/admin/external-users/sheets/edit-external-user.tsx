@@ -20,7 +20,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { SelectExternalUser } from '@/db/schemas/zod/external-users'
+import type { SelectExternalUser } from '@/db/schema/zod/external-users'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateExternalUserFormData, updateExternalUserSchema } from '@/schemas/external-users'
 

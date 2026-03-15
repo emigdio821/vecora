@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { HouseWithOwner } from '@/db/schemas/zod/houses'
+import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteHouseData } from '@/schemas/houses'
 import { EditHouseSheet } from '../sheets/edit-house'

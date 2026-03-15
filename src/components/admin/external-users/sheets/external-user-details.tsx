@@ -11,7 +11,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { SelectExternalUser } from '@/db/schemas/zod/external-users'
+import type { SelectExternalUser } from '@/db/schema/zod/external-users'
 import { formatDate } from '@/lib/utils'
 
 interface ExternalUserDetailsSheetProps {

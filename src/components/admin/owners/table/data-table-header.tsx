@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
+import type { OwnerWithRelations } from '@/db/schema/zod/owners'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateOwnerSheet } from '../sheets/create-owner'
 

@@ -9,7 +9,7 @@ import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { SelectNotification } from '@/db/schemas/zod/notifications'
+import type { SelectNotification } from '@/db/schema/zod/notifications'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateNotificationSheet } from '../sheets/create-notification'
 

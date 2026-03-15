@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import type { ProfileType } from '@/db/schemas/zod/profiles'
+import type { ProfileType } from '@/db/schema/zod/profiles'
 
 interface ProfileTypeBadgeProps extends React.ComponentProps<typeof Badge> {
   type: ProfileType

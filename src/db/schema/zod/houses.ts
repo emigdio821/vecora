@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import type { z } from 'zod'
-import { houses } from '../main'
+import { houses } from '..'
 import type { SelectOwner } from './owners'
 
 export const insertHouseSchema = createInsertSchema(houses)

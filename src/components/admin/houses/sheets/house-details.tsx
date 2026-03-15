@@ -13,7 +13,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HouseWithOwner } from '@/db/schemas/zod/houses'
+import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { formatDate } from '@/lib/utils'
 
 interface HouseDetailsSheetProps {

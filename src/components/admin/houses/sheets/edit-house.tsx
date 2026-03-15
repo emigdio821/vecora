@@ -29,7 +29,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HouseWithOwner } from '@/db/schemas/zod/houses'
+import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateHouseFormData, updateHouseSchema } from '@/schemas/houses'
 

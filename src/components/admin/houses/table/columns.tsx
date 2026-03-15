@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { HouseWithOwner } from '@/db/schemas/zod/houses'
+import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { normalizeString } from '@/lib/utils'
 import { HousesTableActions } from './actions'
 import { HouseNumberCell } from './house-number-cell'

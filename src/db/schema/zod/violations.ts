@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { violationStatusEnum, violations } from '../main'
+import { violationStatusEnum, violations } from '..'
 import type { SelectOwner } from './owners'
 
 export const insertViolationSchema = createInsertSchema(violations)

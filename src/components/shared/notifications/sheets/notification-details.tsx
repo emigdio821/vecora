@@ -11,7 +11,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { SelectNotification } from '@/db/schemas/zod/notifications'
+import type { SelectNotification } from '@/db/schema/zod/notifications'
 import { formatDate } from '@/lib/utils'
 
 interface NotificationDetailsSheetProps {

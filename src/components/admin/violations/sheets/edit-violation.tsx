@@ -36,7 +36,7 @@ import {
   type ViolationStatus,
   type ViolationWithOwner,
   violationStatusSchema,
-} from '@/db/schemas/zod/violations'
+} from '@/db/schema/zod/violations'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate } from '@/lib/utils'
 import { type UpdateViolationFormData, updateViolationSchema } from '@/schemas/violations'

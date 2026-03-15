@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import type { z } from 'zod'
-import { externalUsers } from '../main'
+import { externalUsers } from '..'
 import type { ProfileWithUser } from './profiles'
 
 export const insertExternalUserSchema = createInsertSchema(externalUsers)

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
+import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateProfileSheet } from '../sheets/create-profile'
 

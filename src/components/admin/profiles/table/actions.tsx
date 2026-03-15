@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
+import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { BanProfileData, DeleteProfileData, UnbanProfileData } from '@/schemas/profiles'
 import { EditProfileSheet } from '../sheets/edit-profile'

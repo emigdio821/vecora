@@ -15,7 +15,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
+import type { AuditLogWithUserAndProfile } from '@/db/schema/zod/audit-logs'
 import { formatDate } from '@/lib/utils'
 
 interface AuditDetailsSheetProps {

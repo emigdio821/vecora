@@ -1,8 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
-import { profiles } from '@/db/schemas/main'
-import type { ProfileWithRoles } from '@/db/schemas/zod/profiles'
+import { profiles } from '@/db/schema'
+import type { ProfileWithRoles } from '@/db/schema/zod/profiles'
 import { authMiddleware } from '@/middleware/auth'
 
 export const getUserProfile = createServerFn()

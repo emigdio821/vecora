@@ -16,7 +16,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
+import type { OwnerWithRelations } from '@/db/schema/zod/owners'
 import { formatDate, getPaymentTypeLabel } from '@/lib/utils'
 
 interface OwnerDetailsSheetProps {

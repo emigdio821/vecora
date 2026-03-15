@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { SelectExternalUser } from '@/db/schemas/zod/external-users'
+import type { SelectExternalUser } from '@/db/schema/zod/external-users'
 import { normalizeString } from '@/lib/utils'
 import { ExternalUsersTableActions } from './actions'
 import { ExternalUserNameCell } from './external-user-name-cell'

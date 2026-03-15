@@ -15,7 +15,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
+import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { formatDate } from '@/lib/utils'
 
 interface ProfileDetailsSheetProps {

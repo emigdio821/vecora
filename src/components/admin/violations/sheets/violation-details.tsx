@@ -13,7 +13,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
+import type { ViolationWithOwner } from '@/db/schema/zod/violations'
 import { formatDate } from '@/lib/utils'
 
 interface ViolationDetailsSheetProps {

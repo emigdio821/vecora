@@ -16,6 +16,8 @@ import {
 } from 'drizzle-orm/pg-core'
 import { user } from './auth'
 
+export * from './auth'
+
 // Profile type enum
 export const profileTypeEnum = pgEnum('profile_type', ['owner', 'external'])
 

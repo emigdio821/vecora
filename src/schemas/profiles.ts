@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { profileTypeEnum } from '@/db/schemas/main'
+import { profileTypeEnum } from '@/db/schema'
 
 export const createProfileSchema = z
   .object({

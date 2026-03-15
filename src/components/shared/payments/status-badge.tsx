@@ -1,5 +1,5 @@
 import { Badge, type BadgeProps } from '@/components/ui/badge'
-import type { PaymentStatus } from '@/db/schemas/zod/payments'
+import type { PaymentStatus } from '@/db/schema/zod/payments'
 import { getPaymentStatusLabel } from '@/lib/utils'
 
 interface AuditLogActionBadgeProps extends BadgeProps {

@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { HoaBoardMember } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardMember } from '@/db/schema/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { useUserRoles } from '@/hooks/use-user-roles'
 import type { DeleteHoaBoardMemberData } from '@/schemas/hoa-board'

@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { profiles, profileTypeEnum } from '../main'
+import { profiles, profileTypeEnum } from '..'
 import type { SelectExternalUser } from './external-users'
 import type { SelectHoaBoard } from './hoa-board'
 import type { SelectOwner } from './owners'

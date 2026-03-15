@@ -23,7 +23,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import type { SelectNotification } from '@/db/schemas/zod/notifications'
+import type { SelectNotification } from '@/db/schema/zod/notifications'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate } from '@/lib/utils'
 import { type UpdateNotificationData, updateNotificationSchema } from '@/schemas/notifications'

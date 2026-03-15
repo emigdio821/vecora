@@ -21,7 +21,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardPeriodWithMembers } from '@/db/schema/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { MAX_YEAR_OFFSET } from '@/lib/constants'
 import { formatDate } from '@/lib/utils'

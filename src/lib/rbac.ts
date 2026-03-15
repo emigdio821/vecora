@@ -1,4 +1,4 @@
-import type { ProfileRoleWithRole } from '@/db/schemas/zod/profile-roles'
+import type { ProfileRoleWithRole } from '@/db/schema/zod/profile-roles'
 
 export type RoleName = 'admin' | 'user' | string
 

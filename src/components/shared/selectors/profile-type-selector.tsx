@@ -6,8 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { profileTypeEnum } from '@/db/schemas/main'
-import type { ProfileType } from '@/db/schemas/zod/profiles'
+import { profileTypeEnum } from '@/db/schema'
+import type { ProfileType } from '@/db/schema/zod/profiles'
 
 interface ProfileTypeSelectorProps extends React.ComponentProps<typeof Select> {
   invalid?: boolean

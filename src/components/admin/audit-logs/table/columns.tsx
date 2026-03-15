@@ -4,7 +4,7 @@ import { AuditLogEntityTypeBadge } from '@/components/shared/audit-logs/identity
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
+import type { AuditLogWithUserAndProfile } from '@/db/schema/zod/audit-logs'
 import { formatDate, normalizeString } from '@/lib/utils'
 import { AuditDetailsCell } from './audit-details-cell'
 import type { YearFacetedFilterOption } from './data-table-header'

@@ -1,5 +1,5 @@
 import { Badge, type BadgeProps } from '@/components/ui/badge'
-import type { AuditLogEntityType } from '@/db/schemas/zod/audit-logs'
+import type { AuditLogEntityType } from '@/db/schema/zod/audit-logs'
 
 interface AuditLogEntityTypeBadgeProps extends BadgeProps {
   entityType: AuditLogEntityType

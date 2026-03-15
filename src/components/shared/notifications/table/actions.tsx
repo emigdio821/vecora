@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { SelectNotification } from '@/db/schemas/zod/notifications'
+import type { SelectNotification } from '@/db/schema/zod/notifications'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteNotificationData } from '@/schemas/notifications'
 import { EditNotificationSheet } from '../sheets/edit-notification'

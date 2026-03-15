@@ -14,7 +14,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
+import type { PaymentWithOwnerAndMonths } from '@/db/schema/zod/payments'
 import { formatDate, getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
 
 interface PaymentDetailsSheetProps {

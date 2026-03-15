@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
+import type { OwnerWithRelations } from '@/db/schema/zod/owners'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteOwnerData } from '@/schemas/owners'
 import { EditOwnerSheet } from '../sheets/edit-owner'

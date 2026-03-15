@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { paymentMonths, paymentStatusEnum, payments, paymentTypeEnum } from '../main'
+import { paymentMonths, paymentStatusEnum, payments, paymentTypeEnum } from '..'
 import type { SelectOwner } from './owners'
 
 export const insertPaymentSchema = createInsertSchema(payments)

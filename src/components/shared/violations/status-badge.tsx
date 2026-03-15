@@ -1,5 +1,5 @@
 import { Badge, type BadgeProps } from '@/components/ui/badge'
-import type { ViolationStatus } from '@/db/schemas/zod/violations'
+import type { ViolationStatus } from '@/db/schema/zod/violations'
 
 interface ViolationStatusBadgeProps extends BadgeProps {
   status: ViolationStatus

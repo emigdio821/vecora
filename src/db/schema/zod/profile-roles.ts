@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import type { z } from 'zod'
-import { profileRoles, roles } from '../main'
+import { profileRoles, roles } from '..'
 
 export const insertRoleSchema = createInsertSchema(roles)
 export const selectRoleSchema = createSelectSchema(roles)

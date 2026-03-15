@@ -1,5 +1,5 @@
 import { Badge, type BadgeProps } from '@/components/ui/badge'
-import type { AuditLogAction } from '@/db/schemas/zod/audit-logs'
+import type { AuditLogAction } from '@/db/schema/zod/audit-logs'
 
 interface AuditLogActionBadgeProps extends BadgeProps {
   action: AuditLogAction

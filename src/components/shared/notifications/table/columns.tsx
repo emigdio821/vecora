@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { SelectNotification } from '@/db/schemas/zod/notifications'
+import type { SelectNotification } from '@/db/schema/zod/notifications'
 import { formatDate, normalizeString } from '@/lib/utils'
 import { NotificationsTableActions } from './actions'
 import { NotificationTitleCell } from './notification-title-cell'

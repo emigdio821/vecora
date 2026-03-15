@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import type { z } from 'zod'
-import { notifications } from '../main'
+import { notifications } from '..'
 import type { ProfileWithUserAndRoles } from './profiles'
 
 export const insertNotificationSchema = createInsertSchema(notifications)

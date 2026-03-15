@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { SelectExternalUser } from '@/db/schemas/zod/external-users'
+import type { SelectExternalUser } from '@/db/schema/zod/external-users'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateExternalUserSheet } from '../sheets/create-external-user'
 

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { auditLogActionEnum, auditLogEntityTypeEnum } from '@/db/schemas/main'
+import { auditLogActionEnum, auditLogEntityTypeEnum } from '@/db/schema'
 
 export const createAuditLogSchema = z.object({
   action: z.enum(auditLogActionEnum.enumValues),

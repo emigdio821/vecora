@@ -20,7 +20,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HoaBoardMember } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardMember } from '@/db/schema/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateHoaBoardMemberFormData, updateHoaBoardMemberSchema } from '@/schemas/hoa-board'
 

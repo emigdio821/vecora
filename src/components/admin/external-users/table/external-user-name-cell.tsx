@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import type { SelectExternalUser } from '@/db/schemas/zod/external-users'
+import type { SelectExternalUser } from '@/db/schema/zod/external-users'
 import { ExternalUserDetailsSheet } from '../sheets/external-user-details'
 
 interface ExternalUserNameCellProps {

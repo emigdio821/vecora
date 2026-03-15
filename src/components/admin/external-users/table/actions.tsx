@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { SelectExternalUser } from '@/db/schemas/zod/external-users'
+import type { SelectExternalUser } from '@/db/schema/zod/external-users'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteExternalUserData } from '@/schemas/external-users'
 import { EditExternalUserSheet } from '../sheets/edit-external-user'

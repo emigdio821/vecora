@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import type { AuditLogWithUserAndProfile } from '@/db/schemas/zod/audit-logs'
+import type { AuditLogWithUserAndProfile } from '@/db/schema/zod/audit-logs'
 import { AuditLogDetailsSheet } from '../sheets/audit-log-details'
 
 interface OwnerNameCellProps {

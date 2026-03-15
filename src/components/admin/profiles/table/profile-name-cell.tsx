@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import type { ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
+import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { ProfileDetailsSheet } from '../sheets/profile-details'
 
 interface ProfileNameCellProps {

@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
+import type { PaymentWithOwnerAndMonths } from '@/db/schema/zod/payments'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreatePaymentSheet } from '../sheets/create-payment'
 

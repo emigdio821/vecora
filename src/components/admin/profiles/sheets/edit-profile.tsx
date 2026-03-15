@@ -22,7 +22,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ProfileType, ProfileWithAllRelations } from '@/db/schemas/zod/profiles'
+import type { ProfileType, ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateProfileFormData, updateProfileSchema } from '@/schemas/profiles'
 

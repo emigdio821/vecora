@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
+import type { PaymentWithOwnerAndMonths } from '@/db/schema/zod/payments'
 import { PaymentDetailsSheet } from '../sheets/payment-details'
 
 interface PaymentAmountCellProps {

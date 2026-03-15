@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import type { ViolationWithOwner } from '@/db/schemas/zod/violations'
+import type { ViolationWithOwner } from '@/db/schema/zod/violations'
 import { ViolationDetailsSheet } from '../sheets/violation-details'
 
 interface ViolationConceptCellProps {

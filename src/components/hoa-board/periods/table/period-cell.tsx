@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardPeriodWithMembers } from '@/db/schema/zod/hoa-board'
 import { formatDate } from '@/lib/utils'
 import { HoaPeriodDetailsSheet } from '../sheets/period-details'
 

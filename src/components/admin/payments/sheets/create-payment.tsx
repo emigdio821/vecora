@@ -33,7 +33,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import { type PaymentType, paymentStatusSchema, paymentTypeSchema } from '@/db/schemas/zod/payments'
+import { type PaymentType, paymentStatusSchema, paymentTypeSchema } from '@/db/schema/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { MAX_YEAR_OFFSET, STARTING_YEAR } from '@/lib/constants'
 import { formatDate, getAllMonthsMap, getPaymentStatusLabel, getPaymentTypeLabel } from '@/lib/utils'

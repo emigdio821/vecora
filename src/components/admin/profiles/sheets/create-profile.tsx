@@ -24,7 +24,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ProfileType } from '@/db/schemas/zod/profiles'
+import type { ProfileType } from '@/db/schema/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type CreateProfileFormData, createProfileSchema } from '@/schemas/profiles'
 

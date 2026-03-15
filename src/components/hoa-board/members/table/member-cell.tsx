@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import type { HoaBoardMember } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardMember } from '@/db/schema/zod/hoa-board'
 import { HoaMemberDetailsSheet } from '../sheets/member-details'
 
 interface HoaMemberNameCellProps {

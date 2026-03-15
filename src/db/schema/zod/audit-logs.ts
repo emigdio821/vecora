@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { auditLogActionEnum, auditLogEntityTypeEnum, auditLogs } from '../main'
+import { auditLogActionEnum, auditLogEntityTypeEnum, auditLogs } from '..'
 import type { ProfileWithRoles } from './profiles'
 import type { SelectUser } from './users'
 

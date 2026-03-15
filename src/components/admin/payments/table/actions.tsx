@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { PaymentWithOwnerAndMonths } from '@/db/schemas/zod/payments'
+import type { PaymentWithOwnerAndMonths } from '@/db/schema/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { getPaymentTypeLabel } from '@/lib/utils'
 import type { DeletePaymentData } from '@/schemas/payments'

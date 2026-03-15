@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import type { z } from 'zod'
-import { owners } from '../main'
+import { owners } from '..'
 import type { SelectHouse } from './houses'
 import type { SelectPayment } from './payments'
 import type { SelectProfile } from './profiles'

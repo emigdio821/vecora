@@ -36,7 +36,7 @@ import {
   type PaymentWithOwnerAndMonths,
   paymentStatusSchema,
   paymentTypeSchema,
-} from '@/db/schemas/zod/payments'
+} from '@/db/schema/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate, getAllMonthsMap, getPaymentStatusLabel, getPaymentTypeLabel } from '@/lib/utils'
 import { type UpdatePaymentFormData, updatePaymentSchema } from '@/schemas/payments'

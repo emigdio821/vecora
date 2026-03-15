@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { paymentStatusSchema, paymentTypeSchema } from '@/db/schemas/zod/payments'
+import { paymentStatusSchema, paymentTypeSchema } from '@/db/schema/zod/payments'
 import { MAX_YEAR_OFFSET, STARTING_YEAR } from '@/lib/constants'
 import { requiredAmountSchema } from './shared'
 

@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import type { z } from 'zod'
-import { hoaBoard, hoaBoardPeriods } from '../main'
+import { hoaBoard, hoaBoardPeriods } from '..'
 import type { ProfileWithRoles } from './profiles'
 
 export const insertHoaBoardPeriodSchema = createInsertSchema(hoaBoardPeriods)

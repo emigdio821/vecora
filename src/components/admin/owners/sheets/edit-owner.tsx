@@ -23,7 +23,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { OwnerWithRelations } from '@/db/schemas/zod/owners'
+import type { OwnerWithRelations } from '@/db/schema/zod/owners'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateOwnerFormData, updateOwnerSchema } from '@/schemas/owners'
 

@@ -2,13 +2,13 @@ import { createServerFn } from '@tanstack/react-start'
 import { and, eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
-import { hoaBoard, hoaBoardPeriods } from '@/db/schemas/main'
+import { hoaBoard, hoaBoardPeriods } from '@/db/schema'
 import type {
   HoaBoardMember,
   HoaBoardPeriodWithMembers,
   SelectHoaBoard,
   SelectHoaBoardPeriod,
-} from '@/db/schemas/zod/hoa-board'
+} from '@/db/schema/zod/hoa-board'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import {

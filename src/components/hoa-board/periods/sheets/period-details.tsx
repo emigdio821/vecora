@@ -15,7 +15,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HoaBoardPeriodWithMembers } from '@/db/schemas/zod/hoa-board'
+import type { HoaBoardPeriodWithMembers } from '@/db/schema/zod/hoa-board'
 import { cn, formatDate } from '@/lib/utils'
 
 interface HoaPeriodDetailsSheetProps {

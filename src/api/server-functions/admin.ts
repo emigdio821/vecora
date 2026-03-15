@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { and, eq } from 'drizzle-orm'
 import { db } from '@/db'
-import { profileRoles, profiles, roles } from '@/db/schemas/main'
+import { profileRoles, profiles, roles } from '@/db/schema'
 import { authMiddleware } from '@/middleware/auth'
 
 export const isAdminUser = createServerFn()

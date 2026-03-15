@@ -11,7 +11,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { NotificationWithRelations } from '@/db/schemas/zod/notifications'
+import type { NotificationWithRelations } from '@/db/schema/zod/notifications'
 import { formatDate } from '@/lib/utils'
 import { RoleNameBadge } from '../role-name-badge'
 
