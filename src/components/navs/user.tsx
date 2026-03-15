@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useUserRoles } from '@/hooks/use-user-roles'
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth/client'
 import { logger } from '@/lib/logger'
 import { RoleNameBadge } from '../shared/role-name-badge'
 import { Avatar, AvatarFallback } from '../ui/avatar'

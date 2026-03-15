@@ -1,8 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from './index'
-import { user } from './schemas/auth'
-import { externalUsers, profileRoles, profiles, roles } from './schemas/main'
+import { externalUsers, profileRoles, profiles, roles, user } from './schema'
 
 async function seed() {
   console.log('Seeding database...')

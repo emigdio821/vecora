@@ -15,7 +15,7 @@ import { Frame, FrameDescription, FrameHeader, FrameTitle } from '@/components/u
 import { Input } from '@/components/ui/input'
 import { InputPassword } from '@/components/ui/input-password'
 import { SITE_CONFIG } from '@/config/site'
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/lib/auth/client'
 import { createSEOTitle } from '@/lib/seo'
 
 const DEFAULT_ERROR = 'Error en el servidor, intenta nuevamente.'
