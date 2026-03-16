@@ -5,7 +5,6 @@ import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { ProfileStatusBadge } from '@/components/shared/users/profile-status-badge'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
-import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
@@ -42,19 +41,19 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
             title="Información del perfil"
             icon={IconUserStar}
             content={
-              <div className="space-y-1">
-                <FramePanel className="flex items-center gap-2 p-2">
+              <div>
+                <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">ID del perfil</h2>
                     <p className="line-clamp-2 font-mono text-muted-foreground text-sm">{profile.id}</p>
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={profile.id} />
-                </FramePanel>
+                </div>
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Tipo de perfil</h2>
                   <RoleNameBadge roleName={profile.user.role || ''} />
-                </FramePanel>
+                </div>
               </div>
             }
           />
@@ -65,8 +64,8 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
               title="Usuario de autenticación"
               icon={IconUserScan}
               content={
-                <div className="space-y-1">
-                  <FramePanel className="flex items-center gap-2 p-2">
+                <>
+                  <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">ID de usuario</h2>
                       <p className="line-clamp-2 font-mono text-muted-foreground text-sm">
@@ -74,23 +73,23 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
                       </p>
                     </div>
                     <CopyButton tooltipText="Copiar ID" value={profile.user.id} />
-                  </FramePanel>
+                  </div>
 
                   {profile.user.email && (
-                    <FramePanel className="p-2">
+                    <div>
                       <h2 className="font-medium text-sm">Email</h2>
                       <p className="line-clamp-2 text-muted-foreground text-sm">{profile.user.email}</p>
-                    </FramePanel>
+                    </div>
                   )}
 
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Estado</h2>
                     <ProfileStatusBadge className="mt-1" banned={!!profile.user.banned} />
                     {profile.user.banReason && (
                       <p className="mt-1 text-muted-foreground text-sm">{profile.user.banReason}</p>
                     )}
-                  </FramePanel>
-                </div>
+                  </div>
+                </>
               }
             />
           )}
@@ -101,8 +100,8 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
             icon={IconUser}
             content={
               profile.resident ? (
-                <div className="space-y-1">
-                  <FramePanel className="flex items-center gap-2 p-2">
+                <div>
+                  <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>
                       <p className="line-clamp-2 text-muted-foreground text-sm">
@@ -110,24 +109,24 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
                       </p>
                     </div>
                     <CopyButton tooltipText="Copiar ID" value={profile.resident.id} />
-                  </FramePanel>
+                  </div>
 
                   {profile.resident.email && (
-                    <FramePanel className="p-2">
+                    <div>
                       <h2 className="font-medium text-sm">Correo</h2>
                       <p className="line-clamp-2 text-muted-foreground text-sm">{profile.resident.email}</p>
-                    </FramePanel>
+                    </div>
                   )}
 
                   {profile.resident.phone && (
-                    <FramePanel className="p-2">
+                    <div>
                       <h2 className="font-medium text-sm">Teléfono</h2>
                       <p className="line-clamp-2 text-muted-foreground text-sm">{profile.resident.phone}</p>
-                    </FramePanel>
+                    </div>
                   )}
                 </div>
               ) : (
-                <FramePanel className="p-2">
+                <div>
                   <Empty className="p-1">
                     <EmptyHeader>
                       <EmptyMedia variant="icon" className="mb-0">
@@ -136,7 +135,7 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
                       <EmptyDescription>No hay información del residente</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
-                </FramePanel>
+                </div>
               )
             }
           />
@@ -147,11 +146,11 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
             icon={IconRosette}
             content={
               profile.user.role ? (
-                <FramePanel className="flex items-center gap-2 p-2">
+                <div className="flex items-center gap-2">
                   <RoleNameBadge roleName={profile.user.role} />
-                </FramePanel>
+                </div>
               ) : (
-                <FramePanel className="p-2">
+                <div>
                   <Empty className="p-1">
                     <EmptyHeader>
                       <EmptyMedia variant="icon" className="mb-0">
@@ -160,7 +159,7 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
                       <EmptyDescription>Sin roles asignados</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
-                </FramePanel>
+                </div>
               )
             }
           />

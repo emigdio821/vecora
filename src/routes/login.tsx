@@ -9,9 +9,8 @@ import { Footer } from '@/components/footer'
 import { LoaderIcon, ResidoIcon } from '@/components/icons'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Frame, FrameDescription, FrameHeader, FrameTitle } from '@/components/ui/frame'
 import { Input } from '@/components/ui/input'
 import { InputPassword } from '@/components/ui/input-password'
 import { SITE_CONFIG } from '@/config/site'
@@ -87,78 +86,76 @@ function RouteComponent() {
           <span className="font-medium text-base text-foreground">{SITE_CONFIG.title}</span>
         </div>
 
-        <Frame className="w-full max-w-sm">
-          <FrameHeader>
-            <FrameTitle>Iniciar sesión</FrameTitle>
-            <FrameDescription>Ingresa tus credenciales para acceder a tu cuenta.</FrameDescription>
-          </FrameHeader>
-          <Card>
-            <CardContent>
-              <form
-                className="space-y-4"
-                id={loginFormId}
-                aria-label="Iniciar sesión"
-                onSubmit={form.handleSubmit(onSubmit)}
-              >
-                <FieldGroup>
-                  <Controller
-                    name="email"
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor={field.name}>
-                          Correo <span className="text-destructive">*</span>
-                        </FieldLabel>
-                        <Input
-                          {...field}
-                          id={field.name}
-                          autoComplete="email"
-                          disabled={isLoading}
-                          aria-invalid={fieldState.invalid}
-                        />
-                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                      </Field>
-                    )}
-                  />
-
-                  <Controller
-                    name="password"
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor={field.name}>
-                          Contraseña <span className="text-destructive">*</span>
-                        </FieldLabel>
-                        <InputPassword
-                          {...field}
-                          id={field.name}
-                          aria-invalid={fieldState.invalid}
-                          disabled={isLoading}
-                        />
-                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                      </Field>
-                    )}
-                  />
-
-                  {error && (
-                    <Alert variant="error">
-                      <IconAlertOctagon className="size-4" />
-                      <AlertTitle>Algo salió mal al iniciar sesión</AlertTitle>
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle>Iniciar sesión</CardTitle>
+            <CardDescription>Ingresa tus credenciales para acceder a tu cuenta.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form
+              className="space-y-4"
+              id={loginFormId}
+              aria-label="Iniciar sesión"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FieldGroup>
+                <Controller
+                  name="email"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Correo <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        autoComplete="email"
+                        disabled={isLoading}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
                   )}
-                </FieldGroup>
-              </form>
-            </CardContent>
+                />
 
-            <CardFooter className="pt-4 text-center">
-              <Button type="submit" form={loginFormId} className="w-full" disabled={isLoading}>
-                Iniciar sesión
-                {isLoading && <LoaderIcon />}
-              </Button>
-            </CardFooter>
-          </Card>
-        </Frame>
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Contraseña <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      <InputPassword
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        disabled={isLoading}
+                      />
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+
+                {error && (
+                  <Alert variant="destructive">
+                    <IconAlertOctagon className="size-4" />
+                    <AlertTitle>Algo salió mal al iniciar sesión</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+              </FieldGroup>
+            </form>
+          </CardContent>
+
+          <CardFooter className="pt-4 text-center">
+            <Button type="submit" form={loginFormId} className="w-full" disabled={isLoading}>
+              {isLoading && <LoaderIcon />}
+              Iniciar sesión
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
 
       <Footer />

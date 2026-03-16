@@ -1,44 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
 
-export const COPY_TIMEOUT = 1000
-
-interface UseCopyToClipboardProps {
+export function useCopyToClipboard({
+  timeout = 1000,
+  onCopy,
+}: {
   timeout?: number
-}
-
-export function useCopyToClipboard({ timeout = COPY_TIMEOUT }: UseCopyToClipboardProps = {}) {
+  onCopy?: () => void
+} = {}) {
   const [isCopied, setIsCopied] = useState(false)
-  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
-  function copyToClipboard(value: string) {
-    if (typeof window === 'undefined' || !navigator.clipboard.writeText) {
-      return
-    }
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current)
+  }, [])
 
-    if (!value) return
+  const copyToClipboard = (value: string) => {
+    if (!value || !navigator.clipboard?.writeText) return
 
     navigator.clipboard.writeText(value).then(() => {
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current)
-      }
       setIsCopied(true)
+      onCopy?.()
 
       if (timeout !== 0) {
-        timeoutIdRef.current = setTimeout(() => {
-          setIsCopied(false)
-          timeoutIdRef.current = null
-        }, timeout)
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = setTimeout(() => setIsCopied(false), timeout)
       }
     }, console.error)
   }
 
-  useEffect(() => {
-    return () => {
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current)
-      }
-    }
-  }, [])
-
-  return { copyToClipboard, isCopied }
+  return { isCopied, copyToClipboard }
 }

@@ -5,7 +5,6 @@ import { PaymentStatusBadge } from '@/components/shared/payments/status-badge'
 import { Badge } from '@/components/ui/badge'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
-import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
@@ -45,32 +44,32 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
             title="Información del pago"
             icon={IconCurrencyDollar}
             content={
-              <div className="space-y-1">
-                <FramePanel className="flex items-center gap-2 p-2">
+              <div>
+                <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Monto</h2>
                     <p className="text-muted-foreground text-sm">${payment.amount}</p>
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={payment.id} />
-                </FramePanel>
+                </div>
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Tipo de pago</h2>
                   <p className="text-muted-foreground text-sm">{getPaymentTypeLabel(payment.paymentType)}</p>
-                </FramePanel>
+                </div>
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Concepto</h2>
                   <p className="text-muted-foreground text-sm">{payment.concept}</p>
-                </FramePanel>
+                </div>
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Año</h2>
                   <p className="text-muted-foreground text-sm">{payment.year}</p>
-                </FramePanel>
+                </div>
 
                 {showMonthlyFee && (
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Meses pagados</h2>
                     <div className="mt-1 inline-flex flex-wrap gap-1">
                       {payment.paymentMonths.length === 12 ? (
@@ -83,19 +82,19 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                         ))
                       )}
                     </div>
-                  </FramePanel>
+                  </div>
                 )}
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Estado</h2>
                   <PaymentStatusBadge className="mt-1" status={payment.status} />
-                </FramePanel>
+                </div>
 
                 {payment.paidAt && (
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Fecha de pago</h2>
                     <p className="text-muted-foreground text-sm">{formatDate(payment.paidAt)}</p>
-                  </FramePanel>
+                  </div>
                 )}
               </div>
             }
@@ -107,27 +106,27 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
             icon={IconUserHeart}
             content={
               payment.resident ? (
-                <div className="space-y-1">
-                  <FramePanel className="flex items-center gap-2 p-2">
+                <div>
+                  <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>
                       <p className="text-muted-foreground text-sm">{`${payment.resident.firstName} ${payment.resident.lastName}`}</p>
                     </div>
                     <CopyButton tooltipText="Copiar ID" value={payment.resident.id} />
-                  </FramePanel>
+                  </div>
 
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Correo</h2>
                     <p className="text-muted-foreground text-sm">{payment.resident.email}</p>
-                  </FramePanel>
+                  </div>
 
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Teléfono</h2>
                     <p className="text-muted-foreground text-sm">{payment.resident.phone}</p>
-                  </FramePanel>
+                  </div>
                 </div>
               ) : (
-                <FramePanel className="p-2">
+                <div>
                   <Empty className="p-1">
                     <EmptyHeader>
                       <EmptyMedia variant="icon" className="mb-0">
@@ -136,7 +135,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
                       <EmptyDescription>No tiene propietario asignado.</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
-                </FramePanel>
+                </div>
               )
             }
           />

@@ -17,6 +17,7 @@ export function InputPassword(props: InputProps) {
       <InputGroupAddon align="inline-end">
         <Tooltip>
           <TooltipTrigger
+            closeOnClick={false}
             render={
               <InputGroupButton
                 size="icon-xs"

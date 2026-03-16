@@ -22,7 +22,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Frame } from '../ui/frame'
 
 interface DataTableProps<TData, TValue> {
   data: TData[]
@@ -99,9 +98,10 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
     <div className="space-y-2">
       {header && <div>{header(table)}</div>}
 
-      <Frame className="w-full">
+      <div className="w-full overflow-clip rounded-lg border border-border">
         <Table>
           {caption && <TableCaption>{caption}</TableCaption>}
+
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -143,7 +143,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
             )}
           </TableBody>
         </Table>
-      </Frame>
+      </div>
 
       {rowLength > DEFAULT_TABLE_PAGE_SIZE && (
         <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">

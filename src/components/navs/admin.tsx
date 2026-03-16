@@ -28,11 +28,11 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => setOpenMobile(false)}
-              isActive={pathname === '/admin/users'}
+              isActive={pathname === '/admin/profiles'}
               render={
-                <Link to="/admin/users">
+                <Link to="/admin/profiles">
                   <IconUsersGroup className="size-4" />
-                  <span>Usuarios</span>
+                  <span>Perfiles</span>
                 </Link>
               }
             />

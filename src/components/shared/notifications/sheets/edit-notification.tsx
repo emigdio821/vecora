@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -191,13 +190,6 @@ export function EditNotificationSheet({ notification, state }: EditNotificationS
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={editNotificationFormId} disabled={updateNotificationMutation.isPending}>
             {updateNotificationMutation.isPending && <LoaderIcon />}
             Guardar

@@ -2,7 +2,7 @@ import { IconAlertTriangle } from '@tabler/icons-react'
 import { useState } from 'react'
 import {
   AlertDialog,
-  AlertDialogClose,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -56,7 +56,7 @@ export function AlertDialogGeneric(props: AlertDialogGenericProps) {
       }}
     >
       <AlertDialogContent className="sm:max-w-sm">
-        <div className="flex items-center justify-center p-4 pb-0 sm:justify-normal">
+        <div className="flex items-center justify-center sm:justify-normal">
           <div
             className={cn('flex rounded-md bg-muted p-2 text-muted-foreground', {
               'bg-info/10 text-info-foreground': variant === 'info',
@@ -75,9 +75,7 @@ export function AlertDialogGeneric(props: AlertDialogGenericProps) {
         </AlertDialogHeader>
         {content && <div className="px-4 pb-4">{content}</div>}
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="outline" disabled={isExecutingAction} />}>
-            Cancelar
-          </AlertDialogClose>
+          <AlertDialogCancel disabled={isExecutingAction}>Cancelar</AlertDialogCancel>
           <Button variant={variant} onClick={handleAction} disabled={isExecutingAction}>
             {isExecutingAction && <LoaderIcon />}
             {actionLabel || 'Proceder'}

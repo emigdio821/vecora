@@ -1,7 +1,6 @@
 import { IconBell, IconCalendarOff, IconMessage } from '@tabler/icons-react'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { CopyButton } from '@/components/ui/copy-button'
-import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
@@ -39,14 +38,14 @@ export function NotificationDetailsSheet({ notification, state }: NotificationDe
             title="Información de la notificación"
             icon={IconBell}
             content={
-              <div className="space-y-1">
-                <FramePanel className="flex items-center gap-2 p-2">
+              <div>
+                <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Título</h2>
                     <p className="line-clamp-2 text-muted-foreground text-sm">{notification.title}</p>
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={notification.id} />
-                </FramePanel>
+                </div>
               </div>
             }
           />
@@ -56,9 +55,9 @@ export function NotificationDetailsSheet({ notification, state }: NotificationDe
             title="Mensaje"
             icon={IconMessage}
             content={
-              <FramePanel className="p-2">
+              <div>
                 <p className="whitespace-pre-wrap text-muted-foreground text-sm">{notification.message}</p>
-              </FramePanel>
+              </div>
             }
           />
 
@@ -68,10 +67,10 @@ export function NotificationDetailsSheet({ notification, state }: NotificationDe
               title="Expiración"
               icon={IconCalendarOff}
               content={
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Fecha de expiración</h2>
                   <p className="text-muted-foreground text-sm">{formatDate(notification.expiresAt)}</p>
-                </FramePanel>
+                </div>
               }
             />
           )}

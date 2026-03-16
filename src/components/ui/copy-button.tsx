@@ -1,5 +1,4 @@
 import { IconCheck, IconCopy } from '@tabler/icons-react'
-import { useRef, useState } from 'react'
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { cn } from '@/lib/utils'
 import { Button, type ButtonProps } from './button'
@@ -13,10 +12,7 @@ type CopyButtonProps = ButtonProps & {
 }
 
 export function CopyButton(props: CopyButtonProps) {
-  const [isOpenTooltip, setOpenTooltip] = useState(false)
   const { value, tooltipText = 'Copiar', successText = 'Copiado', iconClassName, ...btnProps } = props
-  const copyButtonRef = useRef<HTMLButtonElement>(null)
-
   const { copyToClipboard, isCopied } = useCopyToClipboard()
 
   function handleCopy() {
@@ -24,19 +20,15 @@ export function CopyButton(props: CopyButtonProps) {
   }
 
   return (
-    <Tooltip open={isOpenTooltip} onOpenChange={setOpenTooltip}>
+    <Tooltip>
       <TooltipTrigger
+        closeOnClick={false}
         render={
           <Button
             size="icon-sm"
             variant="ghost"
             disabled={isCopied}
-            ref={copyButtonRef}
-            onClick={(e) => {
-              e.preventBaseUIHandler()
-              setOpenTooltip(true)
-              handleCopy()
-            }}
+            onClick={handleCopy}
             focusableWhenDisabled
             aria-label={isCopied ? successText : tooltipText}
             {...btnProps}

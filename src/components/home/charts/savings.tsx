@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
-import { Frame, FrameDescription, FrameHeader, FrameTitle } from '@/components/ui/frame'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -44,13 +43,13 @@ export function SavingsChart() {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
 
   return (
-    <Frame>
-      <FrameHeader className="flex flex-row items-center justify-between gap-2">
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div>
-          <FrameTitle>Ahorros</FrameTitle>
-          <FrameDescription>
+          <CardTitle>Ahorros</CardTitle>
+          <CardDescription>
             Mostrando el total de ahorros en el año <span className="font-medium">{selectedYear}</span>
-          </FrameDescription>
+          </CardDescription>
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -71,46 +70,45 @@ export function SavingsChart() {
             </SelectContent>
           </Select>
         </div>
-      </FrameHeader>
-      <Card>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="max-h-80 min-h-52 w-full">
-            <AreaChart accessibilityLayer data={chartData}>
-              <CartesianGrid vertical={false} strokeDasharray="3 3" />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => value.slice(0, 3)}
-              />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-              <defs>
-                <DottedBackgroundPattern config={chartConfig} />
-              </defs>
-              <Area
-                dataKey="mobile"
-                type="natural"
-                fill="url(#dotted-background-pattern-mobile)"
-                fillOpacity={0.4}
-                stroke="var(--color-mobile)"
-                stackId="a"
-                strokeWidth={0.8}
-              />
-              <Area
-                dataKey="desktop"
-                type="natural"
-                fill="url(#dotted-background-pattern-desktop)"
-                fillOpacity={0.4}
-                stroke="var(--color-desktop)"
-                stackId="a"
-                strokeWidth={0.8}
-              />
-            </AreaChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
-    </Frame>
+      </CardHeader>
+
+      <CardContent>
+        <ChartContainer config={chartConfig} className="max-h-80 min-h-52 w-full">
+          <AreaChart accessibilityLayer data={chartData}>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <defs>
+              <DottedBackgroundPattern config={chartConfig} />
+            </defs>
+            <Area
+              dataKey="mobile"
+              type="natural"
+              fill="url(#dotted-background-pattern-mobile)"
+              fillOpacity={0.4}
+              stroke="var(--color-mobile)"
+              stackId="a"
+              strokeWidth={0.8}
+            />
+            <Area
+              dataKey="desktop"
+              type="natural"
+              fill="url(#dotted-background-pattern-desktop)"
+              fillOpacity={0.4}
+              stroke="var(--color-desktop)"
+              stackId="a"
+              strokeWidth={0.8}
+            />
+          </AreaChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   )
 }
 

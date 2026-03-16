@@ -4,7 +4,6 @@ import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { ViolationStatusBadge } from '@/components/shared/violations/status-badge'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
-import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
@@ -41,29 +40,29 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
             title="Información de la infracción"
             icon={IconFlag}
             content={
-              <div className="space-y-1">
-                <FramePanel className="flex items-center gap-2 p-2">
+              <div>
+                <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Concepto</h2>
                     <p className="line-clamp-3 text-muted-foreground text-sm">{violation.concept}</p>
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={violation.id} />
-                </FramePanel>
+                </div>
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Monto</h2>
                   <p className="text-muted-foreground text-sm">${violation.amount}</p>
-                </FramePanel>
+                </div>
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Fecha de infracción</h2>
                   <p className="text-muted-foreground text-sm">{formatDate(violation.violationDate)}</p>
-                </FramePanel>
+                </div>
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Estado</h2>
                   <ViolationStatusBadge className="mt-1" status={violation.status} />
-                </FramePanel>
+                </div>
               </div>
             }
           />
@@ -74,27 +73,27 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
             icon={IconUserHeart}
             content={
               violation.resident ? (
-                <div className="space-y-1">
-                  <FramePanel className="flex items-center gap-2 p-2">
+                <div>
+                  <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>
                       <p className="text-muted-foreground text-sm">{`${violation.resident.firstName} ${violation.resident.lastName}`}</p>
                     </div>
                     <CopyButton tooltipText="Copiar ID" value={violation.resident.id} />
-                  </FramePanel>
+                  </div>
 
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Correo</h2>
                     <p className="text-muted-foreground text-sm">{violation.resident.email}</p>
-                  </FramePanel>
+                  </div>
 
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Teléfono</h2>
                     <p className="text-muted-foreground text-sm">{violation.resident.phone}</p>
-                  </FramePanel>
+                  </div>
                 </div>
               ) : (
-                <FramePanel className="p-2">
+                <div>
                   <Empty className="p-1">
                     <EmptyHeader>
                       <EmptyMedia variant="icon" className="mb-0">
@@ -103,7 +102,7 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
                       <EmptyDescription>No tiene propietario asignado.</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
-                </FramePanel>
+                </div>
               )
             }
           />

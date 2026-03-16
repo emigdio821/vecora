@@ -6,7 +6,6 @@ import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
-import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
@@ -44,21 +43,21 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
             title="Información de la acción"
             icon={IconFileDescription}
             content={
-              <div className="space-y-1">
-                <FramePanel className="flex items-center gap-2 p-2">
+              <div>
+                <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">ID de registro</h2>
                     <p className="font-mono text-muted-foreground text-xs">{auditLog.id}</p>
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={auditLog.id} />
-                </FramePanel>
+                </div>
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Acción</h2>
                   <AuditLogActionBadge className="mt-1" action={auditLog.action} />
-                </FramePanel>
+                </div>
 
-                <FramePanel className="flex items-center gap-2 p-2">
+                <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Tipo de entidad</h2>
                     <AuditLogEntityTypeBadge className="mt-1" entityType={auditLog.entityType} />
@@ -66,7 +65,7 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
                   {auditLog.entityId && (
                     <CopyButton tooltipText="Copiar ID de entidad" value={auditLog.entityId} />
                   )}
-                </FramePanel>
+                </div>
               </div>
             }
           />
@@ -77,31 +76,31 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
             icon={IconUser}
             content={
               auditLog.user ? (
-                <div className="space-y-1">
-                  <FramePanel className="flex items-center gap-2 p-2">
+                <div>
+                  <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>
                       <p className="truncate text-muted-foreground text-sm">{auditLog.user.name}</p>
                     </div>
                     <CopyButton tooltipText="Copiar ID de usuario" value={auditLog.user.id} />
-                  </FramePanel>
+                  </div>
 
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Correo electrónico</h2>
                     <p className="text-muted-foreground text-sm">{auditLog.user.email}</p>
-                  </FramePanel>
+                  </div>
 
                   {userRole && (
-                    <FramePanel className="p-2">
+                    <div>
                       <h2 className="font-medium text-sm">Rol</h2>
                       <div className="mt-1">
                         <RoleNameBadge roleName={userRole} />
                       </div>
-                    </FramePanel>
+                    </div>
                   )}
                 </div>
               ) : (
-                <FramePanel className="p-2">
+                <div>
                   <Empty className="p-1">
                     <EmptyHeader>
                       <EmptyMedia variant="icon" className="mb-0">
@@ -110,7 +109,7 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
                       <EmptyDescription>Usuario no disponible</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
-                </FramePanel>
+                </div>
               )
             }
           />
@@ -121,11 +120,9 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
               title="Cambios"
               icon={IconFileDescription}
               content={
-                <FramePanel className="p-2">
-                  <pre className="overflow-x-auto font-mono text-muted-foreground text-xs">
-                    {JSON.stringify(auditLog.changes, null, 2)}
-                  </pre>
-                </FramePanel>
+                <pre className="overflow-x-auto font-mono text-muted-foreground text-xs">
+                  {JSON.stringify(auditLog.changes, null, 2)}
+                </pre>
               }
             />
           )}
@@ -136,23 +133,23 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
               title="Detalles técnicos"
               icon={IconDeviceDesktopAnalytics}
               content={
-                <div className="space-y-1">
+                <>
                   {auditLog.ipAddress && (
-                    <FramePanel className="flex items-center gap-2 p-2">
+                    <div className="flex items-center gap-2">
                       <div className="min-w-0 flex-1">
                         <h2 className="font-medium text-sm">Dirección IP</h2>
                         <p className="text-muted-foreground text-sm">{auditLog.ipAddress}</p>
                       </div>
                       <CopyButton tooltipText="Copiar IP" value={auditLog.ipAddress} />
-                    </FramePanel>
+                    </div>
                   )}
                   {auditLog.userAgent && (
-                    <FramePanel className="p-2">
+                    <div>
                       <h2 className="font-medium text-sm">Agente de usuario</h2>
                       <p className="break-all text-muted-foreground text-xs">{auditLog.userAgent}</p>
-                    </FramePanel>
+                    </div>
                   )}
-                </div>
+                </>
               }
             />
           )}

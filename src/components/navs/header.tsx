@@ -18,25 +18,20 @@ export function HeaderNav({ ...props }: React.ComponentProps<typeof SidebarGroup
     <SidebarGroupContent className="flex flex-col gap-2" {...props}>
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton
-            size="lg"
-            render={
-              <Link to="/" onClick={() => setOpenMobile(false)}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary">
-                  <ResidoIcon className="size-4 text-sidebar-primary-foreground" />
-                </div>
+          <div className="flex items-center gap-2 p-2">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary">
+              <ResidoIcon className="size-4 text-sidebar-primary-foreground" />
+            </div>
 
-                <div className="grid flex-1 text-left text-sm leading-none">
-                  <span className="truncate font-medium text-base text-sidebar-accent-foreground">
-                    Resido
-                  </span>
-                  <span className="truncate text-sidebar-foreground text-xs">Manejo residencial</span>
-                </div>
-              </Link>
-            }
-          />
+            <div className="grid flex-1 text-left text-sm leading-none">
+              <span className="truncate font-medium text-base text-sidebar-accent-foreground">Resido</span>
+              <span className="truncate text-sidebar-foreground text-xs">Manejo residencial</span>
+            </div>
+          </div>
         </SidebarMenuItem>
+      </SidebarMenu>
 
+      <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton
             onClick={() => setOpenMobile(false)}

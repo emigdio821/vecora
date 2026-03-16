@@ -6,7 +6,6 @@ import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { Badge } from '@/components/ui/badge'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
-import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
@@ -47,20 +46,20 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
             title="Información del periodo"
             icon={IconCalendarTime}
             content={
-              <div className="space-y-1">
-                <FramePanel className="flex items-center gap-2 p-2">
+              <>
+                <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Fecha inicial</h2>
                     <p className="text-muted-foreground text-sm">{formatDate(period.startDate)}</p>
                   </div>
                   <CopyButton tooltipText="Copiar ID del periodo" value={period.id} />
-                </FramePanel>
+                </div>
 
-                <FramePanel className="p-2">
+                <div>
                   <h2 className="font-medium text-sm">Fecha final</h2>
                   <p className="text-muted-foreground text-sm">{formatDate(period.endDate)}</p>
-                </FramePanel>
-              </div>
+                </div>
+              </>
             }
           />
 
@@ -74,13 +73,13 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
             icon={IconUsers}
             content={
               activeMembers.length > 0 ? (
-                <div className="space-y-1">
+                <div>
                   {activeMembers.map((member) => {
                     const memberFullName = `${member.firstName} ${member.lastName}`.trim()
                     const isDeleted = !member.profileId
 
                     return (
-                      <FramePanel key={member.id} className="p-0">
+                      <div key={member.id} className="p-0">
                         <div className="flex items-center justify-between gap-2 p-2">
                           <div className="min-w-0 flex-1">
                             <h2 className={cn('font-medium text-sm', isDeleted && 'text-muted-foreground')}>
@@ -96,12 +95,12 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                           <ProfileTypeBadge isOwner={member.isOwner} />
                           {isDeleted && <Badge variant="destructive">Eliminado</Badge>}
                         </div>
-                      </FramePanel>
+                      </div>
                     )
                   })}
                 </div>
               ) : (
-                <FramePanel className="p-2">
+                <div>
                   <Empty className="gap-2 p-1">
                     <EmptyHeader>
                       <EmptyMedia variant="icon" className="mb-0">
@@ -110,7 +109,7 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                       <EmptyDescription>Este periodo no tiene miembros asignados</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
-                </FramePanel>
+                </div>
               )
             }
           />
@@ -123,27 +122,23 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                 </>
               }
               icon={IconUsers}
-              content={
-                <div className="space-y-1">
-                  {pastMembers.map((member) => {
-                    const memberFullName = `${member.firstName} ${member.lastName}`.trim()
+              content={pastMembers.map((member) => {
+                const memberFullName = `${member.firstName} ${member.lastName}`.trim()
 
-                    return (
-                      <FramePanel key={member.id} className="flex items-center gap-2 p-2">
-                        <div className="min-w-0 flex-1">
-                          <h2 className="font-medium text-sm">{memberFullName}</h2>
-                          {member.phone && <p className="text-muted-foreground text-xs">{member.phone}</p>}
-                          <div className="flex flex-wrap gap-2">
-                            <RoleNameBadge roleName={member.profile?.user?.role || ''} />
-                            <ProfileTypeBadge isOwner={member.isOwner} />
-                          </div>
-                        </div>
-                        <CopyButton tooltipText="Copiar ID" value={member.id} />
-                      </FramePanel>
-                    )
-                  })}
-                </div>
-              }
+                return (
+                  <div key={member.id} className="flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h2 className="font-medium text-sm">{memberFullName}</h2>
+                      {member.phone && <p className="text-muted-foreground text-xs">{member.phone}</p>}
+                      <div className="flex flex-wrap gap-2">
+                        <RoleNameBadge roleName={member.profile?.user?.role || ''} />
+                        <ProfileTypeBadge isOwner={member.isOwner} />
+                      </div>
+                    </div>
+                    <CopyButton tooltipText="Copiar ID" value={member.id} />
+                  </div>
+                )
+              })}
             />
           )}
         </SheetPanel>

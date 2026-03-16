@@ -4,7 +4,6 @@ import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
-import { FramePanel } from '@/components/ui/frame'
 import {
   Sheet,
   SheetContent,
@@ -42,21 +41,21 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
             title="Información de la casa"
             icon={IconHome}
             content={
-              <div className="space-y-1">
-                <FramePanel className="flex items-center gap-2 p-2">
+              <>
+                <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Número de casa</h2>
                     <HouseNumberBadge number={house.houseNumber} />
                   </div>
                   <CopyButton tooltipText="Copiar ID" value={house.id} />
-                </FramePanel>
+                </div>
                 {houseAddress && (
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Direccón</h2>
                     <p className="line-clamp-2 text-muted-foreground text-sm">{houseAddress}</p>
-                  </FramePanel>
+                  </div>
                 )}
-              </div>
+              </>
             }
           />
 
@@ -66,27 +65,27 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
             icon={IconUserHeart}
             content={
               house.resident ? (
-                <div className="space-y-1">
-                  <FramePanel className="flex items-center gap-2 p-2">
+                <>
+                  <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>
                       <p className="text-muted-foreground text-sm">{`${house.resident.firstName} ${house.resident.lastName}`}</p>
                     </div>
                     <CopyButton tooltipText="Copiar ID" value={house.id} />
-                  </FramePanel>
+                  </div>
 
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Correo</h2>
                     <p className="text-muted-foreground text-sm">{house.resident.email}</p>
-                  </FramePanel>
+                  </div>
 
-                  <FramePanel className="p-2">
+                  <div>
                     <h2 className="font-medium text-sm">Teléfono</h2>
                     <p className="text-muted-foreground text-sm">{house.resident.phone}</p>
-                  </FramePanel>
-                </div>
+                  </div>
+                </>
               ) : (
-                <FramePanel className="p-2">
+                <div>
                   <Empty className="p-1">
                     <EmptyHeader>
                       <EmptyMedia variant="icon" className="mb-0">
@@ -95,7 +94,7 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
                       <EmptyDescription>No tiene propietario asignado.</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
-                </FramePanel>
+                </div>
               )
             }
           />

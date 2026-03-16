@@ -12,11 +12,7 @@ import {
   CardAction,
   CardContent,
   CardDescription,
-  CardFrame,
-  CardFrameDescription,
-  CardFrameFooter,
-  CardFrameHeader,
-  CardFrameTitle,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -196,13 +192,13 @@ export function PaymentsChart() {
   }
 
   return (
-    <CardFrame>
-      <CardFrameHeader className="flex flex-row items-center justify-between gap-2">
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div>
-          <CardFrameTitle>Pagos</CardFrameTitle>
-          <CardFrameDescription>
+          <CardTitle>Pagos</CardTitle>
+          <CardDescription>
             Mostrando el total de pagos en el año <span className="font-medium">{selectedYear}</span>
-          </CardFrameDescription>
+          </CardDescription>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Label htmlFor="payments-chart-year">Año</Label>
@@ -225,16 +221,15 @@ export function PaymentsChart() {
             </SelectContent>
           </Select>
         </div>
-      </CardFrameHeader>
-      <Card>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="h-40 w-full sm:h-60 lg:h-80">
-            {renderChartContent()}
-          </ChartContainer>
-        </CardContent>
-      </Card>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className="h-40 w-full sm:h-60 lg:h-80">
+          {renderChartContent()}
+        </ChartContainer>
+      </CardContent>
+
       {paymentStats.total > 0 && (
-        <CardFrameFooter className="flex items-center justify-between gap-4 text-sm">
+        <CardFooter className="flex items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="size-3 shrink-0 rounded-[2px] border bg-success" />
@@ -281,8 +276,8 @@ export function PaymentsChart() {
               </PopoverContent>
             </Popover>
           </div>
-        </CardFrameFooter>
+        </CardFooter>
       )}
-    </CardFrame>
+    </Card>
   )
 }

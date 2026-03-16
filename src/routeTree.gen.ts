@@ -21,8 +21,8 @@ import { Route as AuthedMaintenanceRouteImport } from './routes/_authed/maintena
 import { Route as AuthedHoaBoardRouteImport } from './routes/_authed/hoa-board'
 import { Route as AuthedAdminRouteRouteImport } from './routes/_authed/admin/route'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as AuthedAdminUsersRouteImport } from './routes/_authed/admin/users'
 import { Route as AuthedAdminResidentialRouteImport } from './routes/_authed/admin/residential'
+import { Route as AuthedAdminProfilesRouteImport } from './routes/_authed/admin/profiles'
 import { Route as AuthedAdminAuditRouteImport } from './routes/_authed/admin/audit'
 
 const LoginRoute = LoginRouteImport.update({
@@ -84,14 +84,14 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedAdminUsersRoute = AuthedAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AuthedAdminRouteRoute,
-} as any)
 const AuthedAdminResidentialRoute = AuthedAdminResidentialRouteImport.update({
   id: '/residential',
   path: '/residential',
+  getParentRoute: () => AuthedAdminRouteRoute,
+} as any)
+const AuthedAdminProfilesRoute = AuthedAdminProfilesRouteImport.update({
+  id: '/profiles',
+  path: '/profiles',
   getParentRoute: () => AuthedAdminRouteRoute,
 } as any)
 const AuthedAdminAuditRoute = AuthedAdminAuditRouteImport.update({
@@ -112,8 +112,8 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthedSettingsRoute
   '/treasury': typeof AuthedTreasuryRoute
   '/admin/audit': typeof AuthedAdminAuditRoute
+  '/admin/profiles': typeof AuthedAdminProfilesRoute
   '/admin/residential': typeof AuthedAdminResidentialRoute
-  '/admin/users': typeof AuthedAdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -128,8 +128,8 @@ export interface FileRoutesByTo {
   '/treasury': typeof AuthedTreasuryRoute
   '/': typeof AuthedIndexRoute
   '/admin/audit': typeof AuthedAdminAuditRoute
+  '/admin/profiles': typeof AuthedAdminProfilesRoute
   '/admin/residential': typeof AuthedAdminResidentialRoute
-  '/admin/users': typeof AuthedAdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -146,8 +146,8 @@ export interface FileRoutesById {
   '/_authed/treasury': typeof AuthedTreasuryRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/admin/audit': typeof AuthedAdminAuditRoute
+  '/_authed/admin/profiles': typeof AuthedAdminProfilesRoute
   '/_authed/admin/residential': typeof AuthedAdminResidentialRoute
-  '/_authed/admin/users': typeof AuthedAdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -164,8 +164,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/treasury'
     | '/admin/audit'
+    | '/admin/profiles'
     | '/admin/residential'
-    | '/admin/users'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -180,8 +180,8 @@ export interface FileRouteTypes {
     | '/treasury'
     | '/'
     | '/admin/audit'
+    | '/admin/profiles'
     | '/admin/residential'
-    | '/admin/users'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -197,8 +197,8 @@ export interface FileRouteTypes {
     | '/_authed/treasury'
     | '/_authed/'
     | '/_authed/admin/audit'
+    | '/_authed/admin/profiles'
     | '/_authed/admin/residential'
-    | '/_authed/admin/users'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -294,18 +294,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/admin/users': {
-      id: '/_authed/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthedAdminUsersRouteImport
-      parentRoute: typeof AuthedAdminRouteRoute
-    }
     '/_authed/admin/residential': {
       id: '/_authed/admin/residential'
       path: '/residential'
       fullPath: '/admin/residential'
       preLoaderRoute: typeof AuthedAdminResidentialRouteImport
+      parentRoute: typeof AuthedAdminRouteRoute
+    }
+    '/_authed/admin/profiles': {
+      id: '/_authed/admin/profiles'
+      path: '/profiles'
+      fullPath: '/admin/profiles'
+      preLoaderRoute: typeof AuthedAdminProfilesRouteImport
       parentRoute: typeof AuthedAdminRouteRoute
     }
     '/_authed/admin/audit': {
@@ -320,14 +320,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthedAdminRouteRouteChildren {
   AuthedAdminAuditRoute: typeof AuthedAdminAuditRoute
+  AuthedAdminProfilesRoute: typeof AuthedAdminProfilesRoute
   AuthedAdminResidentialRoute: typeof AuthedAdminResidentialRoute
-  AuthedAdminUsersRoute: typeof AuthedAdminUsersRoute
 }
 
 const AuthedAdminRouteRouteChildren: AuthedAdminRouteRouteChildren = {
   AuthedAdminAuditRoute: AuthedAdminAuditRoute,
+  AuthedAdminProfilesRoute: AuthedAdminProfilesRoute,
   AuthedAdminResidentialRoute: AuthedAdminResidentialRoute,
-  AuthedAdminUsersRoute: AuthedAdminUsersRoute,
 }
 
 const AuthedAdminRouteRouteWithChildren =

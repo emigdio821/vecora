@@ -2,9 +2,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { CreateNotificationSheet } from '@/components/shared/notifications/sheets/create-notification'
 import { NotificationsDataTable } from '@/components/shared/notifications/table/data-table'
+import { createSEOTitle } from '@/lib/seo'
 
 export const Route = createFileRoute('/_authed/notifications')({
   component: RouteComponent,
+  head: () => ({
+    meta: [{ title: createSEOTitle('Notificaciones') }],
+  }),
 })
 
 function RouteComponent() {

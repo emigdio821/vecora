@@ -1,4 +1,4 @@
-import { IconLoader2 } from '@tabler/icons-react'
+import { IconLoader } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 
 type IconProps = React.SVGProps<SVGSVGElement>
@@ -14,5 +14,5 @@ export const ResidoIcon = (props: IconProps) => (
 )
 
 export const LoaderIcon = ({ className, ...props }: IconProps) => (
-  <IconLoader2 className={cn('size-4 animate-spin', className)} {...props} />
+  <IconLoader className={cn('size-4 animate-spin', className)} {...props} />
 )

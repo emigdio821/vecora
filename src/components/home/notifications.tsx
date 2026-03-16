@@ -13,17 +13,11 @@ import { RoleNameBadge } from '../shared/role-name-badge'
 import { NotificationsSkeleton } from '../shared/skeletons/notifications'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
 
 export function HomeNotifications() {
   const [isAllNotificationsOpen, setAllNotificationsOpen] = useState(false)
-  const {
-    data: notifications = [],
-    error,
-    isLoading,
-    refetch,
-    isFetching,
-  } = useQuery(notificationsListQueryOptions())
+  const { data: notifications = [], error, isLoading, refetch } = useQuery(notificationsListQueryOptions())
 
   const maxDisplayed = 3
   const hasMore = notifications.length > maxDisplayed
@@ -54,11 +48,6 @@ export function HomeNotifications() {
           <EmptyTitle>Estás al día</EmptyTitle>
           <EmptyDescription>No hay notificaciones pendientes.</EmptyDescription>
         </EmptyHeader>
-        <EmptyContent>
-          <Button disabled={isLoading || isFetching} onClick={() => refetch()}>
-            Recargar
-          </Button>
-        </EmptyContent>
       </Empty>
     )
   }
