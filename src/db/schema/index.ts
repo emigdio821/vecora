@@ -10,7 +10,6 @@ import {
   primaryKey,
   text,
   timestamp,
-  unique,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core'
@@ -49,18 +48,6 @@ export const auditLogEntityTypeEnum = pgEnum('audit_log_entity_type', [
   'hoa_board_period',
   'notification',
 ])
-
-// Roles table - defines all available roles in the system
-export const roles = pgTable('roles', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: varchar('name', { length: 50 }).notNull().unique(),
-  description: varchar('description', { length: 200 }),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-})
 
 // Owners table - represents property owners
 export const owners = pgTable('owners', {
@@ -142,30 +129,6 @@ export const profiles = pgTable(
         (${table.profileType} = 'external' AND ${table.ownerId} IS NULL AND ${table.externalUserId} IS NOT NULL)
       )`,
     ),
-  ],
-)
-
-// Profile Roles - junction table for many-to-many relationship between profiles and roles
-export const profileRoles = pgTable(
-  'profile_roles',
-  {
-    id: uuid('id').primaryKey().defaultRandom(),
-    profileId: uuid('profile_id')
-      .notNull()
-      .references(() => profiles.id, { onDelete: 'cascade' }),
-    roleId: uuid('role_id')
-      .notNull()
-      .references(() => roles.id, { onDelete: 'cascade' }),
-    assignedAt: timestamp('assigned_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at')
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
-  },
-  (table) => [
-    index('profile_roles_profileId_idx').on(table.profileId),
-    index('profile_roles_roleId_idx').on(table.roleId),
-    unique('profile_roles_unique').on(table.profileId, table.roleId),
   ],
 )
 
@@ -388,10 +351,6 @@ export const notifications = pgTable(
 )
 
 // Relations
-export const rolesRelations = relations(roles, ({ many }) => ({
-  profileRoles: many(profileRoles),
-}))
-
 export const ownersRelations = relations(owners, ({ many, one }) => ({
   houses: many(houses),
   violations: many(violations),
@@ -429,19 +388,7 @@ export const profilesRelations = relations(profiles, ({ one, many }) => ({
     fields: [profiles.externalUserId],
     references: [externalUsers.id],
   }),
-  profileRoles: many(profileRoles),
   hoaBoardMemberships: many(hoaBoard),
-}))
-
-export const profileRolesRelations = relations(profileRoles, ({ one }) => ({
-  profile: one(profiles, {
-    fields: [profileRoles.profileId],
-    references: [profiles.id],
-  }),
-  role: one(roles, {
-    fields: [profileRoles.roleId],
-    references: [roles.id],
-  }),
 }))
 
 export const violationsRelations = relations(violations, ({ one }) => ({

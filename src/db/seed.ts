@@ -1,36 +1,10 @@
 import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from './index'
-import { externalUsers, profileRoles, profiles, roles, user } from './schema'
+import { externalUsers, profiles, user } from './schema'
 
 async function seed() {
   console.log('Seeding database...')
-  console.log('Creating roles...')
-
-  const rolesToInsert = [
-    {
-      name: 'admin',
-      description: 'Acceso completo al sistema',
-    },
-    {
-      name: 'president',
-      description: 'Gestión general y representación',
-    },
-    {
-      name: 'treasurer',
-      description: 'Gestión de ingresos y gastos',
-    },
-    {
-      name: 'maintainer',
-      description: 'Gestión del mantenimiento y reparaciones',
-    },
-    {
-      name: 'security',
-      description: 'Gestión de la seguridad y vigilancia',
-    },
-  ]
-
-  await db.insert(roles).values(rolesToInsert).onConflictDoNothing()
   console.log('Creating admin user...')
 
   // Check if admin user already exists
@@ -42,13 +16,13 @@ async function seed() {
     console.log('Admin user already exists')
     adminUserId = existingAdmin[0].id
   } else {
-    // Create admin user using better-auth API
+    // Create admin user using better-auth API with admin role
     const signUpResult = await auth.api.createUser({
       body: {
         email: 'admin@resido.com',
         password: 'admin123',
         name: 'Administrador Resido',
-        role: 'admin',
+        role: 'admin', // Role is managed by better-auth admin plugin
       },
     })
 
@@ -57,15 +31,14 @@ async function seed() {
     }
 
     adminUserId = signUpResult.user.id
+    console.log('Admin user created successfully')
   }
 
-  // Step 3: Create external user profile for admin
+  // Create external user profile for admin
   const existingProfile = await db.select().from(profiles).where(eq(profiles.userId, adminUserId)).limit(1)
 
-  let adminProfileId: string
-
   if (existingProfile.length === 0) {
-    // Create external user
+    // Create external user record
     const [adminExternalUser] = await db
       .insert(externalUsers)
       .values({
@@ -73,12 +46,12 @@ async function seed() {
         lastName: 'Resido',
         email: 'admin@resido.com',
         phone: '+528124135976', // fake number
-        notes: 'System administrator - Full access',
+        notes: 'System administrator - Full access to all sections',
       })
       .returning()
 
-    // Link to user profile
-    const [adminProfile] = await db
+    // Link user to profile
+    await db
       .insert(profiles)
       .values({
         userId: adminUserId,
@@ -88,37 +61,17 @@ async function seed() {
       })
       .returning()
 
-    adminProfileId = adminProfile.id
+    console.log('Admin profile created successfully')
   } else {
     console.log('Admin profile already exists')
-    adminProfileId = existingProfile[0].id
   }
 
-  const adminRole = await db.select().from(roles).where(eq(roles.name, 'admin')).limit(1)
-
-  if (adminRole.length > 0) {
-    const existingRole = await db
-      .select()
-      .from(profileRoles)
-      .where(eq(profileRoles.profileId, adminProfileId))
-      .limit(1)
-
-    if (existingRole.length === 0) {
-      console.log('Assigning admin role...')
-      await db.insert(profileRoles).values({
-        profileId: adminProfileId,
-        roleId: adminRole[0].id,
-      })
-    } else {
-      console.log('Admin role already assigned')
-    }
-  }
-
-  console.log('Database seeded successfully!')
-  console.log('\nAdmin credentials:')
-  console.log('Email: admin@resido.com')
-  console.log('Password: admin123')
-  console.log('\nAdvice: change the admin password after first login')
+  console.log('\n✅ Database seeded successfully!')
+  console.log('\n📋 Admin credentials:')
+  console.log('   Email: admin@resido.com')
+  console.log('   Password: admin123')
+  console.log('   Role: admin (full access)')
+  console.log('\n⚠️  IMPORTANT: Change the admin password after first login!')
 }
 
 seed()
