@@ -2,7 +2,6 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { profiles } from '@/db/schema'
-import type { ProfileWithRoles } from '@/db/schema/zod/profiles'
 import { authMiddleware } from '@/middleware/auth'
 
 export const getUserProfile = createServerFn()
@@ -15,13 +14,7 @@ export const getUserProfile = createServerFn()
         where: eq(profiles.userId, session.user.id),
         with: {
           user: true,
-          owner: true,
-          externalUser: true,
-          profileRoles: {
-            with: {
-              role: true,
-            },
-          },
+          resident: true,
         },
       })
 
@@ -29,9 +22,9 @@ export const getUserProfile = createServerFn()
         throw new Error('Profile not found')
       }
 
-      return profile satisfies ProfileWithRoles
+      return profile
     } catch (error) {
       console.error('Error fetching user profile:', error)
-      throw error
+      return null
     }
   })

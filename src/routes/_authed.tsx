@@ -1,17 +1,28 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { getServerSession } from '@/api/server-functions/session'
 import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import { AppHeader } from '@/components/app-header'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { authMiddleware } from '@/middleware/auth'
 
 export const Route = createFileRoute('/_authed')({
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
-    await context.queryClient.ensureQueryData(userProfileQueryOptions())
-  },
-  server: {
-    middleware: [authMiddleware],
+    const session = await getServerSession()
+
+    if (!session) {
+      context.queryClient.clear()
+      throw redirect({ to: '/login' })
+    }
+
+    const profile = await context.queryClient.ensureQueryData(userProfileQueryOptions())
+
+    if (!profile) {
+      context.queryClient.clear()
+      throw redirect({ to: '/login' })
+    }
+
+    return { profile }
   },
 })
 

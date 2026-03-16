@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from './index'
-import { externalUsers, profiles, user } from './schema'
+import { profiles, residents, user } from './schema'
 
 async function seed() {
   console.log('Seeding database...')
@@ -34,18 +34,19 @@ async function seed() {
     console.log('Admin user created successfully')
   }
 
-  // Create external user profile for admin
+  // Create resident profile for admin
   const existingProfile = await db.select().from(profiles).where(eq(profiles.userId, adminUserId)).limit(1)
 
   if (existingProfile.length === 0) {
-    // Create external user record
-    const [adminExternalUser] = await db
-      .insert(externalUsers)
+    // Create resident record (non-owner)
+    const [adminResident] = await db
+      .insert(residents)
       .values({
         firstName: 'Administrador',
         lastName: 'Resido',
         email: 'admin@resido.com',
         phone: '+528124135976', // fake number
+        isOwner: false,
         notes: 'System administrator - Full access to all sections',
       })
       .returning()
@@ -55,9 +56,7 @@ async function seed() {
       .insert(profiles)
       .values({
         userId: adminUserId,
-        profileType: 'external',
-        ownerId: null,
-        externalUserId: adminExternalUser.id,
+        residentId: adminResident.id,
       })
       .returning()
 

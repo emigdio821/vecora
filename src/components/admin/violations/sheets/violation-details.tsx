@@ -1,4 +1,5 @@
 import { IconFlag, IconUserHeart, IconWind } from '@tabler/icons-react'
+import type { ViolationQueryData } from '@/api/server-functions/violations'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { ViolationStatusBadge } from '@/components/shared/violations/status-badge'
 import { CopyButton } from '@/components/ui/copy-button'
@@ -13,11 +14,10 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ViolationWithOwner } from '@/db/schema/zod/violations'
 import { formatDate } from '@/lib/utils'
 
 interface ViolationDetailsSheetProps {
-  violation: ViolationWithOwner
+  violation: ViolationQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -68,29 +68,29 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
             }
           />
 
-          {/* Owner info */}
+          {/* Resident info */}
           <CollapsibleDetails
             title="Propietario"
             icon={IconUserHeart}
             content={
-              violation.owner ? (
+              violation.resident ? (
                 <div className="space-y-1">
                   <FramePanel className="flex items-center gap-2 p-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>
-                      <p className="text-muted-foreground text-sm">{`${violation.owner.firstName} ${violation.owner.lastName}`}</p>
+                      <p className="text-muted-foreground text-sm">{`${violation.resident.firstName} ${violation.resident.lastName}`}</p>
                     </div>
-                    <CopyButton tooltipText="Copiar ID" value={violation.owner.id} />
+                    <CopyButton tooltipText="Copiar ID" value={violation.resident.id} />
                   </FramePanel>
 
                   <FramePanel className="p-2">
                     <h2 className="font-medium text-sm">Correo</h2>
-                    <p className="text-muted-foreground text-sm">{violation.owner.email}</p>
+                    <p className="text-muted-foreground text-sm">{violation.resident.email}</p>
                   </FramePanel>
 
                   <FramePanel className="p-2">
                     <h2 className="font-medium text-sm">Teléfono</h2>
-                    <p className="text-muted-foreground text-sm">{violation.owner.phone}</p>
+                    <p className="text-muted-foreground text-sm">{violation.resident.phone}</p>
                   </FramePanel>
                 </div>
               ) : (

@@ -1,16 +1,16 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import type { PaymentQueryData } from '@/api/tanstack-queries/payments'
 import { PaymentStatusBadge } from '@/components/shared/payments/status-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { PaymentWithOwnerAndMonths } from '@/db/schema/zod/payments'
 import { getAllMonthsMap, getPaymentTypeLabel, normalizeString } from '@/lib/utils'
 import { PaymentsTableActions } from './actions'
 import { PaymentAmountCell } from './payment-amount-cell'
 
 const MONTHS = getAllMonthsMap()
 
-export const paymentsTableColumns: ColumnDef<PaymentWithOwnerAndMonths>[] = [
+export const paymentsTableColumns: ColumnDef<PaymentQueryData>[] = [
   {
     id: 'select',
     enablePinning: false,
@@ -41,8 +41,8 @@ export const paymentsTableColumns: ColumnDef<PaymentWithOwnerAndMonths>[] = [
     sortingFn: (rowA, rowB) => Number(rowA.original.amount) - Number(rowB.original.amount),
     cell: ({ row }) => <PaymentAmountCell payment={row.original} />,
     filterFn: (row, _, value: string) => {
-      const ownerFullName = row.original.owner
-        ? `${row.original.owner.firstName} ${row.original.owner.lastName}`
+      const ownerFullName = row.original.resident
+        ? `${row.original.resident.firstName} ${row.original.resident.lastName}`
         : ''
       const normalizedAmount = normalizeString(row.original.amount).toLowerCase()
       const normalizeOwnerFullName = normalizeString(ownerFullName).toLowerCase()
@@ -60,7 +60,7 @@ export const paymentsTableColumns: ColumnDef<PaymentWithOwnerAndMonths>[] = [
     size: 300,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Propietario" />,
     cell: ({ row }) => {
-      const owner = row.original.owner
+      const owner = row.original.resident
       return owner && <p className="truncate">{`${owner.firstName} ${owner.lastName}`}</p>
     },
   },

@@ -61,10 +61,9 @@ export function ProfilesSelector({
     const profilesItems = filteredProfiles.map((profile) => {
       let displayName = 'Sin nombre'
 
-      if (profile.profileType === 'owner' && profile.owner) {
-        displayName = `${profile.owner.firstName} ${profile.owner.lastName}`
-      } else if (profile.profileType === 'external' && profile.externalUser) {
-        displayName = `${profile.externalUser.firstName} ${profile.externalUser.lastName}`
+      // Get name from resident relation
+      if (profile.resident) {
+        displayName = `${profile.resident.firstName} ${profile.resident.lastName}`
       }
 
       return {

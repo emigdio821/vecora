@@ -3,9 +3,14 @@ import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { violations } from '@/db/schema'
-import type { InsertViolation, SelectViolation, ViolationWithOwner } from '@/db/schema/zod/violations'
+import type { SelectResident } from '@/db/schema/zod/residents'
+import type { SelectViolation } from '@/db/schema/zod/violations'
 import { authMiddleware } from '@/middleware/auth'
 import { createViolationSchema, deleteViolationSchema, updateViolationSchema } from '@/schemas/violations'
+
+export type ViolationQueryData = SelectViolation & {
+  resident: SelectResident | null
+}
 
 export const createViolation = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
@@ -22,7 +27,7 @@ export const createViolation = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return newViolation satisfies InsertViolation
+    return newViolation
   })
 
 export const updateViolation = createServerFn({ method: 'POST' })
@@ -49,7 +54,7 @@ export const updateViolation = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return updatedViolation satisfies SelectViolation
+    return updatedViolation
   })
 
 export const deleteViolation = createServerFn({ method: 'POST' })
@@ -75,18 +80,18 @@ export const deleteViolation = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return deletedViolation satisfies SelectViolation
+    return deletedViolation
   })
 
 export const getViolationsList = createServerFn()
   .middleware([authMiddleware])
-  .handler(async () => {
+  .handler(async (): Promise<ViolationQueryData[]> => {
     const allViolations = await db.query.violations.findMany({
       with: {
-        owner: true,
+        resident: true,
       },
       orderBy: (violations, { desc }) => [desc(violations.violationDate)],
     })
 
-    return allViolations satisfies ViolationWithOwner[]
+    return allViolations
   })

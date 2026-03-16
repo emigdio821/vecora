@@ -2,7 +2,7 @@ import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/i
 import { useState } from 'react'
 import { deleteHouse } from '@/api/server-functions/houses'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
+import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/api/tanstack-queries/houses'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,14 +14,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteHouseData } from '@/schemas/houses'
 import { EditHouseSheet } from '../sheets/edit-house'
 import { HouseDetailsSheet } from '../sheets/house-details'
 
 interface ActionsProps {
-  house: HouseWithOwner
+  house: HouseQueryData
 }
 
 export function HousesTableActions({ house }: ActionsProps) {

@@ -1,7 +1,7 @@
 import { IconSelector } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
-import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
+import { residentsListQueryOptions } from '@/api/tanstack-queries/residents'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
-interface OwnersSelectorProps {
+interface ResidentsSelectorProps {
   id?: string
   value?: string | null
   invalid?: boolean
@@ -22,10 +22,11 @@ interface OwnersSelectorProps {
   noneOptionLabel?: string
   includeNoneOption?: boolean
   excludeWithProfiles?: boolean
+  ownersOnly?: boolean
   onValueChange?: (value: string | null) => void
 }
 
-export function OwnersSelector({
+export function ResidentsSelector({
   id,
   value,
   onValueChange,
@@ -33,37 +34,42 @@ export function OwnersSelector({
   disabled = false,
   includeNoneOption = true,
   excludeWithProfiles = false,
+  ownersOnly = false,
   noneOptionLabel = 'Sin selección',
   placeholder = 'Selecciona una opción',
-}: OwnersSelectorProps) {
+}: ResidentsSelectorProps) {
   const [open, setOpen] = useState(false)
-  const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
+  const { data: residents = [], isLoading: isLoadingResidents } = useQuery(residentsListQueryOptions())
 
   const items = useMemo(() => {
-    let filteredOwners = owners
+    let filteredResidents = residents
 
     if (excludeWithProfiles) {
-      filteredOwners = owners.filter((owner) => !owner.profile)
+      filteredResidents = residents.filter((resident) => !resident.profile)
     }
 
-    const ownersItems = filteredOwners.map((owner) => ({
-      value: owner.id,
-      label: `${owner.firstName} ${owner.lastName}`,
+    if (ownersOnly) {
+      filteredResidents = filteredResidents.filter((resident) => resident.isOwner)
+    }
+
+    const residentsItems = filteredResidents.map((resident) => ({
+      value: resident.id,
+      label: `${resident.firstName} ${resident.lastName}`,
     }))
 
-    return ownersItems
-  }, [owners, excludeWithProfiles])
+    return residentsItems
+  }, [residents, excludeWithProfiles, ownersOnly])
 
-  function renderOwnerValue(value?: string | null) {
-    if (isLoadingOwners) return <span className="animate-pulse">Cargando datos...</span>
+  function renderResidentValue(value?: string | null) {
+    if (isLoadingResidents) return <span className="animate-pulse">Cargando datos...</span>
 
     if (items.length === 0) {
-      return <span className="text-muted-foreground">No hay propietarios disponibles</span>
+      return <span className="text-muted-foreground">No hay residentes disponibles</span>
     }
 
-    const owner = owners.find((owner) => owner.id === value)
-    return owner ? (
-      `${owner.firstName} ${owner.lastName}`
+    const resident = residents.find((resident) => resident.id === value)
+    return resident ? (
+      `${resident.firstName} ${resident.lastName}`
     ) : (
       <span className="text-muted-foreground">{placeholder}</span>
     )
@@ -78,11 +84,11 @@ export function OwnersSelector({
             role="combobox"
             variant="outline"
             aria-invalid={invalid}
-            aria-label="Combobox de propietarios"
+            aria-label="Combobox de residentes"
             disabled={items.length === 0 || disabled}
             className="w-full justify-between font-normal disabled:*:opacity-70"
           >
-            {renderOwnerValue(value)}
+            {renderResidentValue(value)}
             <IconSelector className="-me-1 text-muted-foreground" />
           </Button>
         }
@@ -108,18 +114,18 @@ export function OwnersSelector({
                   </CommandItem>
                 )}
 
-                {items.map((owner) => (
+                {items.map((resident) => (
                   <CommandItem
-                    key={owner.value}
-                    value={owner.value}
-                    data-checked={value === owner.value}
-                    keywords={[owner.label]}
+                    key={resident.value}
+                    value={resident.value}
+                    data-checked={value === resident.value}
+                    keywords={[resident.label]}
                     onSelect={(currentValue) => {
                       setOpen(false)
                       onValueChange?.(currentValue)
                     }}
                   >
-                    {owner.label}
+                    {resident.label}
                   </CommandItem>
                 ))}
               </CommandGroup>

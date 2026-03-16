@@ -1,4 +1,5 @@
 import { IconCurrencyDollar, IconUserHeart, IconWind } from '@tabler/icons-react'
+import type { PaymentQueryData } from '@/api/tanstack-queries/payments'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { PaymentStatusBadge } from '@/components/shared/payments/status-badge'
 import { Badge } from '@/components/ui/badge'
@@ -14,11 +15,10 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { PaymentWithOwnerAndMonths } from '@/db/schema/zod/payments'
 import { formatDate, getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
 
 interface PaymentDetailsSheetProps {
-  payment: PaymentWithOwnerAndMonths
+  payment: PaymentQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -106,24 +106,24 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
             title="Propietario"
             icon={IconUserHeart}
             content={
-              payment.owner ? (
+              payment.resident ? (
                 <div className="space-y-1">
                   <FramePanel className="flex items-center gap-2 p-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>
-                      <p className="text-muted-foreground text-sm">{`${payment.owner.firstName} ${payment.owner.lastName}`}</p>
+                      <p className="text-muted-foreground text-sm">{`${payment.resident.firstName} ${payment.resident.lastName}`}</p>
                     </div>
-                    <CopyButton tooltipText="Copiar ID" value={payment.owner.id} />
+                    <CopyButton tooltipText="Copiar ID" value={payment.resident.id} />
                   </FramePanel>
 
                   <FramePanel className="p-2">
                     <h2 className="font-medium text-sm">Correo</h2>
-                    <p className="text-muted-foreground text-sm">{payment.owner.email}</p>
+                    <p className="text-muted-foreground text-sm">{payment.resident.email}</p>
                   </FramePanel>
 
                   <FramePanel className="p-2">
                     <h2 className="font-medium text-sm">Teléfono</h2>
-                    <p className="text-muted-foreground text-sm">{payment.owner.phone}</p>
+                    <p className="text-muted-foreground text-sm">{payment.resident.phone}</p>
                   </FramePanel>
                 </div>
               ) : (

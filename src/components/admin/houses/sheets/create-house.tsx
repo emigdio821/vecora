@@ -5,7 +5,7 @@ import { createHouse } from '@/api/server-functions/houses'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
-import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
+import { ResidentsSelector } from '@/components/shared/selectors/residents-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -42,7 +42,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
       city: '',
       state: '',
       zipCode: '',
-      ownerId: null,
+      residentId: null,
     },
   })
 
@@ -171,12 +171,12 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
             />
 
             <Controller
-              name="ownerId"
+              name="residentId"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Propietario</FieldLabel>
-                  <OwnersSelector
+                  <ResidentsSelector
                     id={field.name}
                     value={field.value}
                     invalid={fieldState.invalid}

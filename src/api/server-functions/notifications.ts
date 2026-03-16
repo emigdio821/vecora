@@ -3,7 +3,6 @@ import { eq, gt, isNull, or } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { notifications, profiles } from '@/db/schema'
-import type { NotificationWithRelations, SelectNotification } from '@/db/schema/zod/notifications'
 import { authMiddleware } from '@/middleware/auth'
 import {
   createNotificationSchema,
@@ -20,17 +19,13 @@ export const getNotificationsList = createServerFn()
         profile: {
           with: {
             user: true,
-            profileRoles: {
-              with: {
-                role: true,
-              },
-            },
           },
         },
       },
       orderBy: (notifications, { desc }) => [desc(notifications.createdAt)],
     })
-    return userNotifications satisfies NotificationWithRelations[]
+
+    return userNotifications
   })
 
 export const getMyNotificationsList = createServerFn()
@@ -44,17 +39,13 @@ export const getMyNotificationsList = createServerFn()
         profile: {
           with: {
             user: true,
-            profileRoles: {
-              with: {
-                role: true,
-              },
-            },
           },
         },
       },
       orderBy: (notifications, { desc }) => [desc(notifications.createdAt)],
     })
-    return myNotifications satisfies NotificationWithRelations[]
+
+    return myNotifications
   })
 
 export const createNotification = createServerFn({ method: 'POST' })
@@ -89,7 +80,7 @@ export const createNotification = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return newNotification satisfies SelectNotification
+    return newNotification
   })
 
 export const updateNotification = createServerFn({ method: 'POST' })
@@ -134,7 +125,7 @@ export const updateNotification = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return updatedNotification satisfies SelectNotification
+    return updatedNotification
   })
 
 export const deleteNotification = createServerFn({ method: 'POST' })
@@ -174,5 +165,5 @@ export const deleteNotification = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return deletedNotifications satisfies SelectNotification[]
+    return deletedNotifications
   })

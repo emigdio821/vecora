@@ -1,13 +1,13 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import type { ViolationQueryData } from '@/api/server-functions/violations'
 import { ViolationStatusBadge } from '@/components/shared/violations/status-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { ViolationWithOwner } from '@/db/schema/zod/violations'
 import { formatDate, normalizeString } from '@/lib/utils'
 import { ViolationsTableActions } from './actions'
 import { ViolationConceptCell } from './violation-concept-cell'
 
-export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
+export const violationsTableColumns: ColumnDef<ViolationQueryData>[] = [
   {
     id: 'select',
     enablePinning: false,
@@ -37,8 +37,8 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
     header: ({ column }) => <DataTableSortableHeader column={column} title="Concepto" />,
     cell: ({ row }) => <ViolationConceptCell violation={row.original} />,
     filterFn: (row, _, value: string) => {
-      const ownerFullName = row.original.owner
-        ? `${row.original.owner.firstName} ${row.original.owner.lastName}`
+      const ownerFullName = row.original.resident
+        ? `${row.original.resident.firstName} ${row.original.resident.lastName}`
         : ''
       const normalizedConcept = normalizeString(row.original.concept).toLowerCase()
       const normalizeOwnerFullName = normalizeString(ownerFullName).toLowerCase()
@@ -56,7 +56,7 @@ export const violationsTableColumns: ColumnDef<ViolationWithOwner>[] = [
     size: 280,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Propietario" />,
     cell: ({ row }) => {
-      const owner = row.original.owner
+      const owner = row.original.resident
       return owner && <p className="truncate">{`${owner.firstName} ${owner.lastName}`}</p>
     },
   },

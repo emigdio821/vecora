@@ -4,12 +4,10 @@ import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
+import { RESIDENTS_QUERY_KEY } from '@/api/tanstack-queries/residents'
 import { LoaderIcon } from '@/components/icons'
-import { ExternalUsersSelector } from '@/components/shared/selectors/external-users-selector'
-import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
-import { ProfileTypeSelector } from '@/components/shared/selectors/profile-type-selector'
+import { ResidentsSelector } from '@/components/shared/selectors/residents-selector'
 import { RolesSelector } from '@/components/shared/selectors/roles-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -24,7 +22,6 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ProfileType } from '@/db/schema/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type CreateProfileFormData, createProfileSchema } from '@/schemas/profiles'
 
@@ -44,10 +41,8 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
     resolver: zodResolver(createProfileSchema),
     defaultValues: {
       password: '',
-      profileType: 'owner',
-      ownerId: null,
-      externalUserId: null,
-      roleIds: [],
+      residentId: '',
+      role: 'resident',
     },
   })
 
@@ -55,7 +50,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
     mutationFn: async (data: CreateProfileFormData) => {
       return await createProfile({ data })
     },
-    invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, OWNERS_QUERY_KEY],
+    invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, RESIDENTS_QUERY_KEY],
     successTitle: 'Perfil creado',
     successDescription: 'El perfil ha sido creado exitosamente.',
     errorDescription: 'Ocurrió un error al crear el perfil, intenta nuevamente.',
@@ -73,8 +68,6 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
     onOpenChange(open)
   }
 
-  const profileType = form.watch('profileType', 'owner')
-
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent side="right">
@@ -91,24 +84,27 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <Controller
-              name="profileType"
+              name="residentId"
               control={form.control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor={field.name}>Tipo de perfil</FieldLabel>
-                  <ProfileTypeSelector
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Propietario <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <ResidentsSelector
                     id={field.name}
                     value={field.value}
-                    includeNoneOption={false}
                     onValueChange={(value) => {
-                      field.onChange(value as ProfileType)
-                      form.setValue('ownerId', null)
-                      form.setValue('externalUserId', null)
+                      field.onChange(value)
                     }}
                     disabled={createProfileMutation.isPending}
+                    invalid={fieldState.invalid}
+                    includeNoneOption={false}
+                    excludeWithProfiles
                   />
+
                   <FieldDescription>
-                    Si el propietario o usuario externo no está listado, tienes que crear un{' '}
+                    Si el residente no está listado, puedes{' '}
                     <Button
                       nativeButton={false}
                       variant="link"
@@ -116,96 +112,21 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                         <Link
                           to="/admin/residential"
                           search={{
-                            tab: 'owners',
+                            tab: 'residents',
                           }}
                         >
-                          propietario
+                          crearlo
                         </Link>
                       }
                     />{' '}
-                    o{' '}
-                    <Button
-                      nativeButton={false}
-                      variant="link"
-                      render={
-                        <Link
-                          onClick={() => onOpenChange(false)}
-                          to="."
-                          search={{
-                            tab: 'external-users',
-                          }}
-                        >
-                          usuario externo
-                        </Link>
-                      }
-                    />
-                    , y después venir a vincularlo aquí.
+                    , y regresar a vincularlo aquí.
                   </FieldDescription>
-                  {/* {fieldState.invalid && <FieldError errors={[fieldState.error]} />} */}
+
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
 
-            <div className="space-y-2">
-              {profileType === 'owner' && (
-                <Controller
-                  name="ownerId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Propietario <span className="text-destructive">*</span>
-                      </FieldLabel>
-                      <OwnersSelector
-                        id={field.name}
-                        value={field.value}
-                        onValueChange={(value) => {
-                          form.setValue('externalUserId', null)
-                          form.setValue('ownerId', value)
-                          field.onChange(value)
-                        }}
-                        disabled={createProfileMutation.isPending}
-                        invalid={fieldState.invalid || !!form.formState.errors.profileType}
-                        includeNoneOption={false}
-                        excludeWithProfiles
-                      />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  )}
-                />
-              )}
-
-              {profileType === 'external' && (
-                <Controller
-                  name="externalUserId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Usuario Externo <span className="text-destructive">*</span>
-                      </FieldLabel>
-                      <ExternalUsersSelector
-                        id={field.name}
-                        value={field.value}
-                        onValueChange={(value) => {
-                          form.setValue('ownerId', null)
-                          form.setValue('externalUserId', value)
-                          field.onChange(value)
-                        }}
-                        disabled={createProfileMutation.isPending}
-                        invalid={fieldState.invalid || !!form.formState.errors.profileType}
-                        includeNoneOption={false}
-                      />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  )}
-                />
-              )}
-
-              {form.formState.errors.profileType && (
-                <FieldError errors={[form.formState.errors.profileType]} />
-              )}
-            </div>
             <Controller
               name="password"
               control={form.control}
@@ -227,7 +148,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
             />
 
             <Controller
-              name="roleIds"
+              name="role"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>

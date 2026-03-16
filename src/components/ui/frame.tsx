@@ -57,4 +57,4 @@ function FrameFooter({ className, ...props }: React.ComponentProps<'footer'>) {
   return <footer className={cn('px-5 py-4', className)} data-slot="frame-panel-footer" {...props} />
 }
 
-export { Frame, FramePanel, FrameHeader, FrameTitle, FrameDescription, FrameFooter }
+export { Frame, FrameDescription, FrameFooter, FrameHeader, FramePanel, FrameTitle }

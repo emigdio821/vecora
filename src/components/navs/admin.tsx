@@ -1,6 +1,5 @@
 import { IconHomeShield, IconLogs, IconUsersGroup } from '@tabler/icons-react'
-import { Link, useLocation } from '@tanstack/react-router'
-import { useUserRoles } from '@/hooks/use-user-roles'
+import { Link, useLocation, useRouteContext } from '@tanstack/react-router'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -15,10 +14,9 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
   const location = useLocation()
   const { pathname } = location
   const { setOpenMobile } = useSidebar()
+  const { profile } = useRouteContext({ from: '/_authed' })
 
-  const { isAdmin, isLoading } = useUserRoles()
-
-  if (isLoading || !isAdmin) {
+  if (!profile || profile.user.role !== 'admin') {
     return null
   }
 

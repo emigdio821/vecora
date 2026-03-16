@@ -68,8 +68,8 @@ function PopoverClose({ ...props }: PopoverPrimitive.Close.Props) {
 
 export {
   Popover,
-  PopoverContent,
   PopoverClose,
+  PopoverContent,
   PopoverDescription,
   PopoverHeader,
   PopoverTitle,

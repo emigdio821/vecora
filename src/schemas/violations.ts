@@ -3,7 +3,7 @@ import { violationStatusSchema } from '@/db/schema/zod/violations'
 import { requiredAmountSchema } from './shared'
 
 export const createViolationSchema = z.object({
-  ownerId: z.uuid('ID de propietario inválido').min(1, 'El propietario es requerido'),
+  residentId: z.uuid('ID de propietario inválido').min(1, 'El propietario es requerido'),
   concept: z.string().min(1, 'El concepto es requerido').max(200, 'El concepto es muy largo'),
   amount: requiredAmountSchema,
   violationDate: z.date('La fecha de infracción es requerida'),
@@ -14,7 +14,7 @@ export type CreateViolationFormData = z.infer<typeof createViolationSchema>
 
 export const updateViolationSchema = z.object({
   violationId: z.uuid('ID de infracción inválido'),
-  ownerId: z.uuid('ID de propietario inválido').min(1, 'El propietario es requerido'),
+  residentId: z.uuid('ID de propietario inválido').min(1, 'El propietario es requerido'),
   concept: z.string().min(1, 'El concepto es requerido').max(200, 'El concepto es muy largo'),
   amount: requiredAmountSchema,
   violationDate: z.date('La fecha de infracción es requerida'),

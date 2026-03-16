@@ -269,7 +269,7 @@ export function PaymentsChart() {
                   {paymentStats.pendingPayments.map((payment) => (
                     <Card key={payment.id} className="rounded-sm">
                       <CardHeader className="gap-0 px-2.5 py-2">
-                        <CardTitle className="text-sm">{`${payment.owner?.firstName} ${payment.owner?.lastName}`}</CardTitle>
+                        <CardTitle className="text-sm">{`${payment.resident?.firstName} ${payment.resident?.lastName}`}</CardTitle>
                         <CardDescription className="text-sm">{payment.concept}</CardDescription>
                         <CardAction>
                           <span className="font-medium text-sm">${Number(payment.amount).toFixed(2)}</span>

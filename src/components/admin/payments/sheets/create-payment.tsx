@@ -4,10 +4,10 @@ import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createPayment } from '@/api/server-functions/payments'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { OWNERS_QUERY_KEY } from '@/api/tanstack-queries/owners'
 import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
+import { RESIDENTS_QUERY_KEY } from '@/api/tanstack-queries/residents'
 import { LoaderIcon } from '@/components/icons'
-import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
+import { ResidentsSelector } from '@/components/shared/selectors/residents-selector'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -56,7 +56,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
     shouldUnregister: true,
     resolver: zodResolver(createPaymentSchema),
     defaultValues: {
-      ownerId: '',
+      residentId: '',
       concept: '',
       amount: '0',
       paymentType: 'monthly_fee',
@@ -80,7 +80,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
     mutationFn: async (data: CreatePaymentFormData) => {
       return await createPayment({ data })
     },
-    invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, OWNERS_QUERY_KEY],
+    invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, RESIDENTS_QUERY_KEY],
     successTitle: 'Pago creado',
     successDescription: 'El pago ha sido creado exitosamente.',
     errorDescription: 'Ocurrió un error al crear el pago, intenta nuevamente.',
@@ -160,14 +160,14 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
             />
 
             <Controller
-              name="ownerId"
+              name="residentId"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Propietario <span className="text-destructive">*</span>
                   </FieldLabel>
-                  <OwnersSelector
+                  <ResidentsSelector
                     id={field.name}
                     value={field.value}
                     onValueChange={field.onChange}

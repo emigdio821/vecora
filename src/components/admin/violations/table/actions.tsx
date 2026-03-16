@@ -1,6 +1,6 @@
 import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
-import { deleteViolation } from '@/api/server-functions/violations'
+import { deleteViolation, type ViolationQueryData } from '@/api/server-functions/violations'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
@@ -14,14 +14,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { ViolationWithOwner } from '@/db/schema/zod/violations'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { DeleteViolationData } from '@/schemas/violations'
 import { EditViolationSheet } from '../sheets/edit-violation'
 import { ViolationDetailsSheet } from '../sheets/violation-details'
 
 interface ActionsProps {
-  violation: ViolationWithOwner
+  violation: ViolationQueryData
 }
 
 export function ViolationsTableActions({ violation }: ActionsProps) {

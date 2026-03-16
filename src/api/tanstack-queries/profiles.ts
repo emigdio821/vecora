@@ -1,18 +1,20 @@
 import { queryOptions } from '@tanstack/react-query'
-import { getProfilesList, getRolesList } from '../server-functions/profiles'
+import type { SelectHoaBoard } from '@/db/schema/zod/hoa-board'
+import type { SelectProfile } from '@/db/schema/zod/profiles'
+import type { SelectResident } from '@/db/schema/zod/residents'
+import type { SelectUser } from '@/db/schema/zod/users'
+import { getProfilesList } from '../server-functions/profiles'
 
 export const PROFILES_QUERY_KEY = 'profiles'
-export const ROLES_QUERY_KEY = 'profile-roles'
+
+export type ProfileQueryData = SelectProfile & {
+  user: SelectUser
+  resident: SelectResident
+  hoaBoardMemberships: SelectHoaBoard[]
+}
 
 export const profilesListQueryOptions = () =>
   queryOptions({
     queryKey: [PROFILES_QUERY_KEY],
-    queryFn: async () => await getProfilesList(),
-  })
-
-export const profileRolesListQueryOptions = () =>
-  queryOptions({
-    queryKey: [ROLES_QUERY_KEY],
-    queryFn: async () => await getRolesList(),
-    staleTime: Number.POSITIVE_INFINITY,
+    queryFn: async (): Promise<ProfileQueryData[]> => await getProfilesList(),
   })

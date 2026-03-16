@@ -3,11 +3,9 @@ import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
+import { PROFILES_QUERY_KEY, type ProfileQueryData } from '@/api/tanstack-queries/profiles'
 import { LoaderIcon } from '@/components/icons'
-import { ExternalUsersSelector } from '@/components/shared/selectors/external-users-selector'
-import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
-import { ProfileTypeSelector } from '@/components/shared/selectors/profile-type-selector'
+import { ResidentsSelector } from '@/components/shared/selectors/residents-selector'
 import { RolesSelector } from '@/components/shared/selectors/roles-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -22,12 +20,12 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ProfileType, ProfileWithAllRelations } from '@/db/schema/zod/profiles'
+import type { ProfileRole } from '@/db/schema/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateProfileFormData, updateProfileSchema } from '@/schemas/profiles'
 
 interface EditProfileSheetProps {
-  profile: ProfileWithAllRelations
+  profile: ProfileQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -44,10 +42,8 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
       password: '',
       profileId: profile.id,
       userId: profile.userId,
-      profileType: profile.profileType,
-      ownerId: profile.ownerId,
-      externalUserId: profile.externalUserId,
-      roleIds: profile.profileRoles.map((pr) => pr.roleId),
+      residentId: profile.residentId,
+      role: (profile.user.role as ProfileRole) || 'resident',
     },
   })
 
@@ -73,8 +69,6 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
     onOpenChange(open)
   }
 
-  const profileType = form.watch('profileType', profile.profileType || 'owner')
-
   return (
     <Sheet
       open={isOpen}
@@ -97,86 +91,27 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <Controller
-              name="profileType"
+              name="residentId"
               control={form.control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor={field.name}>Tipo de perfil</FieldLabel>
-                  <ProfileTypeSelector
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Propietario <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <ResidentsSelector
                     id={field.name}
                     value={field.value}
-                    includeNoneOption={false}
                     onValueChange={(value) => {
-                      field.onChange(value as ProfileType)
-                      form.setValue('ownerId', null)
-                      form.setValue('externalUserId', null)
+                      field.onChange(value)
                     }}
                     disabled={updateProfileMutation.isPending}
+                    invalid={fieldState.invalid}
+                    includeNoneOption={false}
                   />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
-
-            <div className="space-y-2">
-              {profileType === 'owner' && (
-                <Controller
-                  name="ownerId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Propietario <span className="text-destructive">*</span>
-                      </FieldLabel>
-                      <OwnersSelector
-                        id={field.name}
-                        value={field.value}
-                        onValueChange={(value) => {
-                          form.setValue('externalUserId', null)
-                          form.setValue('ownerId', value)
-                          field.onChange(value)
-                        }}
-                        disabled={updateProfileMutation.isPending}
-                        invalid={fieldState.invalid || !!form.formState.errors.profileType}
-                        includeNoneOption={false}
-                      />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  )}
-                />
-              )}
-
-              {profileType === 'external' && (
-                <Controller
-                  name="externalUserId"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Usuario Externo <span className="text-destructive">*</span>
-                      </FieldLabel>
-                      <ExternalUsersSelector
-                        id={field.name}
-                        value={field.value}
-                        onValueChange={(value) => {
-                          form.setValue('ownerId', null)
-                          form.setValue('externalUserId', value)
-                          field.onChange(value)
-                        }}
-                        disabled={updateProfileMutation.isPending}
-                        invalid={fieldState.invalid || !!form.formState.errors.profileType}
-                        includeNoneOption={false}
-                      />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  )}
-                />
-              )}
-
-              {form.formState.errors.profileType && (
-                <FieldError errors={[form.formState.errors.profileType]} />
-              )}
-            </div>
-
             <Controller
               name="password"
               control={form.control}
@@ -197,7 +132,7 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
             />
 
             <Controller
-              name="roleIds"
+              name="role"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
@@ -210,7 +145,7 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
                     invalid={fieldState.invalid}
                     value={field.value[0] || null}
                     disabled={updateProfileMutation.isPending}
-                    onValueChange={(value) => field.onChange([value])}
+                    onValueChange={(value) => field.onChange(value)}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>

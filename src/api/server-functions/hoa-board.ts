@@ -3,12 +3,7 @@ import { and, eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { hoaBoard, hoaBoardPeriods } from '@/db/schema'
-import type {
-  HoaBoardMember,
-  HoaBoardPeriodWithMembers,
-  SelectHoaBoard,
-  SelectHoaBoardPeriod,
-} from '@/db/schema/zod/hoa-board'
+import type { SelectHoaBoard } from '@/db/schema/zod/hoa-board'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import {
@@ -32,11 +27,7 @@ export const getHoaBoardPeriods = createServerFn()
             period: true,
             profile: {
               with: {
-                profileRoles: {
-                  with: {
-                    role: true,
-                  },
-                },
+                user: true,
               },
             },
           },
@@ -45,7 +36,7 @@ export const getHoaBoardPeriods = createServerFn()
       orderBy: (period, { desc }) => [desc(period.startDate)],
     })
 
-    return periods satisfies HoaBoardPeriodWithMembers[]
+    return periods
   })
 
 export const getCurrentHoaBoardMembers = createServerFn()
@@ -71,17 +62,13 @@ export const getCurrentHoaBoardMembers = createServerFn()
         period: true,
         profile: {
           with: {
-            profileRoles: {
-              with: {
-                role: true,
-              },
-            },
+            user: true,
           },
         },
       },
     })
 
-    return members satisfies HoaBoardMember[]
+    return members
   })
 
 export const createHoaBoardPeriod = createServerFn({ method: 'POST' })
@@ -117,7 +104,7 @@ export const createHoaBoardPeriod = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return newPeriod satisfies SelectHoaBoardPeriod
+    return newPeriod
   })
 
 export const updateHoaBoardPeriod = createServerFn({ method: 'POST' })
@@ -168,7 +155,7 @@ export const updateHoaBoardPeriod = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return updatedPeriod satisfies SelectHoaBoardPeriod
+    return updatedPeriod
   })
 
 export const createHoaBoardMember = createServerFn({ method: 'POST' })
@@ -178,33 +165,16 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
     const profile = await db.query.profiles.findFirst({
       where: (profiles, { eq }) => eq(profiles.id, data.profileId),
       with: {
-        owner: true,
-        externalUser: true,
+        resident: true,
+        user: true,
       },
     })
 
-    if (!profile) {
-      throw new Error('Profile not found')
+    if (!profile || !profile.resident) {
+      throw new Error('Profile or resident not found')
     }
 
-    let firstName: string
-    let lastName: string
-    let email: string
-    let phone: string
-
-    if (profile.profileType === 'owner' && profile.owner) {
-      firstName = profile.owner.firstName
-      lastName = profile.owner.lastName
-      email = profile.owner.email
-      phone = profile.owner.phone || ''
-    } else if (profile.profileType === 'external' && profile.externalUser) {
-      firstName = profile.externalUser.firstName
-      lastName = profile.externalUser.lastName
-      email = profile.externalUser.email
-      phone = profile.externalUser.phone || ''
-    } else {
-      throw new Error('Could not determine profile information')
-    }
+    const { firstName, lastName, email, phone, isOwner } = profile.resident
 
     // Check if a soft-deleted member already exists for this profile and period
     const [existingMember] = await db
@@ -225,7 +195,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
           lastName,
           email,
           phone,
-          profileType: profile.profileType,
+          isOwner,
         })
         .where(eq(hoaBoard.id, existingMember.id))
         .returning()
@@ -255,7 +225,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
           lastName,
           email,
           phone,
-          profileType: profile.profileType,
+          isOwner,
         })
         .returning()
 
@@ -271,7 +241,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
       }).catch(console.error)
     }
 
-    return member satisfies SelectHoaBoard
+    return member
   })
 
 export const updateHoaBoardMember = createServerFn({ method: 'POST' })
@@ -283,33 +253,15 @@ export const updateHoaBoardMember = createServerFn({ method: 'POST' })
     const profile = await db.query.profiles.findFirst({
       where: (profiles, { eq }) => eq(profiles.id, updateData.profileId),
       with: {
-        owner: true,
-        externalUser: true,
+        resident: true,
       },
     })
 
-    if (!profile) {
-      throw new Error('Profile not found')
+    if (!profile || !profile.resident) {
+      throw new Error('Profile or resident not found')
     }
 
-    let firstName: string
-    let lastName: string
-    let email: string
-    let phone: string
-
-    if (profile.profileType === 'owner' && profile.owner) {
-      firstName = profile.owner.firstName
-      lastName = profile.owner.lastName
-      email = profile.owner.email
-      phone = profile.owner.phone || ''
-    } else if (profile.profileType === 'external' && profile.externalUser) {
-      firstName = profile.externalUser.firstName
-      lastName = profile.externalUser.lastName
-      email = profile.externalUser.email
-      phone = profile.externalUser.phone || ''
-    } else {
-      throw new Error('Could not determine profile information')
-    }
+    const { firstName, lastName, email, phone, isOwner } = profile.resident
 
     const [oldMember] = await db.select().from(hoaBoard).where(eq(hoaBoard.id, memberId)).limit(1)
 
@@ -322,7 +274,7 @@ export const updateHoaBoardMember = createServerFn({ method: 'POST' })
         lastName,
         email,
         phone,
-        profileType: profile.profileType,
+        isOwner,
       })
       .where(eq(hoaBoard.id, memberId))
       .returning()
@@ -337,7 +289,7 @@ export const updateHoaBoardMember = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return updatedMember satisfies SelectHoaBoard
+    return updatedMember
   })
 
 export const deleteHoaBoardMember = createServerFn({ method: 'POST' })
@@ -362,7 +314,7 @@ export const deleteHoaBoardMember = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return memberToDelete satisfies SelectHoaBoard
+    return memberToDelete
   })
 
 export const deleteHoaBoardPeriod = createServerFn({ method: 'POST' })
@@ -398,5 +350,5 @@ export const deleteHoaBoardPeriod = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return periodToDelete satisfies SelectHoaBoardPeriod
+    return periodToDelete
   })

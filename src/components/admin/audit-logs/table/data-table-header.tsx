@@ -2,6 +2,7 @@ import { IconFileExport, IconInfoCircle, IconSearch } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
+import type { AuditLogQueryData } from '@/api/tanstack-queries/audit-logs'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
@@ -15,11 +16,10 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { AuditLogWithUserAndProfile } from '@/db/schema/zod/audit-logs'
 import { STARTING_YEAR } from '@/lib/constants'
 
 interface AuditLogsDataTableHeaderProps {
-  table: Table<AuditLogWithUserAndProfile>
+  table: Table<AuditLogQueryData>
 }
 
 export interface YearFacetedFilterOption {

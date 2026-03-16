@@ -1,7 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import { paymentMonths, paymentStatusEnum, payments, paymentTypeEnum } from '..'
-import type { SelectOwner } from './owners'
 
 export const insertPaymentSchema = createInsertSchema(payments)
 export const selectPaymentSchema = createSelectSchema(payments)
@@ -18,13 +17,3 @@ export type InsertPaymentMonth = z.infer<typeof insertPaymentMonthSchema>
 export type SelectPaymentMonth = z.infer<typeof selectPaymentMonthSchema>
 export type PaymentStatus = z.infer<typeof paymentStatusSchema>
 export type PaymentType = z.infer<typeof paymentTypeSchema>
-
-// Type for payments with owner and months relations included
-export type PaymentWithOwnerAndMonths = SelectPayment & {
-  owner: SelectOwner | null
-  paymentMonths: SelectPaymentMonth[]
-}
-
-export type PaymentWithMonths = SelectPayment & {
-  paymentMonths: SelectPaymentMonth[]
-}

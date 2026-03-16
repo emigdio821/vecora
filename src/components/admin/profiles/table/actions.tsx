@@ -11,7 +11,7 @@ import { Link, type LinkProps } from '@tanstack/react-router'
 import { useState } from 'react'
 import { banProfile, deleteProfile, unbanProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
+import { PROFILES_QUERY_KEY, type ProfileQueryData } from '@/api/tanstack-queries/profiles'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
@@ -25,14 +25,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import type { BanProfileData, DeleteProfileData, UnbanProfileData } from '@/schemas/profiles'
 import { EditProfileSheet } from '../sheets/edit-profile'
 import { ProfileDetailsSheet } from '../sheets/profile-details'
 
 interface ActionsProps {
-  profile: ProfileWithAllRelations
+  profile: ProfileQueryData
 }
 
 export function ProfilesTableActions({ profile }: ActionsProps) {
@@ -95,22 +94,13 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
   }
 
   function getLinkedUserNavigation(): LinkProps {
-    const owner = profile.owner
-    const externalUser = profile.externalUser
+    const resident = profile.resident
 
-    if (profile.profileType === 'owner' && owner) {
-      const ownerFullName = `${owner.firstName} ${owner.lastName}`
-      return {
-        to: '/admin/residential' as const,
-        search: { tab: 'owners', 'search-owners': ownerFullName },
-      }
-    }
-
-    if (profile.profileType === 'external' && externalUser) {
-      const externalUserFullName = `${externalUser.firstName} ${externalUser.lastName}`
+    if (resident) {
+      const residentName = `${resident.firstName} ${resident.lastName}`
       return {
         to: '/admin/users' as const,
-        search: { tab: 'external-users', 'search-external-users': externalUserFullName },
+        search: { tab: 'residents', 'search-residents': residentName },
       }
     }
 

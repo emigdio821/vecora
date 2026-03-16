@@ -8,14 +8,12 @@ interface AuditLogEntityTypeBadgeProps extends BadgeProps {
 export function AuditLogEntityTypeBadge({ entityType, ...badgeProps }: AuditLogEntityTypeBadgeProps) {
   function getTypeLabel(type: AuditLogEntityType) {
     switch (type) {
-      case 'owner':
-        return 'Propietario'
+      case 'resident':
+        return 'Residente'
       case 'house':
         return 'Casa'
       case 'violation':
         return 'Infracción'
-      case 'external_user':
-        return 'Usuario externo'
       case 'payment':
         return 'Pago'
       case 'profile':

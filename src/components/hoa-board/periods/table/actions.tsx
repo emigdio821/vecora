@@ -1,8 +1,13 @@
 import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/icons-react'
+import { useRouteContext } from '@tanstack/react-router'
 import { useState } from 'react'
 import { deleteHoaBoardPeriod } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOA_BOARD_MEMBERS_QUERY_KEY, HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
+import {
+  HOA_BOARD_MEMBERS_QUERY_KEY,
+  HOA_BOARD_PERIODS_QUERY_KEY,
+  type HoaBoardPeriodQueryData,
+} from '@/api/tanstack-queries/hoa-board'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,16 +19,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { HoaBoardPeriodWithMembers } from '@/db/schema/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
-import { useUserRoles } from '@/hooks/use-user-roles'
 import { formatDate } from '@/lib/utils'
 import type { DeleteHoaBoardPeriodData } from '@/schemas/hoa-board'
 import { EditHoaPeriodSheet } from '../sheets/edit-period'
 import { HoaPeriodDetailsSheet } from '../sheets/period-details'
 
 interface ActionsProps {
-  period: HoaBoardPeriodWithMembers
+  period: HoaBoardPeriodQueryData
 }
 
 export function HoaPeriodsTableActions({ period }: ActionsProps) {
@@ -31,7 +34,7 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
   const [isEditPeriodSheetOpen, setEditPeriodSheetOpen] = useState(false)
   const [isMemberDetailsSheetOpen, setMemberDetailsSheetOpen] = useState(false)
 
-  const { isAdmin } = useUserRoles()
+  const { profile } = useRouteContext({ from: '/_authed' })
 
   const deletePeriodMutation = useEntityMutation({
     mutationFn: async (data: DeleteHoaBoardPeriodData) => {
@@ -52,7 +55,7 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
 
   return (
     <>
-      {isAdmin && (
+      {profile.user.role === 'admin' && (
         <>
           <AlertDialogGeneric
             state={{
@@ -110,7 +113,7 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
                 Editar
               </DropdownMenuItem>
 
-              {isAdmin && (
+              {profile.user.role === 'admin' && (
                 <>
                   <DropdownMenuSeparator />
 

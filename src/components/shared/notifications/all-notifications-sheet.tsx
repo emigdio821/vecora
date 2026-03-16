@@ -1,6 +1,9 @@
 import { IconCalendarOff, IconCalendarWeek, IconUser } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
-import { notificationsListQueryOptions } from '@/api/tanstack-queries/notifications'
+import {
+  type NotificationQueryData,
+  notificationsListQueryOptions,
+} from '@/api/tanstack-queries/notifications'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -11,7 +14,6 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { NotificationWithRelations } from '@/db/schema/zod/notifications'
 import { formatDate } from '@/lib/utils'
 import { RoleNameBadge } from '../role-name-badge'
 
@@ -26,21 +28,19 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
   const { isOpen, onOpenChange } = state
   const { data: notifications = [] } = useQuery(notificationsListQueryOptions())
 
-  function getProfileName(notification: NotificationWithRelations) {
+  function getProfileName(notification: NotificationQueryData) {
     const profile = notification.profile
     return profile?.user?.name ?? 'Sistema'
   }
 
-  function renderRoles(notification: NotificationWithRelations) {
+  function renderRoles(notification: NotificationQueryData) {
     const profile = notification.profile
 
-    if (!profile) return <Badge variant="outline">Administración</Badge>
+    if (!profile || !profile.user.role) return <Badge variant="outline">Administración</Badge>
 
     return (
       <div className="flex flex-wrap gap-1">
-        {profile?.profileRoles.map(({ role }) => (
-          <RoleNameBadge className="text-xs" key={role.id} roleName={role.name} />
-        ))}
+        <RoleNameBadge className="text-xs" roleName={profile.user.role} />
       </div>
     )
   }

@@ -3,9 +3,9 @@ import { IconSelector } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { updateViolation } from '@/api/server-functions/violations'
+import { updateViolation, type ViolationQueryData } from '@/api/server-functions/violations'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
+import { residentsListQueryOptions } from '@/api/tanstack-queries/residents'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
@@ -32,17 +32,13 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  type ViolationStatus,
-  type ViolationWithOwner,
-  violationStatusSchema,
-} from '@/db/schema/zod/violations'
+import { type ViolationStatus, violationStatusSchema } from '@/db/schema/zod/violations'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate } from '@/lib/utils'
 import { type UpdateViolationFormData, updateViolationSchema } from '@/schemas/violations'
 
 interface EditViolationSheetProps {
-  violation: ViolationWithOwner
+  violation: ViolationQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -53,13 +49,13 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
   const editViolationFormId = useId()
   const { isOpen, onOpenChange } = state
 
-  const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
+  const { data: owners = [], isLoading: isLoadingOwners } = useQuery(residentsListQueryOptions())
 
   const form = useForm<UpdateViolationFormData>({
     resolver: zodResolver(updateViolationSchema),
     values: {
       violationId: violation.id,
-      ownerId: violation.ownerId,
+      residentId: violation.residentId,
       concept: violation.concept,
       amount: violation.amount,
       violationDate: new Date(violation.violationDate),
@@ -147,7 +143,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
             />
 
             <Controller
-              name="ownerId"
+              name="residentId"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>

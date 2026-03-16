@@ -3,9 +3,7 @@ import { getRequestHeaders } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
-import { profileRoles, profiles } from '@/db/schema'
-import type { SelectRole } from '@/db/schema/zod/profile-roles'
-import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
+import { profiles } from '@/db/schema'
 import { auth } from '@/lib/auth'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
@@ -20,91 +18,47 @@ import {
 export const getProfilesList = createServerFn()
   .middleware([authMiddleware])
   .handler(async () => {
-    const profiles = await db.query.profiles.findMany({
+    const profilesList = await db.query.profiles.findMany({
       with: {
-        owner: true,
-        externalUser: true,
+        user: true,
+        resident: true,
         hoaBoardMemberships: {
           where: (membership, { isNull }) => isNull(membership.deletedAt),
         },
-        profileRoles: {
-          with: {
-            role: true,
-          },
-        },
-        user: true,
       },
       orderBy: (profiles, { desc }) => [desc(profiles.updatedAt)],
     })
 
-    // Filter out admin users
-    const filteredProfiles = profiles.filter(
-      (profile) => !profile.profileRoles.some((pr) => pr.role.name === 'admin'),
-    )
+    const filteredProfiles = profilesList.filter((profile) => profile.user.role !== 'admin')
 
-    return filteredProfiles satisfies ProfileWithAllRelations[]
-  })
-
-export const getRolesList = createServerFn()
-  .middleware([authMiddleware])
-  .handler(async () => {
-    const roles = await db.query.roles.findMany({
-      orderBy: (roles, { asc }) => [asc(roles.name)],
-    })
-
-    return roles satisfies SelectRole[]
+    return filteredProfiles
   })
 
 export const createProfile = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, adminOnlyMiddleware])
   .inputValidator(createProfileSchema)
   .handler(async ({ data }) => {
-    // Step 1: Fetch owner or external user to get their email and name
-    const { externalUserId, ownerId, profileType, password, roleIds } = data
+    // Step 1: Fetch resident to get their email and name
+    const { residentId, password, role } = data
 
-    let email: string = ''
-    let name: string = ''
-
-    if (profileType === 'owner' && ownerId) {
-      const owner = await db.query.owners.findFirst({
-        where: (owners, { eq }) => eq(owners.id, ownerId),
-      })
-
-      if (!owner) {
-        throw new Error('Owner not found')
-      }
-
-      email = owner.email
-      name = `${owner.firstName} ${owner.lastName}`
-    } else if (profileType === 'external' && externalUserId) {
-      const externalUser = await db.query.externalUsers.findFirst({
-        where: (externalUsers, { eq }) => eq(externalUsers.id, externalUserId),
-      })
-
-      if (!externalUser) {
-        throw new Error('External user not found')
-      }
-
-      email = externalUser.email
-      name = `${externalUser.firstName} ${externalUser.lastName}`
-    } else {
-      throw new Error('Invalid profile type or missing owner/external user ID')
-    }
-
-    // Step 2: Create user account using better-auth
-    const adminRole = await db.query.roles.findFirst({
-      where: (roles, { eq }) => eq(roles.name, 'admin'),
+    const resident = await db.query.residents.findFirst({
+      where: (residents, { eq }) => eq(residents.id, residentId),
     })
 
-    // Check if roleIds contains admin role
-    const isAdmin = adminRole ? roleIds.includes(adminRole.id) : false
+    if (!resident) {
+      throw new Error('Resident not found')
+    }
 
+    const email = resident.email
+    const name = `${resident.firstName} ${resident.lastName}`
+
+    // Step 2: Create user account using better-auth with role
     const signUpResult = await auth.api.createUser({
       body: {
         name,
         email,
         password,
-        role: isAdmin ? 'admin' : 'user',
+        role: role || undefined, // Pass role to better-auth
       },
     })
 
@@ -119,35 +73,17 @@ export const createProfile = createServerFn({ method: 'POST' })
       .insert(profiles)
       .values({
         userId,
-        ownerId,
-        profileType,
-        externalUserId,
+        residentId,
       })
       .returning()
 
-    // Step 4: Create profile roles
-    if (roleIds.length > 0) {
-      await db.insert(profileRoles).values(
-        roleIds.map((roleId) => ({
-          profileId: newProfile.id,
-          roleId,
-        })),
-      )
-    }
-
-    // Step 5: Fetch the complete profile with relations
+    // Step 4: Fetch the complete profile with relations
     const profileWithRelations = await db.query.profiles.findFirst({
       where: eq(profiles.id, newProfile.id),
       with: {
-        owner: true,
-        externalUser: true,
+        resident: true,
         hoaBoardMemberships: {
           where: (membership, { isNull }) => isNull(membership.deletedAt),
-        },
-        profileRoles: {
-          with: {
-            role: true,
-          },
         },
         user: true,
       },
@@ -166,25 +102,19 @@ export const createProfile = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return profileWithRelations satisfies ProfileWithAllRelations
+    return profileWithRelations
   })
 
 export const updateProfile = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, adminOnlyMiddleware])
   .inputValidator(updateProfileSchema)
   .handler(async ({ data }) => {
-    const { externalUserId, ownerId, profileType, userId, password, profileId, roleIds } = data
+    const { residentId, userId, password, profileId, role } = data
     // Fetch old profile for audit log
     const oldProfile = await db.query.profiles.findFirst({
       where: eq(profiles.id, profileId),
       with: {
-        owner: true,
-        externalUser: true,
-        profileRoles: {
-          with: {
-            role: true,
-          },
-        },
+        resident: true,
         user: true,
       },
     })
@@ -193,41 +123,24 @@ export const updateProfile = createServerFn({ method: 'POST' })
       throw new Error('Profile not found')
     }
 
-    // Check if owner/external user has changed
-    const ownerChanged = ownerId !== oldProfile.ownerId
-    const externalUserChanged = externalUserId !== oldProfile.externalUserId
+    // Check if resident has changed
+    const residentChanged = residentId !== oldProfile.residentId
+    const headers = getRequestHeaders()
 
-    // Update user account if owner/external user has changed
-    if (ownerChanged || externalUserChanged) {
-      let email: string = ''
-      let name: string = ''
+    // Update user account if resident has changed
+    if (residentChanged) {
+      const resident = await db.query.residents.findFirst({
+        where: (residents, { eq }) => eq(residents.id, residentId),
+      })
 
-      if (profileType === 'owner' && ownerId) {
-        const owner = await db.query.owners.findFirst({
-          where: (owners, { eq }) => eq(owners.id, ownerId),
-        })
-
-        if (!owner) {
-          throw new Error('Owner not found')
-        }
-
-        email = owner.email
-        name = `${owner.firstName} ${owner.lastName}`
-      } else if (profileType === 'external' && externalUserId) {
-        const externalUser = await db.query.externalUsers.findFirst({
-          where: (externalUsers, { eq }) => eq(externalUsers.id, externalUserId),
-        })
-
-        if (!externalUser) {
-          throw new Error('External user not found')
-        }
-
-        email = externalUser.email
-        name = `${externalUser.firstName} ${externalUser.lastName}`
+      if (!resident) {
+        throw new Error('Resident not found')
       }
 
+      const email = resident.email
+      const name = `${resident.firstName} ${resident.lastName}`
+
       // Update user account using better-auth API
-      const headers = getRequestHeaders()
       await auth.api.adminUpdateUser({
         body: {
           userId,
@@ -240,23 +153,12 @@ export const updateProfile = createServerFn({ method: 'POST' })
       })
     }
 
-    // Check if admin role status has changed
-    const adminRole = await db.query.roles.findFirst({
-      where: (roles, { eq }) => eq(roles.name, 'admin'),
-    })
-
-    const wasAdmin = adminRole ? oldProfile.profileRoles.some((pr) => pr.roleId === adminRole.id) : false
-    const willBeAdmin = adminRole ? roleIds.includes(adminRole.id) : false
-
-    // Update user role if admin status changed
-    if (wasAdmin !== willBeAdmin) {
-      const headers = getRequestHeaders()
-      await auth.api.adminUpdateUser({
+    // Update user role if changed
+    if (role && role !== oldProfile.user?.role) {
+      await auth.api.setRole({
         body: {
           userId,
-          data: {
-            role: willBeAdmin ? 'admin' : 'user',
-          },
+          role,
         },
         headers,
       })
@@ -264,7 +166,6 @@ export const updateProfile = createServerFn({ method: 'POST' })
 
     // Update password if provided
     if (password) {
-      const headers = getRequestHeaders()
       await auth.api.setUserPassword({
         body: {
           newPassword: password,
@@ -279,40 +180,19 @@ export const updateProfile = createServerFn({ method: 'POST' })
       .update(profiles)
       .set({
         userId: userId,
-        profileType: profileType,
-        ownerId: ownerId,
-        externalUserId: externalUserId,
+        residentId: residentId,
         updatedAt: new Date(),
       })
       .where(eq(profiles.id, profileId))
       .returning()
 
-    // Delete existing roles
-    await db.delete(profileRoles).where(eq(profileRoles.profileId, profileId))
-
-    // Insert new roles
-    if (roleIds.length > 0) {
-      await db.insert(profileRoles).values(
-        roleIds.map((roleId) => ({
-          profileId: updatedProfile.id,
-          roleId,
-        })),
-      )
-    }
-
     // Fetch the complete updated profile with relations
     const profileWithRelations = await db.query.profiles.findFirst({
       where: eq(profiles.id, updatedProfile.id),
       with: {
-        owner: true,
-        externalUser: true,
+        resident: true,
         hoaBoardMemberships: {
           where: (membership, { isNull }) => isNull(membership.deletedAt),
-        },
-        profileRoles: {
-          with: {
-            role: true,
-          },
         },
         user: true,
       },
@@ -332,7 +212,7 @@ export const updateProfile = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return profileWithRelations satisfies ProfileWithAllRelations
+    return profileWithRelations
   })
 
 export const deleteProfile = createServerFn({ method: 'POST' })
@@ -343,13 +223,7 @@ export const deleteProfile = createServerFn({ method: 'POST' })
     const oldProfile = await db.query.profiles.findFirst({
       where: eq(profiles.id, profileId),
       with: {
-        owner: true,
-        externalUser: true,
-        profileRoles: {
-          with: {
-            role: true,
-          },
-        },
+        resident: true,
         user: true,
       },
     })

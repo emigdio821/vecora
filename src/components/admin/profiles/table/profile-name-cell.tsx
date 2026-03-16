@@ -1,10 +1,10 @@
 import { useState } from 'react'
+import type { ProfileQueryData } from '@/api/tanstack-queries/profiles'
 import { Button } from '@/components/ui/button'
-import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { ProfileDetailsSheet } from '../sheets/profile-details'
 
 interface ProfileNameCellProps {
-  profile: ProfileWithAllRelations
+  profile: ProfileQueryData
 }
 
 export function ProfileNameCell({ profile }: ProfileNameCellProps) {

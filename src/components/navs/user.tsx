@@ -1,7 +1,8 @@
 import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSun } from '@tabler/icons-react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
+import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -16,7 +17,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useUserRoles } from '@/hooks/use-user-roles'
 import { authClient } from '@/lib/auth/client'
 import { logger } from '@/lib/logger'
 import { RoleNameBadge } from '../shared/role-name-badge'
@@ -29,7 +29,7 @@ export function NavUser() {
   const queryClient = useQueryClient()
   const { theme, setTheme } = useTheme()
 
-  const { profile, isLoading, error, refetch } = useUserRoles()
+  const { data: profile, isLoading, error, refetch } = useQuery(userProfileQueryOptions())
 
   async function handleLogOut() {
     await authClient.signOut({
@@ -92,13 +92,14 @@ export function NavUser() {
           <DropdownMenuContent className="w-(--anchor-width)" align="center">
             <DropdownMenuGroup>
               <DropdownMenuLabel className="line-clamp-2">{profile.user.name}</DropdownMenuLabel>
-              <DropdownMenuLabel>
-                <div className="flex flex-wrap gap-1">
-                  {profile.profileRoles.map(({ role }) => (
-                    <RoleNameBadge className="text-xs" key={role.id} roleName={role.name} />
-                  ))}
-                </div>
-              </DropdownMenuLabel>
+
+              {profile.user.role && (
+                <DropdownMenuLabel>
+                  <div className="flex flex-wrap gap-1">
+                    <RoleNameBadge className="text-xs" roleName={profile.user.role} />
+                  </div>
+                </DropdownMenuLabel>
+              )}
 
               <DropdownMenuSeparator />
 

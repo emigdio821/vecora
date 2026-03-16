@@ -1,13 +1,13 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import type { HoaBoardPeriodQueryData } from '@/api/tanstack-queries/hoa-board'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { HoaBoardPeriodWithMembers } from '@/db/schema/zod/hoa-board'
 import { formatDate, normalizeString } from '@/lib/utils'
 import { HoaPeriodsTableActions } from './actions'
 import { HoaPeriodCell } from './period-cell'
 
-export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodWithMembers>[] = [
+export const hoaBoardPeriodsTableColumns: ColumnDef<HoaBoardPeriodQueryData>[] = [
   {
     id: 'select',
     enablePinning: false,

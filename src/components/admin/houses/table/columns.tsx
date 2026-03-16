@@ -1,12 +1,12 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import type { HouseQueryData } from '@/api/tanstack-queries/houses'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { normalizeString } from '@/lib/utils'
 import { HousesTableActions } from './actions'
 import { HouseNumberCell } from './house-number-cell'
 
-export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
+export const housesTableColumns: ColumnDef<HouseQueryData>[] = [
   {
     id: 'select',
     enablePinning: false,
@@ -36,8 +36,8 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
     header: ({ column }) => <DataTableSortableHeader column={column} title="Casa" />,
     cell: ({ row }) => <HouseNumberCell house={row.original} />,
     filterFn: (row, _, value: string) => {
-      const ownerFullName = row.original.owner
-        ? `${row.original.owner.firstName} ${row.original.owner.lastName}`
+      const ownerFullName = row.original.resident
+        ? `${row.original.resident.firstName} ${row.original.resident.lastName}`
         : ''
       const normalizedHouseNumber = normalizeString(row.original.houseNumber).toLowerCase()
       const normalizeOwnerFullName = normalizeString(ownerFullName).toLowerCase()
@@ -55,7 +55,7 @@ export const housesTableColumns: ColumnDef<HouseWithOwner>[] = [
     size: 300,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Propietario" />,
     cell: ({ row }) => {
-      const owner = row.original.owner
+      const owner = row.original.resident
       const ownerFullName = `${owner?.firstName} ${owner?.lastName}`
 
       return owner ? <p className="line-clamp-2 whitespace-normal text-left">{ownerFullName}</p> : null

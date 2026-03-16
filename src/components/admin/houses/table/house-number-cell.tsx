@@ -1,10 +1,10 @@
 import { useState } from 'react'
+import type { HouseQueryData } from '@/api/tanstack-queries/houses'
 import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
-import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { HouseDetailsSheet } from '../sheets/house-details'
 
 interface HouseNumberCellProps {
-  house: HouseWithOwner
+  house: HouseQueryData
 }
 
 export function HouseNumberCell({ house }: HouseNumberCellProps) {

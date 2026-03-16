@@ -1,5 +1,6 @@
 import { relations, sql } from 'drizzle-orm'
 import {
+  boolean,
   check,
   index,
   integer,
@@ -16,9 +17,6 @@ import {
 import { user } from './auth'
 
 export * from './auth'
-
-// Profile type enum
-export const profileTypeEnum = pgEnum('profile_type', ['owner', 'external'])
 
 // category expenses enum
 export const categoryExpensesEnum = pgEnum('category_expenses', ['security', 'maintenance', 'other'])
@@ -37,8 +35,7 @@ export const auditLogActionEnum = pgEnum('audit_log_action', ['create', 'update'
 
 // audit logs entity type enum
 export const auditLogEntityTypeEnum = pgEnum('audit_log_entity_type', [
-  'external_user',
-  'owner',
+  'resident',
   'house',
   'payment',
   'violation',
@@ -49,27 +46,14 @@ export const auditLogEntityTypeEnum = pgEnum('audit_log_entity_type', [
   'notification',
 ])
 
-// Owners table - represents property owners
-export const owners = pgTable('owners', {
+// Residents table - unified table for all condominium residents (owners and personnel)
+export const residents = pgTable('residents', {
   id: uuid('id').primaryKey().defaultRandom(),
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 20 }).notNull(),
   email: varchar('email', { length: 255 }).notNull().unique(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-})
-
-// External Users table - represents non-owner personnel (e.g., external managers)
-export const externalUsers = pgTable('external_users', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  firstName: varchar('first_name', { length: 100 }).notNull(),
-  lastName: varchar('last_name', { length: 100 }).notNull(),
-  phone: varchar('phone', { length: 20 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
+  isOwner: boolean('is_owner').notNull().default(false),
   notes: varchar('notes', { length: 200 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
@@ -78,12 +62,12 @@ export const externalUsers = pgTable('external_users', {
     .notNull(),
 })
 
-// Houses table - represents properties owned by owners
+// Houses table - represents properties owned by residents
 export const houses = pgTable(
   'houses',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    ownerId: uuid('owner_id').references(() => owners.id, { onDelete: 'set null' }),
+    residentId: uuid('resident_id').references(() => residents.id, { onDelete: 'set null' }),
     houseNumber: varchar('house_number', { length: 20 }).notNull().unique(),
     street: varchar('street', { length: 255 }),
     city: varchar('city', { length: 100 }),
@@ -95,11 +79,10 @@ export const houses = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [index('houses_ownerId_idx').on(table.ownerId)],
+  (table) => [index('houses_residentId_idx').on(table.residentId)],
 )
 
-// Profiles - links auth users to either owners or external users
-// Must have EITHER ownerId OR externalUserId set, not both or neither
+// Profiles - links auth users to residents
 export const profiles = pgTable(
   'profiles',
   {
@@ -108,9 +91,9 @@ export const profiles = pgTable(
       .notNull()
       .unique()
       .references(() => user.id, { onDelete: 'cascade' }),
-    profileType: profileTypeEnum('profile_type').notNull(),
-    ownerId: uuid('owner_id').references(() => owners.id, { onDelete: 'cascade' }),
-    externalUserId: uuid('external_user_id').references(() => externalUsers.id, { onDelete: 'cascade' }),
+    residentId: uuid('resident_id')
+      .notNull()
+      .references(() => residents.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()
@@ -119,16 +102,7 @@ export const profiles = pgTable(
   },
   (table) => [
     index('profiles_userId_idx').on(table.userId),
-    index('profiles_ownerId_idx').on(table.ownerId),
-    index('profiles_externalUserId_idx').on(table.externalUserId),
-    check(
-      'profile_type_constraint',
-      sql`(
-        (${table.profileType} = 'owner' AND ${table.ownerId} IS NOT NULL AND ${table.externalUserId} IS NULL)
-        OR
-        (${table.profileType} = 'external' AND ${table.ownerId} IS NULL AND ${table.externalUserId} IS NOT NULL)
-      )`,
-    ),
+    index('profiles_residentId_idx').on(table.residentId),
   ],
 )
 
@@ -158,9 +132,9 @@ export const violations = pgTable(
   'violations',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    ownerId: uuid('owner_id')
+    residentId: uuid('resident_id')
       .notNull()
-      .references(() => owners.id, { onDelete: 'cascade' }),
+      .references(() => residents.id, { onDelete: 'cascade' }),
     concept: varchar('concept', { length: 200 }).notNull(),
     amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
     violationDate: timestamp('violation_date', { withTimezone: true }).notNull(),
@@ -173,7 +147,7 @@ export const violations = pgTable(
     deletedAt: timestamp('deleted_at'),
   },
   (table) => [
-    index('violations_owner_idx').on(table.ownerId),
+    index('violations_resident_idx').on(table.residentId),
     index('violations_status_idx').on(table.status),
     index('violations_deletedAt_idx').on(table.deletedAt),
   ],
@@ -184,9 +158,9 @@ export const payments = pgTable(
   'payments',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    ownerId: uuid('owner_id')
+    residentId: uuid('resident_id')
       .notNull()
-      .references(() => owners.id, { onDelete: 'cascade' }),
+      .references(() => residents.id, { onDelete: 'cascade' }),
     concept: varchar('concept', { length: 200 }).notNull(),
     amount: numeric('amount', { precision: 12, scale: 2 }).notNull(),
     paymentType: paymentTypeEnum('payment_type').notNull(),
@@ -201,7 +175,7 @@ export const payments = pgTable(
     deletedAt: timestamp('deleted_at'),
   },
   (table) => [
-    index('payments_owner_idx').on(table.ownerId),
+    index('payments_resident_idx').on(table.residentId),
     index('payments_type_idx').on(table.paymentType),
     index('payments_year_idx').on(table.year),
     index('payments_status_idx').on(table.status),
@@ -261,7 +235,7 @@ export const hoaBoard = pgTable(
     lastName: varchar('last_name', { length: 100 }).notNull(),
     email: varchar('email', { length: 255 }).notNull(),
     phone: varchar('phone', { length: 20 }).notNull(),
-    profileType: profileTypeEnum('profile_type').notNull(),
+    isOwner: boolean('is_owner').notNull().default(false),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()
@@ -351,27 +325,20 @@ export const notifications = pgTable(
 )
 
 // Relations
-export const ownersRelations = relations(owners, ({ many, one }) => ({
+export const residentsRelations = relations(residents, ({ many, one }) => ({
   houses: many(houses),
   violations: many(violations),
   payments: many(payments),
   profile: one(profiles, {
-    fields: [owners.id],
-    references: [profiles.ownerId],
-  }),
-}))
-
-export const externalUsersRelations = relations(externalUsers, ({ one }) => ({
-  profile: one(profiles, {
-    fields: [externalUsers.id],
-    references: [profiles.externalUserId],
+    fields: [residents.id],
+    references: [profiles.residentId],
   }),
 }))
 
 export const housesRelations = relations(houses, ({ one }) => ({
-  owner: one(owners, {
-    fields: [houses.ownerId],
-    references: [owners.id],
+  resident: one(residents, {
+    fields: [houses.residentId],
+    references: [residents.id],
   }),
 }))
 
@@ -380,28 +347,24 @@ export const profilesRelations = relations(profiles, ({ one, many }) => ({
     fields: [profiles.userId],
     references: [user.id],
   }),
-  owner: one(owners, {
-    fields: [profiles.ownerId],
-    references: [owners.id],
-  }),
-  externalUser: one(externalUsers, {
-    fields: [profiles.externalUserId],
-    references: [externalUsers.id],
+  resident: one(residents, {
+    fields: [profiles.residentId],
+    references: [residents.id],
   }),
   hoaBoardMemberships: many(hoaBoard),
 }))
 
 export const violationsRelations = relations(violations, ({ one }) => ({
-  owner: one(owners, {
-    fields: [violations.ownerId],
-    references: [owners.id],
+  resident: one(residents, {
+    fields: [violations.residentId],
+    references: [residents.id],
   }),
 }))
 
 export const paymentsRelations = relations(payments, ({ one, many }) => ({
-  owner: one(owners, {
-    fields: [payments.ownerId],
-    references: [owners.id],
+  resident: one(residents, {
+    fields: [payments.residentId],
+    references: [residents.id],
   }),
   paymentMonths: many(paymentMonths),
   paymentHistory: many(paymentHistory),

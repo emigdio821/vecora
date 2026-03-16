@@ -1,15 +1,15 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import type { ProfileQueryData } from '@/api/tanstack-queries/profiles'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { ProfileStatusBadge } from '@/components/shared/users/profile-status-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { normalizeString } from '@/lib/utils'
 import { ProfilesTableActions } from './actions'
 import { ProfileNameCell } from './profile-name-cell'
 
-export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
+export const profilesTableColumns: ColumnDef<ProfileQueryData>[] = [
   {
     id: 'select',
     enablePinning: false,
@@ -53,18 +53,13 @@ export const profilesTableColumns: ColumnDef<ProfileWithAllRelations>[] = [
     accessorKey: 'profileType',
     size: 150,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Tipo de perfil" />,
-    cell: ({ row }) => <ProfileTypeBadge type={row.original.profileType} />,
+    cell: ({ row }) => <ProfileTypeBadge isOwner={row.original.resident.isOwner} />,
   },
   {
     accessorKey: 'profileRoles',
     size: 150,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
-    cell: ({ row }) => {
-      const roles = row.original.profileRoles?.map(({ role }) => role.name) || []
-      const roleBadges = roles.map((role) => <RoleNameBadge roleName={role} key={role} />)
-
-      return <>{roleBadges.length > 0 && <div className="flex flex-wrap gap-1">{roleBadges}</div>}</>
-    },
+    cell: ({ row }) => <RoleNameBadge roleName={row.original.user.role || ''} />,
   },
   {
     id: 'ban-status',

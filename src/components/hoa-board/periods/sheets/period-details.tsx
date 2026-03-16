@@ -1,4 +1,5 @@
 import { IconCalendarTime, IconUsers, IconWind } from '@tabler/icons-react'
+import type { HoaBoardPeriodQueryData } from '@/api/tanstack-queries/hoa-board'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
@@ -15,11 +16,10 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HoaBoardPeriodWithMembers } from '@/db/schema/zod/hoa-board'
 import { cn, formatDate } from '@/lib/utils'
 
 interface HoaPeriodDetailsSheetProps {
-  period: HoaBoardPeriodWithMembers
+  period: HoaBoardPeriodQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -78,7 +78,6 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                   {activeMembers.map((member) => {
                     const memberFullName = `${member.firstName} ${member.lastName}`.trim()
                     const isDeleted = !member.profileId
-                    const roleName = member.profile?.profileRoles[0]?.role.name || 'Sin rol'
 
                     return (
                       <FramePanel key={member.id} className="p-0">
@@ -93,8 +92,8 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                           <CopyButton tooltipText="Copiar ID" value={member.id} />
                         </div>
                         <div className="flex flex-wrap gap-2 p-2 pt-0">
-                          <RoleNameBadge roleName={roleName} />
-                          <ProfileTypeBadge type={member.profileType} />
+                          <RoleNameBadge roleName={member.profile?.user?.role || ''} />
+                          <ProfileTypeBadge isOwner={member.isOwner} />
                           {isDeleted && <Badge variant="destructive">Eliminado</Badge>}
                         </div>
                       </FramePanel>
@@ -128,7 +127,6 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                 <div className="space-y-1">
                   {pastMembers.map((member) => {
                     const memberFullName = `${member.firstName} ${member.lastName}`.trim()
-                    const roleName = member.profile?.profileRoles[0]?.role.name || 'Sin rol'
 
                     return (
                       <FramePanel key={member.id} className="flex items-center gap-2 p-2">
@@ -136,8 +134,8 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                           <h2 className="font-medium text-sm">{memberFullName}</h2>
                           {member.phone && <p className="text-muted-foreground text-xs">{member.phone}</p>}
                           <div className="flex flex-wrap gap-2">
-                            <RoleNameBadge roleName={roleName} />
-                            <ProfileTypeBadge type={member.profileType} />
+                            <RoleNameBadge roleName={member.profile?.user?.role || ''} />
+                            <ProfileTypeBadge isOwner={member.isOwner} />
                           </div>
                         </div>
                         <CopyButton tooltipText="Copiar ID" value={member.id} />

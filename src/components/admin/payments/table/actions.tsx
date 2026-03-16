@@ -2,7 +2,7 @@ import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/i
 import { useState } from 'react'
 import { deletePayment } from '@/api/server-functions/payments'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
+import { PAYMENTS_QUERY_KEY, type PaymentQueryData } from '@/api/tanstack-queries/payments'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { PaymentWithOwnerAndMonths } from '@/db/schema/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { getPaymentTypeLabel } from '@/lib/utils'
 import type { DeletePaymentData } from '@/schemas/payments'
@@ -22,7 +21,7 @@ import { EditPaymentSheet } from '../sheets/edit-payment'
 import { PaymentDetailsSheet } from '../sheets/payment-details'
 
 interface ActionsProps {
-  payment: PaymentWithOwnerAndMonths
+  payment: PaymentQueryData
 }
 
 export function PaymentsTableActions({ payment }: ActionsProps) {

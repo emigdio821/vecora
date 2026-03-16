@@ -4,7 +4,11 @@ import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateHoaBoardMember } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOA_BOARD_MEMBERS_QUERY_KEY, HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
+import {
+  HOA_BOARD_MEMBERS_QUERY_KEY,
+  HOA_BOARD_PERIODS_QUERY_KEY,
+  type HoaBoardMemberQueryData,
+} from '@/api/tanstack-queries/hoa-board'
 import { LoaderIcon } from '@/components/icons'
 import { HoaPeriodSelector } from '@/components/shared/selectors/hoa-period-selector'
 import { ProfilesSelector } from '@/components/shared/selectors/profiles-selector'
@@ -20,12 +24,11 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HoaBoardMember } from '@/db/schema/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateHoaBoardMemberFormData, updateHoaBoardMemberSchema } from '@/schemas/hoa-board'
 
 interface EditMemberSheetProps {
-  member: HoaBoardMember
+  member: HoaBoardMemberQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void

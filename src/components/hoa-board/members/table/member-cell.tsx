@@ -1,10 +1,10 @@
 import { useState } from 'react'
+import type { HoaBoardMemberQueryData } from '@/api/tanstack-queries/hoa-board'
 import { Button } from '@/components/ui/button'
-import type { HoaBoardMember } from '@/db/schema/zod/hoa-board'
 import { HoaMemberDetailsSheet } from '../sheets/member-details'
 
 interface HoaMemberNameCellProps {
-  member: HoaBoardMember
+  member: HoaBoardMemberQueryData
 }
 
 export function HoaMemberNameCell({ member }: HoaMemberNameCellProps) {

@@ -4,18 +4,17 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { banProfile, deleteProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { PROFILES_QUERY_KEY } from '@/api/tanstack-queries/profiles'
+import { PROFILES_QUERY_KEY, type ProfileQueryData } from '@/api/tanstack-queries/profiles'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateProfileSheet } from '../sheets/create-profile'
 
 interface ProfilesDataTableHeaderProps {
-  table: Table<ProfileWithAllRelations>
+  table: Table<ProfileQueryData>
 }
 
 export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps) {

@@ -1,6 +1,5 @@
 import { useQueryState } from 'nuqs'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ExternalUsersDataTable } from './external-users/table/data-table'
 import { ProfilesDataTable } from './profiles/table/data-table'
 
 export function AdminUsersTabs() {
@@ -17,10 +16,6 @@ export function AdminUsersTabs() {
 
       <TabsContent value="profiles" keepMounted>
         <ProfilesDataTable />
-      </TabsContent>
-
-      <TabsContent value="external-users" keepMounted>
-        <ExternalUsersDataTable />
       </TabsContent>
     </Tabs>
   )

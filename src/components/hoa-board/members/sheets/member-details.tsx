@@ -1,4 +1,5 @@
 import { IconCalendarTime, IconUser, IconUserStar, IconWind } from '@tabler/icons-react'
+import type { HoaBoardMemberQueryData } from '@/api/tanstack-queries/hoa-board'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { MemberStatusBadge } from '@/components/shared/member-status-badge'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
@@ -15,11 +16,10 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HoaBoardMember } from '@/db/schema/zod/hoa-board'
 import { formatDate } from '@/lib/utils'
 
 interface MemberDetailsSheetProps {
-  member: HoaBoardMember
+  member: HoaBoardMemberQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -73,7 +73,7 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Tipo de perfil</h2>
                   <div className="mt-1">
-                    <ProfileTypeBadge type={member.profileType} />
+                    <ProfileTypeBadge isOwner={member.isOwner} />
                   </div>
                 </FramePanel>
 
@@ -92,14 +92,11 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
             title="Perfil asociado"
             icon={IconUserStar}
             content={
-              profile && profile.profileRoles.length > 0 ? (
+              profile?.user ? (
                 <FramePanel className="flex items-center gap-2 p-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Rol</h2>
-                    <RoleNameBadge
-                      className="mt-1"
-                      roleName={profile.profileRoles[0]?.role.name || 'Sin rol'}
-                    />
+                    <RoleNameBadge className="mt-1" roleName={profile.user.role || ''} />
                   </div>
                   <CopyButton tooltipText="Copiar ID del perfil asociado" value={profile.id} />
                 </FramePanel>

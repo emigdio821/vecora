@@ -4,18 +4,17 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteHouse } from '@/api/server-functions/houses'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
+import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/api/tanstack-queries/houses'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateHouseSheet } from '../sheets/create-house'
 
 interface HousesDataTableHeaderProps {
-  table: Table<HouseWithOwner>
+  table: Table<HouseQueryData>
 }
 
 export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {

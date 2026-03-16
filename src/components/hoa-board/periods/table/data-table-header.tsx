@@ -1,29 +1,33 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
+import { useRouteContext } from '@tanstack/react-router'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteHoaBoardPeriod } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOA_BOARD_MEMBERS_QUERY_KEY, HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
+import {
+  HOA_BOARD_MEMBERS_QUERY_KEY,
+  HOA_BOARD_PERIODS_QUERY_KEY,
+  type HoaBoardPeriodQueryData,
+} from '@/api/tanstack-queries/hoa-board'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { HoaBoardPeriodWithMembers } from '@/db/schema/zod/hoa-board'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
-import { useUserRoles } from '@/hooks/use-user-roles'
 import { CreatePeriodSheet } from '../sheets/create-period'
 
 interface PeriodsDataTableHeaderProps {
-  table: Table<HoaBoardPeriodWithMembers>
+  table: Table<HoaBoardPeriodQueryData>
 }
 
 export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isCreatePeriodSheetOpen, setIsCreatePeriodSheetOpen] = useState(false)
-  const { isAdmin } = useUserRoles()
+
+  const { profile } = useRouteContext({ from: '/_authed' })
 
   const [searchQuery, setSearchQuery] = useQueryState(
     'search-hoa-board-periods',
@@ -115,7 +119,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
         </InputGroup>
 
         <div className="flex gap-2">
-          {isAdmin && selectedRowsLength > 0 && (
+          {profile.user.role === 'admin' && selectedRowsLength > 0 && (
             <Tooltip>
               <TooltipTrigger
                 render={
@@ -141,7 +145,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
             </Button>
           )}
 
-          {isAdmin && (
+          {profile.user.role === 'admin' && (
             <Button className="ml-auto" onClick={() => setIsCreatePeriodSheetOpen(true)}>
               <IconPlus className="size-4" />
               Crear

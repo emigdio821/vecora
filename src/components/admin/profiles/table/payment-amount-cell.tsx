@@ -1,10 +1,10 @@
 import { useState } from 'react'
+import type { PaymentQueryData } from '@/api/tanstack-queries/payments'
 import { Button } from '@/components/ui/button'
-import type { PaymentWithOwnerAndMonths } from '@/db/schema/zod/payments'
-import { PaymentDetailsSheet } from '../sheets/payment-details'
+import { PaymentDetailsSheet } from '../../payments/sheets/payment-details'
 
 interface PaymentAmountCellProps {
-  payment: PaymentWithOwnerAndMonths
+  payment: PaymentQueryData
 }
 
 export function PaymentAmountCell({ payment }: PaymentAmountCellProps) {

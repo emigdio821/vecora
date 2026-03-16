@@ -4,9 +4,9 @@ import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updatePayment } from '@/api/server-functions/payments'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { PAYMENTS_QUERY_KEY } from '@/api/tanstack-queries/payments'
+import { PAYMENTS_QUERY_KEY, type PaymentQueryData } from '@/api/tanstack-queries/payments'
 import { LoaderIcon } from '@/components/icons'
-import { OwnersSelector } from '@/components/shared/selectors/owners-selector'
+import { ResidentsSelector } from '@/components/shared/selectors/residents-selector'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -31,12 +31,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  type PaymentType,
-  type PaymentWithOwnerAndMonths,
-  paymentStatusSchema,
-  paymentTypeSchema,
-} from '@/db/schema/zod/payments'
+import { type PaymentType, paymentStatusSchema, paymentTypeSchema } from '@/db/schema/zod/payments'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate, getAllMonthsMap, getPaymentStatusLabel, getPaymentTypeLabel } from '@/lib/utils'
 import { type UpdatePaymentFormData, updatePaymentSchema } from '@/schemas/payments'
@@ -46,7 +41,7 @@ interface UpdatePaymentSheetProps {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
   }
-  payment: PaymentWithOwnerAndMonths
+  payment: PaymentQueryData
 }
 
 const MONTHS = getAllMonthsMap()
@@ -61,7 +56,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
     resolver: zodResolver(updatePaymentSchema),
     values: {
       paymentId: payment.id,
-      ownerId: payment.ownerId,
+      residentId: payment.residentId,
       concept: payment.concept,
       amount: payment.amount,
       paymentType: payment.paymentType,
@@ -162,14 +157,14 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
             />
 
             <Controller
-              name="ownerId"
+              name="residentId"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
                     Propietario <span className="text-destructive">*</span>
                   </FieldLabel>
-                  <OwnersSelector
+                  <ResidentsSelector
                     id={field.name}
                     value={field.value}
                     onValueChange={field.onChange}

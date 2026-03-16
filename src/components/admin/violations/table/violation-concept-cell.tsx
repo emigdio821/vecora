@@ -1,10 +1,10 @@
 import { useState } from 'react'
+import type { ViolationQueryData } from '@/api/server-functions/violations'
 import { Button } from '@/components/ui/button'
-import type { ViolationWithOwner } from '@/db/schema/zod/violations'
 import { ViolationDetailsSheet } from '../sheets/violation-details'
 
 interface ViolationConceptCellProps {
-  violation: ViolationWithOwner
+  violation: ViolationQueryData
 }
 
 export function ViolationConceptCell({ violation }: ViolationConceptCellProps) {

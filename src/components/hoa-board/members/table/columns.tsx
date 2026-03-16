@@ -1,15 +1,15 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import type { HoaBoardMemberQueryData } from '@/api/tanstack-queries/hoa-board'
 import { MemberStatusBadge } from '@/components/shared/member-status-badge'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { HoaBoardMember } from '@/db/schema/zod/hoa-board'
 import { normalizeString } from '@/lib/utils'
 import { HoaMembersTableActions } from './actions'
 import { HoaMemberNameCell } from './member-cell'
 
-export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMember>[] = [
+export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMemberQueryData>[] = [
   {
     id: 'select',
     enablePinning: false,
@@ -55,18 +55,13 @@ export const hoaBoardMembersTableColumns: ColumnDef<HoaBoardMember>[] = [
     accessorKey: 'profile',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
     size: 120,
-    cell: ({ row }) => {
-      const profile = row.original.profile
-      const roleName = profile?.profileRoles[0]?.role.name || 'Sin rol'
-
-      return <RoleNameBadge roleName={roleName} />
-    },
+    cell: ({ row }) => <RoleNameBadge roleName={row.original.profile?.user?.role || ''} />,
   },
   {
     accessorKey: 'profileType',
     header: ({ column }) => <DataTableSortableHeader column={column} title="Tipo" />,
     size: 120,
-    cell: ({ row }) => <ProfileTypeBadge type={row.original.profileType} />,
+    cell: ({ row }) => <ProfileTypeBadge isOwner={row.original.isOwner} />,
   },
   {
     id: 'status',

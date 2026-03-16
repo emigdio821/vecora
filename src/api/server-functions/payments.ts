@@ -3,7 +3,6 @@ import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { paymentMonths, payments } from '@/db/schema'
-import type { InsertPayment, PaymentWithOwnerAndMonths } from '@/db/schema/zod/payments'
 import { authMiddleware } from '@/middleware/auth'
 import {
   createPaymentSchema,
@@ -16,11 +15,11 @@ export const createPayment = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
   .inputValidator(createPaymentSchema)
   .handler(async ({ data }) => {
-    const { ownerId, concept, amount, paymentType, year, months, status, paidAt } = data
+    const { residentId, concept, amount, paymentType, year, months, status, paidAt } = data
     const [newPayment] = await db
       .insert(payments)
       .values({
-        ownerId,
+        residentId,
         concept,
         amount,
         paymentType,
@@ -49,14 +48,14 @@ export const createPayment = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return newPayment satisfies InsertPayment
+    return newPayment
   })
 
 export const updatePayment = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
   .inputValidator(updatePaymentSchema)
   .handler(async ({ data }) => {
-    const { paymentId, ownerId, concept, amount, paymentType, year, months, status, paidAt } = data
+    const { paymentId, residentId, concept, amount, paymentType, year, months, status, paidAt } = data
 
     const [oldPayment] = await db.select().from(payments).where(eq(payments.id, paymentId)).limit(1)
     const oldMonths = await db.select().from(paymentMonths).where(eq(paymentMonths.paymentId, paymentId))
@@ -64,7 +63,7 @@ export const updatePayment = createServerFn({ method: 'POST' })
     const [updatedPayment] = await db
       .update(payments)
       .set({
-        ownerId,
+        residentId,
         concept,
         amount,
         paymentType,
@@ -97,7 +96,7 @@ export const updatePayment = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return updatedPayment satisfies InsertPayment
+    return updatedPayment
   })
 
 export const deletePayment = createServerFn({ method: 'POST' })
@@ -131,7 +130,7 @@ export const getPaymentsList = createServerFn()
   .handler(async () => {
     const allPayments = await db.query.payments.findMany({
       with: {
-        owner: true,
+        resident: true,
         paymentMonths: {
           orderBy: (paymentMonths, { asc }) => [asc(paymentMonths.month)],
         },
@@ -139,7 +138,7 @@ export const getPaymentsList = createServerFn()
       orderBy: (payments, { desc }) => [desc(payments.updatedAt)],
     })
 
-    return allPayments satisfies PaymentWithOwnerAndMonths[]
+    return allPayments
   })
 
 export const getPaymentsByYear = createServerFn({ method: 'POST' })
@@ -151,12 +150,12 @@ export const getPaymentsByYear = createServerFn({ method: 'POST' })
     const yearPayments = await db.query.payments.findMany({
       where: eq(payments.year, year),
       with: {
-        owner: true,
+        resident: true,
         paymentMonths: {
           orderBy: (paymentMonths, { asc }) => [asc(paymentMonths.month)],
         },
       },
     })
 
-    return yearPayments satisfies PaymentWithOwnerAndMonths[]
+    return yearPayments
   })

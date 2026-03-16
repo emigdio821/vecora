@@ -1,24 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateHouse } from '@/api/server-functions/houses'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOUSES_QUERY_KEY } from '@/api/tanstack-queries/houses'
-import { ownersListQueryOptions } from '@/api/tanstack-queries/owners'
+import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/api/tanstack-queries/houses'
 import { LoaderIcon } from '@/components/icons'
+import { ResidentsSelector } from '@/components/shared/selectors/residents-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Sheet,
   SheetClose,
@@ -29,12 +19,11 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateHouseFormData, updateHouseSchema } from '@/schemas/houses'
 
 interface EditHouseSheetProps {
-  house: HouseWithOwner
+  house: HouseQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -45,8 +34,6 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
   const editHouseFormId = useId()
   const { isOpen, onOpenChange } = state
 
-  const { data: owners = [], isLoading: isLoadingOwners } = useQuery(ownersListQueryOptions())
-
   const form = useForm<UpdateHouseFormData>({
     resolver: zodResolver(updateHouseSchema),
     values: {
@@ -56,7 +43,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
       city: house.city ?? '',
       state: house.state ?? '',
       zipCode: house.zipCode ?? '',
-      ownerId: house.ownerId,
+      residentId: house.residentId,
     },
   })
 
@@ -80,13 +67,6 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
   function handleOpenChange(open: boolean) {
     if (updateHouseMutation.isPending) return
     onOpenChange(open)
-  }
-
-  function renderOwnerValue(value: string | null) {
-    if (owners.length === 0) return 'No hay propietarios disponibles'
-
-    const owner = owners.find((owner) => owner.id === value)
-    return owner ? `${owner.firstName} ${owner.lastName}` : 'Selecciona una opción'
   }
 
   return (
@@ -198,30 +178,22 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
             />
 
             <Controller
-              name="ownerId"
+              name="residentId"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Propietario</FieldLabel>
-                  <Select
+
+                  <ResidentsSelector
+                    id={field.name}
                     value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={owners.length === 0 || isLoadingOwners}
-                  >
-                    <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
-                      <SelectValue>{renderOwnerValue}</SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value={null}>Sin selección</SelectItem>
-                        {owners.map((owner) => (
-                          <SelectItem key={owner.id} value={owner.id}>
-                            <span>{`${owner.firstName} ${owner.lastName}`}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                    }}
+                    ownersOnly
+                    disabled={updateHouseMutation.isPending}
+                    invalid={fieldState.invalid}
+                  />
 
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>

@@ -3,7 +3,6 @@ import { getRequest } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { auditLogs, profiles } from '@/db/schema'
-import type { AuditLogWithUserAndProfile } from '@/db/schema/zod/audit-logs'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import { createAuditLogSchema } from '@/schemas/audit-logs'
@@ -45,19 +44,11 @@ export const getAuditLogs = createServerFn()
     const logs = await db.query.auditLogs.findMany({
       with: {
         user: true,
-        profile: {
-          with: {
-            profileRoles: {
-              with: {
-                role: true,
-              },
-            },
-          },
-        },
+        profile: true,
         entityUser: true,
       },
       orderBy: (auditLogs, { desc }) => [desc(auditLogs.timestamp)],
     })
 
-    return logs satisfies AuditLogWithUserAndProfile[]
+    return logs
   })

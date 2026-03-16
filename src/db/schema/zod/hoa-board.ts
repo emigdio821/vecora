@@ -1,7 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import type { z } from 'zod'
 import { hoaBoard, hoaBoardPeriods } from '..'
-import type { ProfileWithRoles } from './profiles'
 
 export const insertHoaBoardPeriodSchema = createInsertSchema(hoaBoardPeriods)
 export const selectHoaBoardPeriodSchema = createSelectSchema(hoaBoardPeriods)
@@ -14,14 +13,3 @@ export type SelectHoaBoardPeriod = z.infer<typeof selectHoaBoardPeriodSchema>
 
 export type InsertHoaBoard = z.infer<typeof insertHoaBoardSchema>
 export type SelectHoaBoard = z.infer<typeof selectHoaBoardSchema>
-
-// Type for HOA board periods with members
-export type HoaBoardPeriodWithMembers = SelectHoaBoardPeriod & {
-  members: HoaBoardMember[]
-}
-
-// Type for HOA board members with profile
-export type HoaBoardMember = SelectHoaBoard & {
-  period: SelectHoaBoardPeriod | null
-  profile: ProfileWithRoles | null
-}

@@ -1,15 +1,15 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import type { AuditLogQueryData } from '@/api/tanstack-queries/audit-logs'
 import { AuditLogActionBadge } from '@/components/shared/audit-logs/action-badge'
 import { AuditLogEntityTypeBadge } from '@/components/shared/audit-logs/identity-type-badge'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { DataTableSortableHeader } from '@/components/table/sortable-header'
 import { Checkbox } from '@/components/ui/checkbox'
-import type { AuditLogWithUserAndProfile } from '@/db/schema/zod/audit-logs'
 import { formatDate, normalizeString } from '@/lib/utils'
 import { AuditDetailsCell } from './audit-details-cell'
 import type { YearFacetedFilterOption } from './data-table-header'
 
-export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
+export const auditLogsTableColumns: ColumnDef<AuditLogQueryData>[] = [
   {
     id: 'select',
     size: 28,
@@ -37,7 +37,7 @@ export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
     accessorKey: 'user',
     size: 180,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Usuario" />,
-    cell: ({ row }) => <AuditDetailsCell auditLogs={row.original} />,
+    cell: ({ row }) => <AuditDetailsCell auditLog={row.original} />,
     filterFn: (row, _, value: string) => {
       const normalizedName = normalizeString(row.original.user?.name || '').toLowerCase()
       const normalizedUserId = normalizeString(row.original.user?.id || '').toLowerCase()
@@ -51,10 +51,8 @@ export const auditLogsTableColumns: ColumnDef<AuditLogWithUserAndProfile>[] = [
     size: 150,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Rol" />,
     cell: ({ row }) => {
-      const roles = row.original.profile?.profileRoles?.map(({ role }) => role.name) || []
-      const roleBadges = roles.map((role) => <RoleNameBadge roleName={role} key={role} />)
-
-      return <>{roleBadges.length > 0 && <div className="flex flex-wrap gap-1">{roleBadges}</div>}</>
+      const role = row.original.user?.role
+      return <>{role && <RoleNameBadge roleName={role} />}</>
     },
   },
   {

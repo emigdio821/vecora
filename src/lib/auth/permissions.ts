@@ -20,6 +20,14 @@ export const adminRole = ac.newRole({
   treasurer: ['create', 'read', 'update', 'delete'],
 })
 
+// Resident role: read-only access to all sections
+export const residentRole = ac.newRole({
+  maintenance: ['read'],
+  president: ['read'],
+  security: ['read'],
+  treasurer: ['read'],
+})
+
 // Maintenance role: full CRUD in maintenance section, read-only elsewhere
 export const maintenanceRole = ac.newRole({
   maintenance: ['create', 'read', 'update', 'delete'],

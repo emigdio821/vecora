@@ -1,5 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
-import { profileRolesListQueryOptions } from '@/api/tanstack-queries/profiles'
 import {
   Select,
   SelectContent,
@@ -8,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { profileRoleSchema } from '@/db/schema/zod/profiles'
 
 interface RolesSelectorProps extends React.ComponentProps<typeof Select> {
   disabled?: boolean
@@ -18,6 +17,44 @@ interface RolesSelectorProps extends React.ComponentProps<typeof Select> {
   value: string | null
 }
 
+function getRoleLabel(roleName: string) {
+  switch (roleName) {
+    case 'admin':
+      return 'Administrador'
+    case 'resident':
+      return 'Residente'
+    case 'maintainer':
+      return 'Mantenimiento'
+    case 'treasurer':
+      return 'Tesorero'
+    case 'president':
+      return 'Presidente'
+    case 'security':
+      return 'Seguridad'
+    default:
+      return roleName
+  }
+}
+
+function getRoleDescription(roleName: string) {
+  switch (roleName) {
+    case 'admin':
+      return 'Acceso completo al sistema'
+    case 'resident':
+      return 'Acceso sin permisos administrativos'
+    case 'maintainer':
+      return 'Gestión del mantenimiento'
+    case 'treasurer':
+      return 'Gestión de ingresos y gastos'
+    case 'president':
+      return 'Gestión general y representación'
+    case 'security':
+      return 'Gestión de seguridad y vigilancia'
+    default:
+      return ''
+  }
+}
+
 export function RolesSelector({
   disabled = false,
   invalid = false,
@@ -26,47 +63,24 @@ export function RolesSelector({
   noneOptionLabel = 'Sin selección',
   ...selectProps
 }: RolesSelectorProps) {
-  const { data: roles = [], isLoading: isLoadingRoles } = useQuery(profileRolesListQueryOptions())
-
-  function getRoleLabel(roleName: string) {
-    switch (roleName) {
-      case 'admin':
-        return 'Administrador'
-      case 'maintainer':
-        return 'Mantenimiento'
-      case 'treasurer':
-        return 'Tesorero'
-      case 'president':
-        return 'Presidente'
-      case 'security':
-        return 'Seguridad'
-      default:
-        return roleName
-    }
-  }
-
   function renderRoleValue(value: string | null) {
-    if (isLoadingRoles) return <span className="animate-pulse">Cargando datos...</span>
-
-    if (roles.length === 0) return 'No hay roles disponibles'
-
-    const role = roles.find((role) => role.id === value)
-    return role ? getRoleLabel(role.name) : 'Selecciona una opción'
+    const role = profileRoleSchema.options.find((role) => role === value)
+    return role ? getRoleLabel(role) : 'Selecciona una opción'
   }
 
   return (
-    <Select disabled={roles.length === 0 || disabled} {...selectProps}>
+    <Select {...selectProps}>
       <SelectTrigger aria-invalid={invalid} className="w-full">
         <SelectValue>{renderRoleValue}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           {includeNoneOption && <SelectItem value={null}>{noneOptionLabel}</SelectItem>}
-          {roles.map((role) => (
-            <SelectItem key={role.id} value={role.id}>
+          {profileRoleSchema.options.map((role) => (
+            <SelectItem key={role} value={role}>
               <div>
-                <p className="font-medium">{getRoleLabel(role.name)}</p>
-                <p className="text-muted-foreground! text-xs">{role.description}</p>
+                <p className="font-medium">{getRoleLabel(role)}</p>
+                <p className="text-muted-foreground! text-xs">{getRoleDescription(role)}</p>
               </div>
             </SelectItem>
           ))}

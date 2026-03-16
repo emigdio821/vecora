@@ -1,22 +1,25 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
+import { useRouteContext } from '@tanstack/react-router'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteHoaBoardMember } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOA_BOARD_MEMBERS_QUERY_KEY, HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
+import {
+  HOA_BOARD_MEMBERS_QUERY_KEY,
+  HOA_BOARD_PERIODS_QUERY_KEY,
+  type HoaBoardMemberQueryData,
+} from '@/api/tanstack-queries/hoa-board'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { HoaBoardMember } from '@/db/schema/zod/hoa-board'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
-import { useUserRoles } from '@/hooks/use-user-roles'
 import { CreateMemberSheet } from '../sheets/create-member'
 
 interface MembersDataTableHeaderProps {
-  table: Table<HoaBoardMember>
+  table: Table<HoaBoardMemberQueryData>
 }
 
 export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
@@ -25,7 +28,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-hoa-members', parseAsString.withDefault(''))
 
-  const { isAdmin } = useUserRoles()
+  const { profile } = useRouteContext({ from: '/_authed' })
 
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
@@ -118,7 +121,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
         </InputGroup>
 
         <div className="flex gap-2">
-          {isAdmin && selectedRowsLength > 0 && (
+          {profile.user.role === 'admin' && selectedRowsLength > 0 && (
             <Tooltip>
               <TooltipTrigger
                 render={
@@ -139,7 +142,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
             </Button>
           )}
 
-          {isAdmin && (
+          {profile.user.role === 'admin' && (
             <Button onClick={() => setIsCreateMemberSheetOpen(true)}>
               <IconPlus className="size-4" />
               Agregar

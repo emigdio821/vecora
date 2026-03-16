@@ -1,4 +1,5 @@
 import { IconHome, IconUserHeart, IconWind } from '@tabler/icons-react'
+import type { HouseQueryData } from '@/api/tanstack-queries/houses'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
 import { CopyButton } from '@/components/ui/copy-button'
@@ -13,11 +14,10 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HouseWithOwner } from '@/db/schema/zod/houses'
 import { formatDate } from '@/lib/utils'
 
 interface HouseDetailsSheetProps {
-  house: HouseWithOwner
+  house: HouseQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -65,24 +65,24 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
             title="Propietario"
             icon={IconUserHeart}
             content={
-              house.owner ? (
+              house.resident ? (
                 <div className="space-y-1">
                   <FramePanel className="flex items-center gap-2 p-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>
-                      <p className="text-muted-foreground text-sm">{`${house.owner.firstName} ${house.owner.lastName}`}</p>
+                      <p className="text-muted-foreground text-sm">{`${house.resident.firstName} ${house.resident.lastName}`}</p>
                     </div>
                     <CopyButton tooltipText="Copiar ID" value={house.id} />
                   </FramePanel>
 
                   <FramePanel className="p-2">
                     <h2 className="font-medium text-sm">Correo</h2>
-                    <p className="text-muted-foreground text-sm">{house.owner.email}</p>
+                    <p className="text-muted-foreground text-sm">{house.resident.email}</p>
                   </FramePanel>
 
                   <FramePanel className="p-2">
                     <h2 className="font-medium text-sm">Teléfono</h2>
-                    <p className="text-muted-foreground text-sm">{house.owner.phone}</p>
+                    <p className="text-muted-foreground text-sm">{house.resident.phone}</p>
                   </FramePanel>
                 </div>
               ) : (

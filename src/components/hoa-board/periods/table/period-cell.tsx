@@ -1,11 +1,11 @@
 import { useState } from 'react'
+import type { HoaBoardPeriodQueryData } from '@/api/tanstack-queries/hoa-board'
 import { Button } from '@/components/ui/button'
-import type { HoaBoardPeriodWithMembers } from '@/db/schema/zod/hoa-board'
 import { formatDate } from '@/lib/utils'
 import { HoaPeriodDetailsSheet } from '../sheets/period-details'
 
 interface HoaPeriodCellProps {
-  period: HoaBoardPeriodWithMembers
+  period: HoaBoardPeriodQueryData
 }
 
 export function HoaPeriodCell({ period }: HoaPeriodCellProps) {

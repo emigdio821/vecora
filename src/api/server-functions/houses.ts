@@ -3,7 +3,6 @@ import { eq, isNull } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { houses } from '@/db/schema'
-import type { HouseWithOwner, InsertHouse, SelectHouse } from '@/db/schema/zod/houses'
 import { authMiddleware } from '@/middleware/auth'
 import { createHouseSchema, deleteHouseSchema, updateHouseSchema } from '@/schemas/houses'
 
@@ -22,7 +21,7 @@ export const createHouse = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return newHouse satisfies InsertHouse
+    return newHouse
   })
 
 export const updateHouse = createServerFn({ method: 'POST' })
@@ -45,7 +44,7 @@ export const updateHouse = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return updatedHouse satisfies SelectHouse
+    return updatedHouse
   })
 
 export const getHouses = createServerFn()
@@ -53,12 +52,12 @@ export const getHouses = createServerFn()
   .handler(async () => {
     const allHouses = await db.query.houses.findMany({
       with: {
-        owner: true,
+        resident: true,
       },
       orderBy: (houses, { desc }) => [desc(houses.updatedAt)],
     })
 
-    return allHouses satisfies HouseWithOwner[]
+    return allHouses
   })
 
 export const deleteHouse = createServerFn({ method: 'POST' })
@@ -77,16 +76,16 @@ export const deleteHouse = createServerFn({ method: 'POST' })
       },
     }).catch(console.error)
 
-    return houseToDelete satisfies SelectHouse
+    return houseToDelete
   })
 
 export const getAvailableHouses = createServerFn()
   .middleware([authMiddleware])
   .handler(async () => {
     const availableHouses = await db.query.houses.findMany({
-      where: isNull(houses.ownerId),
+      where: isNull(houses.residentId),
       orderBy: (houses, { asc }) => [asc(houses.houseNumber)],
     })
 
-    return availableHouses satisfies SelectHouse[]
+    return availableHouses
   })

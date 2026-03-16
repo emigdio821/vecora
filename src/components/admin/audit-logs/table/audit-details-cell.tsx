@@ -1,15 +1,15 @@
 import { useState } from 'react'
+import type { AuditLogQueryData } from '@/api/tanstack-queries/audit-logs'
 import { Button } from '@/components/ui/button'
-import type { AuditLogWithUserAndProfile } from '@/db/schema/zod/audit-logs'
 import { AuditLogDetailsSheet } from '../sheets/audit-log-details'
 
 interface OwnerNameCellProps {
-  auditLogs: AuditLogWithUserAndProfile
+  auditLog: AuditLogQueryData
 }
 
-export function AuditDetailsCell({ auditLogs }: OwnerNameCellProps) {
+export function AuditDetailsCell({ auditLog }: OwnerNameCellProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const userName = auditLogs.user?.name || auditLogs.userId || 'Desconocido'
+  const userName = auditLog.user?.name || auditLog.userId || 'Desconocido'
 
   return (
     <>
@@ -22,7 +22,7 @@ export function AuditDetailsCell({ auditLogs }: OwnerNameCellProps) {
       </Button>
 
       <AuditLogDetailsSheet
-        auditLog={auditLogs}
+        auditLog={auditLog}
         state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }}
       />
     </>

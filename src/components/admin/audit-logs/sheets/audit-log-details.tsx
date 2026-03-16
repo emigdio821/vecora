@@ -1,4 +1,5 @@
 import { IconDeviceDesktopAnalytics, IconFileDescription, IconUser, IconWind } from '@tabler/icons-react'
+import type { AuditLogQueryData } from '@/api/tanstack-queries/audit-logs'
 import { AuditLogActionBadge } from '@/components/shared/audit-logs/action-badge'
 import { AuditLogEntityTypeBadge } from '@/components/shared/audit-logs/identity-type-badge'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
@@ -15,11 +16,10 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { AuditLogWithUserAndProfile } from '@/db/schema/zod/audit-logs'
 import { formatDate } from '@/lib/utils'
 
 interface AuditDetailsSheetProps {
-  auditLog: AuditLogWithUserAndProfile
+  auditLog: AuditLogQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -27,7 +27,7 @@ interface AuditDetailsSheetProps {
 }
 
 export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
-  const profileRoles = auditLog.profile?.profileRoles || []
+  const userRole = auditLog.user?.role
   const { isOpen, onOpenChange } = state
 
   return (
@@ -91,13 +91,11 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
                     <p className="text-muted-foreground text-sm">{auditLog.user.email}</p>
                   </FramePanel>
 
-                  {profileRoles.length > 0 && (
+                  {userRole && (
                     <FramePanel className="p-2">
                       <h2 className="font-medium text-sm">Rol</h2>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {profileRoles.map(({ role }) => (
-                          <RoleNameBadge roleName={role.name} key={role.id} />
-                        ))}
+                      <div className="mt-1">
+                        <RoleNameBadge roleName={userRole} />
                       </div>
                     </FramePanel>
                   )}

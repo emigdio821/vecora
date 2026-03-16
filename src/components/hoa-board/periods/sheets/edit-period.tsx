@@ -5,7 +5,11 @@ import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateHoaBoardPeriod } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { HOA_BOARD_MEMBERS_QUERY_KEY, HOA_BOARD_PERIODS_QUERY_KEY } from '@/api/tanstack-queries/hoa-board'
+import {
+  HOA_BOARD_MEMBERS_QUERY_KEY,
+  HOA_BOARD_PERIODS_QUERY_KEY,
+  type HoaBoardPeriodQueryData,
+} from '@/api/tanstack-queries/hoa-board'
 import { LoaderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -21,14 +25,13 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { HoaBoardPeriodWithMembers } from '@/db/schema/zod/hoa-board'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { MAX_YEAR_OFFSET } from '@/lib/constants'
 import { formatDate } from '@/lib/utils'
 import { type UpdateHoaBoardPeriodFormData, updateHoaBoardPeriodSchema } from '@/schemas/hoa-board'
 
 interface EditHoaPeriodSheetProps {
-  period: HoaBoardPeriodWithMembers
+  period: HoaBoardPeriodQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void

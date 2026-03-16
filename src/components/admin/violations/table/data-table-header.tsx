@@ -2,7 +2,7 @@ import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from 
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
-import { deleteViolation } from '@/api/server-functions/violations'
+import { deleteViolation, type ViolationQueryData } from '@/api/server-functions/violations'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
@@ -10,12 +10,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { ViolationWithOwner } from '@/db/schema/zod/violations'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
 import { CreateViolationSheet } from '../sheets/create-violation'
 
 interface ViolationsDataTableHeaderProps {
-  table: Table<ViolationWithOwner>
+  table: Table<ViolationQueryData>
 }
 
 export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderProps) {

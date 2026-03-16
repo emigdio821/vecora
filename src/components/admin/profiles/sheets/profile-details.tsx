@@ -1,8 +1,8 @@
 import { IconRosette, IconUser, IconUserScan, IconUserStar, IconWind } from '@tabler/icons-react'
+import type { ProfileQueryData } from '@/api/tanstack-queries/profiles'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { ProfileStatusBadge } from '@/components/shared/users/profile-status-badge'
-import { Badge } from '@/components/ui/badge'
 import { CopyButton } from '@/components/ui/copy-button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia } from '@/components/ui/empty'
 import { FramePanel } from '@/components/ui/frame'
@@ -15,11 +15,10 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ProfileWithAllRelations } from '@/db/schema/zod/profiles'
 import { formatDate } from '@/lib/utils'
 
 interface ProfileDetailsSheetProps {
-  profile: ProfileWithAllRelations
+  profile: ProfileQueryData
   state: {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
@@ -28,7 +27,6 @@ interface ProfileDetailsSheetProps {
 
 export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps) {
   const { isOpen, onOpenChange } = state
-  const profileTypeLabel = profile.profileType === 'owner' ? 'Propietario' : 'Externo'
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -55,9 +53,7 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
 
                 <FramePanel className="p-2">
                   <h2 className="font-medium text-sm">Tipo de perfil</h2>
-                  <Badge variant="outline" className="mt-1">
-                    {profileTypeLabel}
-                  </Badge>
+                  <RoleNameBadge roleName={profile.user.role || ''} />
                 </FramePanel>
               </div>
             }
@@ -99,74 +95,37 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
             />
           )}
 
-          {/* Owner/External User info */}
+          {/* Resident info */}
           <CollapsibleDetails
-            title={profile.profileType === 'owner' ? 'Propietario' : 'Usuario Externo'}
+            title="Residente"
             icon={IconUser}
             content={
-              profile.profileType === 'owner' && profile.owner ? (
+              profile.resident ? (
                 <div className="space-y-1">
                   <FramePanel className="flex items-center gap-2 p-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>
                       <p className="line-clamp-2 text-muted-foreground text-sm">
-                        {`${profile.owner.firstName} ${profile.owner.lastName}`.trim()}
+                        {`${profile.resident.firstName} ${profile.resident.lastName}`.trim()}
                       </p>
                     </div>
-                    <CopyButton tooltipText="Copiar ID" value={profile.owner.id} />
+                    <CopyButton tooltipText="Copiar ID" value={profile.resident.id} />
                   </FramePanel>
 
-                  {profile.owner.email && (
+                  {profile.resident.email && (
                     <FramePanel className="p-2">
                       <h2 className="font-medium text-sm">Correo</h2>
-                      <p className="line-clamp-2 text-muted-foreground text-sm">{profile.owner.email}</p>
+                      <p className="line-clamp-2 text-muted-foreground text-sm">{profile.resident.email}</p>
                     </FramePanel>
                   )}
 
-                  {profile.owner.phone && (
+                  {profile.resident.phone && (
                     <FramePanel className="p-2">
                       <h2 className="font-medium text-sm">Teléfono</h2>
-                      <p className="line-clamp-2 text-muted-foreground text-sm">{profile.owner.phone}</p>
+                      <p className="line-clamp-2 text-muted-foreground text-sm">{profile.resident.phone}</p>
                     </FramePanel>
                   )}
                 </div>
-              ) : profile.profileType === 'external' && profile.externalUser ? (
-                <>
-                  <FramePanel className="flex items-center gap-2 p-2">
-                    <div className="min-w-0 flex-1">
-                      <h2 className="font-medium text-sm">Nombre</h2>
-                      <p className="line-clamp-2 text-muted-foreground text-sm">
-                        {`${profile.externalUser.firstName} ${profile.externalUser.lastName}`.trim()}
-                      </p>
-                    </div>
-                    <CopyButton tooltipText="Copiar ID" value={profile.externalUser.id} />
-                  </FramePanel>
-
-                  {profile.externalUser.email && (
-                    <FramePanel className="p-2">
-                      <h2 className="font-medium text-sm">Correo</h2>
-                      <p className="line-clamp-2 text-muted-foreground text-sm">
-                        {profile.externalUser.email}
-                      </p>
-                    </FramePanel>
-                  )}
-
-                  {profile.externalUser.phone && (
-                    <FramePanel className="p-2">
-                      <h2 className="font-medium text-sm">Teléfono</h2>
-                      <p className="line-clamp-2 text-muted-foreground text-sm">
-                        {profile.externalUser.phone}
-                      </p>
-                    </FramePanel>
-                  )}
-
-                  {profile.externalUser.notes && (
-                    <FramePanel className="p-2">
-                      <h2 className="font-medium text-sm">Notas</h2>
-                      <p className="text-muted-foreground text-sm">{profile.externalUser.notes}</p>
-                    </FramePanel>
-                  )}
-                </>
               ) : (
                 <FramePanel className="p-2">
                   <Empty className="p-1">
@@ -174,10 +133,7 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
                       <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
-                      <EmptyDescription>
-                        No hay información de{' '}
-                        {profile.profileType === 'owner' ? 'propietario' : 'usuario externo'}
-                      </EmptyDescription>
+                      <EmptyDescription>No hay información del residente</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
                 </FramePanel>
@@ -190,20 +146,10 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
             title="Rol"
             icon={IconRosette}
             content={
-              profile.profileRoles.length > 0 ? (
-                <div className="space-y-1">
-                  {profile.profileRoles.map((profileRole) => (
-                    <FramePanel key={profileRole.id} className="flex items-center gap-2 p-2">
-                      <div className="min-w-0 flex-1">
-                        <RoleNameBadge roleName={profileRole.role.name} />
-                        {profileRole.role.description && (
-                          <p className="text-muted-foreground text-sm">{profileRole.role.description}</p>
-                        )}
-                      </div>
-                      <CopyButton tooltipText="Copiar ID del rol" value={profileRole.role.id} />
-                    </FramePanel>
-                  ))}
-                </div>
+              profile.user.role ? (
+                <FramePanel className="flex items-center gap-2 p-2">
+                  <RoleNameBadge roleName={profile.user.role} />
+                </FramePanel>
               ) : (
                 <FramePanel className="p-2">
                   <Empty className="p-1">

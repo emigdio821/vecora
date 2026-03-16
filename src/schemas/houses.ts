@@ -6,7 +6,7 @@ export const createHouseSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   zipCode: z.string().optional(),
-  ownerId: z.uuid('ID de propietario inválido').nullable(),
+  residentId: z.uuid('ID de propietario inválido').nullable(),
 })
 
 export type CreateHouseFormData = z.infer<typeof createHouseSchema>
@@ -18,7 +18,7 @@ export const updateHouseSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   zipCode: z.string().optional(),
-  ownerId: z.uuid('ID de propietario inválido').nullable(),
+  residentId: z.uuid('ID de propietario inválido').nullable(),
 })
 
 export type UpdateHouseFormData = z.infer<typeof updateHouseSchema>

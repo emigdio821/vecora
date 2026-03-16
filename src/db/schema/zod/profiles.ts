@@ -1,33 +1,18 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { profiles, profileTypeEnum } from '..'
-import type { SelectExternalUser } from './external-users'
-import type { SelectHoaBoard } from './hoa-board'
-import type { SelectOwner } from './owners'
-import type { ProfileRoleWithRole } from './profile-roles'
-import type { SelectUser } from './users'
+import { profiles } from '..'
 
 export const insertProfileSchema = createInsertSchema(profiles)
 export const selectProfileSchema = createSelectSchema(profiles)
-export const profileTypeSchema = z.enum(profileTypeEnum.enumValues)
+export const profileRoleSchema = z.enum([
+  'admin',
+  'resident',
+  'maintenance',
+  'president',
+  'security',
+  'treasurer',
+])
 
-export type ProfileType = z.infer<typeof profileTypeSchema>
+export type ProfileRole = z.infer<typeof profileRoleSchema>
 export type InsertProfile = z.infer<typeof insertProfileSchema>
 export type SelectProfile = z.infer<typeof selectProfileSchema>
-export type ProfileWithUser = z.infer<typeof selectProfileSchema> & {
-  user: SelectUser
-}
-export type ProfileWithRoles = SelectProfile & {
-  profileRoles: ProfileRoleWithRole[]
-}
-export type ProfileWithUserAndRoles = SelectProfile & {
-  user: SelectUser
-  profileRoles: ProfileRoleWithRole[]
-}
-export type ProfileWithAllRelations = SelectProfile & {
-  owner: SelectOwner | null
-  externalUser: SelectExternalUser | null
-  profileRoles: ProfileRoleWithRole[]
-  user: SelectUser | null
-  hoaBoardMemberships: SelectHoaBoard[]
-}
