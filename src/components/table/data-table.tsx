@@ -6,11 +6,12 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type PaginationState,
   type SortingState,
   type Table as TableType,
   useReactTable,
 } from '@tanstack/react-table'
-import { parseAsIndex, parseAsInteger, useQueryStates } from 'nuqs'
+import { parseAsInteger, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { DataTablePagination, DEFAULT_TABLE_PAGE_SIZE } from '@/components/table/pagination'
 import {
@@ -34,22 +35,17 @@ interface DataTableProps<TData, TValue> {
 
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
   const { data, tableId, header, caption, columns, pageSize: tablePageSize = DEFAULT_TABLE_PAGE_SIZE } = props
-  const paginationUrlKeys = {
-    pageIndex: tableId ? `${tableId}-page` : 'page',
-    pageSize: tableId ? `${tableId}-perPage` : 'perPage',
-  }
 
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
-  const paginationParsers = {
-    pageIndex: parseAsIndex.withDefault(0),
-    pageSize: parseAsInteger.withDefault(tablePageSize),
-  }
+  const queryParamKey = tableId ? `${tableId}-page` : 'page'
+  const [pageFromUrl, setPageFromUrl] = useQueryState(queryParamKey, parseAsInteger.withDefault(1))
 
-  const [{ pageIndex, pageSize }, setPagination] = useQueryStates(paginationParsers, {
-    urlKeys: paginationUrlKeys,
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: pageFromUrl - 1,
+    pageSize: tablePageSize,
   })
 
   const table = useReactTable({
@@ -57,8 +53,9 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
     columns,
     onSortingChange: setSorting,
     onPaginationChange: (updater) => {
-      const newPagination = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater
+      const newPagination = typeof updater === 'function' ? updater(pagination) : updater
       setPagination(newPagination)
+      setPageFromUrl(newPagination.pageIndex + 1)
     },
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
@@ -72,27 +69,23 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
       sorting,
       rowSelection,
       columnFilters,
-      pagination: {
-        pageIndex,
-        pageSize,
-      },
+      pagination,
     },
     initialState: {
-      pagination: {
-        pageIndex,
-        pageSize,
-      },
+      pagination,
     },
   })
 
   const rowLength = table.getFilteredRowModel().rows.length
 
   useEffect(() => {
-    const maxPage = Math.max(0, Math.ceil(data.length / pageSize) - 1)
-    if (pageIndex > maxPage) {
-      setPagination({ pageIndex: maxPage, pageSize })
+    const maxPage = Math.max(0, Math.ceil(data.length / pagination.pageSize) - 1)
+
+    if (pagination.pageIndex > maxPage) {
+      setPagination({ pageIndex: maxPage, pageSize: pagination.pageSize })
+      setPageFromUrl(maxPage + 1)
     }
-  }, [data.length, pageIndex, pageSize, setPagination])
+  }, [data.length, pagination, setPageFromUrl])
 
   return (
     <div className="space-y-2">
@@ -137,7 +130,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
             ) : (
               <TableRow>
                 <TableCell className="h-24 text-center" colSpan={columns.length}>
-                  Sin resultados.
+                  Sin resultados
                 </TableCell>
               </TableRow>
             )}

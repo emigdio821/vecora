@@ -99,7 +99,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
     if (resident) {
       const residentName = `${resident.firstName} ${resident.lastName}`
       return {
-        to: '/admin/users' as const,
+        to: '/admin/residential' as const,
         search: { tab: 'residents', 'search-residents': residentName },
       }
     }
@@ -173,11 +173,11 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
                   </Link>
                 }
                 size="icon"
-                aria-label="Ir al usuario vinculado"
+                aria-label="Ir al residente vinculado"
               />
             }
           />
-          <TooltipContent>Ir al usuario vinculado</TooltipContent>
+          <TooltipContent>Ir al residente vinculado</TooltipContent>
         </Tooltip>
 
         <DropdownMenu>

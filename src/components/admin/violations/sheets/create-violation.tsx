@@ -15,7 +15,6 @@ import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -117,7 +116,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
-                    Propietario <span className="text-destructive">*</span>
+                    Residente <span className="text-destructive">*</span>
                   </FieldLabel>
                   <ResidentsSelector
                     id={field.name}
@@ -200,13 +199,6 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={createViolationFormId} disabled={createViolationMutation.isPending}>
             {createViolationMutation.isPending && <LoaderIcon />}
             Crear

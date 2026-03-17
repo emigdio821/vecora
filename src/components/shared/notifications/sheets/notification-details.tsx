@@ -38,7 +38,7 @@ export function NotificationDetailsSheet({ notification, state }: NotificationDe
             title="Información de la notificación"
             icon={IconBell}
             content={
-              <div>
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Título</h2>

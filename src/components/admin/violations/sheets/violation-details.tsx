@@ -40,7 +40,7 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
             title="Información de la infracción"
             icon={IconFlag}
             content={
-              <div>
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Concepto</h2>
@@ -69,11 +69,11 @@ export function ViolationDetailsSheet({ violation, state }: ViolationDetailsShee
 
           {/* Resident info */}
           <CollapsibleDetails
-            title="Propietario"
+            title="Residente"
             icon={IconUserHeart}
             content={
               violation.resident ? (
-                <div>
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>

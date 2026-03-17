@@ -62,6 +62,22 @@ export const residents = pgTable('residents', {
     .notNull(),
 })
 
+// Residential Address table - stores the common address for the condominium complex
+export const residentialAddress = pgTable('residential_address', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 255 }).notNull(), // e.g., "Valle Verde HOA"
+  street: varchar('street', { length: 255 }).notNull(),
+  city: varchar('city', { length: 100 }).notNull(),
+  state: varchar('state', { length: 100 }).notNull(),
+  zipCode: varchar('zip_code', { length: 20 }).notNull(),
+  country: varchar('country', { length: 100 }).default('México'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+})
+
 // Houses table - represents properties owned by residents
 export const houses = pgTable(
   'houses',
@@ -69,10 +85,6 @@ export const houses = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     residentId: uuid('resident_id').references(() => residents.id, { onDelete: 'set null' }),
     houseNumber: varchar('house_number', { length: 20 }).notNull().unique(),
-    street: varchar('street', { length: 255 }),
-    city: varchar('city', { length: 100 }),
-    state: varchar('state', { length: 100 }),
-    zipCode: varchar('zip_code', { length: 20 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()

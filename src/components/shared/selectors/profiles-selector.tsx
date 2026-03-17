@@ -110,7 +110,7 @@ export function ProfilesSelector({
           <Command>
             {items.length > 10 && <CommandInput placeholder="Buscar" />}
             <CommandList>
-              <CommandEmpty>Sin resultados.</CommandEmpty>
+              <CommandEmpty>Sin resultados</CommandEmpty>
               <CommandGroup>
                 {includeNoneOption && (
                   <CommandItem

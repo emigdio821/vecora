@@ -11,6 +11,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
@@ -127,6 +128,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
           </SelectTrigger>
           <SelectContent align="end" className="max-w-20">
             <SelectGroup>
+              <SelectLabel>Año</SelectLabel>
               {facetedFilterYears.map((option) => (
                 <SelectItem key={option.value} value={option}>
                   <span>{option.label}</span>

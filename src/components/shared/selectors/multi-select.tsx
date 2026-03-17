@@ -85,7 +85,7 @@ export function ComboboxMultiSelect({
             role="combobox"
             variant="outline"
             aria-invalid={invalid}
-            aria-label="Combobox de usuarios externos"
+            aria-label="Combobox multiple"
             className="w-full justify-between font-normal"
             disabled={items.length === 0 || isLoading || disabled}
           >
@@ -100,7 +100,7 @@ export function ComboboxMultiSelect({
           <Command>
             {items.length > 10 && <CommandInput placeholder="Buscar" />}
             <CommandList>
-              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandEmpty>Sin resultados</CommandEmpty>
               <CommandGroup>
                 {items.map((item) => (
                   <CommandItem

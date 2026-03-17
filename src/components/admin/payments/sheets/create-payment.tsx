@@ -19,12 +19,12 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -165,7 +165,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
-                    Propietario <span className="text-destructive">*</span>
+                    Residente <span className="text-destructive">*</span>
                   </FieldLabel>
                   <ResidentsSelector
                     id={field.name}
@@ -195,6 +195,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
+                        <SelectLabel>Tipo de pago</SelectLabel>
                         {paymentTypeSchema.options.map((type) => (
                           <SelectItem key={type} value={type}>
                             {renderPaymentTypeValue(type)}
@@ -250,6 +251,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
                       </SelectTrigger>
                       <SelectContent className="max-h-96">
                         <SelectGroup>
+                          <SelectLabel>Meses</SelectLabel>
                           {Object.entries(MONTHS).map(([value, month]) => (
                             <SelectItem key={value} value={Number(value)}>
                               {month}
@@ -279,6 +281,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
                     </SelectTrigger>
                     <SelectContent className="max-h-96">
                       <SelectGroup>
+                        <SelectLabel>Año</SelectLabel>
                         {years.map((year) => (
                           <SelectItem key={year} value={year.toString()}>
                             {year}
@@ -324,6 +327,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
+                        <SelectLabel>Estatus</SelectLabel>
                         {paymentStatusSchema.options.map((status) => (
                           <SelectItem key={status} value={status}>
                             {getPaymentStatusLabel(status)}
@@ -385,13 +389,6 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={createPaymentFormId} disabled={createPaymentMutation.isPending}>
             {createPaymentMutation.isPending && <LoaderIcon />}
             Crear

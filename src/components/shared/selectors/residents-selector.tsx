@@ -36,10 +36,12 @@ export function ResidentsSelector({
   excludeWithProfiles = false,
   ownersOnly = false,
   noneOptionLabel = 'Sin selección',
-  placeholder = 'Selecciona una opción',
+  placeholder,
 }: ResidentsSelectorProps) {
   const [open, setOpen] = useState(false)
   const { data: residents = [], isLoading: isLoadingResidents } = useQuery(residentsListQueryOptions())
+
+  placeholder = placeholder || (ownersOnly ? 'Selecciona un propietario' : 'Selecciona un residente')
 
   const items = useMemo(() => {
     let filteredResidents = residents
@@ -94,13 +96,13 @@ export function ResidentsSelector({
         }
       />
       <PopoverContent
-        className="w-(--anchor-width) gap-0 rounded-lg p-0"
+        className="w-(--anchor-width) gap-0 p-0"
         render={
           <Command>
             {items.length > 10 && <CommandInput placeholder="Buscar" />}
             <CommandList>
-              <CommandEmpty>Sin resultados.</CommandEmpty>
-              <CommandGroup>
+              <CommandEmpty>Sin resultados</CommandEmpty>
+              <CommandGroup heading={ownersOnly ? 'Propietarios' : 'Residentes'}>
                 {includeNoneOption && (
                   <CommandItem
                     value={undefined}

@@ -12,7 +12,6 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { InputPassword } from '@/components/ui/input-password'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -155,13 +154,6 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={editProfileFormId} disabled={updateProfileMutation.isPending}>
             {updateProfileMutation.isPending && <LoaderIcon />}
             Guardar

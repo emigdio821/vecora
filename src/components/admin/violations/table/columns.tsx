@@ -70,7 +70,7 @@ export const violationsTableColumns: ColumnDef<ViolationQueryData>[] = [
   {
     accessorKey: 'status',
     size: 120,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Estatus" />,
     cell: ({ row }) => <ViolationStatusBadge status={row.original.status} />,
   },
   {

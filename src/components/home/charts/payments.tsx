@@ -260,7 +260,7 @@ export function PaymentsChart() {
                     Propietarios con pagos pendientes en <span className="font-medium">{selectedYear}</span>
                   </PopoverDescription>
                 </div>
-                <div className="max-h-72 space-y-1 overflow-y-auto p-2 pt-0">
+                <div className="max-h-72 space-y-1 overflow-y-auto p-2">
                   {paymentStats.pendingPayments.map((payment) => (
                     <Card key={payment.id} className="rounded-sm">
                       <CardHeader className="gap-0 px-2.5 py-2">

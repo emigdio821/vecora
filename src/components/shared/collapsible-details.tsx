@@ -11,7 +11,7 @@ interface CollapsibleDetailsProps {
 
 export function CollapsibleDetails({ icon: Icon, title, content }: CollapsibleDetailsProps) {
   return (
-    <Card className="w-full">
+    <Card className="w-full overflow-clip">
       <Collapsible defaultOpen>
         <CardHeader>
           <div className="flex flex-row items-center justify-between">

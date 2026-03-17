@@ -13,7 +13,6 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -175,13 +174,6 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={createPeriodFormId} disabled={createPeriodMutation.isPending}>
             {createPeriodMutation.isPending && <LoaderIcon />}
             Crear

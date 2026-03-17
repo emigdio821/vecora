@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -146,13 +145,6 @@ export function CreateMemberSheet({ state, defaultPeriodId }: CreateMemberSheetP
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={createMemberFormId} disabled={createMemberMutation.isPending}>
             {createMemberMutation.isPending && <LoaderIcon />}
             Agregar

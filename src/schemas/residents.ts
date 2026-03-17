@@ -9,7 +9,7 @@ export const createResidentSchema = z.object({
     .min(1, 'El teléfono es requerido')
     .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
   email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
-  isOwner: z.boolean().default(false),
+  isOwner: z.boolean(),
   notes: z.string().max(200, 'Las notas son muy largas').optional(),
   houseIds: z.array(z.uuid('ID de casa inválido')).optional(),
 })
@@ -25,7 +25,7 @@ export const updateResidentSchema = z.object({
     .min(1, 'El teléfono es requerido')
     .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
   email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
-  isOwner: z.boolean().default(false),
+  isOwner: z.boolean(),
   notes: z.string().max(200, 'Las notas son muy largas').optional(),
   houseIds: z.array(z.uuid('ID de casa inválido')).optional(),
 })

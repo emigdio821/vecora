@@ -14,7 +14,6 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { InputPassword } from '@/components/ui/input-password'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -89,7 +88,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
-                    Propietario <span className="text-destructive">*</span>
+                    Residente <span className="text-destructive">*</span>
                   </FieldLabel>
                   <ResidentsSelector
                     id={field.name}
@@ -142,6 +141,10 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                     placeholder="Mínimo 8 caracteres"
                     disabled={createProfileMutation.isPending}
                   />
+                  <FieldDescription>
+                    Puedes usar una contraseña temporal, el residente podrá cambiarla después desde su perfil.
+                  </FieldDescription>
+
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -159,7 +162,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                     id={field.name}
                     includeNoneOption={false}
                     invalid={fieldState.invalid}
-                    value={field.value[0] || null}
+                    value={field.value}
                     disabled={createProfileMutation.isPending}
                     onValueChange={(value) => field.onChange([value])}
                   />
@@ -171,13 +174,6 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={createProfileFormId} disabled={createProfileMutation.isPending}>
             {createProfileMutation.isPending && <LoaderIcon />}
             Crear

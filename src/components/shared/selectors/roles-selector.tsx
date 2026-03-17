@@ -23,7 +23,7 @@ function getRoleLabel(roleName: string) {
       return 'Administrador'
     case 'resident':
       return 'Residente'
-    case 'maintainer':
+    case 'maintenance':
       return 'Mantenimiento'
     case 'treasurer':
       return 'Tesorero'
@@ -42,7 +42,7 @@ function getRoleDescription(roleName: string) {
       return 'Acceso completo al sistema'
     case 'resident':
       return 'Acceso sin permisos administrativos'
-    case 'maintainer':
+    case 'maintenance':
       return 'Gestión del mantenimiento'
     case 'treasurer':
       return 'Gestión de ingresos y gastos'

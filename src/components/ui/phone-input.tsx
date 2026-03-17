@@ -135,64 +135,68 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
           </Button>
         }
       />
-      <PopoverContent align="start" className="w-64 p-0 sm:w-72">
-        <Command shouldFilter={false}>
-          <CommandInput placeholder="Buscar" onValueChange={handleCountryFilter} />
-          <CommandList className="overflow-hidden">
-            <CommandEmpty>Sin resultados.</CommandEmpty>
-            <CommandGroup className="overflow-hidden p-0">
-              {filteredCountries.length > 0 && (
-                <div
-                  role="presentation"
-                  ref={handleScrollElementRef}
-                  className="h-[min(16.5rem,var(--total-size))] max-h-(--available-height) overflow-auto overscroll-contain px-1"
-                  style={{ '--total-size': `${totalSize}px` } as React.CSSProperties}
-                >
+      <PopoverContent
+        align="start"
+        className="w-64 gap-0 p-0 sm:w-72"
+        render={
+          <Command shouldFilter={false}>
+            <CommandInput placeholder="Buscar" onValueChange={handleCountryFilter} />
+            <CommandList>
+              <CommandEmpty>Sin resultados</CommandEmpty>
+              <CommandGroup className="overflow-hidden p-0">
+                {filteredCountries.length > 0 && (
                   <div
                     role="presentation"
-                    className="relative w-full overflow-hidden"
-                    style={{ height: totalSize }}
+                    ref={handleScrollElementRef}
+                    className="h-[min(16.5rem,var(--total-size))] max-h-(--available-height) overflow-auto overscroll-contain px-1"
+                    style={{ '--total-size': `${totalSize}px` } as React.CSSProperties}
                   >
-                    {virtualizer.getVirtualItems().map((virtualRow) => {
-                      const item = filteredCountries[virtualRow.index]
-                      if (!item || !item.value) return null
-                      const { label, value } = item
+                    <div
+                      role="presentation"
+                      className="relative w-full overflow-hidden"
+                      style={{ height: totalSize }}
+                    >
+                      {virtualizer.getVirtualItems().map((virtualRow) => {
+                        const item = filteredCountries[virtualRow.index]
+                        if (!item || !item.value) return null
+                        const { label, value } = item
 
-                      return (
-                        <CommandItem
-                          key={value}
-                          value={value}
-                          data-index={virtualRow.index}
-                          ref={virtualizer.measureElement}
-                          data-checked={value === selectedCountry}
-                          onSelect={(currentValue) => {
-                            setOpen(false)
-                            onChange(currentValue as Country)
-                          }}
-                          aria-setsize={filteredCountries.length}
-                          aria-posinset={virtualRow.index + 1}
-                          className="absolute top-0 left-0 w-full"
-                          style={{
-                            height: virtualRow.size,
-                            transform: `translateY(${virtualRow.start}px)`,
-                          }}
-                        >
-                          <div className="inline-flex w-full min-w-0 flex-1 items-center justify-between gap-2">
-                            <span title={label} className="truncate">
-                              {label}
-                            </span>
-                            <span className="text-muted-foreground text-xs">{getCountryCode(value)}</span>
-                          </div>
-                        </CommandItem>
-                      )
-                    })}
+                        return (
+                          <CommandItem
+                            key={value}
+                            value={value}
+                            data-index={virtualRow.index}
+                            ref={virtualizer.measureElement}
+                            data-checked={value === selectedCountry}
+                            onSelect={(currentValue) => {
+                              setOpen(false)
+                              onChange(currentValue as Country)
+                            }}
+                            aria-setsize={filteredCountries.length}
+                            aria-posinset={virtualRow.index + 1}
+                            className="absolute top-0 left-0 w-full"
+                            style={{
+                              height: virtualRow.size,
+                              transform: `translateY(${virtualRow.start}px)`,
+                            }}
+                          >
+                            <div className="inline-flex w-full min-w-0 flex-1 items-center justify-between gap-2">
+                              <span title={label} className="truncate">
+                                {label}
+                              </span>
+                              <span className="text-muted-foreground text-xs">{getCountryCode(value)}</span>
+                            </div>
+                          </CommandItem>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
+                )}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        }
+      />
     </Popover>
   )
 }

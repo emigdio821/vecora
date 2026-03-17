@@ -17,7 +17,6 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -180,13 +179,6 @@ export function EditHoaPeriodSheet({ period, state }: EditHoaPeriodSheetProps) {
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={editPeriodFormId} disabled={updatePeriodMutation.isPending}>
             {updatePeriodMutation.isPending && <LoaderIcon />}
             Guardar

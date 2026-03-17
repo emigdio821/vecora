@@ -44,7 +44,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
             title="Información del pago"
             icon={IconCurrencyDollar}
             content={
-              <div>
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Monto</h2>
@@ -106,7 +106,7 @@ export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps
             icon={IconUserHeart}
             content={
               payment.resident ? (
-                <div>
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>

@@ -58,7 +58,7 @@ export const createProfile = createServerFn({ method: 'POST' })
         name,
         email,
         password,
-        role: role || undefined, // Pass role to better-auth
+        role: role || 'resident',
       },
     })
 

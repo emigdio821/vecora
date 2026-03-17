@@ -62,38 +62,6 @@ export const housesTableColumns: ColumnDef<HouseQueryData>[] = [
     },
   },
   {
-    accessorKey: 'street',
-    size: 220,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Calle" />,
-    cell: ({ row }) => <p className="line-clamp-2 whitespace-normal text-left">{row.original.street}</p>,
-  },
-  {
-    accessorKey: 'city',
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Ciudad" />,
-    size: 180,
-    sortingFn: (rowA, rowB) => {
-      const rowACity = [rowA.original.city, rowA.original.state].filter(Boolean).join(', ')
-      const rowBCity = [rowB.original.city, rowB.original.state].filter(Boolean).join(', ')
-
-      return rowACity.localeCompare(rowBCity)
-    },
-    cell: ({ row }) => {
-      const house = row.original
-      const houseCityState = [house.city, house.state].filter(Boolean).join(', ')
-
-      return houseCityState && <p className="line-clamp-2 whitespace-normal text-left">{houseCityState}</p>
-    },
-  },
-  {
-    accessorKey: 'zipCode',
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Código postal" />,
-    size: 180,
-    cell: ({ row }) => {
-      const zipCode = row.original.zipCode
-      return zipCode && <p>{zipCode}</p>
-    },
-  },
-  {
     id: 'actions',
     enablePinning: false,
     enableResizing: false,

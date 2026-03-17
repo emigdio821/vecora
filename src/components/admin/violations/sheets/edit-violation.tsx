@@ -1,13 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
-import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateViolation, type ViolationQueryData } from '@/api/server-functions/violations'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
-import { residentsListQueryOptions } from '@/api/tanstack-queries/residents'
 import { VIOLATIONS_QUERY_KEY } from '@/api/tanstack-queries/violations'
 import { LoaderIcon } from '@/components/icons'
+import { ResidentsSelector } from '@/components/shared/selectors/residents-selector'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -18,12 +17,12 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -48,8 +47,6 @@ interface EditViolationSheetProps {
 export function EditViolationSheet({ violation, state }: EditViolationSheetProps) {
   const editViolationFormId = useId()
   const { isOpen, onOpenChange } = state
-
-  const { data: owners = [], isLoading: isLoadingOwners } = useQuery(residentsListQueryOptions())
 
   const form = useForm<UpdateViolationFormData>({
     resolver: zodResolver(updateViolationSchema),
@@ -83,13 +80,6 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
   function handleOpenChange(open: boolean) {
     if (updateViolationMutation.isPending) return
     onOpenChange(open)
-  }
-
-  function renderOwnerValue(value: string) {
-    if (owners.length === 0) return 'No hay propietarios disponibles'
-
-    const owner = owners.find((owner) => owner.id === value)
-    return owner ? `${owner.firstName} ${owner.lastName}` : 'Selecciona una opción'
   }
 
   function renderStatusValue(value: ViolationStatus | undefined) {
@@ -148,26 +138,17 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
-                    Propietario <span className="text-destructive">*</span>
+                    Residente <span className="text-destructive">*</span>
                   </FieldLabel>
-                  <Select
+
+                  <ResidentsSelector
+                    id={field.name}
                     value={field.value}
                     onValueChange={field.onChange}
-                    disabled={owners.length === 0 || isLoadingOwners}
-                  >
-                    <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
-                      <SelectValue>{renderOwnerValue}</SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {owners.map((owner) => (
-                          <SelectItem key={owner.id} value={owner.id}>
-                            <span>{`${owner.firstName} ${owner.lastName}`}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                    disabled={updateViolationMutation.isPending}
+                    invalid={fieldState.invalid}
+                    includeNoneOption={false}
+                  />
 
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -215,13 +196,14 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Estado</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Estatus</FieldLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className="w-full">
                       <SelectValue>{renderStatusValue}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
+                        <SelectLabel>Estatus</SelectLabel>
                         {violationStatusSchema.options.map((status) => (
                           <SelectItem key={status} value={status}>
                             {status === 'pending' ? 'Pendiente' : 'Pagada'}
@@ -262,13 +244,6 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={editViolationFormId} disabled={updateViolationMutation.isPending}>
             {updateViolationMutation.isPending && <LoaderIcon />}
             Guardar

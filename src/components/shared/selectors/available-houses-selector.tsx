@@ -30,6 +30,7 @@ export function AvailableHousesSelector({
   return (
     <ComboboxMultiSelect
       items={items}
+      placeholder="Selecciona casas"
       emptyLabel="No hay casas disponibles"
       isLoading={isLoadingAvailableHouses}
       {...comboboxProps}

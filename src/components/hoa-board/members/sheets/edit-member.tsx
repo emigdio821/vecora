@@ -16,7 +16,6 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -157,13 +156,6 @@ export function EditMemberSheet({ member, state }: EditMemberSheetProps) {
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={editMemberFormId} disabled={updateMemberMutation.isPending}>
             {updateMemberMutation.isPending && <LoaderIcon />}
             Guardar

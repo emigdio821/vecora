@@ -53,10 +53,12 @@ export function getRoleLabel(roleName: string): string {
       return 'Presidente'
     case 'treasurer':
       return 'Tesorero'
-    case 'maintainer':
+    case 'maintenance':
       return 'Mantenimiento'
     case 'security':
       return 'Seguridad'
+    case 'resident':
+      return 'Residente'
     default:
       return roleName
   }

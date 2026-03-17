@@ -43,7 +43,7 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
             title="Información de la acción"
             icon={IconFileDescription}
             content={
-              <div>
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">ID de registro</h2>
@@ -76,7 +76,7 @@ export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps
             icon={IconUser}
             content={
               auditLog.user ? (
-                <div>
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-sm">Nombre</h2>

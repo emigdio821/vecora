@@ -46,7 +46,7 @@ export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps
             title="Información del miembro"
             icon={IconUser}
             content={
-              <div>
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium text-sm">Nombre completo</h2>

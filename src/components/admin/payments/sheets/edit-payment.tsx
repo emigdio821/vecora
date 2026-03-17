@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/select'
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -162,7 +161,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
-                    Propietario <span className="text-destructive">*</span>
+                    Residente <span className="text-destructive">*</span>
                   </FieldLabel>
                   <ResidentsSelector
                     id={field.name}
@@ -382,13 +381,6 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
         </SheetPanel>
 
         <SheetFooter>
-          <SheetClose
-            render={
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            }
-          />
           <Button type="submit" form={updatePaymentFormId} disabled={updatePaymentMutation.isPending}>
             {updatePaymentMutation.isPending && <LoaderIcon />}
             Guardar
