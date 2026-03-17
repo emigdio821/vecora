@@ -1,5 +1,7 @@
 import { IconBell, IconGavel, IconHomeShield, IconPigMoney, IconShield, IconTool } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
+import { useHasRole } from '@/hooks/use-rbac'
+import { Role } from '@/types/rbac'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -14,6 +16,8 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
   const location = useLocation()
   const { pathname } = location
   const { setOpenMobile } = useSidebar()
+
+  const hideNotifications = useHasRole(Role.RESIDENT)
 
   return (
     <SidebarGroup {...props}>
@@ -85,18 +89,20 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
             />
           </SidebarMenuItem>
 
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
-              isActive={pathname === '/notifications'}
-              render={
-                <Link to="/notifications">
-                  <IconBell className="size-4" />
-                  <span>Notificaciones</span>
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
+          {!hideNotifications && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => setOpenMobile(false)}
+                isActive={pathname === '/notifications'}
+                render={
+                  <Link to="/notifications">
+                    <IconBell className="size-4" />
+                    <span>Notificaciones</span>
+                  </Link>
+                }
+              />
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

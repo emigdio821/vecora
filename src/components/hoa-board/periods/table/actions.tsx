@@ -1,5 +1,4 @@
 import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/icons-react'
-import { useRouteContext } from '@tanstack/react-router'
 import { useState } from 'react'
 import { deleteHoaBoardPeriod } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -20,8 +19,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
+import { useHasRole } from '@/hooks/use-rbac'
 import { formatDate } from '@/lib/utils'
 import type { DeleteHoaBoardPeriodData } from '@/schemas/hoa-board'
+import { Role } from '@/types/rbac'
 import { EditHoaPeriodSheet } from '../sheets/edit-period'
 import { HoaPeriodDetailsSheet } from '../sheets/period-details'
 
@@ -34,7 +35,7 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
   const [isEditPeriodSheetOpen, setEditPeriodSheetOpen] = useState(false)
   const [isMemberDetailsSheetOpen, setMemberDetailsSheetOpen] = useState(false)
 
-  const { profile } = useRouteContext({ from: '/_authed' })
+  const canPerformActions = useHasRole([Role.ADMIN, Role.PRESIDENT])
 
   const deletePeriodMutation = useEntityMutation({
     mutationFn: async (data: DeleteHoaBoardPeriodData) => {
@@ -55,7 +56,7 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
 
   return (
     <>
-      {profile.user.role === 'admin' && (
+      {canPerformActions && (
         <>
           <AlertDialogGeneric
             state={{
@@ -113,7 +114,7 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
                 Editar
               </DropdownMenuItem>
 
-              {profile.user.role === 'admin' && (
+              {canPerformActions && (
                 <>
                   <DropdownMenuSeparator />
 

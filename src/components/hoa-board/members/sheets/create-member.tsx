@@ -99,8 +99,7 @@ export function CreateMemberSheet({ state, defaultPeriodId }: CreateMemberSheetP
                     disabled={createMemberMutation.isPending}
                   />
                   <FieldDescription>
-                    El periodo de la mesa directiva al que pertenecerá este miembro. Si no hay periodos
-                    disponibles, crea uno{' '}
+                    Periodo al que pertenecerá este miembro. Si no hay periodos disponibles, crea uno{' '}
                     <Button
                       variant="link"
                       nativeButton={false}

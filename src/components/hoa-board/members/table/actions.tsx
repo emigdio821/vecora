@@ -1,5 +1,4 @@
 import { IconDotsVertical, IconEdit, IconInfoCircle, IconTrash } from '@tabler/icons-react'
-import { useRouteContext } from '@tanstack/react-router'
 import { useState } from 'react'
 import { deleteHoaBoardMember } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -20,7 +19,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
+import { useHasRole } from '@/hooks/use-rbac'
 import type { DeleteHoaBoardMemberData } from '@/schemas/hoa-board'
+import { Role } from '@/types/rbac'
 import { EditMemberSheet } from '../sheets/edit-member'
 import { HoaMemberDetailsSheet } from '../sheets/member-details'
 
@@ -33,7 +34,7 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
   const [isMemberDetailsSheetOpen, setMemberDetailsSheetOpen] = useState(false)
   const [isEditMemberSheetOpen, setEditMemberSheetOpen] = useState(false)
 
-  const { profile } = useRouteContext({ from: '/_authed' })
+  const canPerformActions = useHasRole([Role.ADMIN, Role.PRESIDENT])
 
   const memberFullName = `${member.firstName} ${member.lastName}`
 
@@ -56,7 +57,7 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
 
   return (
     <>
-      {profile.user.role === 'admin' && (
+      {canPerformActions && (
         <>
           <AlertDialogGeneric
             state={{
@@ -107,7 +108,7 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
                 Información
               </DropdownMenuItem>
 
-              {profile.user.role === 'admin' && (
+              {canPerformActions && (
                 <>
                   <DropdownMenuItem onClick={() => setEditMemberSheetOpen(true)}>
                     <IconEdit className="size-4" />

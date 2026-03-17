@@ -1,10 +1,20 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useState } from 'react'
 import { CreateNotificationSheet } from '@/components/shared/notifications/sheets/create-notification'
 import { NotificationsDataTable } from '@/components/shared/notifications/table/data-table'
+import { hasRole } from '@/lib/auth/rbac'
 import { createSEOTitle } from '@/lib/seo'
+import { Role } from '@/types/rbac'
 
 export const Route = createFileRoute('/_authed/notifications')({
+  beforeLoad: async ({ context }) => {
+    const profile = context.profile
+    const role = profile?.user.role
+
+    if (!role || !hasRole(profile.user, [Role.PRESIDENT])) {
+      throw redirect({ to: '/' })
+    }
+  },
   component: RouteComponent,
   head: () => ({
     meta: [{ title: createSEOTitle('Notificaciones') }],

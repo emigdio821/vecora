@@ -1,5 +1,4 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
-import { useRouteContext } from '@tanstack/react-router'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -16,6 +15,8 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
+import { useHasRole } from '@/hooks/use-rbac'
+import { Role } from '@/types/rbac'
 import { CreatePeriodSheet } from '../sheets/create-period'
 
 interface PeriodsDataTableHeaderProps {
@@ -27,7 +28,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isCreatePeriodSheetOpen, setIsCreatePeriodSheetOpen] = useState(false)
 
-  const { profile } = useRouteContext({ from: '/_authed' })
+  const canPerformActions = useHasRole([Role.ADMIN, Role.PRESIDENT])
 
   const [searchQuery, setSearchQuery] = useQueryState(
     'search-hoa-board-periods',
@@ -61,24 +62,26 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
 
   return (
     <>
-      <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
-        action={handleBatchDelete}
-        variant="destructive"
-        actionLabel="Eliminar"
-        title="¿Eliminar periodos?"
-        description={
-          <div>
-            <p>
-              Periodos seleccionados: <strong>{selectedRowsLength}</strong>.
-            </p>
-            <p>Esta acción no se puede deshacer.</p>
-          </div>
-        }
-      />
+      {canPerformActions && (
+        <AlertDialogGeneric
+          state={{
+            isOpen: isDeleteDialogOpen,
+            onOpenChange: setDeleteDialogOpen,
+          }}
+          action={handleBatchDelete}
+          variant="destructive"
+          actionLabel="Eliminar"
+          title="¿Eliminar periodos?"
+          description={
+            <div>
+              <p>
+                Periodos seleccionados: <strong>{selectedRowsLength}</strong>.
+              </p>
+              <p>Esta acción no se puede deshacer.</p>
+            </div>
+          }
+        />
+      )}
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full bg-background sm:w-sm">
@@ -119,7 +122,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
         </InputGroup>
 
         <div className="flex gap-2">
-          {profile.user.role === 'admin' && selectedRowsLength > 0 && (
+          {canPerformActions && selectedRowsLength > 0 && (
             <Tooltip>
               <TooltipTrigger
                 render={
@@ -145,7 +148,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
             </Button>
           )}
 
-          {profile.user.role === 'admin' && (
+          {canPerformActions && (
             <Button className="ml-auto" onClick={() => setIsCreatePeriodSheetOpen(true)}>
               <IconPlus className="size-4" />
               Crear

@@ -109,8 +109,7 @@ export function EditMemberSheet({ member, state }: EditMemberSheetProps) {
                     disabled={updateMemberMutation.isPending}
                   />
                   <FieldDescription>
-                    El periodo de la mesa directiva al que pertenecerá este miembro. Si no hay periodos
-                    disponibles, crea uno{' '}
+                    Periodo al que pertenecerá este miembro. Si no hay periodos disponibles, crea uno{' '}
                     <Button
                       variant="link"
                       nativeButton={false}

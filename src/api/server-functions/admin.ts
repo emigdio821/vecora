@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { authMiddleware } from '@/middleware/auth'
+import { Role } from '@/types/rbac'
 
 export const isAdminUser = createServerFn()
   .middleware([authMiddleware])
@@ -7,8 +8,7 @@ export const isAdminUser = createServerFn()
     const { session } = context
 
     try {
-      // Role is now stored directly on the user object via better-auth admin plugin
-      return session.user.role === 'admin'
+      return session.user.role === Role.ADMIN
     } catch (error) {
       console.error('Error checking admin role:', error)
       return false

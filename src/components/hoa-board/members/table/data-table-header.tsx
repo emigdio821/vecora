@@ -1,5 +1,4 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
-import { useRouteContext } from '@tanstack/react-router'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -16,6 +15,8 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
+import { useHasRole } from '@/hooks/use-rbac'
+import { Role } from '@/types/rbac'
 import { CreateMemberSheet } from '../sheets/create-member'
 
 interface MembersDataTableHeaderProps {
@@ -28,7 +29,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-hoa-members', parseAsString.withDefault(''))
 
-  const { profile } = useRouteContext({ from: '/_authed' })
+  const canPerformActions = useHasRole([Role.ADMIN, Role.PRESIDENT])
 
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
@@ -121,7 +122,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
         </InputGroup>
 
         <div className="flex gap-2">
-          {profile.user.role === 'admin' && selectedRowsLength > 0 && (
+          {canPerformActions && selectedRowsLength > 0 && (
             <Tooltip>
               <TooltipTrigger
                 render={
@@ -142,7 +143,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
             </Button>
           )}
 
-          {profile.user.role === 'admin' && (
+          {canPerformActions && (
             <Button onClick={() => setIsCreateMemberSheetOpen(true)}>
               <IconPlus className="size-4" />
               Agregar
