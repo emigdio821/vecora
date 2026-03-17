@@ -29,9 +29,7 @@ export const getProfilesList = createServerFn()
       orderBy: (profiles, { desc }) => [desc(profiles.updatedAt)],
     })
 
-    const filteredProfiles = profilesList.filter((profile) => profile.user.role !== 'admin')
-
-    return filteredProfiles
+    return profilesList
   })
 
 export const createProfile = createServerFn({ method: 'POST' })
@@ -40,6 +38,11 @@ export const createProfile = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     // Step 1: Fetch resident to get their email and name
     const { residentId, password, role } = data
+
+    // Non-admin profiles must be linked to a resident
+    if (!residentId) {
+      throw new Error('A resident must be selected for this profile')
+    }
 
     const resident = await db.query.residents.findFirst({
       where: (residents, { eq }) => eq(residents.id, residentId),
@@ -234,8 +237,6 @@ export const deleteProfile = createServerFn({ method: 'POST' })
 
     const userId = oldProfile.userId
 
-    await db.delete(profiles).where(eq(profiles.id, profileId))
-
     if (userId) {
       const headers = getRequestHeaders()
       await auth.api.revokeUserSessions({
@@ -266,7 +267,7 @@ export const deleteProfile = createServerFn({ method: 'POST' })
 export const banProfile = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, adminOnlyMiddleware])
   .inputValidator(banProfileSchema)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { userId, duration, reason } = data
     const headers = getRequestHeaders()
 
@@ -283,7 +284,7 @@ export const banProfile = createServerFn({ method: 'POST' })
     await auth.api.banUser({
       body: {
         userId,
-        banReason: reason || 'Banned by admin',
+        banReason: reason || 'No se proporcionó una razón',
         banExpiresIn: getBanExpiryDate(),
       },
       headers,
@@ -297,8 +298,12 @@ export const banProfile = createServerFn({ method: 'POST' })
         oldData: null,
         newData: {
           banned: true,
-          banReason: reason,
-          banExpiresIn: duration,
+          banReason: reason || 'No se proporcionó una razón',
+          banExpiresIn: getBanExpiryDate(),
+          bannedBy: {
+            id: context.session.user.name,
+            name: context.session.user.name,
+          },
         },
       },
     }).catch(console.error)
@@ -307,7 +312,7 @@ export const banProfile = createServerFn({ method: 'POST' })
 export const unbanProfile = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, adminOnlyMiddleware])
   .inputValidator(unbanProfileSchema)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { userId } = data
     const headers = getRequestHeaders()
 
@@ -326,6 +331,10 @@ export const unbanProfile = createServerFn({ method: 'POST' })
         oldData: null,
         newData: {
           banned: false,
+          unbannedBy: {
+            id: context.session.user.name,
+            name: context.session.user.name,
+          },
         },
       },
     }).catch(console.error)

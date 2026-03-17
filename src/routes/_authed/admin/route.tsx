@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_authed/admin')({
     const profile = context.profile
     const role = profile?.user.role
 
-    if (!role || role !== Role.ADMIN) {
+    if (!role || (role !== Role.SUPER_ADMIN && role !== Role.ADMIN)) {
       throw redirect({ to: '/' })
     }
   },

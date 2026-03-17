@@ -15,6 +15,7 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { isSuperAdmin as isSuperAdmon } from '@/lib/auth/rbac'
 import { formatDate } from '@/lib/utils'
 
 interface ProfileDetailsSheetProps {
@@ -27,6 +28,7 @@ interface ProfileDetailsSheetProps {
 
 export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps) {
   const { isOpen, onOpenChange } = state
+  const isSuperAdmin = isSuperAdmon(profile.user)
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -59,10 +61,12 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
                   <CopyButton tooltipText="Copiar ID de usuario" value={profile.user.id} />
                 </div>
 
-                <div>
-                  <h2 className="font-medium text-sm">Tipo de perfil</h2>
-                  <ProfileTypeBadge isOwner={profile.resident.isOwner} />
-                </div>
+                {profile.resident && (
+                  <div>
+                    <h2 className="font-medium text-sm">Tipo de perfil</h2>
+                    <ProfileTypeBadge isOwner={profile.resident.isOwner} />
+                  </div>
+                )}
 
                 {profile.user.role && (
                   <div>
@@ -83,50 +87,52 @@ export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps
           />
 
           {/* Resident info */}
-          <CollapsibleDetails
-            title="Residente"
-            icon={IconUser}
-            content={
-              profile.resident ? (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="min-w-0 flex-1">
-                      <h2 className="font-medium text-sm">Nombre</h2>
-                      <p className="line-clamp-2 text-muted-foreground text-sm">
-                        {`${profile.resident.firstName} ${profile.resident.lastName}`.trim()}
-                      </p>
+          {!isSuperAdmin && (
+            <CollapsibleDetails
+              title="Residente"
+              icon={IconUser}
+              content={
+                profile.resident ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="font-medium text-sm">Nombre</h2>
+                        <p className="line-clamp-2 text-muted-foreground text-sm">
+                          {`${profile.resident.firstName} ${profile.resident.lastName}`.trim()}
+                        </p>
+                      </div>
+                      <CopyButton tooltipText="Copiar ID" value={profile.resident.id} />
                     </div>
-                    <CopyButton tooltipText="Copiar ID" value={profile.resident.id} />
+
+                    {profile.resident.email && (
+                      <div>
+                        <h2 className="font-medium text-sm">Correo</h2>
+                        <p className="line-clamp-2 text-muted-foreground text-sm">{profile.resident.email}</p>
+                      </div>
+                    )}
+
+                    {profile.resident.phone && (
+                      <div>
+                        <h2 className="font-medium text-sm">Teléfono</h2>
+                        <p className="line-clamp-2 text-muted-foreground text-sm">{profile.resident.phone}</p>
+                      </div>
+                    )}
                   </div>
-
-                  {profile.resident.email && (
-                    <div>
-                      <h2 className="font-medium text-sm">Correo</h2>
-                      <p className="line-clamp-2 text-muted-foreground text-sm">{profile.resident.email}</p>
-                    </div>
-                  )}
-
-                  {profile.resident.phone && (
-                    <div>
-                      <h2 className="font-medium text-sm">Teléfono</h2>
-                      <p className="line-clamp-2 text-muted-foreground text-sm">{profile.resident.phone}</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  <Empty className="p-1">
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon" className="mb-0">
-                        <IconWind />
-                      </EmptyMedia>
-                      <EmptyDescription>No hay información del residente</EmptyDescription>
-                    </EmptyHeader>
-                  </Empty>
-                </div>
-              )
-            }
-          />
+                ) : (
+                  <div>
+                    <Empty className="p-1">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon" className="mb-0">
+                          <IconWind />
+                        </EmptyMedia>
+                        <EmptyDescription>No hay información del residente</EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </div>
+                )
+              }
+            />
+          )}
         </SheetPanel>
 
         <SheetFooter className="block space-y-1">

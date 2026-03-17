@@ -47,6 +47,8 @@ export function getPaymentTypeLabel(type: PaymentType): string {
 
 export function getRoleLabel(roleName: string): string {
   switch (roleName) {
+    case 'super_admin':
+      return 'Super administrador'
     case 'admin':
       return 'Administrador'
     case 'president':

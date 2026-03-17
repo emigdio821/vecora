@@ -53,7 +53,8 @@ export const profilesTableColumns: ColumnDef<ProfileQueryData>[] = [
     accessorKey: 'profileType',
     size: 150,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Tipo de perfil" />,
-    cell: ({ row }) => <ProfileTypeBadge isOwner={row.original.resident.isOwner} />,
+    cell: ({ row }) =>
+      row.original.resident ? <ProfileTypeBadge isOwner={row.original.resident.isOwner} /> : null,
   },
   {
     accessorKey: 'profileRoles',

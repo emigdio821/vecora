@@ -17,8 +17,11 @@ function buildPermissionMap(fn: (r: Resource) => readonly Action[]): PermissionM
 
 const readOnlyAll = buildPermissionMap(() => readOnly)
 
-const rolePermissions: Record<Role, PermissionMap | Role.ADMIN> = {
-  [Role.ADMIN]: Role.ADMIN,
+const FULL_ACCESS = 'full-access' as const
+
+const rolePermissions: Record<Role, PermissionMap | typeof FULL_ACCESS> = {
+  [Role.SUPER_ADMIN]: FULL_ACCESS,
+  [Role.ADMIN]: FULL_ACCESS,
   [Role.RESIDENT]: readOnlyAll,
   [Role.MAINTENANCE]: buildPermissionMap((r) => (r === Resource.MAINTENANCE ? allActions : readOnly)),
   [Role.PRESIDENT]: buildPermissionMap((r) => (r === Resource.PRESIDENT ? allActions : readOnly)),
@@ -34,9 +37,14 @@ export function hasRole(user: UserLike, role: Role | Role[]): boolean {
   return Array.isArray(role) ? role.includes(user.role as Role) : user.role === role
 }
 
-/** Returns `true` if the user has the `ADMIN` role. */
+/** Returns `true` if the user has `SUPER_ADMIN` or `ADMIN` role. */
 export function isAdmin(user: UserLike): boolean {
-  return hasRole(user, Role.ADMIN)
+  return hasRole(user, [Role.SUPER_ADMIN, Role.ADMIN])
+}
+
+/** Returns `true` if the user has the `SUPER_ADMIN` role. */
+export function isSuperAdmin(user: UserLike): boolean {
+  return hasRole(user, Role.SUPER_ADMIN)
 }
 
 /** Checks whether the user is allowed to perform `action` on `resource`. Admins always pass. */
@@ -45,7 +53,7 @@ export function can(user: UserLike, action: Action, resource: Resource): boolean
   if (isAdmin(user)) return true
 
   const perms = rolePermissions[user.role as Role]
-  if (!perms || perms === Role.ADMIN) return false
+  if (!perms || perms === FULL_ACCESS) return false
 
   return perms[resource]?.includes(action) ?? false
 }

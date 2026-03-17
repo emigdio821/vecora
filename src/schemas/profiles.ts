@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { profileRoleSchema } from '@/db/schema/zod/profiles'
+import { Role } from '@/types/rbac'
 
 export const createProfileSchema = z.object({
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
   residentId: z.uuid('ID de residente inválido'),
-  role: profileRoleSchema,
+  role: z.enum(Object.values(Role)),
 })
 
 export type CreateProfileFormData = z.infer<typeof createProfileSchema>
@@ -13,7 +13,7 @@ export const updateProfileSchema = z.object({
   profileId: z.uuid('ID de perfil inválido'),
   userId: z.string().min(1, 'El ID de usuario es requerido'),
   residentId: z.uuid('ID de residente inválido'),
-  role: profileRoleSchema,
+  role: z.enum(Object.values(Role)),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres').or(z.literal('')).optional(),
 })
 

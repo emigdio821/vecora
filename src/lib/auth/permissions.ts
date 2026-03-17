@@ -12,6 +12,15 @@ const statement = {
 
 export const ac = createAccessControl(statement)
 
+// Super Admin role: system-level admin with full access (seeded, cannot be created via UI)
+export const superAdminRole = ac.newRole({
+  ...adminAc.statements,
+  [Resource.MAINTENANCE]: [Action.CREATE, Action.READ, Action.UPDATE, Action.DELETE],
+  [Resource.PRESIDENT]: [Action.CREATE, Action.READ, Action.UPDATE, Action.DELETE],
+  [Resource.SECURITY]: [Action.CREATE, Action.READ, Action.UPDATE, Action.DELETE],
+  [Resource.TREASURER]: [Action.CREATE, Action.READ, Action.UPDATE, Action.DELETE],
+})
+
 // Admin role: full access to everything
 export const adminRole = ac.newRole({
   ...adminAc.statements,

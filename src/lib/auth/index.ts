@@ -10,6 +10,7 @@ import {
   presidentRole,
   residentRole,
   securityRole,
+  superAdminRole,
   treasurerRole,
 } from './permissions'
 
@@ -27,6 +28,7 @@ export const auth = betterAuth({
     admin({
       ac,
       roles: {
+        super_admin: superAdminRole,
         admin: adminRole,
         resident: residentRole,
         maintenance: maintenanceRole,

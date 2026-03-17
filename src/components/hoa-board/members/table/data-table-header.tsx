@@ -29,7 +29,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-hoa-members', parseAsString.withDefault(''))
 
-  const canPerformActions = useHasRole([Role.ADMIN, Role.PRESIDENT])
+  const canPerformActions = useHasRole([Role.SUPER_ADMIN, Role.ADMIN, Role.PRESIDENT])
 
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows

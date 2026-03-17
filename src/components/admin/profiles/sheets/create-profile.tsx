@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/sheet'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type CreateProfileFormData, createProfileSchema } from '@/schemas/profiles'
+import { Role } from '@/types/rbac'
 
 interface CreateProfileSheetProps {
   state: {
@@ -41,7 +42,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
     defaultValues: {
       password: '',
       residentId: '',
-      role: 'resident',
+      role: Role.RESIDENT,
     },
   })
 
@@ -164,7 +165,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
                     invalid={fieldState.invalid}
                     value={field.value}
                     disabled={createProfileMutation.isPending}
-                    onValueChange={(value) => field.onChange([value])}
+                    onValueChange={field.onChange}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>

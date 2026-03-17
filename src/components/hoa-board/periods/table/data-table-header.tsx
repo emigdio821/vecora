@@ -28,7 +28,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isCreatePeriodSheetOpen, setIsCreatePeriodSheetOpen] = useState(false)
 
-  const canPerformActions = useHasRole([Role.ADMIN, Role.PRESIDENT])
+  const canPerformActions = useHasRole([Role.SUPER_ADMIN, Role.ADMIN, Role.PRESIDENT])
 
   const [searchQuery, setSearchQuery] = useQueryState(
     'search-hoa-board-periods',

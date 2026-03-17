@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
+import { Role } from '@/types/rbac'
 import { db } from './index'
-import { profiles, residents, user } from './schema'
+import { profiles, user } from './schema'
 
 async function seed() {
   console.log('Seeding database...')
@@ -22,7 +23,7 @@ async function seed() {
         email: 'admin@resido.com',
         password: 'admin123',
         name: 'Administrador Resido',
-        role: 'admin', // Role is managed by better-auth admin plugin
+        role: Role.SUPER_ADMIN,
       },
     })
 
@@ -34,29 +35,15 @@ async function seed() {
     console.log('Admin user created successfully')
   }
 
-  // Create resident profile for admin
+  // Create profile for admin (no linked resident — admin is independent)
   const existingProfile = await db.select().from(profiles).where(eq(profiles.userId, adminUserId)).limit(1)
 
   if (existingProfile.length === 0) {
-    // Create resident record (non-owner)
-    const [adminResident] = await db
-      .insert(residents)
-      .values({
-        firstName: 'Administrador',
-        lastName: 'Resido',
-        email: 'admin@resido.com',
-        phone: '+528124135976', // fake number
-        isOwner: false,
-        notes: 'System administrator - Full access to all sections',
-      })
-      .returning()
-
-    // Link user to profile
     await db
       .insert(profiles)
       .values({
         userId: adminUserId,
-        residentId: adminResident.id,
+        residentId: null,
       })
       .returning()
 
@@ -69,7 +56,7 @@ async function seed() {
   console.log('\n📋 Admin credentials:')
   console.log('   Email: admin@resido.com')
   console.log('   Password: admin123')
-  console.log('   Role: admin (full access)')
+  console.log('   Role: super_admin (full access)')
   console.log('\n⚠️  IMPORTANT: Change the admin password after first login!')
 }
 

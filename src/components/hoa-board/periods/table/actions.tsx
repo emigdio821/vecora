@@ -35,7 +35,7 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
   const [isEditPeriodSheetOpen, setEditPeriodSheetOpen] = useState(false)
   const [isMemberDetailsSheetOpen, setMemberDetailsSheetOpen] = useState(false)
 
-  const canPerformActions = useHasRole([Role.ADMIN, Role.PRESIDENT])
+  const canPerformActions = useHasRole([Role.SUPER_ADMIN, Role.ADMIN, Role.PRESIDENT])
 
   const deletePeriodMutation = useEntityMutation({
     mutationFn: async (data: DeleteHoaBoardPeriodData) => {

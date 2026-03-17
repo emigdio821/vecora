@@ -34,7 +34,7 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
   const [isMemberDetailsSheetOpen, setMemberDetailsSheetOpen] = useState(false)
   const [isEditMemberSheetOpen, setEditMemberSheetOpen] = useState(false)
 
-  const canPerformActions = useHasRole([Role.ADMIN, Role.PRESIDENT])
+  const canPerformActions = useHasRole([Role.SUPER_ADMIN, Role.ADMIN, Role.PRESIDENT])
 
   const memberFullName = `${member.firstName} ${member.lastName}`
 

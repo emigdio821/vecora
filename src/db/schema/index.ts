@@ -103,9 +103,7 @@ export const profiles = pgTable(
       .notNull()
       .unique()
       .references(() => user.id, { onDelete: 'cascade' }),
-    residentId: uuid('resident_id')
-      .notNull()
-      .references(() => residents.id, { onDelete: 'cascade' }),
+    residentId: uuid('resident_id').references(() => residents.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()

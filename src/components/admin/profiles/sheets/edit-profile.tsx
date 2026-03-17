@@ -19,9 +19,9 @@ import {
   SheetPanel,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { ProfileRole } from '@/db/schema/zod/profiles'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateProfileFormData, updateProfileSchema } from '@/schemas/profiles'
+import { Role } from '@/types/rbac'
 
 interface EditProfileSheetProps {
   profile: ProfileQueryData
@@ -41,8 +41,8 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
       password: '',
       profileId: profile.id,
       userId: profile.userId,
-      residentId: profile.residentId,
-      role: (profile.user.role as ProfileRole) || 'resident',
+      residentId: profile.residentId ?? '',
+      role: (profile.user.role as Role) || Role.RESIDENT,
     },
   })
 
@@ -142,9 +142,9 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
                     id={field.name}
                     includeNoneOption={false}
                     invalid={fieldState.invalid}
-                    value={field.value[0] || null}
+                    value={field.value}
                     disabled={updateProfileMutation.isPending}
-                    onValueChange={(value) => field.onChange(value)}
+                    onValueChange={field.onChange}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>

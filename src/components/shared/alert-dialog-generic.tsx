@@ -73,7 +73,7 @@ export function AlertDialogGeneric(props: AlertDialogGenericProps) {
             {description || 'Esta acción no se puede deshacer.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        {content && <div className="px-4 pb-4">{content}</div>}
+        {content && content}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isExecutingAction}>Cancelar</AlertDialogCancel>
           <Button variant={variant} onClick={handleAction} disabled={isExecutingAction}>

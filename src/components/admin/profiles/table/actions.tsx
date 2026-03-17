@@ -12,6 +12,7 @@ import { useState } from 'react'
 import { banProfile, deleteProfile, unbanProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
 import { PROFILES_QUERY_KEY, type ProfileQueryData } from '@/api/tanstack-queries/profiles'
+import { RESIDENTS_QUERY_KEY } from '@/api/tanstack-queries/residents'
 import { AlertDialogGeneric } from '@/components/shared/alert-dialog-generic'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,7 +27,10 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
+import { useIsSuperAdmin, useRBAC } from '@/hooks/use-rbac'
+import { hasRole } from '@/lib/auth/rbac'
 import type { BanProfileData, DeleteProfileData, UnbanProfileData } from '@/schemas/profiles'
+import { Role } from '@/types/rbac'
 import { EditProfileSheet } from '../sheets/edit-profile'
 import { ProfileDetailsSheet } from '../sheets/profile-details'
 
@@ -42,11 +46,22 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
   const [isEditProfileSheetOpen, setEditProfileSheetOpen] = useState(false)
   const [isProfileDetailsSheetOpen, setProfileDetailsSheetOpen] = useState(false)
 
+  const { user: currentUser } = useRBAC()
+  const currentUserIsSuperAdmin = useIsSuperAdmin()
+  const targetIsSuperAdmin = hasRole(profile.user, Role.SUPER_ADMIN)
+  const isSelf = currentUser?.id === profile.user?.id
+
+  // Permission rules:
+  // - Super admin → can edit/ban/delete everyone except themselves
+  // - Admin → can edit/ban/delete non-super-admin profiles, but not themselves
+  const canEditProfile = !isSelf && (currentUserIsSuperAdmin || !targetIsSuperAdmin)
+  const canDeleteOrBanProfile = canEditProfile
+
   const deleteProfileMutation = useEntityMutation({
     mutationFn: async (data: DeleteProfileData) => {
       return await deleteProfile({ data })
     },
-    invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
+    invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, RESIDENTS_QUERY_KEY],
     successTitle: 'Perfil eliminado',
     successDescription: 'El perfil ha sido eliminado exitosamente.',
     errorDescription: 'Ocurrió un error al eliminar el perfil, intenta nuevamente.',
@@ -86,7 +101,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
   }
 
   async function handleBanProfile() {
-    await banProfileMutation.mutateAsync({ userId: profile.userId, reason: banReason })
+    await banProfileMutation.mutateAsync({ userId: profile.userId, reason: banReason || undefined })
   }
 
   async function handleUnbanProfile() {
@@ -112,73 +127,81 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
 
   return (
     <>
-      <AlertDialogGeneric
-        variant="destructive"
-        actionLabel="Eliminar"
-        title="¿Eliminar perfil?"
-        description="Se eliminará de manera permanentemente. Esta acción no se puede deshacer."
-        action={handleDeleteProfile}
-        state={{ isOpen: isDeleteDialogOpen, onOpenChange: setDeleteDialogOpen }}
-      />
+      {canEditProfile && (
+        <EditProfileSheet
+          profile={profile}
+          state={{ isOpen: isEditProfileSheetOpen, onOpenChange: setEditProfileSheetOpen }}
+        />
+      )}
 
-      <AlertDialogGeneric
-        actionLabel="Reactivar"
-        title="¿Reactivar perfil?"
-        description="El perfil será reactivado y el usuario podrá acceder a su cuenta nuevamente."
-        action={handleUnbanProfile}
-        state={{ isOpen: isUnbanDialogOpen, onOpenChange: setUnbanDialogOpen }}
-      />
+      {canDeleteOrBanProfile && (
+        <>
+          <AlertDialogGeneric
+            variant="destructive"
+            actionLabel="Eliminar"
+            title="¿Eliminar perfil?"
+            description="Se eliminará de manera permanentemente. Esta acción no se puede deshacer."
+            action={handleDeleteProfile}
+            state={{ isOpen: isDeleteDialogOpen, onOpenChange: setDeleteDialogOpen }}
+          />
 
-      <AlertDialogGeneric
-        variant="warning"
-        actionLabel="Desactivar"
-        title="¿Desactivar perfil?"
-        description="El perfil será desactivado y el usuario no podrá acceder a su cuenta. Esta acción puede ser revertida."
-        action={handleBanProfile}
-        state={{ isOpen: isBanDialogOpen, onOpenChange: setBanDialogOpen }}
-        content={
-          <div>
-            <Textarea
-              name="ban-reason"
-              value={banReason}
-              className="resize-none"
-              aria-label="Razón de la desactivación"
-              onChange={(e) => setBanReason(e.target.value)}
-              placeholder="Razón de la desactivación (opcional)"
-            />
-          </div>
-        }
-      />
+          <AlertDialogGeneric
+            actionLabel="Reactivar"
+            title="¿Reactivar perfil?"
+            description="El perfil será reactivado y el usuario podrá acceder a su cuenta nuevamente."
+            action={handleUnbanProfile}
+            state={{ isOpen: isUnbanDialogOpen, onOpenChange: setUnbanDialogOpen }}
+          />
+
+          <AlertDialogGeneric
+            variant="warning"
+            actionLabel="Desactivar"
+            title="¿Desactivar perfil?"
+            description="El perfil será desactivado y el usuario no podrá acceder a su cuenta. Esta acción puede ser revertida."
+            action={handleBanProfile}
+            state={{ isOpen: isBanDialogOpen, onOpenChange: setBanDialogOpen }}
+            content={
+              <div>
+                <Textarea
+                  name="ban-reason"
+                  value={banReason}
+                  className="resize-none"
+                  aria-label="Razón de la desactivación"
+                  onChange={(e) => setBanReason(e.target.value)}
+                  placeholder="Razón de la desactivación (opcional)"
+                />
+              </div>
+            }
+          />
+        </>
+      )}
 
       <ProfileDetailsSheet
         profile={profile}
         state={{ isOpen: isProfileDetailsSheetOpen, onOpenChange: setProfileDetailsSheetOpen }}
       />
 
-      <EditProfileSheet
-        profile={profile}
-        state={{ isOpen: isEditProfileSheetOpen, onOpenChange: setEditProfileSheetOpen }}
-      />
-
       <div className="flex items-center justify-end">
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                nativeButton={false}
-                variant="ghost"
-                render={
-                  <Link {...getLinkedUserNavigation()}>
-                    <IconUserUp className="size-4" />
-                  </Link>
-                }
-                size="icon"
-                aria-label="Ir al residente vinculado"
-              />
-            }
-          />
-          <TooltipContent>Ir al residente vinculado</TooltipContent>
-        </Tooltip>
+        {profile.resident && (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  nativeButton={false}
+                  variant="ghost"
+                  render={
+                    <Link {...getLinkedUserNavigation()}>
+                      <IconUserUp className="size-4" />
+                    </Link>
+                  }
+                  size="icon"
+                  aria-label="Ir al residente vinculado"
+                />
+              }
+            />
+            <TooltipContent>Ir al residente vinculado</TooltipContent>
+          </Tooltip>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -199,29 +222,35 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
                 Información
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => setEditProfileSheetOpen(true)}>
-                <IconEdit className="size-4" />
-                Editar
-              </DropdownMenuItem>
-
-              {profile.user?.banned ? (
-                <DropdownMenuItem onClick={() => setUnbanDialogOpen(true)}>
-                  <IconReload className="size-4" />
-                  <span>Reactivar</span>
-                </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem onClick={() => setBanDialogOpen(true)}>
-                  <IconBan className="size-4" />
-                  <span>Desactivar</span>
+              {canEditProfile && (
+                <DropdownMenuItem onClick={() => setEditProfileSheetOpen(true)}>
+                  <IconEdit className="size-4" />
+                  Editar
                 </DropdownMenuItem>
               )}
 
-              <DropdownMenuSeparator />
+              {canDeleteOrBanProfile && (
+                <>
+                  {profile.user?.banned ? (
+                    <DropdownMenuItem onClick={() => setUnbanDialogOpen(true)}>
+                      <IconReload className="size-4" />
+                      <span>Reactivar</span>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem onClick={() => setBanDialogOpen(true)}>
+                      <IconBan className="size-4" />
+                      <span>Desactivar</span>
+                    </DropdownMenuItem>
+                  )}
 
-              <DropdownMenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
-                <IconTrash className="size-4" />
-                Eliminar
-              </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                    <IconTrash className="size-4" />
+                    Eliminar
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

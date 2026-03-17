@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { profileRoleSchema } from '@/db/schema/zod/profiles'
+import { Role } from '@/types/rbac'
 
 interface RolesSelectorProps extends React.ComponentProps<typeof Select> {
   disabled?: boolean
@@ -17,38 +17,42 @@ interface RolesSelectorProps extends React.ComponentProps<typeof Select> {
   value: string | null
 }
 
-function getRoleLabel(roleName: string) {
-  switch (roleName) {
-    case 'admin':
+function getRoleLabel(role: Role) {
+  switch (role) {
+    case Role.SUPER_ADMIN:
+      return 'Super administrador'
+    case Role.ADMIN:
       return 'Administrador'
-    case 'resident':
+    case Role.RESIDENT:
       return 'Residente'
-    case 'maintenance':
+    case Role.MAINTENANCE:
       return 'Mantenimiento'
-    case 'treasurer':
+    case Role.TREASURER:
       return 'Tesorero'
-    case 'president':
+    case Role.PRESIDENT:
       return 'Presidente'
-    case 'security':
+    case Role.SECURITY:
       return 'Seguridad'
     default:
-      return roleName
+      return role
   }
 }
 
-function getRoleDescription(roleName: string) {
-  switch (roleName) {
-    case 'admin':
+function getRoleDescription(role: Role) {
+  switch (role) {
+    case Role.SUPER_ADMIN:
+      return 'Administrador del sistema (solo se puede crear por seed)'
+    case Role.ADMIN:
       return 'Acceso completo al sistema'
-    case 'resident':
+    case Role.RESIDENT:
       return 'Acceso sin permisos administrativos'
-    case 'maintenance':
+    case Role.MAINTENANCE:
       return 'Gestión del mantenimiento'
-    case 'treasurer':
+    case Role.TREASURER:
       return 'Gestión de ingresos y gastos'
-    case 'president':
+    case Role.PRESIDENT:
       return 'Gestión general y representación'
-    case 'security':
+    case Role.SECURITY:
       return 'Gestión de seguridad y vigilancia'
     default:
       return ''
@@ -63,8 +67,8 @@ export function RolesSelector({
   noneOptionLabel = 'Sin selección',
   ...selectProps
 }: RolesSelectorProps) {
-  function renderRoleValue(value: string | null) {
-    const role = profileRoleSchema.options.find((role) => role === value)
+  function renderRoleValue(value: Role | null) {
+    const role = Object.values(Role).find((role) => role === value)
     return role ? getRoleLabel(role) : 'Selecciona una opción'
   }
 
@@ -76,14 +80,16 @@ export function RolesSelector({
       <SelectContent>
         <SelectGroup>
           {includeNoneOption && <SelectItem value={null}>{noneOptionLabel}</SelectItem>}
-          {profileRoleSchema.options.map((role) => (
-            <SelectItem key={role} value={role}>
-              <div>
-                <p className="font-medium">{getRoleLabel(role)}</p>
-                <p className="text-muted-foreground! text-xs">{getRoleDescription(role)}</p>
-              </div>
-            </SelectItem>
-          ))}
+          {Object.values(Role)
+            .filter((role) => role !== Role.SUPER_ADMIN)
+            .map((role) => (
+              <SelectItem key={role} value={role}>
+                <div>
+                  <p className="font-medium">{getRoleLabel(role)}</p>
+                  <p className="text-muted-foreground! text-xs">{getRoleDescription(role)}</p>
+                </div>
+              </SelectItem>
+            ))}
         </SelectGroup>
       </SelectContent>
     </Select>

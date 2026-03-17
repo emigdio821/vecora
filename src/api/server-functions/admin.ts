@@ -8,7 +8,7 @@ export const isAdminUser = createServerFn()
     const { session } = context
 
     try {
-      return session.user.role === Role.ADMIN
+      return session.user.role === Role.SUPER_ADMIN || session.user.role === Role.ADMIN
     } catch (error) {
       console.error('Error checking admin role:', error)
       return false

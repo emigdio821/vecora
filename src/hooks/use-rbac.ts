@@ -1,6 +1,6 @@
 import { useRouteContext } from '@tanstack/react-router'
 import { useMemo } from 'react'
-import { can, canAll, canAny, getUserPermissions, hasRole, isAdmin } from '@/lib/auth/rbac'
+import { can, canAll, canAny, getUserPermissions, hasRole, isAdmin, isSuperAdmin } from '@/lib/auth/rbac'
 import type { Action, Resource, Role } from '@/types/rbac'
 
 export function useRBAC() {
@@ -11,6 +11,7 @@ export function useRBAC() {
     () => ({
       user,
       isAdmin: () => isAdmin(user),
+      isSuperAdmin: () => isSuperAdmin(user),
       permissions: getUserPermissions(user),
       hasRole: (role: Role | Role[]) => hasRole(user, role),
       can: (action: Action, resource: Resource) => can(user, action, resource),
@@ -29,6 +30,11 @@ export function useHasRole(role: Role | Role[]): boolean {
 export function useIsAdmin(): boolean {
   const { isAdmin } = useRBAC()
   return isAdmin()
+}
+
+export function useIsSuperAdmin(): boolean {
+  const { isSuperAdmin } = useRBAC()
+  return isSuperAdmin()
 }
 
 export function useCan(action: Action, resource: Resource): boolean {

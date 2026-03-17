@@ -9,7 +9,7 @@ export const PROFILES_QUERY_KEY = 'profiles'
 
 export type ProfileQueryData = SelectProfile & {
   user: SelectUser
-  resident: SelectResident
+  resident: SelectResident | null
   hoaBoardMemberships: SelectHoaBoard[]
 }
 

@@ -24,10 +24,7 @@ export const getResidents = createServerFn()
       orderBy: (resident, { desc }) => [desc(resident.updatedAt)],
     })
 
-    // Filter out admin users (role is now on user object)
-    const filteredResidents = residentsData.filter((resident) => resident.profile?.user?.role !== 'admin')
-
-    return filteredResidents
+    return residentsData
   })
 
 export const createResident = createServerFn({ method: 'POST' })
