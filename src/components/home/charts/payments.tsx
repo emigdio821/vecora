@@ -192,7 +192,7 @@ export function PaymentsChart() {
   }
 
   return (
-    <Card>
+    <Card className="bg-transparent">
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div>
           <CardTitle>Pagos</CardTitle>
@@ -242,7 +242,7 @@ export function PaymentsChart() {
             <Popover>
               <PopoverTrigger
                 render={
-                  <Button variant="plain">
+                  <Button variant="plain" className="flex items-center gap-2">
                     <div className="size-3 shrink-0 rounded-[2px] border bg-warning" />
                     <span className="text-muted-foreground">
                       Pendiente:{' '}

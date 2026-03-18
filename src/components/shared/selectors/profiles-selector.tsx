@@ -111,7 +111,7 @@ export function ProfilesSelector({
             {items.length > 10 && <CommandInput placeholder="Buscar" />}
             <CommandList>
               <CommandEmpty>Sin resultados</CommandEmpty>
-              <CommandGroup>
+              <CommandGroup heading="Perfiles">
                 {includeNoneOption && (
                   <CommandItem
                     value={undefined}

@@ -26,6 +26,7 @@ export interface ComboboxMultiSelectProps {
   emptyLabel?: string
   placeholder?: string
   noneOptionLabel?: string
+  heading?: React.ReactNode
   includeNoneOption?: boolean
   items: ComboboxMultiSelectItem[]
   onValueChange: (value: string[]) => void
@@ -35,6 +36,7 @@ export function ComboboxMultiSelect({
   id,
   value,
   items,
+  heading,
   isLoading,
   onValueChange,
   invalid = false,
@@ -101,7 +103,7 @@ export function ComboboxMultiSelect({
             {items.length > 10 && <CommandInput placeholder="Buscar" />}
             <CommandList>
               <CommandEmpty>Sin resultados</CommandEmpty>
-              <CommandGroup>
+              <CommandGroup heading={heading}>
                 {items.map((item) => (
                   <CommandItem
                     key={item.value}

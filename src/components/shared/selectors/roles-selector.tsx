@@ -3,6 +3,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
@@ -79,6 +80,7 @@ export function RolesSelector({
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
+          <SelectLabel>Roles</SelectLabel>
           {includeNoneOption && <SelectItem value={null}>{noneOptionLabel}</SelectItem>}
           {Object.values(Role)
             .filter((role) => role !== Role.SUPER_ADMIN)

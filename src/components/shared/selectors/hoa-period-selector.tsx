@@ -6,6 +6,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
@@ -55,6 +56,7 @@ export function HoaPeriodSelector({
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
+          <SelectLabel>Periodos</SelectLabel>
           {includeNoneOption && <SelectItem value={null}>{noneOptionLabel}</SelectItem>}
 
           {periodOptions.map((period) => (
