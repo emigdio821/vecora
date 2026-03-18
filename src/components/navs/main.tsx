@@ -17,7 +17,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
   const { pathname } = location
   const { setOpenMobile } = useSidebar()
 
-  const hideNotifications = useHasRole(Role.RESIDENT)
+  const isResident = useHasRole(Role.RESIDENT)
 
   return (
     <SidebarGroup {...props}>
@@ -89,7 +89,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
             />
           </SidebarMenuItem>
 
-          {!hideNotifications && (
+          {!isResident && (
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => setOpenMobile(false)}

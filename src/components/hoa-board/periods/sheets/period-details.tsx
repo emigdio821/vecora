@@ -126,16 +126,19 @@ export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetPr
                 const memberFullName = `${member.firstName} ${member.lastName}`.trim()
 
                 return (
-                  <div key={member.id} className="flex items-center gap-2">
-                    <div className="min-w-0 flex-1">
-                      <h2 className="font-medium text-sm">{memberFullName}</h2>
-                      {member.phone && <p className="text-muted-foreground text-xs">{member.phone}</p>}
-                      <div className="flex flex-wrap gap-2">
-                        <RoleNameBadge roleName={member.profile?.user?.role || ''} />
-                        <ProfileTypeBadge isOwner={member.isOwner} />
+                  <div key={member.id} className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="font-medium text-sm">{memberFullName}</h2>
+                        {member.phone && <p className="text-muted-foreground text-sm">{member.phone}</p>}
                       </div>
+                      <CopyButton tooltipText="Copiar ID del periodo" value={period.id} />
                     </div>
-                    <CopyButton tooltipText="Copiar ID" value={member.id} />
+
+                    <div className="flex flex-wrap gap-2">
+                      {member.role && <RoleNameBadge roleName={member.role} />}
+                      <ProfileTypeBadge isOwner={member.isOwner} />
+                    </div>
                   </div>
                 )
               })}

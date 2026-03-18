@@ -23,9 +23,10 @@ export function ProfilesDataTable() {
       tableId="profiles"
       columns={profilesTableColumns}
       header={(table) => <ProfilesDataTableHeader table={table} />}
-      caption={`Estos perfiles representan a los usuarios registrados en el sistema.
+      caption={`
+        Estos perfiles representan a los usuarios registrados en el sistema.
         Puedes vincular un perfil a un residente.
-        `}
+      `}
     />
   )
 }

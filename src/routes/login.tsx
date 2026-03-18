@@ -139,8 +139,8 @@ function RouteComponent() {
                 />
 
                 {error && (
-                  <Alert variant="destructive">
-                    <IconAlertOctagon className="size-4" />
+                  <Alert>
+                    <IconAlertOctagon className="size-4 text-destructive-foreground!" />
                     <AlertTitle>Algo salió mal al iniciar sesión</AlertTitle>
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>

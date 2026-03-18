@@ -83,7 +83,9 @@ export function HomeNotifications() {
           <Card key={notification.id} className="mb-4 break-inside-avoid">
             <CardHeader>
               <CardTitle className="text-sm">{notification.title}</CardTitle>
-              <CardDescription>{notification.message}</CardDescription>
+              <CardDescription>
+                <p className="whitespace-pre-wrap">{notification.message}</p>
+              </CardDescription>
             </CardHeader>
 
             <CardFooter className="flex items-center justify-between text-muted-foreground text-xs">

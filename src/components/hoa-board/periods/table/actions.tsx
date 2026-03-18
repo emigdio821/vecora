@@ -109,13 +109,13 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
                 Información
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => setEditPeriodSheetOpen(true)}>
-                <IconEdit className="size-4" />
-                Editar
-              </DropdownMenuItem>
-
               {canPerformActions && (
                 <>
+                  <DropdownMenuItem onClick={() => setEditPeriodSheetOpen(true)}>
+                    <IconEdit className="size-4" />
+                    Editar
+                  </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem variant="destructive" onClick={() => setDeleteDialogOpen(true)}>

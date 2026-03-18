@@ -11,7 +11,9 @@ export const Route = createFileRoute('/_authed/notifications')({
     const profile = context.profile
     const role = profile?.user.role
 
-    if (!role || !hasRole(profile.user, [Role.PRESIDENT])) {
+    const isResident = hasRole(profile.user, [Role.RESIDENT])
+
+    if (!role || isResident) {
       throw redirect({ to: '/' })
     }
   },

@@ -175,6 +175,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
     }
 
     const { firstName, lastName, email, phone, isOwner } = profile.resident
+    const role = profile.user?.role ?? null
 
     // Check if a soft-deleted member already exists for this profile and period
     const [existingMember] = await db
@@ -195,6 +196,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
           lastName,
           email,
           phone,
+          role,
           isOwner,
         })
         .where(eq(hoaBoard.id, existingMember.id))
@@ -225,6 +227,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
           lastName,
           email,
           phone,
+          role,
           isOwner,
         })
         .returning()
@@ -254,6 +257,7 @@ export const updateHoaBoardMember = createServerFn({ method: 'POST' })
       where: (profiles, { eq }) => eq(profiles.id, updateData.profileId),
       with: {
         resident: true,
+        user: true,
       },
     })
 
@@ -262,6 +266,7 @@ export const updateHoaBoardMember = createServerFn({ method: 'POST' })
     }
 
     const { firstName, lastName, email, phone, isOwner } = profile.resident
+    const role = profile.user?.role ?? null
 
     const [oldMember] = await db.select().from(hoaBoard).where(eq(hoaBoard.id, memberId)).limit(1)
 
@@ -274,6 +279,7 @@ export const updateHoaBoardMember = createServerFn({ method: 'POST' })
         lastName,
         email,
         phone,
+        role,
         isOwner,
       })
       .where(eq(hoaBoard.id, memberId))

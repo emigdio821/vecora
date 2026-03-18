@@ -14,6 +14,7 @@ import {
   unbanProfileSchema,
   updateProfileSchema,
 } from '@/schemas/profiles'
+import { Role } from '@/types/rbac'
 
 export const getProfilesList = createServerFn()
   .middleware([authMiddleware])
@@ -29,7 +30,9 @@ export const getProfilesList = createServerFn()
       orderBy: (profiles, { desc }) => [desc(profiles.updatedAt)],
     })
 
-    return profilesList
+    const filteredProfiles = profilesList.filter((profile) => profile.user.role !== Role.SUPER_ADMIN)
+
+    return filteredProfiles
   })
 
 export const createProfile = createServerFn({ method: 'POST' })

@@ -68,7 +68,6 @@ export function NotificationDetailsSheet({ notification, state }: NotificationDe
               icon={IconCalendarOff}
               content={
                 <div>
-                  <h2 className="font-medium text-sm">Fecha de expiración</h2>
                   <p className="text-muted-foreground text-sm">{formatDate(notification.expiresAt)}</p>
                 </div>
               }

@@ -245,6 +245,7 @@ export const hoaBoard = pgTable(
     lastName: varchar('last_name', { length: 100 }).notNull(),
     email: varchar('email', { length: 255 }).notNull(),
     phone: varchar('phone', { length: 20 }).notNull(),
+    role: varchar('role', { length: 50 }),
     isOwner: boolean('is_owner').notNull().default(false),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
