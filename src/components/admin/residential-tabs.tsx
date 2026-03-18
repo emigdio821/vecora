@@ -1,14 +1,12 @@
-import { useQueryState } from 'nuqs'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useTabQueryState } from '@/hooks/use-tab-query-state'
 import { HousesDataTable } from './houses/table/data-table'
 import { PaymentsDataTable } from './payments/table/data-table'
 import { ResidentsDataTable } from './residents/table/data-table'
 import { ViolationsDataTable } from './violations/table/data-table'
 
 export function AdminResidentialTabs() {
-  const [tab, setTab] = useQueryState('tab', {
-    defaultValue: 'residents',
-  })
+  const [tab, setTab] = useTabQueryState('tab', 'residents')
 
   return (
     <Tabs value={tab} onValueChange={(value) => setTab(value)}>

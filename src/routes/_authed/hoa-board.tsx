@@ -1,17 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQueryState } from 'nuqs'
 import { HoaMembersDataTable } from '@/components/hoa-board/members/table/data-table'
 import { HoaPeriodsDataTable } from '@/components/hoa-board/periods/table/data-table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useTabQueryState } from '@/hooks/use-tab-query-state'
 
 export const Route = createFileRoute('/_authed/hoa-board')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const [tab, setTab] = useQueryState('tab', {
-    defaultValue: 'hoa-board-members',
-  })
+  const [tab, setTab] = useTabQueryState('tab', 'hoa-board-members')
 
   return (
     <div className="flex flex-col gap-2">

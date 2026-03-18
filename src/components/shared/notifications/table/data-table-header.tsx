@@ -10,7 +10,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { SelectNotification } from '@/db/schema/zod/notifications'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
-import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query-state'
 import { CreateNotificationSheet } from '../sheets/create-notification'
 
 interface NotificationsDataTableHeaderProps {

@@ -10,7 +10,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
-import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query-state'
 import { CreateProfileSheet } from '../sheets/create-profile'
 
 interface ProfilesDataTableHeaderProps {

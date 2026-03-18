@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
-import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query-state'
 import { CreateResidentSheet } from '../sheets/create-resident'
 
 interface ResidentsDataTableHeaderProps {

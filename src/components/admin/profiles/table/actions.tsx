@@ -115,7 +115,7 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
       const residentName = `${resident.firstName} ${resident.lastName}`
       return {
         to: '/admin/residential' as const,
-        search: { tab: 'residents', 'search-residents': residentName },
+        search: { 'search-residents': residentName },
       }
     }
 

@@ -1,6 +1,5 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteHoaBoardPeriod } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -15,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query-state'
 import { useHasRole } from '@/hooks/use-rbac'
 import { Role } from '@/types/rbac'
 import { CreatePeriodSheet } from '../sheets/create-period'
@@ -30,10 +30,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
 
   const canPerformActions = useHasRole([Role.SUPER_ADMIN, Role.ADMIN, Role.PRESIDENT])
 
-  const [searchQuery, setSearchQuery] = useQueryState(
-    'search-hoa-board-periods',
-    parseAsString.withDefault(''),
-  )
+  const [searchQuery, setSearchQuery, debouncedSearch] = useDebouncedSearchQuery('search-periods')
 
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
@@ -57,8 +54,8 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
   }
 
   useEffect(() => {
-    table.getColumn('startDate')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
+    table.getColumn('startDate')?.setFilterValue(debouncedSearch)
+  }, [debouncedSearch, table])
 
   return (
     <>
@@ -90,7 +87,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
             placeholder="Buscar"
             name="search-external-users"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value || null)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <InputGroupAddon>
             <IconSearch className="size-4" />

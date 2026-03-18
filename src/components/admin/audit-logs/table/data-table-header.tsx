@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query-state'
 import { STARTING_YEAR } from '@/lib/constants'
 
 interface AuditLogsDataTableHeaderProps {
