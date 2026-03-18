@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { authClient } from '@/lib/auth/client'
 import { logger } from '@/lib/logger'
+import { getAvatarFallback } from '@/lib/utils'
 import { RoleNameBadge } from '../shared/role-name-badge'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar'
@@ -45,15 +46,6 @@ export function NavUser() {
     })
   }
 
-  function getAvatarFallback() {
-    if (!profile) return null
-
-    const profileName = profile.user.name
-    const fallabck = `${profileName.split(' ')[0].charAt(0)}${profileName.split(' ')[1]?.charAt(0) ?? ''}`
-
-    return fallabck
-  }
-
   if (isLoading) return <Skeleton className="h-12 rounded-lg" />
 
   if (error || !profile)
@@ -78,7 +70,7 @@ export function NavUser() {
               >
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <Avatar>
-                    <AvatarFallback>{getAvatarFallback()}</AvatarFallback>
+                    <AvatarFallback>{getAvatarFallback(profile.user.name)}</AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="truncate font-medium">{profile.user.name.split(' ')[0]}</p>

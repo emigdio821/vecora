@@ -85,8 +85,8 @@ export function HomeNotifications() {
               </CardDescription>
             </CardHeader>
 
-            <CardFooter className="flex items-center justify-between text-muted-foreground text-xs">
-              <div>
+            <CardFooter className="flex items-center justify-between gap-1 text-muted-foreground text-xs">
+              <div className="flex flex-col gap-1">
                 <p className="flex items-center gap-1">
                   <IconUser className="size-4" />
                   <span className="line-clamp-2 flex-1">{getProfileName(notification)}</span>

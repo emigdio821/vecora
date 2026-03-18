@@ -1,5 +1,6 @@
 import { isValidPhoneNumber } from 'react-phone-number-input'
 import { z } from 'zod'
+import { emailSchema } from './shared'
 
 export const createResidentSchema = z.object({
   firstName: z.string().min(1, 'El nombre es requerido').max(100, 'El nombre es muy largo'),
@@ -8,7 +9,7 @@ export const createResidentSchema = z.object({
     .string()
     .min(1, 'El teléfono es requerido')
     .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
-  email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
+  email: emailSchema,
   isOwner: z.boolean(),
   notes: z.string().max(200, 'Las notas son muy largas').optional(),
   houseIds: z.array(z.uuid('ID de casa inválido')).optional(),
@@ -24,7 +25,7 @@ export const updateResidentSchema = z.object({
     .string()
     .min(1, 'El teléfono es requerido')
     .refine(isValidPhoneNumber, { message: 'Teléfono inválido' }),
-  email: z.email('Correo inválido').min(1, 'El correo es requerido').max(255, 'El correo es muy largo'),
+  email: emailSchema,
   isOwner: z.boolean(),
   notes: z.string().max(200, 'Las notas son muy largas').optional(),
   houseIds: z.array(z.uuid('ID de casa inválido')).optional(),

@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ResidentialAddressSettings } from '@/components/settings/residential-address'
+import { ResidentialAddressSettings } from '@/components/settings/residential-address/residential-address'
+import { ProfileSettings } from '@/components/settings/user-profile/user-profile'
 import { createSEOTitle } from '@/lib/seo'
 
 export const Route = createFileRoute('/_authed/settings')({
@@ -14,11 +15,9 @@ function RouteComponent() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <h1 className="font-heading font-medium text-lg leading-none">Configuración</h1>
-        {/*<p className="text-muted-foreground text-sm">
-          En esta sección puedes administrar tus notificaciones.
-        </p>*/}
       </div>
 
+      <ProfileSettings />
       <ResidentialAddressSettings />
     </div>
   )

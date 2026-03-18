@@ -17,12 +17,13 @@ import { SITE_CONFIG } from '@/config/site'
 import { authClient } from '@/lib/auth/client'
 import { logger } from '@/lib/logger'
 import { createSEOTitle } from '@/lib/seo'
+import { emailSchema, passwordSchema } from '@/schemas/shared'
 
 const DEFAULT_ERROR = 'Error en el servidor, intenta nuevamente'
 
 const loginSchema = z.object({
-  email: z.email('Correo inválido').min(1, 'El correo es requerido'),
-  password: z.string().min(1, 'La contraseña es requerida'),
+  email: emailSchema,
+  password: passwordSchema,
 })
 
 type LoginFormData = z.infer<typeof loginSchema>

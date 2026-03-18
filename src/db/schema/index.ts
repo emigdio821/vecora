@@ -66,7 +66,7 @@ export const residents = pgTable('residents', {
 // Residential Address table - stores the common address for the condominium complex
 export const residentialAddress = pgTable('residential_address', {
   id: uuid('id').primaryKey().defaultRandom(),
-  name: varchar('name', { length: 255 }).notNull(), // e.g., "Valle Verde HOA"
+  name: varchar('name', { length: 255 }).notNull(),
   street: varchar('street', { length: 255 }).notNull(),
   city: varchar('city', { length: 100 }).notNull(),
   state: varchar('state', { length: 100 }).notNull(),

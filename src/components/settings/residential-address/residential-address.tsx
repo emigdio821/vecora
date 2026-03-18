@@ -2,12 +2,12 @@ import { IconWind } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { residentialAddressQueryOptions } from '@/api/tanstack-queries/residential-address'
+import { TSQueryGenericError } from '@/components/shared/errors/query-generic'
+import { TextGenericSkeleton } from '@/components/shared/skeletons/text-generic'
+import { Button } from '@/components/ui/button'
 import { useIsAdmin, useIsSuperAdmin } from '@/hooks/use-rbac'
-import { TSQueryGenericError } from '../shared/errors/query-generic'
-import { TextGenericSkeleton } from '../shared/skeletons/text-generic'
-import { Button } from '../ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card'
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../ui/card'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../../ui/empty'
 import { UpdateResidentialAddressSheet } from './sheets/update-residential-address'
 
 export function ResidentialAddressSettings() {
@@ -47,7 +47,7 @@ export function ResidentialAddressSettings() {
         </CardHeader>
         <CardContent>
           {data ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <div className="flex gap-1">
                 <span className="font-medium">País</span>
                 <span className="text-muted-foreground">{data.country}</span>

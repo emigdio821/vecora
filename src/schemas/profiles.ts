@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import { Role } from '@/types/rbac'
+import { passwordSchema } from './shared'
 
 export const createProfileSchema = z.object({
-  password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
+  password: passwordSchema,
   residentId: z.uuid('ID de residente inválido'),
   role: z.enum(Object.values(Role)),
 })
@@ -14,7 +15,7 @@ export const updateProfileSchema = z.object({
   userId: z.string().min(1, 'El ID de usuario es requerido'),
   residentId: z.uuid('ID de residente inválido'),
   role: z.enum(Object.values(Role)),
-  password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres').or(z.literal('')).optional(),
+  password: passwordSchema,
 })
 
 export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>
