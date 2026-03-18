@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { profiles } from '@/db/schema'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 
 export const getUserProfile = createServerFn()
@@ -24,7 +25,7 @@ export const getUserProfile = createServerFn()
 
       return profile
     } catch (error) {
-      console.error('Error fetching user profile:', error)
+      logger.error('Error fetching user profile:', error)
       return null
     }
   })

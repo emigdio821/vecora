@@ -3,6 +3,7 @@ import { eq, gt, isNull, or } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { notifications, profiles } from '@/db/schema'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 import {
   createNotificationSchema,
@@ -78,7 +79,7 @@ export const createNotification = createServerFn({ method: 'POST' })
         entityId: newNotification.id,
         newData: newNotification,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return newNotification
   })
@@ -123,7 +124,7 @@ export const updateNotification = createServerFn({ method: 'POST' })
         oldData: notificationToUpdate,
         newData: updatedNotification,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return updatedNotification
   })
@@ -163,7 +164,7 @@ export const deleteNotification = createServerFn({ method: 'POST' })
         entityId: notificationId,
         oldData: notificationToDelete,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return deletedNotifications
   })

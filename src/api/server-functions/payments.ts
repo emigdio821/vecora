@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { paymentMonths, payments } from '@/db/schema'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 import {
   createPaymentSchema,
@@ -46,7 +47,7 @@ export const createPayment = createServerFn({ method: 'POST' })
         entityId: newPayment.id,
         newData: { ...newPayment, months },
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return newPayment
   })
@@ -94,7 +95,7 @@ export const updatePayment = createServerFn({ method: 'POST' })
         oldData: { ...oldPayment, months: oldMonths.map((m) => m.month) },
         newData: { ...updatedPayment, months },
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return updatedPayment
   })
@@ -120,7 +121,7 @@ export const deletePayment = createServerFn({ method: 'POST' })
         entityId: deletedPayment.id,
         oldData: { ...paymentToDelete, months: paymentMonthsToDelete.map((m) => m.month) },
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return deletedPayment
   })

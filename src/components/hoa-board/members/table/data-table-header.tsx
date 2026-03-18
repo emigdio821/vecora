@@ -38,7 +38,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
   const bulkDeleteMutation = useBulkDelete({
     table,
     successTitle: 'Miembros eliminados',
-    successDescription: 'Los miembros seleccionados han sido eliminados exitosamente.',
+    successDescription: 'Los miembros seleccionados han sido eliminados exitosamente',
     deleteFn: async (member) => {
       await deleteHoaBoardMember({ data: { memberId: member.id } })
     },

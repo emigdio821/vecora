@@ -75,8 +75,8 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
     },
     invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Pago actualizado',
-    successDescription: 'El pago ha sido actualizado exitosamente.',
-    errorDescription: 'Ocurrió un error al actualizar el pago, intenta nuevamente.',
+    successDescription: 'El pago ha sido actualizado exitosamente',
+    errorDescription: 'Ocurrió un error al actualizar el pago, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -117,7 +117,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Editar pago</SheetTitle>
-          <SheetDescription>Actualiza la información del pago.</SheetDescription>
+          <SheetDescription>Actualiza la información del pago</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

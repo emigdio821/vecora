@@ -10,7 +10,7 @@ export function PaymentsDataTable() {
   const { data: payments = [], isLoading, error, refetch } = useQuery(paymentsListQueryOptions())
 
   if (error) {
-    return <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar los pagos." />
+    return <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar los pagos" />
   }
 
   if (isLoading) {

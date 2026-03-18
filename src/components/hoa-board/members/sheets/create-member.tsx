@@ -49,8 +49,8 @@ export function CreateMemberSheet({ state, defaultPeriodId }: CreateMemberSheetP
     },
     invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, HOA_BOARD_MEMBERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Miembro agregado',
-    successDescription: 'El miembro ha sido agregado exitosamente.',
-    errorDescription: 'Ocurrió un error al agregar el miembro, intenta nuevamente.',
+    successDescription: 'El miembro ha sido agregado exitosamente',
+    errorDescription: 'Ocurrió un error al agregar el miembro, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -71,7 +71,7 @@ export function CreateMemberSheet({ state, defaultPeriodId }: CreateMemberSheetP
         <SheetHeader>
           <SheetTitle>Agregar miembro</SheetTitle>
           <SheetDescription>
-            Selecciona el periodo y el perfil del nuevo miembro de la mesa directiva.
+            Selecciona el periodo y el perfil del nuevo miembro de la mesa directiva
           </SheetDescription>
         </SheetHeader>
 

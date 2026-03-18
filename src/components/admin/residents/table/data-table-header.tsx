@@ -29,7 +29,7 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
   const bulkDeleteMutation = useBulkDelete({
     table,
     successTitle: 'Residentes eliminados',
-    successDescription: 'Los residentes seleccionados han sido eliminados exitosamente.',
+    successDescription: 'Los residentes seleccionados han sido eliminados exitosamente',
     deleteFn: async (resident) => {
       await deleteResident({ data: { residentId: resident.id } })
     },

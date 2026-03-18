@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { houses, residents } from '@/db/schema'
+import { logger } from '@/lib/logger'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import { createResidentSchema, deleteResidentSchema, updateResidentSchema } from '@/schemas/residents'
@@ -57,7 +58,7 @@ export const createResident = createServerFn({ method: 'POST' })
         entityId: newResident.id,
         newData: newResident,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return newResident
   })
@@ -103,7 +104,7 @@ export const updateResident = createServerFn({ method: 'POST' })
         oldData: oldResident,
         newData: updatedResident,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return updatedResident
   })
@@ -130,7 +131,7 @@ export const deleteResident = createServerFn({ method: 'POST' })
         entityId: deletedResident.id,
         oldData: residentToDelete,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return deletedResident
   })

@@ -10,6 +10,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button, type ButtonProps } from '@/components/ui/button'
+import { logger } from '@/lib/logger'
 import { cn } from '@/lib/utils'
 import { LoaderIcon } from '../icons'
 
@@ -37,7 +38,7 @@ export function AlertDialogGeneric(props: AlertDialogGenericProps) {
       try {
         await action()
       } catch (error) {
-        console.error('Error executing action:', error)
+        logger.error('Error executing action:', error)
         throw error
       } finally {
         setExecutingAction(false)

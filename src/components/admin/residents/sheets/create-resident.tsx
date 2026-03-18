@@ -57,8 +57,8 @@ export function CreateResidentSheet({ state }: CreateResidentSheetProps) {
     },
     invalidateKeys: [RESIDENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Residente creado',
-    successDescription: 'El residente ha sido creado exitosamente.',
-    errorDescription: 'Ocurrió un error al crear el residente, intenta nuevamente.',
+    successDescription: 'El residente ha sido creado exitosamente',
+    errorDescription: 'Ocurrió un error al crear el residente, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -78,7 +78,7 @@ export function CreateResidentSheet({ state }: CreateResidentSheetProps) {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Crear residente</SheetTitle>
-          <SheetDescription>Ingresa la información del nuevo residente.</SheetDescription>
+          <SheetDescription>Ingresa la información del nuevo residente</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

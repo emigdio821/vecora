@@ -11,10 +11,7 @@ export function NotificationsDataTable() {
 
   if (error) {
     return (
-      <TSQueryGenericError
-        refetch={refetch}
-        errorDescription="Algo salió mal al cargar las notificaciones."
-      />
+      <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar las notificaciones" />
     )
   }
 

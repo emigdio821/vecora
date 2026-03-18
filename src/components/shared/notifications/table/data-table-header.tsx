@@ -29,7 +29,7 @@ export function NotificationsDataTableHeader({ table }: NotificationsDataTableHe
   const bulkDeleteMutation = useBulkDelete({
     table,
     successTitle: 'Notificaciones eliminadas',
-    successDescription: 'Las notificaciones seleccionadas han sido eliminadas exitosamente.',
+    successDescription: 'Las notificaciones seleccionadas han sido eliminadas exitosamente',
     deleteFn: async (notification) => {
       await deleteNotification({ data: { notificationId: notification.id } })
     },

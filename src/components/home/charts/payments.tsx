@@ -125,7 +125,7 @@ export function PaymentsChart() {
         <TSQueryGenericError
           refetch={refetch}
           className="size-full flex-1 border-none"
-          errorDescription="Algo salió mal al cargar la información de los pagos."
+          errorDescription="Algo salió mal al cargar la información de los pagos"
         />
       )
     } else if (payments.length === 0) {
@@ -136,7 +136,7 @@ export function PaymentsChart() {
               <IconWind />
             </EmptyMedia>
             <EmptyTitle>Sin resultados</EmptyTitle>
-            <EmptyDescription>No hay pagos para mostrar en este año.</EmptyDescription>
+            <EmptyDescription>No hay pagos para mostrar en este año</EmptyDescription>
           </EmptyHeader>
         </Empty>
       )

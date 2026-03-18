@@ -56,8 +56,8 @@ export function EditHoaPeriodSheet({ period, state }: EditHoaPeriodSheetProps) {
     },
     invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, HOA_BOARD_MEMBERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Periodo actualizado',
-    successDescription: 'El periodo ha sido actualizado exitosamente.',
-    errorDescription: 'Ocurrió un error al actualizar el periodo, intenta nuevamente.',
+    successDescription: 'El periodo ha sido actualizado exitosamente',
+    errorDescription: 'Ocurrió un error al actualizar el periodo, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -79,7 +79,7 @@ export function EditHoaPeriodSheet({ period, state }: EditHoaPeriodSheetProps) {
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Editar periodo</SheetTitle>
-          <SheetDescription>Actualiza las fechas del periodo de mesa directiva.</SheetDescription>
+          <SheetDescription>Actualiza las fechas del periodo de mesa directiva</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

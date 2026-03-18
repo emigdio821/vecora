@@ -31,7 +31,7 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
   const bulkProfileDeleteMutation = useBulkDelete({
     table,
     successTitle: 'Perfiles eliminados',
-    successDescription: 'Los perfiles seleccionados han sido eliminados exitosamente.',
+    successDescription: 'Los perfiles seleccionados han sido eliminados exitosamente',
     deleteFn: async (profile) => {
       await deleteProfile({ data: { profileId: profile.id } })
     },
@@ -44,7 +44,7 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
   const bulkProfileBanMutation = useBulkDelete({
     table,
     successTitle: 'Perfiles desactivados',
-    successDescription: 'Los perfiles seleccionados han sido desactivados exitosamente.',
+    successDescription: 'Los perfiles seleccionados han sido desactivados exitosamente',
     deleteFn: async (profile) => {
       await banProfile({ data: { userId: profile.userId } })
     },

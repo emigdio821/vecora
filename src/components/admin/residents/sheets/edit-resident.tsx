@@ -58,8 +58,8 @@ export function EditResidentSheet({ resident, state }: EditResidentSheetProps) {
     },
     invalidateKeys: [RESIDENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Residente actualizado',
-    successDescription: 'El residente ha sido actualizado exitosamente.',
-    errorDescription: 'Ocurrió un error al actualizar el residente, intenta nuevamente.',
+    successDescription: 'El residente ha sido actualizado exitosamente',
+    errorDescription: 'Ocurrió un error al actualizar el residente, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -85,7 +85,7 @@ export function EditResidentSheet({ resident, state }: EditResidentSheetProps) {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Editar residente</SheetTitle>
-          <SheetDescription>Actualiza la información del residente.</SheetDescription>
+          <SheetDescription>Actualiza la información del residente</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

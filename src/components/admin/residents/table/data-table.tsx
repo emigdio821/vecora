@@ -11,7 +11,7 @@ export function ResidentsDataTable() {
 
   if (error) {
     return (
-      <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar los residentes." />
+      <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar los residentes" />
     )
   }
 

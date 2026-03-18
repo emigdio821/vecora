@@ -10,7 +10,7 @@ export function HousesDataTable() {
   const { data: houses = [], isLoading, error, refetch } = useQuery(housesListQueryOptions())
 
   if (error) {
-    return <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar las casas." />
+    return <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar las casas" />
   }
 
   if (isLoading) {

@@ -26,6 +26,8 @@ export function AuditLogEntityTypeBadge({ entityType, ...badgeProps }: AuditLogE
         return 'Usuario'
       case 'notification':
         return 'Notificación'
+      case 'residential_address':
+        return 'Dirección residencial'
       default:
         return type
     }

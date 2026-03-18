@@ -29,7 +29,7 @@ export function ViolationsDataTableHeader({ table }: ViolationsDataTableHeaderPr
   const bulkDeleteMutation = useBulkDelete({
     table,
     successTitle: 'Infracciones eliminadas',
-    successDescription: 'Las infracciones seleccionadas han sido eliminadas exitosamente.',
+    successDescription: 'Las infracciones seleccionadas han sido eliminadas exitosamente',
     deleteFn: async (violation) => {
       await deleteViolation({ data: { violationId: violation.id } })
     },

@@ -1,6 +1,6 @@
-import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSun } from '@tabler/icons-react'
+import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSettings, IconSun } from '@tabler/icons-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
 import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
 import {
@@ -125,7 +125,7 @@ export function NavUser() {
               </DropdownMenuSub>
             </DropdownMenuGroup>
 
-            {/* <DropdownMenuGroup>
+            <DropdownMenuGroup>
               <DropdownMenuItem
                 render={
                   <Link to="/settings">
@@ -134,9 +134,9 @@ export function NavUser() {
                   </Link>
                 }
               />
-            </DropdownMenuGroup> */}
+            </DropdownMenuGroup>
 
-            {/* <DropdownMenuSeparator /> */}
+            <DropdownMenuSeparator />
 
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleLogOut}>

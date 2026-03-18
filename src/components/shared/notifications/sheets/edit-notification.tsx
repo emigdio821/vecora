@@ -55,8 +55,8 @@ export function EditNotificationSheet({ notification, state }: EditNotificationS
     },
     invalidateKeys: [NOTIFICATIONS_QUERY_KEY, MY_NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Notificación actualizada',
-    successDescription: 'La notificación ha sido actualizada exitosamente.',
-    errorDescription: 'Ocurrió un error al actualizar la notificación, intenta nuevamente.',
+    successDescription: 'La notificación ha sido actualizada exitosamente',
+    errorDescription: 'Ocurrió un error al actualizar la notificación, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -82,7 +82,7 @@ export function EditNotificationSheet({ notification, state }: EditNotificationS
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Editar notificación</SheetTitle>
-          <SheetDescription>Actualiza la información de la notificación.</SheetDescription>
+          <SheetDescription>Actualiza la información de la notificación</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

@@ -44,8 +44,8 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
     },
     invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, HOA_BOARD_MEMBERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Miembro eliminado',
-    successDescription: 'El miembro ha sido eliminado exitosamente.',
-    errorDescription: 'Ocurrió un error al eliminar el miembro, intenta nuevamente.',
+    successDescription: 'El miembro ha sido eliminado exitosamente',
+    errorDescription: 'Ocurrió un error al eliminar el miembro, intenta nuevamente',
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

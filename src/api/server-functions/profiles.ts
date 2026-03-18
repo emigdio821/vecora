@@ -5,6 +5,7 @@ import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { profiles } from '@/db/schema'
 import { auth } from '@/lib/auth'
+import { logger } from '@/lib/logger'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import {
@@ -106,7 +107,7 @@ export const createProfile = createServerFn({ method: 'POST' })
         entityId: newProfile.id,
         newData: profileWithRelations,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return profileWithRelations
   })
@@ -216,7 +217,7 @@ export const updateProfile = createServerFn({ method: 'POST' })
         oldData: oldProfile,
         newData: profileWithRelations,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return profileWithRelations
   })
@@ -264,7 +265,7 @@ export const deleteProfile = createServerFn({ method: 'POST' })
         entityId: profileId,
         oldData: oldProfile,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
   })
 
 export const banProfile = createServerFn({ method: 'POST' })
@@ -309,7 +310,7 @@ export const banProfile = createServerFn({ method: 'POST' })
           },
         },
       },
-    }).catch(console.error)
+    }).catch(logger.error)
   })
 
 export const unbanProfile = createServerFn({ method: 'POST' })
@@ -340,5 +341,5 @@ export const unbanProfile = createServerFn({ method: 'POST' })
           },
         },
       },
-    }).catch(console.error)
+    }).catch(logger.error)
   })

@@ -26,8 +26,16 @@ class Logger {
         consoleMethod(logMessage)
       }
     } else {
+      // Log the same as dev for now
       // In production, you can send logs to external service
       // Example: Sentry.captureMessage(message, { level, extra: context })
+      const consoleMethod = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log
+
+      if (context) {
+        consoleMethod(logMessage, context)
+      } else {
+        consoleMethod(logMessage)
+      }
     }
   }
 

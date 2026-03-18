@@ -5,6 +5,7 @@ import { db } from '@/db'
 import { violations } from '@/db/schema'
 import type { SelectResident } from '@/db/schema/zod/residents'
 import type { SelectViolation } from '@/db/schema/zod/violations'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 import { createViolationSchema, deleteViolationSchema, updateViolationSchema } from '@/schemas/violations'
 
@@ -25,7 +26,7 @@ export const createViolation = createServerFn({ method: 'POST' })
         entityId: newViolation.id,
         newData: newViolation,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return newViolation
   })
@@ -52,7 +53,7 @@ export const updateViolation = createServerFn({ method: 'POST' })
         oldData: oldViolation,
         newData: updatedViolation,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return updatedViolation
   })
@@ -78,7 +79,7 @@ export const deleteViolation = createServerFn({ method: 'POST' })
         entityId: deletedViolation.id,
         oldData: violationToDelete,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return deletedViolation
   })

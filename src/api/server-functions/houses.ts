@@ -3,6 +3,7 @@ import { eq, isNull } from 'drizzle-orm'
 import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { houses } from '@/db/schema'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 import { createHouseSchema, deleteHouseSchema, updateHouseSchema } from '@/schemas/houses'
 
@@ -19,7 +20,7 @@ export const createHouse = createServerFn({ method: 'POST' })
         entityId: newHouse.id,
         newData: newHouse,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return newHouse
   })
@@ -42,7 +43,7 @@ export const updateHouse = createServerFn({ method: 'POST' })
         oldData: oldHouse,
         newData: updatedHouse,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return updatedHouse
   })
@@ -74,7 +75,7 @@ export const deleteHouse = createServerFn({ method: 'POST' })
         entityId: deletdHouse.id,
         oldData: houseToDelete,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return houseToDelete
   })

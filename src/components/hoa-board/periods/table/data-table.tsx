@@ -13,7 +13,7 @@ export function HoaPeriodsDataTable() {
     return (
       <TSQueryGenericError
         refetch={refetch}
-        errorDescription="Algo salió mal al cargar los periodos de la mesa directiva."
+        errorDescription="Algo salió mal al cargar los periodos de la mesa directiva"
       />
     )
   }

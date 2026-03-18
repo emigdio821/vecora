@@ -82,8 +82,8 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
     },
     invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, RESIDENTS_QUERY_KEY],
     successTitle: 'Pago creado',
-    successDescription: 'El pago ha sido creado exitosamente.',
-    errorDescription: 'Ocurrió un error al crear el pago, intenta nuevamente.',
+    successDescription: 'El pago ha sido creado exitosamente',
+    errorDescription: 'Ocurrió un error al crear el pago, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -121,7 +121,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Crear pago</SheetTitle>
-          <SheetDescription>Ingresa la información del nuevo pago.</SheetDescription>
+          <SheetDescription>Ingresa la información del nuevo pago</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

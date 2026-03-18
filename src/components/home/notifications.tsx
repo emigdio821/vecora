@@ -31,10 +31,7 @@ export function HomeNotifications() {
 
   if (error) {
     return (
-      <TSQueryGenericError
-        refetch={refetch}
-        errorDescription="Algo salió mal al cargar las notificaciones."
-      />
+      <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar las notificaciones" />
     )
   }
 
@@ -46,7 +43,7 @@ export function HomeNotifications() {
             <IconBellOff />
           </EmptyMedia>
           <EmptyTitle>Estás al día</EmptyTitle>
-          <EmptyDescription>No hay notificaciones pendientes.</EmptyDescription>
+          <EmptyDescription>No hay notificaciones pendientes</EmptyDescription>
         </EmptyHeader>
       </Empty>
     )

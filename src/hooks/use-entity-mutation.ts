@@ -19,7 +19,7 @@ export function useEntityMutation<TData = unknown, TVariables = unknown>({
   successTitle,
   successDescription,
   errorTitle = 'Error',
-  errorDescription = 'Ocurrió un error, intenta nuevamente.',
+  errorDescription = 'Ocurrió un error, intenta nuevamente',
   onSuccess: customOnSuccess,
   onError: customOnError,
 }: EntityMutationConfig<TData, TVariables>) {

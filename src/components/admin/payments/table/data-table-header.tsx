@@ -29,7 +29,7 @@ export function PaymentsDataTableHeader({ table }: PaymentsDataTableHeaderProps)
   const bulkDeleteMutation = useBulkDelete({
     table,
     successTitle: 'Propietarios eliminados',
-    successDescription: 'Los propietarios seleccionadas han sido eliminados exitosamente.',
+    successDescription: 'Los propietarios seleccionadas han sido eliminados exitosamente',
     deleteFn: async (payment) => {
       await deletePayment({ data: { paymentId: payment.id } })
     },

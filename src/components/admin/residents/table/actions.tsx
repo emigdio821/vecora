@@ -34,8 +34,8 @@ export function ResidentsTableActions({ resident }: ActionsProps) {
     },
     invalidateKeys: [RESIDENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Residente eliminado',
-    successDescription: 'El residente ha sido eliminado exitosamente.',
-    errorDescription: 'Ocurrió un error al eliminar el residente, intenta nuevamente.',
+    successDescription: 'El residente ha sido eliminado exitosamente',
+    errorDescription: 'Ocurrió un error al eliminar el residente, intenta nuevamente',
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

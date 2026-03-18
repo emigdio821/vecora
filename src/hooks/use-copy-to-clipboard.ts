@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { logger } from '@/lib/logger'
 
 export function useCopyToClipboard({
   timeout = 1000,
@@ -25,7 +26,7 @@ export function useCopyToClipboard({
         clearTimeout(timeoutRef.current)
         timeoutRef.current = setTimeout(() => setIsCopied(false), timeout)
       }
-    }, console.error)
+    }, logger.error)
   }
 
   return { isCopied, copyToClipboard }

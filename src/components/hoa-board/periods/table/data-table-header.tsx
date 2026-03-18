@@ -42,7 +42,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
   const bulkDeleteMutation = useBulkDelete({
     table,
     successTitle: 'Periodos eliminados',
-    successDescription: 'Los periodos seleccionados han sido eliminados exitosamente.',
+    successDescription: 'Los periodos seleccionados han sido eliminados exitosamente',
     deleteFn: async (period) => {
       await deleteHoaBoardPeriod({ data: { periodId: period.id } })
     },

@@ -48,8 +48,8 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
     },
     invalidateKeys: [HOUSES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Casa actualizada',
-    successDescription: 'La casa ha sido actualizada exitosamente.',
-    errorDescription: 'Ocurrió un error al actualizar la casa, intenta nuevamente.',
+    successDescription: 'La casa ha sido actualizada exitosamente',
+    errorDescription: 'Ocurrió un error al actualizar la casa, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -75,7 +75,7 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Editar casa</SheetTitle>
-          <SheetDescription>Actualiza la información de la casa.</SheetDescription>
+          <SheetDescription>Actualiza la información de la casa</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

@@ -91,7 +91,7 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
                       <EmptyMedia variant="icon" className="mb-0">
                         <IconWind />
                       </EmptyMedia>
-                      <EmptyDescription>No tiene propietario asignado.</EmptyDescription>
+                      <EmptyDescription>No tiene propietario asignado</EmptyDescription>
                     </EmptyHeader>
                   </Empty>
                 </div>

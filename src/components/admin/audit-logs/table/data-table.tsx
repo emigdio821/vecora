@@ -13,7 +13,7 @@ export function AuditLogsDataTable() {
     return (
       <TSQueryGenericError
         refetch={refetch}
-        errorDescription="Algo salió mal al cargar los registros de auditoría."
+        errorDescription="Algo salió mal al cargar los registros de auditoría"
       />
     )
   }

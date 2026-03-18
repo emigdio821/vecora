@@ -44,6 +44,7 @@ export const auditLogEntityTypeEnum = pgEnum('audit_log_entity_type', [
   'hoa_board',
   'hoa_board_period',
   'notification',
+  'residential_address',
 ])
 
 // Residents table - unified table for all condominium residents (owners and personnel)

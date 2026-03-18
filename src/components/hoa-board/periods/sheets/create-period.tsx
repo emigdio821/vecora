@@ -51,8 +51,8 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
     },
     invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Periodo creado',
-    successDescription: 'El periodo ha sido creado exitosamente.',
-    errorDescription: 'Ocurrió un error al crear el periodo, intenta nuevamente.',
+    successDescription: 'El periodo ha sido creado exitosamente',
+    errorDescription: 'Ocurrió un error al crear el periodo, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -74,7 +74,7 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Crear periodo</SheetTitle>
-          <SheetDescription>Ingresa las fechas del nuevo periodo de mesa directiva.</SheetDescription>
+          <SheetDescription>Ingresa las fechas del nuevo periodo de mesa directiva</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

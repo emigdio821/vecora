@@ -4,6 +4,7 @@ import { createAuditLog } from '@/api/server-functions/audit-logs'
 import { db } from '@/db'
 import { hoaBoard, hoaBoardPeriods } from '@/db/schema'
 import type { SelectHoaBoard } from '@/db/schema/zod/hoa-board'
+import { logger } from '@/lib/logger'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import {
@@ -102,7 +103,7 @@ export const createHoaBoardPeriod = createServerFn({ method: 'POST' })
         entityId: newPeriod.id,
         newData: newPeriod,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return newPeriod
   })
@@ -153,7 +154,7 @@ export const updateHoaBoardPeriod = createServerFn({ method: 'POST' })
         oldData: oldPeriod,
         newData: updatedPeriod,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return updatedPeriod
   })
@@ -212,7 +213,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
           oldData: existingMember,
           newData: restoredMember,
         },
-      }).catch(console.error)
+      }).catch(logger.error)
     } else if (existingMember) {
       // Member already exists and is not deleted
       throw new Error('Member already exists in this period')
@@ -241,7 +242,7 @@ export const createHoaBoardMember = createServerFn({ method: 'POST' })
           entityId: member.id,
           newData: newMember,
         },
-      }).catch(console.error)
+      }).catch(logger.error)
     }
 
     return member
@@ -293,7 +294,7 @@ export const updateHoaBoardMember = createServerFn({ method: 'POST' })
         oldData: oldMember,
         newData: updatedMember,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return updatedMember
   })
@@ -318,7 +319,7 @@ export const deleteHoaBoardMember = createServerFn({ method: 'POST' })
         entityId: deletedMember.id,
         oldData: memberToDelete,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return memberToDelete
   })
@@ -354,7 +355,7 @@ export const deleteHoaBoardPeriod = createServerFn({ method: 'POST' })
         entityId: deletedPeriod.id,
         oldData: periodToDelete,
       },
-    }).catch(console.error)
+    }).catch(logger.error)
 
     return periodToDelete
   })

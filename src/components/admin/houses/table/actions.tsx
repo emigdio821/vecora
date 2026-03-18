@@ -34,8 +34,8 @@ export function HousesTableActions({ house }: ActionsProps) {
     },
     invalidateKeys: [HOUSES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Casa eliminada',
-    successDescription: 'La casa ha sido eliminada exitosamente.',
-    errorDescription: 'Ocurrió un error al eliminar la casa, intenta nuevamente.',
+    successDescription: 'La casa ha sido eliminada exitosamente',
+    errorDescription: 'Ocurrió un error al eliminar la casa, intenta nuevamente',
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

@@ -15,9 +15,10 @@ import { Input } from '@/components/ui/input'
 import { InputPassword } from '@/components/ui/input-password'
 import { SITE_CONFIG } from '@/config/site'
 import { authClient } from '@/lib/auth/client'
+import { logger } from '@/lib/logger'
 import { createSEOTitle } from '@/lib/seo'
 
-const DEFAULT_ERROR = 'Error en el servidor, intenta nuevamente.'
+const DEFAULT_ERROR = 'Error en el servidor, intenta nuevamente'
 
 const loginSchema = z.object({
   email: z.email('Correo inválido').min(1, 'El correo es requerido'),
@@ -66,9 +67,9 @@ function RouteComponent() {
 
       if (error) {
         setLoading(false)
-        console.error('login error:', error)
+        logger.error('login error:', error)
 
-        setError(error.status === 401 ? 'Crendeciales inválidas, intenta nuevamente.' : DEFAULT_ERROR)
+        setError(error.status === 401 ? 'Crendeciales inválidas, intenta nuevamente' : DEFAULT_ERROR)
       }
     } catch {
       setLoading(false)

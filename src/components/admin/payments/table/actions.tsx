@@ -35,8 +35,8 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
     },
     invalidateKeys: [PAYMENTS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Pago eliminado',
-    successDescription: 'El pago ha sido eliminado exitosamente.',
-    errorDescription: 'Ocurrió un error al eliminar el pago, intenta nuevamente.',
+    successDescription: 'El pago ha sido eliminado exitosamente',
+    errorDescription: 'Ocurrió un error al eliminar el pago, intenta nuevamente',
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

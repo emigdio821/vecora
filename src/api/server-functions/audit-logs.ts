@@ -3,6 +3,7 @@ import { getRequest } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { auditLogs, profiles } from '@/db/schema'
+import { logger } from '@/lib/logger'
 import { adminOnlyMiddleware } from '@/middleware/admin'
 import { authMiddleware } from '@/middleware/auth'
 import { createAuditLogSchema } from '@/schemas/audit-logs'
@@ -34,7 +35,7 @@ export const createAuditLog = createServerFn({ method: 'POST' })
         userAgent: request.headers.get('user-agent') ?? null,
       })
     } catch (error) {
-      console.error('Failed to create audit log:', error)
+      logger.error('Failed to create audit log:', error)
     }
   })
 

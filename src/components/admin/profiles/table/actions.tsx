@@ -63,8 +63,8 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
     },
     invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, RESIDENTS_QUERY_KEY],
     successTitle: 'Perfil eliminado',
-    successDescription: 'El perfil ha sido eliminado exitosamente.',
-    errorDescription: 'Ocurrió un error al eliminar el perfil, intenta nuevamente.',
+    successDescription: 'El perfil ha sido eliminado exitosamente',
+    errorDescription: 'Ocurrió un error al eliminar el perfil, intenta nuevamente',
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },
@@ -76,8 +76,8 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
     },
     invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Perfil desactivado',
-    successDescription: 'El perfil ha sido desactivado exitosamente.',
-    errorDescription: 'Ocurrió un error al desactivar el perfil, intenta nuevamente.',
+    successDescription: 'El perfil ha sido desactivado exitosamente',
+    errorDescription: 'Ocurrió un error al desactivar el perfil, intenta nuevamente',
     onSuccess: () => {
       setBanDialogOpen(false)
     },
@@ -89,8 +89,8 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
     },
     invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Perfil reactivado',
-    successDescription: 'El perfil ha sido reactivado exitosamente.',
-    errorDescription: 'Ocurrió un error al reactivar el perfil, intenta nuevamente.',
+    successDescription: 'El perfil ha sido reactivado exitosamente',
+    errorDescription: 'Ocurrió un error al reactivar el perfil, intenta nuevamente',
     onSuccess: () => {
       setUnbanDialogOpen(false)
     },

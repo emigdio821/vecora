@@ -34,8 +34,8 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
     },
     invalidateKeys: [VIOLATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Infracción eliminada',
-    successDescription: 'La infracción ha sido eliminada exitosamente.',
-    errorDescription: 'Ocurrió un error al eliminar la infracción, intenta nuevamente.',
+    successDescription: 'La infracción ha sido eliminada exitosamente',
+    errorDescription: 'Ocurrió un error al eliminar la infracción, intenta nuevamente',
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

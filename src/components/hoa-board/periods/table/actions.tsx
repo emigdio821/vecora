@@ -43,8 +43,8 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
     },
     invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, HOA_BOARD_MEMBERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Periodo eliminado',
-    successDescription: 'El periodo ha sido eliminado exitosamente.',
-    errorDescription: 'Ocurrió un error al eliminar el periodo, intenta nuevamente.',
+    successDescription: 'El periodo ha sido eliminado exitosamente',
+    errorDescription: 'Ocurrió un error al eliminar el periodo, intenta nuevamente',
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

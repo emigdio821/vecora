@@ -53,8 +53,8 @@ export function CreateNotificationSheet({ state }: CreateNotificationSheetProps)
     },
     invalidateKeys: [NOTIFICATIONS_QUERY_KEY, MY_NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Notificación creada',
-    successDescription: 'La notificación ha sido enviada exitosamente.',
-    errorDescription: 'Ocurrió un error al crear la notificación, intenta nuevamente.',
+    successDescription: 'La notificación ha sido enviada exitosamente',
+    errorDescription: 'Ocurrió un error al crear la notificación, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -75,7 +75,7 @@ export function CreateNotificationSheet({ state }: CreateNotificationSheetProps)
         <SheetHeader>
           <SheetTitle>Crear notificación</SheetTitle>
           <SheetDescription>
-            Ingresa la información de la notificación. Esta será visible para todos los usuarios.
+            Ingresa la información de la notificación, esta será visible para todos los usuarios
           </SheetDescription>
         </SheetHeader>
 

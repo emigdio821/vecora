@@ -56,8 +56,8 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
     },
     invalidateKeys: [VIOLATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, RESIDENTS_QUERY_KEY],
     successTitle: 'Infracción creada',
-    successDescription: 'La infracción ha sido creada exitosamente.',
-    errorDescription: 'Ocurrió un error al crear la infracción, intenta nuevamente.',
+    successDescription: 'La infracción ha sido creada exitosamente',
+    errorDescription: 'Ocurrió un error al crear la infracción, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -77,7 +77,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Crear infracción</SheetTitle>
-          <SheetDescription>Ingresa la información de la nueva infracción.</SheetDescription>
+          <SheetDescription>Ingresa la información de la nueva infracción</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middleware/auth'
 import { Role } from '@/types/rbac'
 
@@ -10,7 +11,7 @@ export const isAdminUser = createServerFn()
     try {
       return session.user.role === Role.SUPER_ADMIN || session.user.role === Role.ADMIN
     } catch (error) {
-      console.error('Error checking admin role:', error)
+      logger.error('Error checking admin role:', error)
       return false
     }
   })

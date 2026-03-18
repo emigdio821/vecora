@@ -52,8 +52,8 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
     },
     invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY, RESIDENTS_QUERY_KEY],
     successTitle: 'Perfil creado',
-    successDescription: 'El perfil ha sido creado exitosamente.',
-    errorDescription: 'Ocurrió un error al crear el perfil, intenta nuevamente.',
+    successDescription: 'El perfil ha sido creado exitosamente',
+    errorDescription: 'Ocurrió un error al crear el perfil, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -73,7 +73,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Crear perfil</SheetTitle>
-          <SheetDescription>Ingresa la información del nuevo perfil.</SheetDescription>
+          <SheetDescription>Ingresa la información del nuevo perfil</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

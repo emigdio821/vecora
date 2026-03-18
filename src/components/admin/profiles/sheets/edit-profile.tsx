@@ -52,8 +52,8 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
     },
     invalidateKeys: [PROFILES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Perfil actualizado',
-    successDescription: 'El perfil ha sido actualizado exitosamente.',
-    errorDescription: 'Ocurrió un error al actualizar el perfil, intenta nuevamente.',
+    successDescription: 'El perfil ha sido actualizado exitosamente',
+    errorDescription: 'Ocurrió un error al actualizar el perfil, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -79,7 +79,7 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Editar perfil</SheetTitle>
-          <SheetDescription>Actualiza la información del perfil.</SheetDescription>
+          <SheetDescription>Actualiza la información del perfil</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

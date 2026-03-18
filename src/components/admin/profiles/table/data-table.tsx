@@ -10,7 +10,7 @@ export function ProfilesDataTable() {
   const { data: profiles = [], isLoading, error, refetch } = useQuery(profilesListQueryOptions())
 
   if (error) {
-    return <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar los perfiles." />
+    return <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar los perfiles" />
   }
 
   if (isLoading) {

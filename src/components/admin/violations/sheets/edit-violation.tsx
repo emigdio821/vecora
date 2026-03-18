@@ -66,8 +66,8 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
     },
     invalidateKeys: [VIOLATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Infracción actualizada',
-    successDescription: 'La infracción ha sido actualizada exitosamente.',
-    errorDescription: 'Ocurrió un error al actualizar la infracción, intenta nuevamente.',
+    successDescription: 'La infracción ha sido actualizada exitosamente',
+    errorDescription: 'Ocurrió un error al actualizar la infracción, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -99,7 +99,7 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Editar infracción</SheetTitle>
-          <SheetDescription>Actualiza la información de la infracción.</SheetDescription>
+          <SheetDescription>Actualiza la información de la infracción</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>

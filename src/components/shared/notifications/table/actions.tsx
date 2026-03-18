@@ -35,8 +35,8 @@ export function NotificationsTableActions({ notification }: ActionsProps) {
     },
     invalidateKeys: [NOTIFICATIONS_QUERY_KEY, MY_NOTIFICATIONS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Notificación eliminada',
-    successDescription: 'La notificación ha sido eliminada exitosamente.',
-    errorDescription: 'Ocurrió un error al eliminar la notificación, intenta nuevamente.',
+    successDescription: 'La notificación ha sido eliminada exitosamente',
+    errorDescription: 'Ocurrió un error al eliminar la notificación, intenta nuevamente',
     onSuccess: () => {
       setDeleteDialogOpen(false)
     },

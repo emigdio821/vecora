@@ -13,7 +13,7 @@ export function HoaMembersDataTable() {
     return (
       <TSQueryGenericError
         refetch={refetch}
-        errorDescription="Algo salió mal al cargar los miembros de la mesa."
+        errorDescription="Algo salió mal al cargar los miembros de la mesa"
       />
     )
   }

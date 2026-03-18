@@ -50,7 +50,7 @@ export function useBulkDelete<TData>({
         })
       } else if (fulfilled === 0) {
         toast.error(errorTitle || 'Error', {
-          description: errorDescription || 'Ocurrió un error al eliminar los elementos, intenta nuevamente.',
+          description: errorDescription || 'Ocurrió un error al eliminar los elementos, intenta nuevamente',
         })
       } else {
         toast.warning('Advertencia', {
@@ -62,7 +62,7 @@ export function useBulkDelete<TData>({
     },
     onError: (error) => {
       toast.error(errorTitle || 'Error', {
-        description: errorDescription || 'Ocurrió un error al eliminar los elementos, intenta nuevamente.',
+        description: errorDescription || 'Ocurrió un error al eliminar los elementos, intenta nuevamente',
       })
 
       logger.error('Bulk Delete Error', error)

@@ -53,8 +53,8 @@ export function EditMemberSheet({ member, state }: EditMemberSheetProps) {
     },
     invalidateKeys: [HOA_BOARD_PERIODS_QUERY_KEY, HOA_BOARD_MEMBERS_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Miembro actualizado',
-    successDescription: 'El miembro ha sido actualizado exitosamente.',
-    errorDescription: 'Ocurrió un error al actualizar el miembro, intenta nuevamente.',
+    successDescription: 'El miembro ha sido actualizado exitosamente',
+    errorDescription: 'Ocurrió un error al actualizar el miembro, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -81,7 +81,7 @@ export function EditMemberSheet({ member, state }: EditMemberSheetProps) {
         <SheetHeader>
           <SheetTitle>Editar miembro</SheetTitle>
           <SheetDescription>
-            Actualiza el periodo y el perfil del miembro de la mesa directiva.
+            Actualiza el periodo y el perfil del miembro de la mesa directiva
           </SheetDescription>
         </SheetHeader>
 

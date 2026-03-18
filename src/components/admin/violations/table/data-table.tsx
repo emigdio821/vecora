@@ -11,7 +11,7 @@ export function ViolationsDataTable() {
 
   if (error) {
     return (
-      <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar las infracciones." />
+      <TSQueryGenericError refetch={refetch} errorDescription="Algo salió mal al cargar las infracciones" />
     )
   }
 

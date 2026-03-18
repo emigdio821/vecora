@@ -47,8 +47,8 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
     },
     invalidateKeys: [HOUSES_QUERY_KEY, AUDIT_LOGS_QUERY_KEY],
     successTitle: 'Casa creada',
-    successDescription: 'La casa ha sido creada exitosamente.',
-    errorDescription: 'Ocurrió un error al crear la casa, intenta nuevamente.',
+    successDescription: 'La casa ha sido creada exitosamente',
+    errorDescription: 'Ocurrió un error al crear la casa, intenta nuevamente',
     onSuccess: () => {
       onOpenChange(false)
     },
@@ -68,7 +68,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Crear casa</SheetTitle>
-          <SheetDescription>Ingresa la información de la nueva casa.</SheetDescription>
+          <SheetDescription>Ingresa la información de la nueva casa</SheetDescription>
         </SheetHeader>
 
         <SheetPanel>
