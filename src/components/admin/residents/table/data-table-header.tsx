@@ -1,6 +1,5 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteResident } from '@/api/server-functions/residents'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
 import { CreateResidentSheet } from '../sheets/create-resident'
 
 interface ResidentsDataTableHeaderProps {
@@ -21,7 +21,9 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
   const [openCreateResidentDialog, setOpenCreateResidentDialog] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-residents', parseAsString.withDefault(''))
+
+  const [searchQuery, setSearchQuery, debouncedSearch] = useDebouncedSearchQuery('search-residents')
+
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
@@ -44,8 +46,8 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
   }
 
   useEffect(() => {
-    table.getColumn('name')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
+    table.getColumn('name')?.setFilterValue(debouncedSearch)
+  }, [debouncedSearch, table])
 
   return (
     <>
@@ -77,7 +79,7 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
             placeholder="Buscar"
             name="search-residents"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value || null)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <InputGroupAddon>
             <IconSearch />

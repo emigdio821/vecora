@@ -1,6 +1,5 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteHouse } from '@/api/server-functions/houses'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
 import { CreateHouseSheet } from '../sheets/create-house'
 
 interface HousesDataTableHeaderProps {
@@ -21,7 +21,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
   const [openCreateOwnerDialog, setOpenCreateOwnerDialog] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-houses', parseAsString.withDefault(''))
+  const [searchQuery, setSearchQuery, debouncedSearch] = useDebouncedSearchQuery('search-houses')
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
@@ -44,8 +44,8 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
   }
 
   useEffect(() => {
-    table.getColumn('houseNumber')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
+    table.getColumn('houseNumber')?.setFilterValue(debouncedSearch)
+  }, [debouncedSearch, table])
 
   return (
     <>
@@ -77,7 +77,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
             placeholder="Buscar"
             name="search-houses"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value || null)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <InputGroupAddon>
             <IconSearch />

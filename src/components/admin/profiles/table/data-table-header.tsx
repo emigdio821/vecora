@@ -1,6 +1,5 @@
 import { IconBan, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { banProfile, deleteProfile } from '@/api/server-functions/profiles'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -11,6 +10,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
 import { CreateProfileSheet } from '../sheets/create-profile'
 
 interface ProfilesDataTableHeaderProps {
@@ -23,7 +23,7 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isBanDialogOpen, setBanDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-profiles', { defaultValue: '' })
+  const [searchQuery, setSearchQuery, debouncedSearch] = useDebouncedSearchQuery('search-profiles')
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
   const tableRowsLength = table.getCoreRowModel().rows.length
@@ -63,8 +63,8 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
   }
 
   useEffect(() => {
-    table.getColumn('user-name')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
+    table.getColumn('user-name')?.setFilterValue(debouncedSearch)
+  }, [debouncedSearch, table])
 
   return (
     <>
@@ -122,7 +122,7 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
             placeholder="Buscar"
             name="search-profiles"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value || null)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <InputGroupAddon>
             <IconSearch />

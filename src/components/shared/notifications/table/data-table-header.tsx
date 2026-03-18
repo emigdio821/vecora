@@ -1,6 +1,5 @@
 import { IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteNotification } from '@/api/server-functions/notifications'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -11,6 +10,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { SelectNotification } from '@/db/schema/zod/notifications'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
 import { CreateNotificationSheet } from '../sheets/create-notification'
 
 interface NotificationsDataTableHeaderProps {
@@ -21,7 +21,7 @@ export function NotificationsDataTableHeader({ table }: NotificationsDataTableHe
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isCreateNotificationSheetOpen, setCreateNotificationSheetOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-notifications', parseAsString.withDefault(''))
+  const [searchQuery, setSearchQuery, debouncedSearch] = useDebouncedSearchQuery('search-notifications')
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
@@ -44,8 +44,8 @@ export function NotificationsDataTableHeader({ table }: NotificationsDataTableHe
   }
 
   useEffect(() => {
-    table.getColumn('title')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
+    table.getColumn('title')?.setFilterValue(debouncedSearch)
+  }, [debouncedSearch, table])
 
   return (
     <>
@@ -80,7 +80,7 @@ export function NotificationsDataTableHeader({ table }: NotificationsDataTableHe
             placeholder="Buscar"
             name="search-notifications"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value || null)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <InputGroupAddon>
             <IconSearch />

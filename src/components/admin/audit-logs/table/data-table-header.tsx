@@ -1,6 +1,5 @@
 import { IconFileExport, IconInfoCircle, IconSearch } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import type { AuditLogQueryData } from '@/api/tanstack-queries/audit-logs'
 import { Badge } from '@/components/ui/badge'
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
 import { STARTING_YEAR } from '@/lib/constants'
 
 interface AuditLogsDataTableHeaderProps {
@@ -39,7 +39,7 @@ const facetedFilterYears: YearFacetedFilterOption[] = Array.from(
 
 export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProps) {
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-audit-logs', parseAsString.withDefault(''))
+  const [searchQuery, setSearchQuery, debouncedSearch] = useDebouncedSearchQuery('search-audit-logs')
   const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
@@ -67,8 +67,8 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
   }
 
   useEffect(() => {
-    table.getColumn('user')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
+    table.getColumn('user')?.setFilterValue(debouncedSearch)
+  }, [debouncedSearch, table])
 
   return (
     <div className="flex flex-col justify-between gap-2 sm:flex-row">
@@ -80,7 +80,7 @@ export function AuditLogsDataTableHeader({ table }: AuditLogsDataTableHeaderProp
           placeholder="Buscar"
           name="search-audit-logs"
           disabled={tableRowsLength === 0}
-          onChange={(e) => setSearchQuery(e.target.value || null)}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <InputGroupAddon>
           <IconSearch />

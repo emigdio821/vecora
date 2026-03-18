@@ -1,6 +1,5 @@
 import { IconFileExport, IconInfoCircle, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { deleteHoaBoardMember } from '@/api/server-functions/hoa-board'
 import { AUDIT_LOGS_QUERY_KEY } from '@/api/tanstack-queries/audit-logs'
@@ -15,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBulkDelete } from '@/hooks/use-bulk-delete'
+import { useDebouncedSearchQuery } from '@/hooks/use-debounced-search-query'
 import { useHasRole } from '@/hooks/use-rbac'
 import { Role } from '@/types/rbac'
 import { CreateMemberSheet } from '../sheets/create-member'
@@ -27,7 +27,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isCreateMemberSheetOpen, setIsCreateMemberSheetOpen] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-hoa-members', parseAsString.withDefault(''))
+  const [searchQuery, setSearchQuery, debouncedSearch] = useDebouncedSearchQuery('search-hoa-members')
 
   const canPerformActions = useHasRole([Role.SUPER_ADMIN, Role.ADMIN, Role.PRESIDENT])
 
@@ -53,8 +53,8 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
   }
 
   useEffect(() => {
-    table.getColumn('firstName')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
+    table.getColumn('firstName')?.setFilterValue(debouncedSearch)
+  }, [debouncedSearch, table])
 
   return (
     <>
