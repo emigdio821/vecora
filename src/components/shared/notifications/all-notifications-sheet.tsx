@@ -1,5 +1,6 @@
 import { IconCalendarOff, IconCalendarWeek, IconUser } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
+import type React from 'react'
 import {
   type NotificationQueryData,
   notificationsListQueryOptions,
@@ -17,15 +18,12 @@ import {
 import { formatDate } from '@/lib/utils'
 import { RoleNameBadge } from '../role-name-badge'
 
-interface AllNotificationsSheetProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface AllNotificationsSheetProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
-  const { isOpen, onOpenChange } = state
+export function AllNotificationsSheet({ open, onOpenChange, ...props }: AllNotificationsSheetProps) {
   const { data: notifications = [] } = useQuery(notificationsListQueryOptions())
 
   function getProfileName(notification: NotificationQueryData) {
@@ -46,7 +44,7 @@ export function AllNotificationsSheet({ state }: AllNotificationsSheetProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Todas las notificaciones</SheetTitle>

@@ -68,12 +68,7 @@ export function HomeNotifications() {
 
   return (
     <>
-      <AllNotificationsSheet
-        state={{
-          isOpen: isAllNotificationsOpen,
-          onOpenChange: setAllNotificationsOpen,
-        }}
-      />
+      <AllNotificationsSheet open={isAllNotificationsOpen} onOpenChange={setAllNotificationsOpen} />
 
       <div className="columns-1 gap-4 sm:columns-2 xl:columns-4">
         {displayedNotifications.map((notification) => (

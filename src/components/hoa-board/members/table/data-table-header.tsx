@@ -59,10 +59,8 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
   return (
     <>
       <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         action={handleBatchDelete}
         variant="destructive"
         actionLabel="Eliminar"
@@ -77,12 +75,7 @@ export function MembersDataTableHeader({ table }: MembersDataTableHeaderProps) {
         }
       />
 
-      <CreateMemberSheet
-        state={{
-          isOpen: isCreateMemberSheetOpen,
-          onOpenChange: setIsCreateMemberSheetOpen,
-        }}
-      />
+      <CreateMemberSheet open={isCreateMemberSheetOpen} onOpenChange={setIsCreateMemberSheetOpen} />
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full bg-background sm:w-sm">

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createHouse } from '@/api/server-functions/houses'
@@ -21,16 +22,13 @@ import {
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type CreateHouseFormData, createHouseSchema } from '@/schemas/houses'
 
-interface CreateHouseDialogProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface CreateHouseSheetProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
+export function CreateHouseSheet({ open, onOpenChange, ...props }: CreateHouseSheetProps) {
   const createHouseFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<CreateHouseFormData>({
     shouldUnregister: true,
@@ -64,7 +62,7 @@ export function CreateHouseSheet({ state }: CreateHouseDialogProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Crear casa</SheetTitle>

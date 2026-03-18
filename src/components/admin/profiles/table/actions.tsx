@@ -130,7 +130,8 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
       {canEditProfile && (
         <EditProfileSheet
           profile={profile}
-          state={{ isOpen: isEditProfileSheetOpen, onOpenChange: setEditProfileSheetOpen }}
+          open={isEditProfileSheetOpen}
+          onOpenChange={setEditProfileSheetOpen}
         />
       )}
 
@@ -142,7 +143,8 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
             title="¿Eliminar perfil?"
             description="Se eliminará de manera permanentemente. Esta acción no se puede deshacer."
             action={handleDeleteProfile}
-            state={{ isOpen: isDeleteDialogOpen, onOpenChange: setDeleteDialogOpen }}
+            open={isDeleteDialogOpen}
+            onOpenChange={setDeleteDialogOpen}
           />
 
           <AlertDialogGeneric
@@ -150,7 +152,8 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
             title="¿Reactivar perfil?"
             description="El perfil será reactivado y el usuario podrá acceder a su cuenta nuevamente."
             action={handleUnbanProfile}
-            state={{ isOpen: isUnbanDialogOpen, onOpenChange: setUnbanDialogOpen }}
+            open={isUnbanDialogOpen}
+            onOpenChange={setUnbanDialogOpen}
           />
 
           <AlertDialogGeneric
@@ -159,7 +162,8 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
             title="¿Desactivar perfil?"
             description="El perfil será desactivado y el usuario no podrá acceder a su cuenta. Esta acción puede ser revertida."
             action={handleBanProfile}
-            state={{ isOpen: isBanDialogOpen, onOpenChange: setBanDialogOpen }}
+            open={isBanDialogOpen}
+            onOpenChange={setBanDialogOpen}
             content={
               <div>
                 <Textarea
@@ -178,7 +182,8 @@ export function ProfilesTableActions({ profile }: ActionsProps) {
 
       <ProfileDetailsSheet
         profile={profile}
-        state={{ isOpen: isProfileDetailsSheetOpen, onOpenChange: setProfileDetailsSheetOpen }}
+        open={isProfileDetailsSheetOpen}
+        onOpenChange={setProfileDetailsSheetOpen}
       />
 
       <div className="flex items-center justify-end">

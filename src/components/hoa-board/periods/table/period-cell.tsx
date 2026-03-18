@@ -21,7 +21,7 @@ export function HoaPeriodCell({ period }: HoaPeriodCellProps) {
         {formatDate(period.startDate)}
       </Button>
 
-      <HoaPeriodDetailsSheet period={period} state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }} />
+      <HoaPeriodDetailsSheet period={period} open={isSheetOpen} onOpenChange={setIsSheetOpen} />
     </>
   )
 }

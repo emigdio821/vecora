@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
+import type React from 'react'
 import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createPayment } from '@/api/server-functions/payments'
@@ -39,18 +40,15 @@ import { MAX_YEAR_OFFSET, STARTING_YEAR } from '@/lib/constants'
 import { formatDate, getAllMonthsMap, getPaymentStatusLabel, getPaymentTypeLabel } from '@/lib/utils'
 import { type CreatePaymentFormData, createPaymentSchema } from '@/schemas/payments'
 
-interface CreatePaymentDialogProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface CreatePaymentDialogProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 const MONTHS = getAllMonthsMap()
 
-export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
+export function CreatePaymentSheet({ open, onOpenChange, ...props }: CreatePaymentDialogProps) {
   const createPaymentFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<CreatePaymentFormData>({
     shouldUnregister: true,
@@ -117,7 +115,7 @@ export function CreatePaymentSheet({ state }: CreatePaymentDialogProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Crear pago</SheetTitle>

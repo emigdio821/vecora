@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateHouse } from '@/api/server-functions/houses'
@@ -21,17 +22,14 @@ import {
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateHouseFormData, updateHouseSchema } from '@/schemas/houses'
 
-interface EditHouseSheetProps {
+interface EditHouseSheetProps extends React.ComponentProps<typeof Sheet> {
   house: HouseQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
+export function EditHouseSheet({ house, open, onOpenChange, ...props }: EditHouseSheetProps) {
   const editHouseFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<UpdateHouseFormData>({
     resolver: zodResolver(updateHouseSchema),
@@ -66,8 +64,9 @@ export function EditHouseSheet({ house, state }: EditHouseSheetProps) {
 
   return (
     <Sheet
-      open={isOpen}
+      open={open}
       onOpenChange={handleOpenChange}
+      {...props}
       onOpenChangeComplete={(isOpen) => {
         if (!isOpen) form.reset()
       }}

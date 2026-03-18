@@ -1,4 +1,5 @@
 import { IconFlag, IconUserHeart, IconWind } from '@tabler/icons-react'
+import type React from 'react'
 import type { ViolationQueryData } from '@/api/server-functions/violations'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { ViolationStatusBadge } from '@/components/shared/violations/status-badge'
@@ -15,19 +16,20 @@ import {
 } from '@/components/ui/sheet'
 import { formatDate } from '@/lib/utils'
 
-interface ViolationDetailsSheetProps {
+interface ViolationDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   violation: ViolationQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function ViolationDetailsSheet({ violation, state }: ViolationDetailsSheetProps) {
-  const { isOpen, onOpenChange } = state
-
+export function ViolationDetailsSheet({
+  violation,
+  open,
+  onOpenChange,
+  ...props
+}: ViolationDetailsSheetProps) {
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Información de la infracción</SheetTitle>

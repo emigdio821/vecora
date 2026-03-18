@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateHoaBoardMember } from '@/api/server-functions/hoa-board'
@@ -26,17 +27,14 @@ import {
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateHoaBoardMemberFormData, updateHoaBoardMemberSchema } from '@/schemas/hoa-board'
 
-interface EditMemberSheetProps {
+interface EditMemberSheetProps extends React.ComponentProps<typeof Sheet> {
   member: HoaBoardMemberQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function EditMemberSheet({ member, state }: EditMemberSheetProps) {
+export function EditMemberSheet({ member, open, onOpenChange, ...props }: EditMemberSheetProps) {
   const editMemberFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<UpdateHoaBoardMemberFormData>({
     resolver: zodResolver(updateHoaBoardMemberSchema),
@@ -71,8 +69,9 @@ export function EditMemberSheet({ member, state }: EditMemberSheetProps) {
 
   return (
     <Sheet
-      open={isOpen}
+      open={open}
       onOpenChange={handleOpenChange}
+      {...props}
       onOpenChangeComplete={(isOpen) => {
         if (!isOpen) form.reset()
       }}

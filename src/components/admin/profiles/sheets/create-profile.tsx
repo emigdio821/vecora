@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createProfile } from '@/api/server-functions/profiles'
@@ -25,16 +26,13 @@ import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type CreateProfileFormData, createProfileSchema } from '@/schemas/profiles'
 import { Role } from '@/types/rbac'
 
-interface CreateProfileSheetProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface CreateProfileSheetProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
+export function CreateProfileSheet({ open, onOpenChange, ...props }: CreateProfileSheetProps) {
   const createProfileFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<CreateProfileFormData>({
     shouldUnregister: true,
@@ -69,7 +67,7 @@ export function CreateProfileSheet({ state }: CreateProfileSheetProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange} {...props}>
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Crear perfil</SheetTitle>

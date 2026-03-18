@@ -20,7 +20,7 @@ export function PaymentAmountCell({ payment }: PaymentAmountCellProps) {
         ${payment.amount}
       </Button>
 
-      <PaymentDetailsSheet payment={payment} state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }} />
+      <PaymentDetailsSheet payment={payment} open={isSheetOpen} onOpenChange={setIsSheetOpen} />
     </div>
   )
 }

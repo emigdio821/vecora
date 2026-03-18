@@ -21,10 +21,7 @@ export function AuditDetailsCell({ auditLog }: OwnerNameCellProps) {
         {userName}
       </Button>
 
-      <AuditLogDetailsSheet
-        auditLog={auditLog}
-        state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }}
-      />
+      <AuditLogDetailsSheet auditLog={auditLog} open={isSheetOpen} onOpenChange={setIsSheetOpen} />
     </>
   )
 }

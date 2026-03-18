@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
+import type React from 'react'
 import { Activity, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updatePayment } from '@/api/server-functions/payments'
@@ -35,11 +36,9 @@ import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate, getAllMonthsMap, getPaymentStatusLabel, getPaymentTypeLabel } from '@/lib/utils'
 import { type UpdatePaymentFormData, updatePaymentSchema } from '@/schemas/payments'
 
-interface UpdatePaymentSheetProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface UpdatePaymentSheetProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
   payment: PaymentQueryData
 }
 
@@ -47,9 +46,8 @@ const MONTHS = getAllMonthsMap()
 const currentYear = new Date().getFullYear()
 const years = Array.from({ length: currentYear + 2 - 2020 + 1 }, (_, i) => 2020 + i)
 
-export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
+export function EditPaymentSheet({ payment, open, onOpenChange, ...props }: UpdatePaymentSheetProps) {
   const updatePaymentFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<UpdatePaymentFormData>({
     resolver: zodResolver(updatePaymentSchema),
@@ -108,8 +106,9 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
 
   return (
     <Sheet
-      open={isOpen}
+      open={open}
       onOpenChange={handleOpenChange}
+      {...props}
       onOpenChangeComplete={(isOpen) => {
         if (!isOpen) form.reset()
       }}

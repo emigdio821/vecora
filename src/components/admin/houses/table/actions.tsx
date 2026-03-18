@@ -48,10 +48,8 @@ export function HousesTableActions({ house }: ActionsProps) {
   return (
     <>
       <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         action={handleDeleteHouse}
         variant="destructive"
         actionLabel="Eliminar"
@@ -65,13 +63,11 @@ export function HousesTableActions({ house }: ActionsProps) {
 
       <HouseDetailsSheet
         house={house}
-        state={{ isOpen: isHouseDetailsSheetOpen, onOpenChange: setHouseDetailsSheetOpen }}
+        open={isHouseDetailsSheetOpen}
+        onOpenChange={setHouseDetailsSheetOpen}
       />
 
-      <EditHouseSheet
-        house={house}
-        state={{ isOpen: isEditHouseSheetOpen, onOpenChange: setEditHouseSheetOpen }}
-      />
+      <EditHouseSheet house={house} open={isEditHouseSheetOpen} onOpenChange={setEditHouseSheetOpen} />
 
       <div className="flex">
         <DropdownMenu>

@@ -64,10 +64,8 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
     <>
       {canPerformActions && (
         <AlertDialogGeneric
-          state={{
-            isOpen: isDeleteDialogOpen,
-            onOpenChange: setDeleteDialogOpen,
-          }}
+          open={isDeleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
           action={handleBatchDelete}
           variant="destructive"
           actionLabel="Eliminar"
@@ -157,12 +155,7 @@ export function PeriodsDataTableHeader({ table }: PeriodsDataTableHeaderProps) {
         </div>
       </div>
 
-      <CreatePeriodSheet
-        state={{
-          isOpen: isCreatePeriodSheetOpen,
-          onOpenChange: setIsCreatePeriodSheetOpen,
-        }}
-      />
+      <CreatePeriodSheet open={isCreatePeriodSheetOpen} onOpenChange={setIsCreatePeriodSheetOpen} />
     </>
   )
 }

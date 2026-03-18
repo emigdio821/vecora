@@ -60,10 +60,8 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
       {canPerformActions && (
         <>
           <AlertDialogGeneric
-            state={{
-              isOpen: isDeleteDialogOpen,
-              onOpenChange: setDeleteDialogOpen,
-            }}
+            open={isDeleteDialogOpen}
+            onOpenChange={setDeleteDialogOpen}
             action={handleDeleteMember}
             variant="destructive"
             actionLabel="Eliminar"
@@ -78,14 +76,16 @@ export function HoaMembersTableActions({ member }: ActionsProps) {
 
           <EditMemberSheet
             member={member}
-            state={{ isOpen: isEditMemberSheetOpen, onOpenChange: setEditMemberSheetOpen }}
+            open={isEditMemberSheetOpen}
+            onOpenChange={setEditMemberSheetOpen}
           />
         </>
       )}
 
       <HoaMemberDetailsSheet
         member={member}
-        state={{ isOpen: isMemberDetailsSheetOpen, onOpenChange: setMemberDetailsSheetOpen }}
+        open={isMemberDetailsSheetOpen}
+        onOpenChange={setMemberDetailsSheetOpen}
       />
 
       <div className="flex">

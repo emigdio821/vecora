@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
 import { addMonths } from 'date-fns'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateNotification } from '@/api/server-functions/notifications'
@@ -27,17 +28,19 @@ import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate } from '@/lib/utils'
 import { type UpdateNotificationData, updateNotificationSchema } from '@/schemas/notifications'
 
-interface EditNotificationSheetProps {
+interface EditNotificationSheetProps extends React.ComponentProps<typeof Sheet> {
   notification: SelectNotification
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function EditNotificationSheet({ notification, state }: EditNotificationSheetProps) {
+export function EditNotificationSheet({
+  notification,
+  open,
+  onOpenChange,
+  ...props
+}: EditNotificationSheetProps) {
   const editNotificationFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<UpdateNotificationData>({
     resolver: zodResolver(updateNotificationSchema),
@@ -73,8 +76,9 @@ export function EditNotificationSheet({ notification, state }: EditNotificationS
 
   return (
     <Sheet
-      open={isOpen}
+      open={open}
       onOpenChange={handleOpenChange}
+      {...props}
       onOpenChangeComplete={(isOpen) => {
         if (!isOpen) form.reset()
       }}

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateResident } from '@/api/server-functions/residents'
@@ -24,17 +25,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateResidentFormData, updateResidentSchema } from '@/schemas/residents'
 
-interface EditResidentSheetProps {
+interface EditResidentSheetProps extends React.ComponentProps<typeof Sheet> {
   resident: ResidentQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function EditResidentSheet({ resident, state }: EditResidentSheetProps) {
+export function EditResidentSheet({ resident, open, onOpenChange, ...props }: EditResidentSheetProps) {
   const editResidentFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<UpdateResidentFormData>({
     resolver: zodResolver(updateResidentSchema),
@@ -76,8 +74,9 @@ export function EditResidentSheet({ resident, state }: EditResidentSheetProps) {
 
   return (
     <Sheet
-      open={isOpen}
+      open={open}
       onOpenChange={handleOpenChange}
+      {...props}
       onOpenChangeComplete={(isOpen) => {
         if (!isOpen) form.reset()
       }}

@@ -59,10 +59,8 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
       {canPerformActions && (
         <>
           <AlertDialogGeneric
-            state={{
-              isOpen: isDeleteDialogOpen,
-              onOpenChange: setDeleteDialogOpen,
-            }}
+            open={isDeleteDialogOpen}
+            onOpenChange={setDeleteDialogOpen}
             action={handleDeletePeriod}
             variant="destructive"
             actionLabel="Eliminar"
@@ -79,14 +77,16 @@ export function HoaPeriodsTableActions({ period }: ActionsProps) {
 
           <EditHoaPeriodSheet
             period={period}
-            state={{ isOpen: isEditPeriodSheetOpen, onOpenChange: setEditPeriodSheetOpen }}
+            open={isEditPeriodSheetOpen}
+            onOpenChange={setEditPeriodSheetOpen}
           />
         </>
       )}
 
       <HoaPeriodDetailsSheet
         period={period}
-        state={{ isOpen: isMemberDetailsSheetOpen, onOpenChange: setMemberDetailsSheetOpen }}
+        open={isMemberDetailsSheetOpen}
+        onOpenChange={setMemberDetailsSheetOpen}
       />
 
       <div className="flex">

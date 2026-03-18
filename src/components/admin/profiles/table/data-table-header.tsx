@@ -68,15 +68,11 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
 
   return (
     <>
-      <CreateProfileSheet
-        state={{ isOpen: openCreateProfileDialog, onOpenChange: setOpenCreateProfileDialog }}
-      />
+      <CreateProfileSheet open={openCreateProfileDialog} onOpenChange={setOpenCreateProfileDialog} />
       <AlertDialogGeneric
         variant="warning"
-        state={{
-          isOpen: isBanDialogOpen,
-          onOpenChange: setBanDialogOpen,
-        }}
+        open={isBanDialogOpen}
+        onOpenChange={setBanDialogOpen}
         action={bulkProfileBan}
         title="¿Desactivar perfiles?"
         description={
@@ -103,10 +99,8 @@ export function ProfilesDataTableHeader({ table }: ProfilesDataTableHeaderProps)
 
       <AlertDialogGeneric
         variant="destructive"
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         action={bulkProfileDelete}
         title="¿Eliminar perfiles?"
         description={

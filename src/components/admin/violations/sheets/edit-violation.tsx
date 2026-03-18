@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateViolation, type ViolationQueryData } from '@/api/server-functions/violations'
@@ -36,17 +37,14 @@ import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate } from '@/lib/utils'
 import { type UpdateViolationFormData, updateViolationSchema } from '@/schemas/violations'
 
-interface EditViolationSheetProps {
+interface EditViolationSheetProps extends React.ComponentProps<typeof Sheet> {
   violation: ViolationQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function EditViolationSheet({ violation, state }: EditViolationSheetProps) {
+export function EditViolationSheet({ violation, open, onOpenChange, ...props }: EditViolationSheetProps) {
   const editViolationFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<UpdateViolationFormData>({
     resolver: zodResolver(updateViolationSchema),
@@ -90,8 +88,9 @@ export function EditViolationSheet({ violation, state }: EditViolationSheetProps
 
   return (
     <Sheet
-      open={isOpen}
+      open={open}
       onOpenChange={handleOpenChange}
+      {...props}
       onOpenChangeComplete={(isOpen) => {
         if (!isOpen) form.reset()
       }}

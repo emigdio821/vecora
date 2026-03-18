@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { updateProfile } from '@/api/server-functions/profiles'
@@ -23,17 +24,14 @@ import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type UpdateProfileFormData, updateProfileSchema } from '@/schemas/profiles'
 import { Role } from '@/types/rbac'
 
-interface EditProfileSheetProps {
+interface EditProfileSheetProps extends React.ComponentProps<typeof Sheet> {
   profile: ProfileQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
+export function EditProfileSheet({ profile, open, onOpenChange, ...props }: EditProfileSheetProps) {
   const editProfileFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<UpdateProfileFormData>({
     resolver: zodResolver(updateProfileSchema),
@@ -70,8 +68,9 @@ export function EditProfileSheet({ profile, state }: EditProfileSheetProps) {
 
   return (
     <Sheet
-      open={isOpen}
+      open={open}
       onOpenChange={handleOpenChange}
+      {...props}
       onOpenChangeComplete={(isOpen) => {
         if (!isOpen) form.reset()
       }}

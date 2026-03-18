@@ -21,7 +21,7 @@ export function ProfileNameCell({ profile }: ProfileNameCellProps) {
         {profileName}
       </Button>
 
-      <ProfileDetailsSheet profile={profile} state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }} />
+      <ProfileDetailsSheet profile={profile} open={isSheetOpen} onOpenChange={setIsSheetOpen} />
     </>
   )
 }

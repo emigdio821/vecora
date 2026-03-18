@@ -20,10 +20,7 @@ export function ViolationConceptCell({ violation }: ViolationConceptCellProps) {
         {violation.concept}
       </Button>
 
-      <ViolationDetailsSheet
-        violation={violation}
-        state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }}
-      />
+      <ViolationDetailsSheet violation={violation} open={isSheetOpen} onOpenChange={setIsSheetOpen} />
     </div>
   )
 }

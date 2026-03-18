@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
 import { addYears } from 'date-fns'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createHoaBoardPeriod } from '@/api/server-functions/hoa-board'
@@ -25,16 +26,13 @@ import { MAX_YEAR_OFFSET } from '@/lib/constants'
 import { formatDate } from '@/lib/utils'
 import { type CreateHoaBoardPeriodFormData, createHoaBoardPeriodSchema } from '@/schemas/hoa-board'
 
-interface CreatePeriodSheetProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface CreatePeriodSheetProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
+export function CreatePeriodSheet({ open, onOpenChange, ...props }: CreatePeriodSheetProps) {
   const createPeriodFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<CreateHoaBoardPeriodFormData>({
     shouldUnregister: true,
@@ -70,7 +68,7 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
   const startDate = form.watch('startDate', new Date())
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange} {...props}>
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Crear periodo</SheetTitle>

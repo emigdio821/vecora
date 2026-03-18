@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createViolation } from '@/api/server-functions/violations'
@@ -27,16 +28,13 @@ import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate } from '@/lib/utils'
 import { type CreateViolationFormData, createViolationSchema } from '@/schemas/violations'
 
-interface CreateViolationDialogProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface CreateViolationDialogProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
+export function CreateViolationSheet({ open, onOpenChange, ...props }: CreateViolationDialogProps) {
   const createViolationFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<CreateViolationFormData>({
     shouldUnregister: true,
@@ -73,7 +71,7 @@ export function CreateViolationSheet({ state }: CreateViolationDialogProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Crear infracción</SheetTitle>

@@ -48,10 +48,8 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
   return (
     <>
       <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         action={handleDeleteViolation}
         variant="destructive"
         actionLabel="Eliminar"
@@ -66,12 +64,14 @@ export function ViolationsTableActions({ violation }: ActionsProps) {
 
       <ViolationDetailsSheet
         violation={violation}
-        state={{ isOpen: isViolationDetailsSheetOpen, onOpenChange: setViolationDetailsSheetOpen }}
+        open={isViolationDetailsSheetOpen}
+        onOpenChange={setViolationDetailsSheetOpen}
       />
 
       <EditViolationSheet
         violation={violation}
-        state={{ isOpen: isEditViolationSheetOpen, onOpenChange: setEditViolationSheetOpen }}
+        open={isEditViolationSheetOpen}
+        onOpenChange={setEditViolationSheetOpen}
       />
 
       <div className="flex">

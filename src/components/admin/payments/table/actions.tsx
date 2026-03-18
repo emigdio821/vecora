@@ -49,10 +49,8 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
   return (
     <>
       <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         action={handleDeletePayment}
         variant="destructive"
         actionLabel="Eliminar"
@@ -62,12 +60,14 @@ export function PaymentsTableActions({ payment }: ActionsProps) {
 
       <PaymentDetailsSheet
         payment={payment}
-        state={{ isOpen: isPaymentDetailsSheetOpen, onOpenChange: setPaymentDetailsSheetOpen }}
+        open={isPaymentDetailsSheetOpen}
+        onOpenChange={setPaymentDetailsSheetOpen}
       />
 
       <EditPaymentSheet
         payment={payment}
-        state={{ isOpen: isEditPaymentSheetOpen, onOpenChange: setEditPaymentSheetOpen }}
+        open={isEditPaymentSheetOpen}
+        onOpenChange={setEditPaymentSheetOpen}
       />
 
       <div className="flex">

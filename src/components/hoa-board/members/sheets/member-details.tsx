@@ -1,4 +1,5 @@
 import { IconCalendarTime, IconUser, IconUserStar, IconWind } from '@tabler/icons-react'
+import type React from 'react'
 import type { HoaBoardMemberQueryData } from '@/api/tanstack-queries/hoa-board'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { MemberStatusBadge } from '@/components/shared/member-status-badge'
@@ -17,23 +18,20 @@ import {
 } from '@/components/ui/sheet'
 import { formatDate } from '@/lib/utils'
 
-interface MemberDetailsSheetProps {
+interface MemberDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   member: HoaBoardMemberQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function HoaMemberDetailsSheet({ member, state }: MemberDetailsSheetProps) {
-  const { isOpen, onOpenChange } = state
+export function HoaMemberDetailsSheet({ member, open, onOpenChange, ...props }: MemberDetailsSheetProps) {
   const memberFullName = `${member.firstName} ${member.lastName}`.trim()
   const isActive = !!member.profileId
   const period = member.period
   const profile = member.profile
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Información del miembro de la mesa directiva</SheetTitle>

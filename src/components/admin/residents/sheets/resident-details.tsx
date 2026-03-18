@@ -1,4 +1,5 @@
 import { IconCurrencyDollar, IconFlag, IconHome, IconUser, IconWind } from '@tabler/icons-react'
+import type React from 'react'
 import type { ResidentQueryData } from '@/api/tanstack-queries/residents'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
@@ -19,21 +20,18 @@ import {
 } from '@/components/ui/sheet'
 import { formatDate } from '@/lib/utils'
 
-interface ResidentDetailsSheetProps {
+interface ResidentDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   resident: ResidentQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function ResidentDetailsSheet({ resident, state }: ResidentDetailsSheetProps) {
-  const { isOpen, onOpenChange } = state
+export function ResidentDetailsSheet({ resident, open, onOpenChange, ...props }: ResidentDetailsSheetProps) {
   const fullName = `${resident.firstName} ${resident.lastName}`
   const userRole = resident.profile?.user?.role
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Información del residente</SheetTitle>

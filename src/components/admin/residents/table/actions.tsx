@@ -50,10 +50,8 @@ export function ResidentsTableActions({ resident }: ActionsProps) {
   return (
     <>
       <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         action={handleDeleteResident}
         variant="destructive"
         actionLabel="Eliminar"
@@ -67,12 +65,14 @@ export function ResidentsTableActions({ resident }: ActionsProps) {
 
       <ResidentDetailsSheet
         resident={resident}
-        state={{ isOpen: isResidentDetailsSheetOpen, onOpenChange: setResidentDetailsSheetOpen }}
+        open={isResidentDetailsSheetOpen}
+        onOpenChange={setResidentDetailsSheetOpen}
       />
 
       <EditResidentSheet
         resident={resident}
-        state={{ isOpen: isEditResidentSheetOpen, onOpenChange: setEditResidentSheetOpen }}
+        open={isEditResidentSheetOpen}
+        onOpenChange={setEditResidentSheetOpen}
       />
 
       <div className="flex">

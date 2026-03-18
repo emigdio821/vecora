@@ -50,10 +50,8 @@ export function NotificationsDataTableHeader({ table }: NotificationsDataTableHe
   return (
     <>
       <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         action={handleBatchDelete}
         variant="destructive"
         actionLabel="Eliminar"
@@ -69,10 +67,8 @@ export function NotificationsDataTableHeader({ table }: NotificationsDataTableHe
       />
 
       <CreateNotificationSheet
-        state={{
-          isOpen: isCreateNotificationSheetOpen,
-          onOpenChange: setCreateNotificationSheetOpen,
-        }}
+        open={isCreateNotificationSheetOpen}
+        onOpenChange={setCreateNotificationSheetOpen}
       />
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">

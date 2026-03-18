@@ -22,7 +22,7 @@ export function HoaMemberNameCell({ member }: HoaMemberNameCellProps) {
         {fullName}
       </Button>
 
-      <HoaMemberDetailsSheet member={member} state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }} />
+      <HoaMemberDetailsSheet member={member} open={isSheetOpen} onOpenChange={setIsSheetOpen} />
     </>
   )
 }

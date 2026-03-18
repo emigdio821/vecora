@@ -49,10 +49,8 @@ export function NotificationsTableActions({ notification }: ActionsProps) {
   return (
     <>
       <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         action={handleDeleteNotification}
         variant="destructive"
         actionLabel="Eliminar"
@@ -67,12 +65,14 @@ export function NotificationsTableActions({ notification }: ActionsProps) {
 
       <NotificationDetailsSheet
         notification={notification}
-        state={{ isOpen: isNotificationDetailsSheetOpen, onOpenChange: setNotificationDetailsSheetOpen }}
+        open={isNotificationDetailsSheetOpen}
+        onOpenChange={setNotificationDetailsSheetOpen}
       />
 
       <EditNotificationSheet
         notification={notification}
-        state={{ isOpen: isEditNotificationSheetOpen, onOpenChange: setEditNotificationSheetOpen }}
+        open={isEditNotificationSheetOpen}
+        onOpenChange={setEditNotificationSheetOpen}
       />
 
       <div className="flex">

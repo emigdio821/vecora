@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createHoaBoardMember } from '@/api/server-functions/hoa-board'
@@ -22,17 +23,14 @@ import {
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type CreateHoaBoardMemberFormData, createHoaBoardMemberSchema } from '@/schemas/hoa-board'
 
-interface CreateMemberSheetProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface CreateMemberSheetProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
   defaultPeriodId?: string
 }
 
-export function CreateMemberSheet({ state, defaultPeriodId }: CreateMemberSheetProps) {
+export function CreateMemberSheet({ defaultPeriodId, open, onOpenChange, ...props }: CreateMemberSheetProps) {
   const createMemberFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<CreateHoaBoardMemberFormData>({
     shouldUnregister: true,
@@ -66,7 +64,7 @@ export function CreateMemberSheet({ state, defaultPeriodId }: CreateMemberSheetP
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange} {...props}>
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Agregar miembro</SheetTitle>

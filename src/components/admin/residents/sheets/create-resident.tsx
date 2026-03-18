@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createResident } from '@/api/server-functions/residents'
@@ -24,16 +25,13 @@ import { Textarea } from '@/components/ui/textarea'
 import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { type CreateResidentFormData, createResidentSchema } from '@/schemas/residents'
 
-interface CreateResidentSheetProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface CreateResidentSheetProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function CreateResidentSheet({ state }: CreateResidentSheetProps) {
+export function CreateResidentSheet({ open, onOpenChange, ...props }: CreateResidentSheetProps) {
   const createResidentFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<CreateResidentFormData>({
     shouldUnregister: true,
@@ -74,7 +72,7 @@ export function CreateResidentSheet({ state }: CreateResidentSheetProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Crear residente</SheetTitle>

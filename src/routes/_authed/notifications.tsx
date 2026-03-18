@@ -29,10 +29,8 @@ function RouteComponent() {
   return (
     <>
       <CreateNotificationSheet
-        state={{
-          isOpen: isCreateNotificationSheetOpen,
-          onOpenChange: setCreateNotificationSheetOpen,
-        }}
+        open={isCreateNotificationSheetOpen}
+        onOpenChange={setCreateNotificationSheetOpen}
       />
 
       <div className="flex flex-col gap-4">

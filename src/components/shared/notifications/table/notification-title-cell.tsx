@@ -17,7 +17,8 @@ export function NotificationTitleCell({ notification }: NotificationTitleCellPro
       </Button>
       <NotificationDetailsSheet
         notification={notification}
-        state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }}
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
       />
     </>
   )

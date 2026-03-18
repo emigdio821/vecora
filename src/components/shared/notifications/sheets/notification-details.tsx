@@ -1,4 +1,5 @@
 import { IconBell, IconCalendarOff, IconMessage } from '@tabler/icons-react'
+import type React from 'react'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { CopyButton } from '@/components/ui/copy-button'
 import {
@@ -13,19 +14,20 @@ import {
 import type { SelectNotification } from '@/db/schema/zod/notifications'
 import { formatDate } from '@/lib/utils'
 
-interface NotificationDetailsSheetProps {
+interface NotificationDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   notification: SelectNotification
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function NotificationDetailsSheet({ notification, state }: NotificationDetailsSheetProps) {
-  const { isOpen, onOpenChange } = state
-
+export function NotificationDetailsSheet({
+  notification,
+  open,
+  onOpenChange,
+  ...props
+}: NotificationDetailsSheetProps) {
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Información de la notificación</SheetTitle>

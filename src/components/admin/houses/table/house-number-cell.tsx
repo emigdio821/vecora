@@ -21,7 +21,7 @@ export function HouseNumberCell({ house }: HouseNumberCellProps) {
         }
       />
 
-      <HouseDetailsSheet house={house} state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }} />
+      <HouseDetailsSheet house={house} open={isSheetOpen} onOpenChange={setIsSheetOpen} />
     </>
   )
 }

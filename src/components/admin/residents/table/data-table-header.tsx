@@ -50,10 +50,8 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
   return (
     <>
       <AlertDialogGeneric
-        state={{
-          isOpen: isDeleteDialogOpen,
-          onOpenChange: setDeleteDialogOpen,
-        }}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         action={handleBatchDelete}
         variant="destructive"
         actionLabel="Eliminar"
@@ -68,9 +66,7 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
         }
       />
 
-      <CreateResidentSheet
-        state={{ isOpen: openCreateResidentDialog, onOpenChange: setOpenCreateResidentDialog }}
-      />
+      <CreateResidentSheet open={openCreateResidentDialog} onOpenChange={setOpenCreateResidentDialog} />
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <InputGroup className="w-full bg-background sm:w-sm">

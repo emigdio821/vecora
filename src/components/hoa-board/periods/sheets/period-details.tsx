@@ -1,4 +1,5 @@
 import { IconCalendarTime, IconUsers, IconWind } from '@tabler/icons-react'
+import type React from 'react'
 import type { HoaBoardPeriodQueryData } from '@/api/tanstack-queries/hoa-board'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
@@ -17,21 +18,18 @@ import {
 } from '@/components/ui/sheet'
 import { cn, formatDate } from '@/lib/utils'
 
-interface HoaPeriodDetailsSheetProps {
+interface HoaPeriodDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   period: HoaBoardPeriodQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function HoaPeriodDetailsSheet({ period, state }: HoaPeriodDetailsSheetProps) {
-  const { isOpen, onOpenChange } = state
+export function HoaPeriodDetailsSheet({ period, open, onOpenChange, ...props }: HoaPeriodDetailsSheetProps) {
   const activeMembers = period.members?.filter((member) => !member.deletedAt) || []
   const pastMembers = period.members?.filter((member) => member.deletedAt) || []
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Información del periodo</SheetTitle>

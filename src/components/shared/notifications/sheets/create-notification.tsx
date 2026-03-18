@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconSelector } from '@tabler/icons-react'
 import { addMonths } from 'date-fns'
+import type React from 'react'
 import { useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { createNotification } from '@/api/server-functions/notifications'
@@ -26,16 +27,13 @@ import { useEntityMutation } from '@/hooks/use-entity-mutation'
 import { formatDate } from '@/lib/utils'
 import { type CreateNotificationData, createNotificationSchema } from '@/schemas/notifications'
 
-interface CreateNotificationSheetProps {
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+interface CreateNotificationSheetProps extends React.ComponentProps<typeof Sheet> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function CreateNotificationSheet({ state }: CreateNotificationSheetProps) {
+export function CreateNotificationSheet({ open, onOpenChange, ...props }: CreateNotificationSheetProps) {
   const createNotificationFormId = useId()
-  const { isOpen, onOpenChange } = state
 
   const form = useForm<CreateNotificationData>({
     shouldUnregister: true,
@@ -70,7 +68,7 @@ export function CreateNotificationSheet({ state }: CreateNotificationSheetProps)
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Crear notificación</SheetTitle>

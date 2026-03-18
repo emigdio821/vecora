@@ -1,4 +1,5 @@
 import { IconCurrencyDollar, IconUserHeart, IconWind } from '@tabler/icons-react'
+import type React from 'react'
 import type { PaymentQueryData } from '@/api/tanstack-queries/payments'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { PaymentStatusBadge } from '@/components/shared/payments/status-badge'
@@ -16,22 +17,19 @@ import {
 } from '@/components/ui/sheet'
 import { formatDate, getAllMonthsMap, getPaymentTypeLabel } from '@/lib/utils'
 
-interface PaymentDetailsSheetProps {
+interface PaymentDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   payment: PaymentQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 const MONTHS = getAllMonthsMap()
 
-export function PaymentDetailsSheet({ payment, state }: PaymentDetailsSheetProps) {
-  const { isOpen, onOpenChange } = state
+export function PaymentDetailsSheet({ payment, open, onOpenChange, ...props }: PaymentDetailsSheetProps) {
   const showMonthlyFee = payment.paymentType === 'monthly_fee' && payment.paymentMonths.length > 0
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Información del pago</SheetTitle>

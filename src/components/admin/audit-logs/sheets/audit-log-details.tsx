@@ -1,4 +1,5 @@
 import { IconDeviceDesktopAnalytics, IconFileDescription, IconUser, IconWind } from '@tabler/icons-react'
+import type React from 'react'
 import type { AuditLogQueryData } from '@/api/tanstack-queries/audit-logs'
 import { AuditLogActionBadge } from '@/components/shared/audit-logs/action-badge'
 import { AuditLogEntityTypeBadge } from '@/components/shared/audit-logs/identity-type-badge'
@@ -17,20 +18,17 @@ import {
 } from '@/components/ui/sheet'
 import { formatDate } from '@/lib/utils'
 
-interface AuditDetailsSheetProps {
+interface AuditDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   auditLog: AuditLogQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function AuditLogDetailsSheet({ auditLog, state }: AuditDetailsSheetProps) {
+export function AuditLogDetailsSheet({ auditLog, open, onOpenChange, ...props }: AuditDetailsSheetProps) {
   const userRole = auditLog.user?.role
-  const { isOpen, onOpenChange } = state
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Detalles del registro de auditoría</SheetTitle>

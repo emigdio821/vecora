@@ -21,10 +21,7 @@ export function ResidentNameCell({ resident }: ResidentNameCellProps) {
         {fullName}
       </Button>
 
-      <ResidentDetailsSheet
-        resident={resident}
-        state={{ isOpen: isSheetOpen, onOpenChange: setIsSheetOpen }}
-      />
+      <ResidentDetailsSheet resident={resident} open={isSheetOpen} onOpenChange={setIsSheetOpen} />
     </div>
   )
 }

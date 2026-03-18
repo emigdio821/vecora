@@ -1,4 +1,5 @@
 import { IconHome, IconUserHeart, IconWind } from '@tabler/icons-react'
+import type React from 'react'
 import type { HouseQueryData } from '@/api/tanstack-queries/houses'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { HouseNumberBadge } from '@/components/shared/houses/house-number-badge'
@@ -15,20 +16,15 @@ import {
 } from '@/components/ui/sheet'
 import { formatDate } from '@/lib/utils'
 
-interface HouseDetailsSheetProps {
+interface HouseDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   house: HouseQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
-  const { isOpen, onOpenChange } = state
-  const houseAddress = [house.street, house.city, house.state].filter(Boolean).join(', ')
-
+export function HouseDetailsSheet({ house, open, onOpenChange, ...props }: HouseDetailsSheetProps) {
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Información de la casa</SheetTitle>
@@ -41,21 +37,13 @@ export function HouseDetailsSheet({ house, state }: HouseDetailsSheetProps) {
             title="Información de la casa"
             icon={IconHome}
             content={
-              <>
-                <div className="flex items-center gap-2">
-                  <div className="min-w-0 flex-1">
-                    <h2 className="font-medium text-sm">Número de casa</h2>
-                    <HouseNumberBadge number={house.houseNumber} />
-                  </div>
-                  <CopyButton tooltipText="Copiar ID" value={house.id} />
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <h2 className="font-medium text-sm">Número de casa</h2>
+                  <HouseNumberBadge number={house.houseNumber} />
                 </div>
-                {houseAddress && (
-                  <div>
-                    <h2 className="font-medium text-sm">Direccón</h2>
-                    <p className="line-clamp-2 text-muted-foreground text-sm">{houseAddress}</p>
-                  </div>
-                )}
-              </>
+                <CopyButton tooltipText="Copiar ID" value={house.id} />
+              </div>
             }
           />
 

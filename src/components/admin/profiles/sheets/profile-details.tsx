@@ -1,4 +1,5 @@
 import { IconUser, IconUserStar, IconWind } from '@tabler/icons-react'
+import type React from 'react'
 import type { ProfileQueryData } from '@/api/tanstack-queries/profiles'
 import { CollapsibleDetails } from '@/components/shared/collapsible-details'
 import { ProfileTypeBadge } from '@/components/shared/profile-type-badge'
@@ -18,20 +19,17 @@ import {
 import { isSuperAdmin as isSuperAdmon } from '@/lib/auth/rbac'
 import { formatDate } from '@/lib/utils'
 
-interface ProfileDetailsSheetProps {
+interface ProfileDetailsSheetProps extends React.ComponentProps<typeof Sheet> {
   profile: ProfileQueryData
-  state: {
-    isOpen: boolean
-    onOpenChange: (open: boolean) => void
-  }
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function ProfileDetailsSheet({ profile, state }: ProfileDetailsSheetProps) {
-  const { isOpen, onOpenChange } = state
+export function ProfileDetailsSheet({ profile, open, onOpenChange, ...props }: ProfileDetailsSheetProps) {
   const isSuperAdmin = isSuperAdmon(profile.user)
 
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} {...props}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Información del perfil</SheetTitle>
