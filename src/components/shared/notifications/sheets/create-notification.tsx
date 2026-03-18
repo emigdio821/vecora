@@ -154,7 +154,7 @@ export function CreateNotificationSheet({ state }: CreateNotificationSheetProps)
                         </Button>
                       }
                     />
-                    <PopoverContent className="p-1">
+                    <PopoverContent className="w-auto p-1">
                       <Calendar
                         mode="single"
                         id={field.name}

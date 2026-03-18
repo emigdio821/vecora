@@ -358,7 +358,7 @@ export function EditPaymentSheet({ state, payment }: UpdatePaymentSheetProps) {
                           </Button>
                         }
                       />
-                      <PopoverContent className="p-1">
+                      <PopoverContent className="w-auto p-1">
                         <Calendar
                           mode="single"
                           id={field.name}

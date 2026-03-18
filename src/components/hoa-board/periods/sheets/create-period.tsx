@@ -107,7 +107,7 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
                         </Button>
                       }
                     />
-                    <PopoverContent className="p-1">
+                    <PopoverContent className="w-auto p-1">
                       <Calendar
                         mode="single"
                         id={field.name}
@@ -148,7 +148,7 @@ export function CreatePeriodSheet({ state }: CreatePeriodSheetProps) {
                         </Button>
                       }
                     />
-                    <PopoverContent className="p-1">
+                    <PopoverContent className="w-auto p-1">
                       <Calendar
                         mode="single"
                         id={field.name}
