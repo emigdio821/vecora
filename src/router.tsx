@@ -3,6 +3,7 @@ import { createRouter, parseSearchWith, stringifySearchWith } from '@tanstack/re
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { DefaultErrorBoundary } from './components/shared/errors/default-boundary'
 import { NotFound } from './components/shared/errors/not-found'
+import { PendingGeneric } from './components/shared/peding-generic'
 import { routeTree } from './routeTree.gen'
 
 export function getRouter() {
@@ -18,7 +19,8 @@ export function getRouter() {
     context: { queryClient },
     // defaultPreload: 'intent',
     defaultErrorComponent: DefaultErrorBoundary,
-    defaultNotFoundComponent: () => <NotFound />,
+    defaultNotFoundComponent: () => <NotFound className="p-0 sm:p-0" />,
+    defaultPendingComponent: () => <PendingGeneric />,
     stringifySearch: stringifySearchWith((value) => String(value)),
     parseSearch: parseSearchWith((value) => value),
   })

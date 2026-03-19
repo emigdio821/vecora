@@ -1,13 +1,14 @@
 import { IconGhost3 } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
+import { Footer } from '@/components/footer'
+import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Footer } from '../../footer'
-import { Button } from '../../ui/button'
+import { cn } from '@/lib/utils'
 
-export function NotFound() {
+export function NotFound({ className }: { className?: string }) {
   return (
     <>
-      <section className="p-4 sm:p-6">
+      <section className={cn('p-4 sm:p-6', className)}>
         <Card className="mx-auto w-full max-w-sm">
           <CardHeader>
             <CardTitle className="text-center font-extrabold text-4xl">

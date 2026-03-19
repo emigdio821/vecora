@@ -106,16 +106,7 @@ export function CreateProfileSheet({ open, onOpenChange, ...props }: CreateProfi
                     <Button
                       nativeButton={false}
                       variant="link"
-                      render={
-                        <Link
-                          to="/admin/residential"
-                          search={{
-                            tab: 'residents',
-                          }}
-                        >
-                          crearlo
-                        </Link>
-                      }
+                      render={<Link to="/admin/residential">crearlo</Link>}
                     />{' '}
                     , y regresar a vincularlo aquí.
                   </FieldDescription>
