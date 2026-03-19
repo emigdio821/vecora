@@ -3,7 +3,7 @@ import { LoaderIcon } from '../icons'
 
 export function PendingGeneric() {
   return (
-    <Empty className="h-full bg-muted/30">
+    <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <LoaderIcon />

@@ -8,6 +8,12 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 export const Route = createFileRoute('/_authed')({
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
+    const cachedProfile = context.queryClient.getQueryData(userProfileQueryOptions().queryKey)
+
+    if (cachedProfile) {
+      return { profile: cachedProfile }
+    }
+
     const session = await getServerSession()
 
     if (!session) {

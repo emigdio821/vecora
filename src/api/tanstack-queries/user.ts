@@ -17,6 +17,4 @@ export const userProfileQueryOptions = () =>
   queryOptions({
     queryKey: [USER_PROFILE_QUERY_KEY],
     queryFn: async (): Promise<UserProfileQueryData> => await getUserProfile(),
-    staleTime: Number.POSITIVE_INFINITY,
-    gcTime: Number.POSITIVE_INFINITY,
   })
