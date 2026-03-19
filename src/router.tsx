@@ -17,7 +17,7 @@ export function getRouter() {
     routeTree,
     scrollRestoration: true,
     context: { queryClient },
-    defaultPreload: 'intent',
+    // defaultPreload: 'intent',
     defaultErrorComponent: DefaultErrorBoundary,
     defaultNotFoundComponent: () => <NotFound className="p-0 sm:p-0" />,
     defaultPendingComponent: () => <PendingGeneric />,
