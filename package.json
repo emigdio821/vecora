@@ -11,6 +11,8 @@
     "format": "oxfmt",
     "typecheck": "tsc --noEmit",
     "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
+    "db:reset": "supabase db reset --local",
+    "db:seed": "supabase db push --linked --include-seed",
     "prepare": "husky"
   },
   "dependencies": {
