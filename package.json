@@ -39,6 +39,7 @@
     "oxfmt": "^0.70.0",
     "oxlint": "^1.85.0",
     "oxlint-tsgolint": "^7.0.2002",
+    "supabase": "^2.117.0",
     "typescript": "^6.0.3"
   },
   "lint-staged": {
