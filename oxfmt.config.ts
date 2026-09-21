@@ -1,6 +1,7 @@
 import { defineConfig } from 'oxfmt'
 
 export default defineConfig({
+  ignore: ['.claude', '.agents'],
   tabWidth: 2,
   semi: false,
   useTabs: false,
