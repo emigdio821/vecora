@@ -1,7 +1,7 @@
 import { defineConfig } from 'oxlint'
 
 export default defineConfig({
-  ignorePatterns: ['**/src/components/ui/**'],
+  ignorePatterns: ['**/src/components/ui/**', '**/src/lib/supabase/database.types.ts'],
   plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'promise', 'nextjs', 'react', 'react-perf', 'jsx-a11y'],
   rules: {
     'object-shorthand': 'error',

@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# agent skills: .agents/skills is the source of truth (see skills-lock.json);
+# .claude/skills only holds symlinks to it, which Git on Windows would copy.
+.claude/skills/
 
 # vercel
 .vercel

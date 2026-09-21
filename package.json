@@ -10,11 +10,14 @@
     "lint": "oxlint --fix",
     "format": "oxfmt",
     "typecheck": "tsc --noEmit",
+    "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
     "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
     "@daypicker/react": "^10.0.1",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
     "@tailwindcss/postcss": "^4.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
