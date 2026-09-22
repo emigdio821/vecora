@@ -1,12 +1,10 @@
 import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { AppHeader } from '@/components/app-header'
+import { AppSidebar } from '@/components/app-sidebar'
+import { AppProviders } from '@/components/providers'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { createClient } from '@/lib/supabase/server'
-import { logout } from '@/server-actions/auth'
 
-/**
- * Every route under (authed) requires a signed-in user.
- * proxy.ts redirects early as an optimisation; this check is the real gate.
- */
 export default async function AuthedLayout({ children }: LayoutProps<'/'>) {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
@@ -16,19 +14,14 @@ export default async function AuthedLayout({ children }: LayoutProps<'/'>) {
   }
 
   return (
-    <>
-      <header className="flex items-center justify-between border-b px-6 py-3">
-        <span className="font-semibold">Resido</span>
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-muted-foreground">{data.claims.email}</span>
-          <form action={logout}>
-            <Button type="submit" variant="outline" size="sm">
-              Sign out
-            </Button>
-          </form>
-        </div>
-      </header>
-      {children}
-    </>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <AppHeader />
+        <section className="flex w-full flex-1 flex-col gap-4 p-4 sm:p-6 xl:mx-auto xl:max-w-7xl">
+          <AppProviders>{children}</AppProviders>
+        </section>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

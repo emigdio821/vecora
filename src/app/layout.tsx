@@ -1,5 +1,6 @@
 import '../styles/globals.css'
 import type { Metadata } from 'next'
+import { ThemeProvider } from 'next-themes'
 import { Geist } from 'next/font/google'
 import { cn } from '@/lib/utils'
 
@@ -15,8 +16,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className={cn('font-sans', geist.variable)}>
-      <body>{children}</body>
+    <html suppressHydrationWarning lang="en" className={cn('font-sans', geist.variable)}>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }

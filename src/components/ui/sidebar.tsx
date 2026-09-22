@@ -79,7 +79,7 @@ export function SidebarProvider({
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }): React.ReactElement {
-  const isMobile = useMediaQuery('max-md')
+  const isMobile = useMediaQuery('min-md')
   const [openMobile, setOpenMobile] = React.useState(false)
 
   // This is the internal state of the sidebar.
