@@ -3,22 +3,22 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { type LoginInput, loginSchema } from '@/lib/validations/auth'
 
-export type LoginState = { error: string } | undefined
+export type ActionResult = { error: string } | undefined
 
-export async function login(_prev: LoginState, formData: FormData): Promise<LoginState> {
-  const email = formData.get('email')
-  const password = formData.get('password')
+export async function login(input: LoginInput): Promise<ActionResult> {
+  const parsed = loginSchema.safeParse(input)
 
-  if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
-    return { error: 'Email and password are required.' }
+  if (!parsed.success) {
+    return { error: 'Correo y contraseña son requeridos' }
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { error } = await supabase.auth.signInWithPassword(parsed.data)
 
   if (error) {
-    return { error: 'Invalid email or password.' }
+    return { error: 'Correo o contraseña inválidos' }
   }
 
   revalidatePath('/', 'layout')
