@@ -8,27 +8,125 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
-          phone: string | null
-          unit_number: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           full_name?: string
           id: string
-          phone?: string | null
-          unit_number?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           full_name?: string
           id?: string
-          phone?: string | null
-          unit_number?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      properties: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          number: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          number: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      property_residents: {
+        Row: {
+          created_at: string
+          property_id: string
+          relationship: Database['public']['Enums']['residency_relationship']
+          resident_id: string
+        }
+        Insert: {
+          created_at?: string
+          property_id: string
+          relationship: Database['public']['Enums']['residency_relationship']
+          resident_id: string
+        }
+        Update: {
+          created_at?: string
+          property_id?: string
+          relationship?: Database['public']['Enums']['residency_relationship']
+          resident_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'property_residents_property_id_fkey'
+            columns: ['property_id']
+            isOneToOne: false
+            referencedRelation: 'properties'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'property_residents_resident_id_fkey'
+            columns: ['resident_id']
+            isOneToOne: false
+            referencedRelation: 'residents'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      residents: {
+        Row: {
+          created_at: string
+          email: string | null
+          first_name: string
+          id: string
+          last_name: string
+          notes: string | null
+          phone: string
+          profile_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          notes?: string | null
+          phone: string
+          profile_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          notes?: string | null
+          phone?: string
+          profile_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'residents_profile_id_fkey'
+            columns: ['profile_id']
+            isOneToOne: true
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -75,6 +173,7 @@ export type Database = {
     }
     Enums: {
       app_role: 'admin' | 'president' | 'treasurer' | 'security' | 'maintenance'
+      residency_relationship: 'owner' | 'tenant' | 'family'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -201,6 +300,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ['admin', 'president', 'treasurer', 'security', 'maintenance'],
+      residency_relationship: ['owner', 'tenant', 'family'],
     },
   },
 } as const

@@ -13,7 +13,11 @@ export default async function Page() {
 
   const [{ data: roles, error: rolesError }, { data: profiles, error: profilesError }] = await Promise.all([
     supabase.from('user_roles').select('role').eq('user_id', claims.claims.sub),
-    supabase.from('profiles').select('id, full_name, unit_number'),
+    supabase
+      .from('profiles')
+      .select(
+        'id, full_name, residents(first_name, last_name, property_residents(relationship, properties(number)))',
+      ),
   ])
 
   const error = rolesError ?? profilesError
@@ -25,11 +29,18 @@ export default async function Page() {
       <p>Roles: {roles?.length ? roles.map((r) => r.role).join(', ') : 'none (regular member)'}</p>
       {error && <p className="text-red-600">Error: {error.message}</p>}
       <ul>
-        {profiles?.map((profile) => (
-          <li key={profile.id}>
-            {profile.full_name || '(no name)'} {profile.unit_number && `— unit ${profile.unit_number}`}
-          </li>
-        ))}
+        {profiles?.map((profile) => {
+          const resident = profile.residents
+          return (
+            <li key={profile.id}>
+              {profile.full_name || '(no name)'}
+              {resident && ` — ${resident.first_name} ${resident.last_name}`}
+              {resident?.property_residents.length
+                ? ` (${resident.property_residents.map((pr) => `${pr.relationship} of ${pr.properties.number}`).join(', ')})`
+                : null}
+            </li>
+          )
+        })}
       </ul>
     </main>
   )
