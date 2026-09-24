@@ -4,7 +4,6 @@ import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
 import { ChevronsUpDownIcon, XIcon } from 'lucide-react'
 import * as React from 'react'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
 export const ComboboxContext: React.Context<{
@@ -281,16 +280,14 @@ export const ComboboxValue: typeof ComboboxPrimitive.Value = ComboboxPrimitive.V
 
 export function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props): React.ReactElement {
   return (
-    <ScrollArea overscrollContain scrollbarGutter scrollFade>
-      <ComboboxPrimitive.List
-        className={cn(
-          'not-empty:scroll-py-1 not-empty:px-1 not-empty:py-1 in-data-has-overflow-y:pe-3',
-          className,
-        )}
-        data-slot="combobox-list"
-        {...props}
-      />
-    </ScrollArea>
+    <ComboboxPrimitive.List
+      data-slot="combobox-list"
+      className={cn(
+        'scroll-fade overflow-auto overscroll-contain not-empty:scroll-py-1 not-empty:p-1',
+        className,
+      )}
+      {...props}
+    />
   )
 }
 

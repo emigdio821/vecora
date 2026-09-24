@@ -16,7 +16,12 @@ interface TanstackQueryErrorProps extends React.ComponentProps<typeof Empty> {
 }
 
 export function TanstackQueryError(props: TanstackQueryErrorProps) {
-  const { refetch, errorTitle = 'Error', errorDescription = 'Algo salió mal.', ...emptyProps } = props
+  const {
+    refetch,
+    errorTitle = 'Error',
+    errorDescription = 'No se pudo cargar la información, por favor intente nuevamente.',
+    ...emptyProps
+  } = props
 
   return (
     <Empty {...emptyProps}>

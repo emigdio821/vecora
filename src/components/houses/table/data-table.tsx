@@ -10,7 +10,7 @@ export function HousesDataTable() {
   const { data: houses = [], isLoading, error, refetch } = useQuery(housesListQueryOptions())
 
   if (error) {
-    return <TanstackQueryError refetch={refetch} errorDescription="Algo salió mal al cargar las casas" />
+    return <TanstackQueryError refetch={refetch} />
   }
 
   if (isLoading) {

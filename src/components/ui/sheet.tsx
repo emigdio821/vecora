@@ -6,7 +6,6 @@ import { useRender } from '@base-ui/react/use-render'
 import { XIcon } from 'lucide-react'
 import type React from 'react'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
 export const Sheet: typeof SheetPrimitive.Root = SheetPrimitive.Root
@@ -199,13 +198,13 @@ export function SheetPanel({
   }
 
   return (
-    <ScrollArea overscrollContain scrollFade={scrollFade}>
+    <div className={cn('size-full min-h-0 overflow-auto overscroll-contain', scrollFade && 'scroll-fade')}>
       {useRender({
         defaultTagName: 'div',
         props: mergeProps<'div'>(defaultProps, props),
         render,
       })}
-    </ScrollArea>
+    </div>
   )
 }
 

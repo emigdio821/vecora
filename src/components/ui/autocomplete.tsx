@@ -4,7 +4,6 @@ import { Autocomplete as AutocompletePrimitive } from '@base-ui/react/autocomple
 import { ChevronsUpDownIcon, XIcon } from 'lucide-react'
 import type React from 'react'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
 export const Autocomplete: typeof AutocompletePrimitive.Root = AutocompletePrimitive.Root
@@ -217,13 +216,14 @@ export function AutocompleteList({
   ...props
 }: AutocompletePrimitive.List.Props): React.ReactElement {
   return (
-    <ScrollArea overscrollContain scrollbarGutter scrollFade>
-      <AutocompletePrimitive.List
-        className={cn('not-empty:scroll-py-1 not-empty:p-1 in-data-has-overflow-y:pe-3', className)}
-        data-slot="autocomplete-list"
-        {...props}
-      />
-    </ScrollArea>
+    <AutocompletePrimitive.List
+      className={cn(
+        'scroll-fade overflow-auto overscroll-contain not-empty:scroll-py-1 not-empty:p-1',
+        className,
+      )}
+      data-slot="autocomplete-list"
+      {...props}
+    />
   )
 }
 

@@ -10,7 +10,6 @@ import { ChevronRightIcon, XIcon } from 'lucide-react'
 import type React from 'react'
 import { createContext, useContext } from 'react'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
 type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'
@@ -315,9 +314,14 @@ export function DrawerPanel({
 
   if (scrollable) {
     return (
-      <ScrollArea className="touch-auto" overscrollContain scrollFade={scrollFade}>
+      <div
+        className={cn(
+          'size-full min-h-0 touch-auto overflow-auto overscroll-contain',
+          scrollFade && 'scroll-fade',
+        )}
+      >
         {content}
-      </ScrollArea>
+      </div>
     )
   }
 

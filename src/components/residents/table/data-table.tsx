@@ -13,7 +13,7 @@ export function ResidentsDataTable() {
   const { data: residents = [], isLoading, error, refetch } = useQuery(residentsListQueryOptions())
 
   if (error) {
-    return <TanstackQueryError refetch={refetch} errorDescription="Algo salió mal al cargar los residentes" />
+    return <TanstackQueryError refetch={refetch} />
   }
 
   if (isLoading) {

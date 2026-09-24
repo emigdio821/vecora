@@ -59,6 +59,7 @@ export function DeleteResidentsAlertDialog({
   const count = residents.length
   const isSingle = count === 1
   const singleName = isSingle ? `${residents[0].first_name} ${residents[0].last_name}` : null
+  const linkedCount = residents.reduce((total, resident) => total + resident.property_residents.length, 0)
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -119,9 +120,10 @@ export function DeleteResidentsAlertDialog({
             {isSingle ? `¿Eliminar a ${singleName}?` : `¿Eliminar ${count} residentes?`}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción no se puede deshacer. Se{' '}
-            {isSingle ? 'eliminará el residente' : 'eliminarán los residentes'} y sus vínculos con las casas
-            asignadas.
+            {linkedCount > 0
+              ? `${isSingle ? 'Tiene' : 'Tienen'} ${linkedCount} ${linkedCount === 1 ? 'casa asignada' : 'casas asignadas'}. `
+              : ''}
+            Esta acción no se puede deshacer después de unos segundos.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

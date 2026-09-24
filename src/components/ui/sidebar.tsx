@@ -7,7 +7,6 @@ import { PanelLeftIcon } from 'lucide-react'
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetDescription, SheetHeader, SheetPopup, SheetTitle } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -79,7 +78,7 @@ export function SidebarProvider({
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }): React.ReactElement {
-  const isMobile = useMediaQuery('min-md')
+  const isMobile = useMediaQuery('max-md')
   const [openMobile, setOpenMobile] = React.useState(false)
 
   // This is the internal state of the sidebar.
@@ -384,14 +383,14 @@ export function SidebarSeparator({
 
 export function SidebarContent({ className, ...props }: React.ComponentProps<'div'>): React.ReactElement {
   return (
-    <ScrollArea className="min-h-0 flex-1" fill overscrollContain scrollFade>
+    <div className="min-h-0 flex-1 scroll-fade overflow-auto overscroll-contain">
       <div
         className={cn('flex h-full flex-col gap-2 group-data-[collapsible=icon]:overflow-hidden', className)}
         data-sidebar="content"
         data-slot="sidebar-content"
         {...props}
       />
-    </ScrollArea>
+    </div>
   )
 }
 

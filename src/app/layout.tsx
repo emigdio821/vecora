@@ -8,14 +8,6 @@ import { cn } from '@/lib/utils'
 
 const fontSans = Geist({ subsets: ['latin'], variable: '--font-sans' })
 
-// export const metadata: Metadata = {
-//   title: {
-//     default: 'Resido',
-//     template: `%s · Resido`,
-//   },
-//   description: 'Resido es una plataforma para la gestión de propiedades.',
-// }
-
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
@@ -48,7 +40,7 @@ export const metadata: Metadata = {
     images: [siteConfig.ogUrl],
     creator: '@luzapien, @emigdio821',
   },
-  manifest: '/site.webmanifest',
+  // manifest: '/site.webmanifest',
 }
 
 export const viewport: Viewport = {

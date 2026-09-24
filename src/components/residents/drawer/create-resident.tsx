@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircleAlertIcon } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
+import { PhoneInput } from '@/components/shared/phone-input'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -163,7 +164,11 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                   <FieldLabel>
                     Teléfono <span className="text-destructive">*</span>
                   </FieldLabel>
-                  <Input {...field} type="tel" autoComplete="tel" placeholder="+52 55 1234 5678" />
+                  <PhoneInput
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    onChange={(value) => field.onChange(value ?? '')}
+                  />
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
