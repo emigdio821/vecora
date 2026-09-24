@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { deleteHouses, restoreHouses } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/tanstack-queries/houses'
+import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
 
 /** How long the "Deshacer" toast stays up. Rows are recoverable for 6 months
  *  either way; this only bounds the one-click shortcut. */
@@ -32,7 +33,9 @@ async function undoDelete(queryClient: QueryClient, ids: string[]) {
     return
   }
 
+  // Residents list their houses, so they change too.
   void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
+  void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
   toastManager.add({
     type: 'success',
     title: result.data.restored === 1 ? 'Casa restaurada' : 'Casas restauradas',
@@ -59,7 +62,12 @@ export function DeleteHousesAlertDialog({
   const count = houses.length
   const isSingle = count === 1
   const singleLabel = isSingle ? `la casa ${houses[0].number}` : null
-  const linkedCount = houses.reduce((total, house) => total + house.property_residents.length, 0)
+  const residentCount = new Set(houses.flatMap((h) => h.property_residents.map((pr) => pr.resident.id))).size
+  const residentsClause =
+    residentCount === 0
+      ? `${isSingle ? 'Dejará' : 'Dejarán'} de aparecer en el listado de casas.`
+      : `${residentCount === 1 ? 'Su residente seguirá' : `Sus ${residentCount} residentes seguirán`} en el directorio, pero ya no ${residentCount === 1 ? 'aparecerá asignado' : 'aparecerán asignados'} a ${isSingle ? 'esta casa' : 'estas casas'}.`
+  const description = `${residentsClause} Solo podrás deshacerlo durante unos segundos.`
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -69,7 +77,9 @@ export function DeleteHousesAlertDialog({
       return { ...result.data, ids }
     },
     onSuccess: ({ deleted, ids }) => {
+      // Residents list their houses, so they change too.
       void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
+      void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
 
       const partial = deleted < count // RLS filtered some rows out
       const toastId = toastManager.add({
@@ -118,12 +128,7 @@ export function DeleteHousesAlertDialog({
           <AlertDialogTitle>
             {isSingle ? `¿Eliminar ${singleLabel}?` : `¿Eliminar ${count} casas?`}
           </AlertDialogTitle>
-          <AlertDialogDescription>
-            {linkedCount > 0
-              ? `${isSingle ? 'Tiene' : 'Tienen'} ${linkedCount} ${linkedCount === 1 ? 'residente asignado' : 'residentes asignados'}. `
-              : ''}
-            Esta acción no se puede deshacer después de unos segundos.
-          </AlertDialogDescription>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
 
         {!isSingle && (

@@ -6,16 +6,21 @@ export const HOUSES_QUERY_KEY = 'houses'
 
 // "House" in the app, `properties` in the database.
 function housesListQuery() {
-  return createClient()
-    .from('properties')
-    .select(
-      `
+  return (
+    createClient()
+      .from('properties')
+      .select(
+        `
       id, number, notes, created_at, updated_at,
-      property_residents ( relationship, resident:residents ( id, first_name, last_name, phone, email ) )
+      property_residents ( relationship, resident:residents!inner ( id, first_name, last_name, phone, email ) )
       `,
-    )
-    .is('deleted_at', null)
-    .order('updated_at', { ascending: false })
+      )
+      .is('deleted_at', null)
+      // Soft-deleted residents keep their links (so undo restores them); `!inner`
+      // drops those links here without dropping the house.
+      .is('property_residents.resident.deleted_at', null)
+      .order('updated_at', { ascending: false })
+  )
 }
 
 export type HouseQueryData = QueryData<ReturnType<typeof housesListQuery>>[number]
