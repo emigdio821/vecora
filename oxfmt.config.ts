@@ -13,7 +13,7 @@ export default defineConfig({
   },
   sortTailwindcss: {
     preserveWhitespace: false,
-    stylesheet: './src/app/styles/globals.css',
+    stylesheet: './src/app/globals.css',
     functions: ['clsx', 'cva', 'tw', 'tw.*', 'cn'],
     attributes: ['className', 'iconClassName', 'class'],
   },

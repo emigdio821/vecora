@@ -22,6 +22,23 @@ export function getRoleLabel(roleName: string): string {
   }
 }
 
+/** Lowercase and strip accents so "López" matches "lopez". */
+export function normalizeString(value: string | null | undefined): string {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+}
+
+const dateFormatter = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' })
+
+/** "22 sept 2026, 10:15 a.m." from an ISO string, timestamp or Date. */
+export function formatDate(value: string | number | Date | null | undefined): string {
+  if (value == null) return '—'
+  const date = value instanceof Date ? value : new Date(value)
+  return Number.isNaN(date.getTime()) ? '—' : dateFormatter.format(date)
+}
+
 export function getAvatarFallback(name: string) {
   if (!name) return null
 

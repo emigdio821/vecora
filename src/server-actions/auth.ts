@@ -25,10 +25,17 @@ export async function login(input: LoginInput): Promise<ActionResult> {
   redirect('/')
 }
 
-export async function logout() {
+/**
+ * Signs the user out. Navigation is left to the caller so it can clear
+ * client-side state (e.g. the TanStack Query cache) before redirecting.
+ */
+export async function logout(): Promise<ActionResult> {
   const supabase = await createClient()
-  await supabase.auth.signOut()
+  const { error } = await supabase.auth.signOut()
+
+  if (error) {
+    return { error: 'No se pudo cerrar la sesión, intenta nuevamente' }
+  }
 
   revalidatePath('/', 'layout')
-  redirect('/login')
 }

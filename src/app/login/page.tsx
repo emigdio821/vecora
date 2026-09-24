@@ -30,10 +30,10 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <CardFrame className="w-full max-w-sm mx-auto">
+        <CardFrame className="mx-auto w-full max-w-sm">
           <CardFrameHeader>
             <CardFrameTitle>Iniciar sesión</CardFrameTitle>
-            <CardFrameDescription>Ingresa tus credenciales para acceder a tu cuenta</CardFrameDescription>
+            <CardFrameDescription>Ingresa tus credenciales para acceder a tu cuenta.</CardFrameDescription>
           </CardFrameHeader>
           <Card>
             <CardPanel>

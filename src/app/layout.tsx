@@ -1,10 +1,11 @@
-import '../styles/globals.css'
+import './globals.css'
 import type { Metadata } from 'next'
 import { ThemeProvider } from 'next-themes'
 import { Geist } from 'next/font/google'
+import ScreenSizeIndicator from '@/components/screen-size-indicator'
 import { cn } from '@/lib/utils'
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
+const fontSans = Geist({ subsets: ['latin'], variable: '--font-sans' })
 
 export const metadata: Metadata = {
   title: {
@@ -16,10 +17,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html suppressHydrationWarning lang="en" className={cn('font-sans', geist.variable)}>
+    <html suppressHydrationWarning lang="en" className={cn('font-sans', fontSans.variable)}>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
           {children}
+          <ScreenSizeIndicator />
         </ThemeProvider>
       </body>
     </html>

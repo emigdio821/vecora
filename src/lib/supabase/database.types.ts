@@ -27,6 +27,8 @@ export type Database = {
       properties: {
         Row: {
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           id: string
           notes: string | null
           number: string
@@ -34,6 +36,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           notes?: string | null
           number: string
@@ -41,12 +45,22 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           notes?: string | null
           number?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'properties_deleted_by_fkey'
+            columns: ['deleted_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
       }
       property_residents: {
         Row: {
@@ -87,6 +101,8 @@ export type Database = {
       residents: {
         Row: {
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           email: string | null
           first_name: string
           id: string
@@ -98,6 +114,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string | null
           first_name: string
           id?: string
@@ -109,6 +127,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           email?: string | null
           first_name?: string
           id?: string
@@ -119,6 +139,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: 'residents_deleted_by_fkey'
+            columns: ['deleted_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
           {
             foreignKeyName: 'residents_profile_id_fkey'
             columns: ['profile_id']

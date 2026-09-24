@@ -3,25 +3,26 @@ import { AppHeader } from '@/components/app-header'
 import { AppSidebar } from '@/components/app-sidebar'
 import { AppProviders } from '@/components/providers'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/supabase/current-user'
 
 export default async function AuthedLayout({ children }: LayoutProps<'/'>) {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getClaims()
+  const user = await getCurrentUser()
 
-  if (!data) {
+  if (!user) {
     redirect('/login')
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <AppHeader />
-        <section className="flex w-full flex-1 flex-col gap-4 p-4 sm:p-6 xl:mx-auto xl:max-w-7xl">
-          <AppProviders>{children}</AppProviders>
-        </section>
-      </SidebarInset>
-    </SidebarProvider>
+    <AppProviders>
+      <SidebarProvider>
+        <AppSidebar user={user} />
+        <SidebarInset>
+          <AppHeader />
+          <section className="mx-auto flex w-full flex-1 flex-col gap-4 p-4 md:max-w-lg lg:max-w-3xl xl:max-w-5xl 2xl:max-w-7xl">
+            {children}
+          </section>
+        </SidebarInset>
+      </SidebarProvider>
+    </AppProviders>
   )
 }

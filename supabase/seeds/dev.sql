@@ -105,7 +105,7 @@ begin
     (r_tomas,  u_member,    'Tomás',  'Rivera',    '+52 55 1000 0004', 'member@resido.com',    null),
     (r_sofia,  null,        'Sofía',  'Rivera',    '+52 55 1000 0005', null,                   'Tomás'' partner'),
     (r_diego,  null,        'Diego',  'Martínez',  '+52 55 1000 0006', 'diego@example.com',    'Owns two units'),
-    (r_carmen, null,        'Carmen', 'Ortega',    '+52 55 1000 0007', null,                   'Tenant in 2B'),
+    (r_carmen, null,        'Carmen', 'Ortega',    '+52 55 1000 0007', 'carmen@example.com',   'Tenant in 2B'),
     (r_pablo,  null,        'Pablo',  'Ortega',    '+52 55 1000 0008', null,                   'Carmen''s son');
 
   -- -------------------------------------------------------------------------

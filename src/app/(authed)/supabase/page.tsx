@@ -16,7 +16,7 @@ export default async function Page() {
     supabase
       .from('profiles')
       .select(
-        'id, full_name, residents(first_name, last_name, property_residents(relationship, properties(number)))',
+        'id, full_name, residents!profile_id(first_name, last_name, property_residents(relationship, properties(number)))',
       ),
   ])
 
