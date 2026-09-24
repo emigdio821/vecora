@@ -3,8 +3,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircleAlertIcon } from 'lucide-react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
+import { RELATIONSHIP_ITEMS } from '@/components/houses/relationship'
 import { PhoneInput } from '@/components/shared/phone-input'
+import { HousesPicker, houseLabel } from '@/components/shared/pickers/houses-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -21,10 +23,12 @@ import {
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { type CreateResidentInput, createResidentSchema } from '@/lib/validations/residents'
 import { createResident } from '@/server-actions/residents'
+import { HOUSES_QUERY_KEY, housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
 
 const FORM_ID = 'create-resident-form'
@@ -35,6 +39,8 @@ const defaultValues: CreateResidentInput = {
   phone: '',
   email: '',
   notes: '',
+  property_id: null,
+  relationship: 'owner',
 }
 
 interface CreateResidentDrawerProps extends React.ComponentProps<typeof Drawer> {
@@ -49,6 +55,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
     resolver: zodResolver(createResidentSchema),
     defaultValues,
   })
+  const propertyId = useWatch({ control: form.control, name: 'property_id' })
 
   const mutation = useMutation({
     mutationFn: async (values: CreateResidentInput) => {
@@ -57,11 +64,24 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
       return result.data
     },
     onSuccess: (_data, values) => {
+      // Read before invalidating; the picker loaded this list to offer the house.
+      const house = values.property_id
+        ? queryClient
+            .getQueryData(housesPickerQueryOptions().queryKey)
+            ?.find((h) => h.id === values.property_id)
+        : undefined
+
+      // The new link shows up in the houses list too.
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
+      if (values.property_id) void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
+
+      const name = `${values.first_name} ${values.last_name}`
       toastManager.add({
         type: 'success',
         title: 'Residente creado',
-        description: `${values.first_name} ${values.last_name} se agregó al directorio.`,
+        description: house
+          ? `${name} se agregó al directorio y a la ${houseLabel(house).toLowerCase()}.`
+          : `${name} se agregó al directorio.`,
       })
       onOpenChange(false)
     },
@@ -101,7 +121,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
         <DrawerHeader>
           <DrawerTitle>Nuevo residente</DrawerTitle>
           <DrawerDescription>
-            Agrega una persona al directorio. Podrás asignarle una casa después.
+            Agrega una persona al directorio y, si ya sabes dónde vive, asígnale su casa.
           </DrawerDescription>
         </DrawerHeader>
 
@@ -193,6 +213,68 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                 </Field>
               )}
             />
+
+            <Controller
+              name="property_id"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  name={field.name}
+                  invalid={fieldState.invalid}
+                  touched={fieldState.isTouched}
+                  dirty={fieldState.isDirty}
+                >
+                  <FieldLabel>Casa</FieldLabel>
+                  <HousesPicker
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    inputRef={field.ref}
+                    disabled={mutation.isPending}
+                  />
+                  <FieldDescription>
+                    Opcional. Si vive en más de una casa, podrás asignarle las demás desde la pestaña Casas.
+                  </FieldDescription>
+                  <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+
+            {propertyId && (
+              <Controller
+                name="relationship"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    name={field.name}
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
+                  >
+                    <FieldLabel>
+                      Relación <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <Select
+                      items={RELATIONSHIP_ITEMS}
+                      value={field.value}
+                      onValueChange={(value) => field.onChange(value)}
+                      disabled={mutation.isPending}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecciona una relación" />
+                      </SelectTrigger>
+                      <SelectPopup>
+                        {RELATIONSHIP_ITEMS.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectPopup>
+                    </Select>
+                    <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
+            )}
 
             <Controller
               name="notes"

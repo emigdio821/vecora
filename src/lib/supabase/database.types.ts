@@ -196,7 +196,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_resident: {
+        Args: {
+          p_email?: string
+          p_first_name: string
+          p_last_name: string
+          p_notes?: string
+          p_phone: string
+          p_property_id?: string
+          p_relationship?: Database['public']['Enums']['residency_relationship']
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: 'admin' | 'president' | 'treasurer' | 'security' | 'maintenance'

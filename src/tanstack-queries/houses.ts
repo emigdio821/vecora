@@ -35,3 +35,32 @@ export function housesListQueryOptions() {
     },
   })
 }
+
+/** Lightweight list for pickers: number + who lives there. */
+function housesPickerQuery() {
+  return createClient()
+    .from('properties')
+    .select(
+      `
+      id, number,
+      property_residents ( relationship, resident:residents!inner ( id, first_name, last_name ) )
+      `,
+    )
+    .is('deleted_at', null)
+    .is('property_residents.resident.deleted_at', null)
+}
+
+export type PickerHouse = QueryData<ReturnType<typeof housesPickerQuery>>[number]
+
+/** Shares the `houses` prefix so invalidating the list also refreshes pickers. */
+export function housesPickerQueryOptions() {
+  return queryOptions({
+    queryKey: [HOUSES_QUERY_KEY, 'picker'],
+    queryFn: async () => {
+      const { data, error } = await housesPickerQuery()
+      if (error) throw error
+      // Numeric-aware so "2" sorts before "10" (Postgres would sort them as text).
+      return data.sort((a, b) => a.number.localeCompare(b.number, 'es', { numeric: true }))
+    },
+  })
+}

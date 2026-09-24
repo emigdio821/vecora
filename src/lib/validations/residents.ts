@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import { RELATIONSHIPS } from './houses'
 
 const requiredText = (label: string) => z.string().trim().min(1, `${label} es requerido`)
 
-export const createResidentSchema = z.object({
+const residentSchema = z.object({
   first_name: requiredText('Nombre'),
   last_name: requiredText('Apellido'),
   phone: requiredText('Teléfono'),
@@ -16,9 +17,15 @@ export const createResidentSchema = z.object({
   notes: z.string().trim(),
 })
 
+export const createResidentSchema = residentSchema.extend({
+  // Optional house to link on creation; `relationship` is ignored without one.
+  property_id: z.uuid().nullable(),
+  relationship: z.enum(RELATIONSHIPS, 'Selecciona el tipo de relación'),
+})
+
 export type CreateResidentInput = z.infer<typeof createResidentSchema>
 
-// Same fields for now; kept separate so they can diverge later.
-export const updateResidentSchema = createResidentSchema
+// Houses are managed from the resident's links once they exist.
+export const updateResidentSchema = residentSchema
 
 export type UpdateResidentInput = z.infer<typeof updateResidentSchema>

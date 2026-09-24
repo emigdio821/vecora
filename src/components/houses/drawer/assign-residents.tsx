@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircleAlertIcon } from 'lucide-react'
 import { useId, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { type ResidentsPickerScope, ResidentsPicker } from '@/components/shared/pickers/residents-picker'
+import { ResidentsPicker } from '@/components/shared/pickers/residents-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -25,18 +25,13 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { toastManager } from '@/components/ui/toast'
-import { type AssignResidentsInput, assignResidentsSchema, type Relationship } from '@/lib/validations/houses'
+import { type AssignResidentsInput, assignResidentsSchema } from '@/lib/validations/houses'
 import { assignResidents } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
+import { RELATIONSHIP_ITEMS } from '../relationship'
 
 const FORM_ID = 'assign-residents-form'
-
-const RELATIONSHIP_ITEMS: { value: Relationship; label: string }[] = [
-  { value: 'owner', label: 'Propietario' },
-  { value: 'tenant', label: 'Inquilino' },
-  { value: 'family', label: 'Familiar' },
-]
 
 const defaultValues: AssignResidentsInput = {
   residentIds: [],
@@ -52,7 +47,7 @@ interface AssignResidentsDrawerProps extends React.ComponentProps<typeof Drawer>
 export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: AssignResidentsDrawerProps) {
   const queryClient = useQueryClient()
   const scopeSwitchId = useId()
-  const [scope, setScope] = useState<ResidentsPickerScope>('unassigned')
+  const [scope, setScope] = useState<'all' | 'unassigned'>('unassigned')
 
   const form = useForm<AssignResidentsInput>({
     resolver: zodResolver(assignResidentsSchema),

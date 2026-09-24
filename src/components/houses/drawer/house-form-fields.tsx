@@ -24,7 +24,7 @@ export function HouseFormFields({ control }: { control: Control<CreateHouseInput
             <FieldLabel>
               Número <span className="text-destructive">*</span>
             </FieldLabel>
-            <Input {...field} autoComplete="off" placeholder="12B" />
+            <Input {...field} autoComplete="off" />
             <FieldDescription>Identificador de la casa. Debe ser único.</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>

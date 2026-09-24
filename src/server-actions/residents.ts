@@ -24,20 +24,29 @@ export async function createResident(input: CreateResidentInput): Promise<Action
     return { error: 'Revisa los campos del formulario' }
   }
 
-  const { email, notes, ...rest } = parsed.data
+  const { first_name, last_name, phone, email, notes, property_id, relationship } = parsed.data
   const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('residents')
-    .insert({ ...rest, email: email || null, notes: notes || null })
-    .select('id')
-    .single()
+  // RPC so the resident and their house link are created in one transaction.
+  const { data, error } = await supabase.rpc('create_resident', {
+    p_first_name: first_name,
+    p_last_name: last_name,
+    p_phone: phone,
+    p_email: email || undefined,
+    p_notes: notes || undefined,
+    p_property_id: property_id || undefined,
+    p_relationship: property_id ? relationship : undefined,
+  })
 
   if (error) {
+    // P0002: raised by the RPC for a missing/soft-deleted house; 23503: FK race.
+    if (error.code === 'P0002' || error.code === '23503') {
+      return { error: 'La casa seleccionada ya no existe' }
+    }
     return { error: toMessage(error, 'No se pudo crear el residente, intenta nuevamente') }
   }
 
-  return { data }
+  return { data: { id: data } }
 }
 
 export async function updateResident(
