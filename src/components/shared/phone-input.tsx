@@ -6,7 +6,6 @@ import RPNInput, {
   type Props as RPNInputProps,
 } from 'react-phone-number-input'
 import defaultLabels from 'react-phone-number-input/locale/es'
-import { Group, GroupSeparator } from '@/components/ui/group'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { Button } from '../ui/button'
@@ -50,10 +49,9 @@ export function PhoneInput({ className, ...props }: PhoneInputProps) {
       defaultCountry="MX"
       international={false}
       labels={defaultLabels}
-      containerComponent={Group}
       inputComponent={InputComponent}
       countrySelectComponent={CountrySelect}
-      className={cn('w-full', className)}
+      className={cn('flex w-full gap-2 rounded-md', className)}
       {...props}
     />
   )
@@ -67,44 +65,40 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
   const [open, setOpen] = useState(false)
   const countries = useMemo(() => options.filter((option) => option.value !== undefined), [options])
 
-  // Fragment so the separator is a direct child of the Group container.
   return (
-    <>
-      <Combobox
-        open={open}
-        autoHighlight
-        items={countries}
-        value={countries.find((c) => c.value === selectedCountry)}
-        disabled={disabled}
-        onValueChange={(country: CountrySelectOption | null) => {
-          onChange(country?.value ?? 'MX')
-        }}
-        onOpenChange={setOpen}
-      >
-        <ComboboxTrigger render={<Button className="w-20 justify-between font-normal" variant="outline" />}>
-          <ComboboxValue>{getCountryCode}</ComboboxValue>
-          <ChevronsUpDownIcon className="-me-1!" />
-        </ComboboxTrigger>
-        <ComboboxPopup aria-label="Código" className="max-w-64 sm:max-w-72 sm:min-w-72">
-          <div className="border-b p-2">
-            <ComboboxInput
-              showTrigger={false}
-              placeholder="Buscar"
-              className="rounded-md before:rounded-[calc(var(--radius-md)-1px)]"
-              startAddon={<SearchIcon />}
-            />
-          </div>
-          <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
-          <ComboboxList>
-            {(country: CountrySelectOption) => (
-              <ComboboxItem key={country.value} value={country}>
-                {country.label}
-              </ComboboxItem>
-            )}
-          </ComboboxList>
-        </ComboboxPopup>
-      </Combobox>
-      <GroupSeparator />
-    </>
+    <Combobox
+      open={open}
+      autoHighlight
+      items={countries}
+      value={countries.find((c) => c.value === selectedCountry)}
+      disabled={disabled}
+      onValueChange={(country: CountrySelectOption | null) => {
+        onChange(country?.value ?? 'MX')
+      }}
+      onOpenChange={setOpen}
+    >
+      <ComboboxTrigger render={<Button className="w-20 justify-between font-normal" variant="outline" />}>
+        <ComboboxValue>{getCountryCode}</ComboboxValue>
+        <ChevronsUpDownIcon className="-me-1!" />
+      </ComboboxTrigger>
+      <ComboboxPopup aria-label="Código" className="max-w-64 sm:max-w-72 sm:min-w-72">
+        <div className="border-b p-2">
+          <ComboboxInput
+            showTrigger={false}
+            placeholder="Buscar"
+            className="rounded-md before:rounded-[calc(var(--radius-md)-1px)]"
+            startAddon={<SearchIcon />}
+          />
+        </div>
+        <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
+        <ComboboxList>
+          {(country: CountrySelectOption) => (
+            <ComboboxItem key={country.value} value={country}>
+              {country.label}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxPopup>
+    </Combobox>
   )
 }
