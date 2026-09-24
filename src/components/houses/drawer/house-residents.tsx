@@ -4,6 +4,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { UserMinusIcon, UsersIcon } from 'lucide-react'
 import { useState } from 'react'
 import { CollapsibleSection, Muted } from '@/components/shared/details'
+import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogPopup,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
@@ -48,13 +58,7 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
         <Muted>Nadie está asignado a esta casa.</Muted>
       )}
 
-      <Button
-        size="sm"
-        variant="outline"
-        disabled={disabled}
-        className="justify-self-start"
-        onClick={() => setAssignOpen(true)}
-      >
+      <Button size="sm" variant="outline" disabled={disabled} onClick={() => setAssignOpen(true)}>
         Asignar residentes
       </Button>
 
@@ -76,6 +80,7 @@ function UnassignResidentButton({
   disabled?: boolean
 }) {
   const queryClient = useQueryClient()
+  const [isConfirmOpen, setConfirmOpen] = useState(false)
   const name = `${resident.first_name} ${resident.last_name}`
 
   const mutation = useMutation({
@@ -92,31 +97,64 @@ function UnassignResidentButton({
         title: 'Residente quitado',
         description: `${name} ya no está asignado a la casa ${house.number}`,
       })
+      setConfirmOpen(false)
     },
     onError: (error) => {
       toastManager.add({ type: 'error', title: 'No se pudo quitar', description: error.message })
     },
   })
 
-  return (
-    <Tooltip>
-      <TooltipTrigger
-        closeOnClick={false}
-        render={
-          <Button
-            size="icon-sm"
-            disabled={disabled}
-            loading={mutation.isPending}
-            variant="destructive-outline"
-            onClick={() => mutation.mutate()}
-            aria-label={`Quitar a ${name} de la casa`}
-          >
-            <UserMinusIcon />
-          </Button>
-        }
-      />
+  const handleOpenChange: AlertDialogPrimitive.Root.Props['onOpenChange'] = (nextOpen, eventDetails) => {
+    if (!nextOpen && mutation.isPending) {
+      eventDetails.cancel()
+      return
+    }
 
-      <TooltipPopup>Quitar a {name} de la casa</TooltipPopup>
-    </Tooltip>
+    setConfirmOpen(nextOpen)
+  }
+
+  return (
+    <>
+      <Tooltip>
+        <TooltipTrigger
+          closeOnClick={false}
+          render={
+            <Button
+              size="icon-sm"
+              disabled={disabled}
+              variant="destructive-outline"
+              onClick={() => setConfirmOpen(true)}
+              aria-label={`Quitar a ${name} de la casa`}
+            >
+              <UserMinusIcon />
+            </Button>
+          }
+        />
+
+        <TooltipPopup>Quitar a {name} de la casa</TooltipPopup>
+      </Tooltip>
+
+      <AlertDialog open={isConfirmOpen} onOpenChange={handleOpenChange}>
+        <AlertDialogPopup>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              ¿Quitar a {name} de la casa {house.number}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Dejará de aparecer como residente de esta casa. Podrás volver a asignarlo después.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+              Cancelar
+            </AlertDialogClose>
+            <Button variant="destructive" loading={mutation.isPending} onClick={() => mutation.mutate()}>
+              Quitar
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
+    </>
   )
 }
