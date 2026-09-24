@@ -1,6 +1,7 @@
 'use server'
 
 import type { PostgrestError } from '@supabase/supabase-js'
+import { type ActionResult, postgrestErrorMessage, UNIQUE_VIOLATION } from '@/lib/action-result'
 import { createClient } from '@/lib/supabase/server'
 import {
   type CreateResidentInput,
@@ -9,32 +10,12 @@ import {
   updateResidentSchema,
 } from '@/lib/validations/residents'
 
-export type ActionResult<T = undefined> = { data: T; error?: never } | { data?: never; error: string }
-
-const RLS_VIOLATION = '42501'
-// PostgREST: `.single()` found no row. After an UPDATE this means RLS filtered
-// it out (Postgres reports 0 rows instead of an error in that case).
-const NO_ROWS = 'PGRST116'
-const UNIQUE_VIOLATION = '23505'
-
-// Postgres names the violated constraint in the message:
-// `duplicate key value violates unique constraint "residents_email_unique"`.
-const UNIQUE_MESSAGES: Record<string, string> = {
-  residents_email_unique: 'Ya existe un residente con ese correo',
-}
-
 function toMessage(error: PostgrestError, fallback: string) {
-  switch (error.code) {
-    case RLS_VIOLATION:
-    case NO_ROWS:
-      return 'No tienes permisos para realizar esta acción'
-    case UNIQUE_VIOLATION: {
-      const constraint = Object.keys(UNIQUE_MESSAGES).find((name) => error.message.includes(name))
-      return constraint ? UNIQUE_MESSAGES[constraint] : 'Ya existe un residente con esos datos'
-    }
-    default:
-      return fallback
-  }
+  return postgrestErrorMessage(error, {
+    fallback,
+    unique: { residents_email_unique: 'Ya existe un residente con ese correo' },
+    uniqueFallback: 'Ya existe un residente con esos datos',
+  })
 }
 
 export async function createResident(input: CreateResidentInput): Promise<ActionResult<{ id: string }>> {

@@ -81,7 +81,12 @@ export const residentsTableColumns = columnHelper.columns([
     id: 'email',
     size: 200,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Correo" />,
-    cell: ({ getValue }) => <span className="truncate">{getValue() ?? '—'}</span>,
+    cell: ({ getValue }) => {
+      const email = getValue()
+      if (!email) return null
+
+      return <span className="truncate">{email}</span>
+    },
   }),
 
   columnHelper.accessor('phone', {

@@ -21,7 +21,7 @@ export function HeaderNav({ ...props }: React.ComponentProps<typeof SidebarGroup
       <SidebarMenu>
         <SidebarMenuItem>
           <div className="flex items-center gap-2 p-2">
-            <ResidoIcon className="size-5" />
+            <ResidoIcon className="size-5 text-sidebar-accent-foreground" />
 
             <div className="grid flex-1 text-left text-sm leading-none">
               <span className="truncate text-base font-semibold text-sidebar-accent-foreground">Resido</span>

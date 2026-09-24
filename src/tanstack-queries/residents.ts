@@ -30,3 +30,32 @@ export function residentsListQueryOptions() {
     },
   })
 }
+
+/** Lightweight list for pickers: identity + which houses each resident is linked to. */
+function residentsPickerQuery() {
+  return createClient()
+    .from('residents')
+    .select(
+      `
+      id, first_name, last_name, phone, email,
+      property_residents ( property:properties ( id, number ) )
+      `,
+    )
+    .is('deleted_at', null)
+    .order('first_name')
+    .order('last_name')
+}
+
+export type PickerResident = QueryData<ReturnType<typeof residentsPickerQuery>>[number]
+
+/** Shares the `residents` prefix so invalidating the list also refreshes pickers. */
+export function residentsPickerQueryOptions() {
+  return queryOptions({
+    queryKey: [RESIDENTS_QUERY_KEY, 'picker'],
+    queryFn: async () => {
+      const { data, error } = await residentsPickerQuery()
+      if (error) throw error
+      return data
+    },
+  })
+}

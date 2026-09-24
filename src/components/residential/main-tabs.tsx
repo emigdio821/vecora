@@ -1,8 +1,7 @@
 'use client'
 
 import { useQueryState } from 'nuqs'
-// import { HousesDataTable } from './houses/table/data-table'
-// import { ViolationsDataTable } from './violations/table/data-table'
+import { HousesDataTable } from '../houses/table/data-table'
 import { ResidentsDataTable } from '../residents/table/data-table'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '../ui/tabs'
 
@@ -14,10 +13,9 @@ export function ResidentialMainTabs() {
       <TabsList>
         <TabsTab value="houses">Casas</TabsTab>
         <TabsTab value="residents">Residentes</TabsTab>
-        {/* <TabsTab value="violations">Infracciones</TabsTab> */}
       </TabsList>
       <TabsPanel value="houses" keepMounted>
-        {/* <HousesDataTable /> */}
+        <HousesDataTable />
       </TabsPanel>
       <TabsPanel value="residents" keepMounted>
         <ResidentsDataTable />

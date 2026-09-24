@@ -10,7 +10,13 @@ export function TableGenericSkeleton({ withHeader = true, headerContent }: Table
   return (
     <div className="flex flex-col gap-4" data-slot="table-generic-skeleton">
       {withHeader && (
-        <div>{headerContent ? headerContent : <Skeleton className="h-8 w-full rounded-lg sm:w-sm" />}</div>
+        <div>
+          {headerContent ? (
+            headerContent
+          ) : (
+            <Skeleton className="h-8 w-full rounded-lg sm:w-2xs md:w-xs xl:w-sm" />
+          )}
+        </div>
       )}
 
       <TextGenericSkeleton />
