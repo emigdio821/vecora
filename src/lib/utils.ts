@@ -1,4 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
+import { format, isValid, parseISO } from 'date-fns'
+import { es } from 'date-fns/locale'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]): string {
@@ -30,13 +32,11 @@ export function normalizeString(value: string | null | undefined): string {
     .toLowerCase()
 }
 
-const dateFormatter = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' })
-
-/** "22 sept 2026, 10:15 a.m." from an ISO string, timestamp or Date. */
+/** "22 sept 2026, 10:15 a.m." from an ISO timestamp or Date. Empty when missing or invalid. */
 export function formatDate(value: string | number | Date | null | undefined): string {
-  if (value == null) return '—'
+  if (value == null) return ''
   const date = value instanceof Date ? value : new Date(value)
-  return Number.isNaN(date.getTime()) ? '—' : dateFormatter.format(date)
+  return isValid(date) ? format(date, 'd MMM yyyy, h:mm aaaa', { locale: es }) : ''
 }
 
 export function getAvatarFallback(name: string) {
@@ -45,4 +45,24 @@ export function getAvatarFallback(name: string) {
   const fallabck = `${name.split(' ')[0].charAt(0)}${name.split(' ')[1]?.charAt(0) ?? ''}`
 
   return fallabck
+}
+
+const currencyFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })
+
+/** "$1,250.00" from a number or the numeric string PostgREST returns. */
+export function formatCurrency(value: number | string): string {
+  return currencyFormatter.format(typeof value === 'string' ? Number(value) : value)
+}
+
+// `date` columns arrive as "YYYY-MM-DD"; parseISO reads them as *local* midnight
+// (new Date() would use UTC, which is still the previous day in Mexico).
+
+/** "12 sept 2026" from a "YYYY-MM-DD" date column. Empty when missing. */
+export function formatDay(value: string | null | undefined): string {
+  return value ? format(parseISO(value), 'd MMM yyyy', { locale: es }) : ''
+}
+
+/** "septiembre 2026" from a "YYYY-MM-DD" date column (day ignored). Empty when missing. */
+export function formatMonth(value: string | null | undefined): string {
+  return value ? format(parseISO(value), 'MMMM yyyy', { locale: es }) : ''
 }

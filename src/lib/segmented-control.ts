@@ -25,13 +25,15 @@ export const segmentedControlItemVariants = cva(
     },
     variants: {
       size: segmentedControlItemSizeClassNames,
+      // The selected item keeps its colors under the pointer (the base `hover:`
+      // rules only exist for unselected items), like the active tab in Tabs.
       state: {
         checked:
-          'data-checked:bg-background data-checked:text-foreground data-checked:shadow-sm/5 dark:data-checked:bg-input',
+          'data-checked:bg-background data-checked:text-foreground data-checked:shadow-sm/5 data-checked:hover:bg-background data-checked:hover:text-foreground dark:data-checked:bg-input dark:data-checked:hover:bg-input',
         current:
-          'aria-[current=page]:bg-background aria-[current=page]:text-foreground aria-[current=page]:shadow-sm/5 dark:aria-[current=page]:bg-input',
+          'aria-[current=page]:bg-background aria-[current=page]:text-foreground aria-[current=page]:shadow-sm/5 aria-[current=page]:hover:bg-background aria-[current=page]:hover:text-foreground dark:aria-[current=page]:bg-input dark:aria-[current=page]:hover:bg-input',
         pressed:
-          'data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-sm/5 dark:data-pressed:bg-input',
+          'data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-sm/5 data-pressed:hover:bg-background data-pressed:hover:text-foreground dark:data-pressed:bg-input dark:data-pressed:hover:bg-input',
       },
     },
   },

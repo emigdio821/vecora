@@ -1,12 +1,92 @@
 'use client'
 
-import { DayPicker } from '@daypicker/react'
+import { DayPicker, type DropdownProps, useDayPicker } from '@daypicker/react'
+import type { Month } from 'date-fns'
+import { es } from 'date-fns/locale'
 import { ChevronLeftIcon, ChevronRightIcon, ChevronsUpDownIcon } from 'lucide-react'
-import type * as React from 'react'
+import * as React from 'react'
+import {
+  Combobox,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+} from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 
 const buttonClassNames =
   "relative flex size-(--cell-size) text-base sm:text-sm items-center justify-center rounded-lg text-foreground not-in-data-selected:hover:bg-accent disabled:pointer-events-none disabled:opacity-64 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
+
+interface DropdownItem {
+  disabled?: boolean
+  label: string
+  value: string
+}
+
+interface CalendarDropdownProps extends DropdownProps {
+  /** Text shown in the input for the selected option; the list keeps `label`. */
+  inputLabel?: (value: number) => string
+}
+
+/** Month / year selector used when `captionLayout="dropdown"`: a searchable combobox instead of a native <select>. */
+function CalendarDropdown({
+  options,
+  value,
+  onChange,
+  'aria-label': ariaLabel,
+  inputLabel,
+}: CalendarDropdownProps) {
+  const items: DropdownItem[] =
+    options?.map((option) => ({
+      disabled: option.disabled,
+      label: option.label,
+      value: option.value.toString(),
+    })) ?? []
+
+  const selectedItem = items.find((item) => item.value === value?.toString())
+
+  return (
+    <Combobox
+      aria-label={ariaLabel}
+      autoHighlight
+      items={items}
+      value={selectedItem}
+      itemToStringLabel={(item) => (item ? (inputLabel?.(Number(item.value)) ?? item.label) : '')}
+      onValueChange={(item: DropdownItem | null) => {
+        if (!onChange || !item) return
+        // DayPicker expects a <select> change event; only `target.value` is read.
+        onChange({ target: { value: item.value } } as React.ChangeEvent<HTMLSelectElement>)
+      }}
+    >
+      <ComboboxInput className="**:[input]:w-0 **:[input]:flex-1" onFocus={(e) => e.currentTarget.select()} />
+      <ComboboxPopup aria-label={ariaLabel}>
+        <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
+        <ComboboxList>
+          {(item: DropdownItem) => (
+            <ComboboxItem key={item.value} value={item} disabled={item.disabled}>
+              {item.label}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxPopup>
+    </Combobox>
+  )
+}
+
+/** Full month names in the list ("septiembre"), short in the input ("sep") so month and year fit side by side. */
+function CalendarMonthsDropdown(props: DropdownProps) {
+  const { dayPickerProps } = useDayPicker()
+  const localize = dayPickerProps.locale?.localize
+
+  return (
+    <CalendarDropdown
+      {...props}
+      // Options are always 0–11, which is what date-fns's `Month` union is.
+      inputLabel={localize ? (month) => localize.month(month as Month, { width: 'abbreviated' }) : undefined}
+    />
+  )
+}
 
 export function Calendar({
   className,
@@ -14,6 +94,7 @@ export function Calendar({
   showOutsideDays = true,
   components: userComponents,
   mode = 'single',
+  locale = es,
   ...props
 }: React.ComponentProps<typeof DayPicker>): React.ReactElement {
   const defaultClassNames = {
@@ -57,6 +138,8 @@ export function Calendar({
   )
 
   const defaultComponents = {
+    Dropdown: CalendarDropdown,
+    MonthsDropdown: CalendarMonthsDropdown,
     Chevron: ({
       className,
       orientation,
@@ -87,9 +170,7 @@ export function Calendar({
     classNames: mergedClassNames,
     components: mergedComponents,
     'data-slot': 'calendar',
-    formatters: {
-      formatMonthDropdown: (date: Date) => date.toLocaleString('default', { month: 'short' }),
-    } as React.ComponentProps<typeof DayPicker>['formatters'],
+    locale,
     mode,
     showOutsideDays,
     ...props,

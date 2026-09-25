@@ -38,6 +38,12 @@ declare
   r_diego  constant uuid := 'd0000000-0000-4000-8000-000000000006';
   r_carmen constant uuid := 'd0000000-0000-4000-8000-000000000007';
   r_pablo  constant uuid := 'd0000000-0000-4000-8000-000000000008';
+
+  per_2026 constant uuid := 'e0000000-0000-4000-8000-000000000001';
+  cat_fee      uuid;
+  cat_late_fee uuid;
+  cat_garden   uuid;
+  cat_services uuid;
 begin
   if not is_local then
     raise notice 'seeds/dev.sql: not a local database, skipping';
@@ -123,5 +129,30 @@ begin
     (p_3a, r_diego,  'owner');
     -- 3B intentionally has nobody
 
-  raise notice 'seeds/dev.sql: created 5 users, 6 properties, 8 residents';
+  -- -------------------------------------------------------------------------
+  -- treasury: one period, September fees (one paid late) and two expenses
+  -- -------------------------------------------------------------------------
+  insert into public.periods (id, name, starts_on, ends_on, monthly_fee, late_fee, due_day) values
+    (per_2026, '2026-2027', '2026-09-01', '2027-08-31', 500, 100, 10);
+
+  select id into cat_fee      from public.transaction_categories where key = 'fee';
+  select id into cat_late_fee from public.transaction_categories where key = 'late_fee';
+  select id into cat_garden   from public.transaction_categories where kind = 'expense' and name = 'Jardinería';
+  select id into cat_services from public.transaction_categories where kind = 'expense' and name = 'Servicios';
+
+  -- created_by is explicit: auth.uid() is null while seeding
+  insert into public.transactions
+    (kind, category_id, period_id, property_id, amount, occurred_on, fee_month, payment_method, folio, reference, description, notes, created_by)
+  values
+    ('income',  cat_fee,      per_2026, p_1a, 500, '2026-09-03', '2026-09-01', 'cash',     'A-0001', null,       'Cuota septiembre 2026 · Casa 1A', null, u_treasurer),
+    ('income',  cat_fee,      per_2026, p_1b, 500, '2026-09-05', '2026-09-01', 'transfer', 'A-0002', 'SPEI 48213', 'Cuota septiembre 2026 · Casa 1B', null, u_treasurer),
+    ('income',  cat_fee,      per_2026, p_2a, 500, '2026-09-08', '2026-09-01', 'cash',     'A-0003', null,       'Cuota septiembre 2026 · Casa 2A', null, u_treasurer),
+    -- 2B paid after the 10th: fee + recargo on the same ticket
+    ('income',  cat_fee,      per_2026, p_2b, 500, '2026-09-15', '2026-09-01', 'cash',     'A-0004', null,       'Cuota septiembre 2026 · Casa 2B', 'Pagó Carmen (inquilina)', u_treasurer),
+    ('income',  cat_late_fee, per_2026, p_2b, 100, '2026-09-15', '2026-09-01', 'cash',     'A-0004', null,       'Recargo septiembre 2026 · Casa 2B', null, u_treasurer),
+    -- 3A and 3B have not paid September
+    ('expense', cat_garden,   per_2026, null, 350, '2026-09-12', null,         'transfer', null,     'SPEI 51907', 'Pintura para el área del jardín', null, u_treasurer),
+    ('expense', cat_services, per_2026, null, 820, '2026-09-18', null,         'cash',     null,     'CFE 0912',   'Luz de áreas comunes · septiembre', null, u_treasurer);
+
+  raise notice 'seeds/dev.sql: created 5 users, 6 properties, 8 residents, 1 period, 7 transactions';
 end $$;

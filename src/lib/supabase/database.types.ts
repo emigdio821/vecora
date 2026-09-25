@@ -3,6 +3,42 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      periods: {
+        Row: {
+          created_at: string
+          due_day: number
+          ends_on: string
+          id: string
+          late_fee: number
+          monthly_fee: number
+          name: string
+          starts_on: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          due_day?: number
+          ends_on: string
+          id?: string
+          late_fee?: number
+          monthly_fee: number
+          name: string
+          starts_on: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          due_day?: number
+          ends_on?: string
+          id?: string
+          late_fee?: number
+          monthly_fee?: number
+          name?: string
+          starts_on?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -155,6 +191,142 @@ export type Database = {
           },
         ]
       }
+      transaction_categories: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          key: string | null
+          kind: Database['public']['Enums']['transaction_kind']
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key?: string | null
+          kind: Database['public']['Enums']['transaction_kind']
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key?: string | null
+          kind?: Database['public']['Enums']['transaction_kind']
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category_id: string
+          created_at: string
+          created_by: string
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string
+          fee_month: string | null
+          folio: string | null
+          id: string
+          kind: Database['public']['Enums']['transaction_kind']
+          notes: string | null
+          occurred_on: string
+          payment_method: Database['public']['Enums']['payment_method']
+          period_id: string
+          property_id: string | null
+          reference: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category_id: string
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description: string
+          fee_month?: string | null
+          folio?: string | null
+          id?: string
+          kind: Database['public']['Enums']['transaction_kind']
+          notes?: string | null
+          occurred_on?: string
+          payment_method?: Database['public']['Enums']['payment_method']
+          period_id: string
+          property_id?: string | null
+          reference?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string
+          created_at?: string
+          created_by?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string
+          fee_month?: string | null
+          folio?: string | null
+          id?: string
+          kind?: Database['public']['Enums']['transaction_kind']
+          notes?: string | null
+          occurred_on?: string
+          payment_method?: Database['public']['Enums']['payment_method']
+          period_id?: string
+          property_id?: string | null
+          reference?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'transactions_category_fkey'
+            columns: ['category_id', 'kind']
+            isOneToOne: false
+            referencedRelation: 'transaction_categories'
+            referencedColumns: ['id', 'kind']
+          },
+          {
+            foreignKeyName: 'transactions_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'transactions_deleted_by_fkey'
+            columns: ['deleted_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'transactions_period_id_fkey'
+            columns: ['period_id']
+            isOneToOne: false
+            referencedRelation: 'periods'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'transactions_period_id_fkey'
+            columns: ['period_id']
+            isOneToOne: false
+            referencedRelation: 'treasury_period_summary'
+            referencedColumns: ['period_id']
+          },
+          {
+            foreignKeyName: 'transactions_property_id_fkey'
+            columns: ['property_id']
+            isOneToOne: false
+            referencedRelation: 'properties'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -193,7 +365,15 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      treasury_period_summary: {
+        Row: {
+          balance: number | null
+          period_id: string | null
+          total_expense: number | null
+          total_income: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       create_resident: {
@@ -208,10 +388,31 @@ export type Database = {
         }
         Returns: string
       }
+      record_fee_payment: {
+        Args: {
+          p_amount?: number
+          p_apply_late_fee?: boolean
+          p_fee_months: string[]
+          p_folio: string
+          p_notes?: string
+          p_occurred_on: string
+          p_payment_method?: Database['public']['Enums']['payment_method']
+          p_period_id?: string
+          p_property_id: string
+          p_reference?: string
+        }
+        Returns: {
+          fee_count: number
+          late_fee_count: number
+          total: number
+        }[]
+      }
     }
     Enums: {
       app_role: 'admin' | 'president' | 'treasurer' | 'security' | 'maintenance'
+      payment_method: 'cash' | 'transfer'
       residency_relationship: 'owner' | 'tenant' | 'family'
+      transaction_kind: 'income' | 'expense'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -338,7 +539,9 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ['admin', 'president', 'treasurer', 'security', 'maintenance'],
+      payment_method: ['cash', 'transfer'],
       residency_relationship: ['owner', 'tenant', 'family'],
+      transaction_kind: ['income', 'expense'],
     },
   },
 } as const
