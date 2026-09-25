@@ -86,6 +86,30 @@ export function periodSummariesQueryOptions() {
   })
 }
 
+/**
+ * Per live house, fee months due vs paid in the current period (DB view).
+ * Empty when no period covers today.
+ */
+function houseFeeStatusQuery() {
+  return createClient()
+    .from('house_fee_status')
+    .select('property_id, number, period_id, months_due, months_paid, unpaid_months')
+}
+
+export type HouseFeeStatusQueryData = QueryData<ReturnType<typeof houseFeeStatusQuery>>[number]
+
+export function houseFeeStatusQueryOptions() {
+  return queryOptions({
+    queryKey: [TREASURY_QUERY_KEY, 'fee-status'],
+    queryFn: async () => {
+      const { data, error } = await houseFeeStatusQuery()
+      if (error) throw error
+      // Numeric-aware so "2" sorts before "10" (Postgres would sort them as text).
+      return data.sort((a, b) => (a.number ?? '').localeCompare(b.number ?? '', 'es', { numeric: true }))
+    },
+  })
+}
+
 /** See periodsQuery for why the count includes soft-deleted movements. */
 function categoriesQuery() {
   return createClient()

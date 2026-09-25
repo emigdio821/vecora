@@ -2,8 +2,10 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import { CircleAlertIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { houseLabel } from '@/components/shared/pickers/houses-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -19,41 +21,52 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
-import { type CategoryInput, categorySchema } from '@/lib/validations/treasury'
-import { createCategory } from '@/server-actions/treasury'
-import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
-import { KIND_LABEL } from '../../kind'
-import { CategoryFormFields } from './category-form-fields'
+import { formatDay, ISO_DAY } from '@/lib/utils'
+import { type HallReservationInput, hallReservationSchema } from '@/lib/validations/presidency'
+import { createHallReservation } from '@/server-actions/presidency'
+import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
+import { PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
+import { HallReservationFormFields } from './hall-reservation-form-fields'
 
-const FORM_ID = 'create-category-form'
+const FORM_ID = 'create-hall-reservation-form'
 
-const DEFAULT_VALUES: CategoryInput = { kind: 'income', name: '' }
+function defaultValues(): HallReservationInput {
+  return { property_id: '', reserved_on: format(new Date(), ISO_DAY), notes: '' }
+}
 
-interface CreateCategoryDrawerProps extends React.ComponentProps<typeof Drawer> {
+interface CreateHallReservationDrawerProps extends React.ComponentProps<typeof Drawer> {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCategoryDrawerProps) {
+export function CreateHallReservationDrawer({
+  open,
+  onOpenChange,
+  ...props
+}: CreateHallReservationDrawerProps) {
   const queryClient = useQueryClient()
 
-  const form = useForm<CategoryInput>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: DEFAULT_VALUES,
+  const form = useForm<HallReservationInput>({
+    resolver: zodResolver(hallReservationSchema),
+    defaultValues: defaultValues(),
   })
 
   const mutation = useMutation({
-    mutationFn: async (values: CategoryInput) => {
-      const result = await createCategory(values)
+    mutationFn: async (values: HallReservationInput) => {
+      const result = await createHallReservation(values)
       if (result.error !== undefined) throw new Error(result.error)
       return result.data
     },
     onSuccess: (_data, values) => {
-      void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY, 'categories'] })
+      const house = queryClient
+        .getQueryData(housesPickerQueryOptions().queryKey)
+        ?.find((h) => h.id === values.property_id)
+
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Categoría creada',
-        description: `${values.name} · ${KIND_LABEL[values.kind]}`,
+        title: 'Terraza reservada',
+        description: `${formatDay(values.reserved_on)}${house ? ` · ${houseLabel(house)}` : ''}`,
       })
       onOpenChange(false)
     },
@@ -75,7 +88,7 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
     props.onOpenChangeComplete?.(isOpen)
 
     if (!isOpen) {
-      form.reset(DEFAULT_VALUES)
+      form.reset(defaultValues())
     }
   }
 
@@ -89,9 +102,9 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Nueva categoría</DrawerTitle>
+          <DrawerTitle>Reservar terraza</DrawerTitle>
           <DrawerDescription>
-            Las categorías agrupan los movimientos, por ejemplo "Jardinería" o "Renta de terraza".
+            La terraza se aparta por día completo y solo una casa puede usarla cada día.
           </DrawerDescription>
         </DrawerHeader>
 
@@ -101,7 +114,7 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
           >
-            <CategoryFormFields form={form} disabled={mutation.isPending} />
+            <HallReservationFormFields form={form} disabled={mutation.isPending} />
 
             {form.formState.errors.root && (
               <Alert variant="error">
@@ -118,7 +131,7 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
             Cancelar
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Crear
+            Reservar
           </Button>
         </DrawerFooter>
       </DrawerPopup>

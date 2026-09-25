@@ -42,7 +42,7 @@ export function formatDate(value: string | number | Date | null | undefined): st
 export function getAvatarFallback(name: string) {
   if (!name) return null
 
-  const fallabck = `${name.split(' ')[0].charAt(0)}${name.split(' ')[1]?.charAt(0) ?? ''}`
+  const fallabck = name.split(' ')[0].charAt(0) ?? ''
 
   return fallabck
 }

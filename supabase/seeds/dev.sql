@@ -154,5 +154,10 @@ begin
     ('expense', cat_garden,   per_2026, null, 350, '2026-09-12', null,         'transfer', null,     'SPEI 51907', 'Pintura para el área del jardín', null, u_treasurer),
     ('expense', cat_services, per_2026, null, 820, '2026-09-18', null,         'cash',     null,     'CFE 0912',   'Luz de áreas comunes · septiembre', null, u_treasurer);
 
-  raise notice 'seeds/dev.sql: created 5 users, 6 properties, 8 residents, 1 period, 7 transactions';
+  -- terraza: two upcoming bookings for the dashboard "Avisos" card
+  insert into public.hall_reservations (property_id, reserved_on, notes, created_by) values
+    (p_2a, '2026-09-27', 'Cumpleaños, hasta las 10 pm', u_president),
+    (p_1b, '2026-10-04', null,                          u_president);
+
+  raise notice 'seeds/dev.sql: created 5 users, 6 properties, 8 residents, 1 period, 7 transactions, 2 hall reservations';
 end $$;

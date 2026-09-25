@@ -6,9 +6,9 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { PanelLeftIcon } from 'lucide-react'
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
+import { Drawer, DrawerDescription, DrawerHeader, DrawerPopup, DrawerTitle } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { Sheet, SheetDescription, SheetHeader, SheetPopup, SheetTitle } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip'
 import { useMediaQuery } from '@/hooks/use-media-query'
@@ -194,26 +194,26 @@ export function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet onOpenChange={setOpenMobile} open={openMobile} {...props}>
-        <SheetPopup
-          className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+      <Drawer position={side} onOpenChange={setOpenMobile} open={openMobile} {...props}>
+        <DrawerPopup
+          variant="inset"
+          className="w-(--sidebar-width) bg-sidebar text-sidebar-foreground after:bg-sidebar"
           data-mobile="true"
           data-sidebar="sidebar"
           data-slot="sidebar"
-          side={side}
           style={
             {
               '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
             } as React.CSSProperties
           }
         >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
-          </SheetHeader>
+          <DrawerHeader className="sr-only">
+            <DrawerTitle>Sidebar</DrawerTitle>
+            <DrawerDescription>Displays the mobile sidebar.</DrawerDescription>
+          </DrawerHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
-        </SheetPopup>
-      </Sheet>
+        </DrawerPopup>
+      </Drawer>
     )
   }
 

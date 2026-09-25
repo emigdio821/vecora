@@ -3,6 +3,58 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      hall_reservations: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          property_id: string
+          reserved_on: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          property_id: string
+          reserved_on: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          property_id?: string
+          reserved_on?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'hall_reservations_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'hall_reservations_property_id_fkey'
+            columns: ['property_id']
+            isOneToOne: false
+            referencedRelation: 'house_fee_status'
+            referencedColumns: ['property_id']
+          },
+          {
+            foreignKeyName: 'hall_reservations_property_id_fkey'
+            columns: ['property_id']
+            isOneToOne: false
+            referencedRelation: 'properties'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       periods: {
         Row: {
           created_at: string
@@ -118,6 +170,13 @@ export type Database = {
           resident_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: 'property_residents_property_id_fkey'
+            columns: ['property_id']
+            isOneToOne: false
+            referencedRelation: 'house_fee_status'
+            referencedColumns: ['property_id']
+          },
           {
             foreignKeyName: 'property_residents_property_id_fkey'
             columns: ['property_id']
@@ -308,6 +367,13 @@ export type Database = {
             foreignKeyName: 'transactions_period_id_fkey'
             columns: ['period_id']
             isOneToOne: false
+            referencedRelation: 'house_fee_status'
+            referencedColumns: ['period_id']
+          },
+          {
+            foreignKeyName: 'transactions_period_id_fkey'
+            columns: ['period_id']
+            isOneToOne: false
             referencedRelation: 'periods'
             referencedColumns: ['id']
           },
@@ -317,6 +383,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: 'treasury_period_summary'
             referencedColumns: ['period_id']
+          },
+          {
+            foreignKeyName: 'transactions_property_id_fkey'
+            columns: ['property_id']
+            isOneToOne: false
+            referencedRelation: 'house_fee_status'
+            referencedColumns: ['property_id']
           },
           {
             foreignKeyName: 'transactions_property_id_fkey'
@@ -365,6 +438,17 @@ export type Database = {
       }
     }
     Views: {
+      house_fee_status: {
+        Row: {
+          months_due: number | null
+          months_paid: number | null
+          number: string | null
+          period_id: string | null
+          property_id: string | null
+          unpaid_months: string[] | null
+        }
+        Relationships: []
+      }
       treasury_period_summary: {
         Row: {
           balance: number | null
