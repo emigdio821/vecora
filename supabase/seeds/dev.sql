@@ -105,12 +105,15 @@ begin
   -- residents (two of them have app accounts)
   -- -------------------------------------------------------------------------
   insert into public.residents (id, profile_id, first_name, last_name, phone, email, notes) values
-    (r_ana,    u_president, 'Ana',    'López',     '+52 55 1000 0001', 'president@resido.com', 'Board president'),
-    (r_luis,   null,        'Luis',   'Fernández', '+52 55 1000 0002', 'luis@example.com',     null),
-    (r_maria,  null,        'María',  'García',    '+52 55 1000 0003', null,                   null),
-    (r_tomas,  u_member,    'Tomás',  'Rivera',    '+52 55 1000 0004', 'member@resido.com',    null),
-    (r_sofia,  null,        'Sofía',  'Rivera',    '+52 55 1000 0005', null,                   'Tomás'' partner'),
-    (r_diego,  null,        'Diego',  'Martínez',  '+52 55 1000 0006', 'diego@example.com',    'Owns two units'),
+    -- Board members are residents with an account + role (see hoa_board migration).
+    -- Tomás has an account but no role: he can't sign in, and shows how a
+    -- demoted member is turned away.
+    (r_ana,    u_president,   'Ana',    'López',     '+52 55 1000 0001', 'president@resido.com',   'Board president'),
+    (r_luis,   u_treasurer,   'Luis',   'Fernández', '+52 55 1000 0002', 'treasurer@resido.com',   null),
+    (r_maria,  u_security,    'María',  'García',    '+52 55 1000 0003', 'security@resido.com',    null),
+    (r_tomas,  u_member,      'Tomás',  'Rivera',    '+52 55 1000 0004', 'member@resido.com',      null),
+    (r_sofia,  null,          'Sofía',  'Rivera',    '+52 55 1000 0005', null,                     'Tomás'' partner'),
+    (r_diego,  u_maintenance, 'Diego',  'Martínez',  '+52 55 1000 0006', 'maintenance@resido.com', 'Owns two units'),
     (r_carmen, null,        'Carmen', 'Ortega',    '+52 55 1000 0007', 'carmen@example.com',   'Tenant in 2B'),
     (r_pablo,  null,        'Pablo',  'Ortega',    '+52 55 1000 0008', null,                   'Carmen''s son');
 

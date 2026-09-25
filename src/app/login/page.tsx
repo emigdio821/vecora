@@ -1,6 +1,8 @@
+import { CircleAlertIcon } from 'lucide-react'
 import type { Metadata } from 'next'
 import { AppFooter } from '@/components/app-footer'
 import { ResidoIcon } from '@/components/shared/icons'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   Card,
   CardFrame,
@@ -19,7 +21,11 @@ export const metadata: Metadata = {
   description: 'Ingresa tus credenciales para acceder a tu cuenta',
 }
 
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
+  // /auth/confirm sends people here when an invite link is expired or reused.
+  const { error } = await searchParams
+  const inviteFailed = error === 'invite'
+
   return (
     <section className="flex min-h-svh flex-col items-center justify-center">
       <div className="p-4 sm:p-6">
@@ -36,7 +42,16 @@ export default function LoginPage() {
             <CardFrameDescription>Ingresa tus credenciales para acceder a tu cuenta.</CardFrameDescription>
           </CardFrameHeader>
           <Card>
-            <CardPanel>
+            <CardPanel className="flex flex-col gap-4">
+              {inviteFailed && (
+                <Alert variant="warning">
+                  <CircleAlertIcon />
+                  <AlertTitle>El enlace de invitación ya no es válido</AlertTitle>
+                  <AlertDescription>
+                    Puede haber caducado o ya se usó. Pide a la mesa directiva que te envíe uno nuevo.
+                  </AlertDescription>
+                </Alert>
+              )}
               <LoginPageClient />
             </CardPanel>
           </Card>

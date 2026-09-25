@@ -12,6 +12,12 @@ export default async function AuthedLayout({ children }: LayoutProps<'/'>) {
     redirect('/login')
   }
 
+  // Board members only: an account whose roles were all revoked still has a
+  // valid session, so the gate has to live here as well as in login().
+  if (user.roles.length === 0) {
+    redirect('/no-access')
+  }
+
   return (
     <AppProviders>
       <SidebarProvider>

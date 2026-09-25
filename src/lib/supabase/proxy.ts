@@ -10,7 +10,11 @@ import type { Database } from './database.types'
  * Also does an optimistic redirect: signed-out users go to /login, signed-in
  * users are kept away from /login. The (authed) layout re-checks server-side.
  */
-const PUBLIC_PATHS = ['/login']
+// /auth/confirm turns an invite link into a session, so it must be reachable
+// signed out; unlike /login it stays reachable signed in too (the link may be
+// opened by someone who already has another session in the browser).
+const PUBLIC_PATHS = ['/login', '/auth/confirm']
+const SIGNED_OUT_ONLY_PATHS = ['/login']
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
 
@@ -39,13 +43,15 @@ export async function updateSession(request: NextRequest) {
   // the access token is close to expiry, which is what keeps users signed in.
   const { data } = await supabase.auth.getClaims()
   const isSignedIn = Boolean(data)
-  const isPublic = PUBLIC_PATHS.some((path) => request.nextUrl.pathname.startsWith(path))
+  const { pathname } = request.nextUrl
+  const isPublic = PUBLIC_PATHS.some((path) => pathname.startsWith(path))
+  const isSignedOutOnly = SIGNED_OUT_ONLY_PATHS.some((path) => pathname.startsWith(path))
 
   if (!isSignedIn && !isPublic) {
     return redirectWithCookies(request, response, '/login')
   }
 
-  if (isSignedIn && isPublic) {
+  if (isSignedIn && isSignedOutOnly) {
     return redirectWithCookies(request, response, '/')
   }
 

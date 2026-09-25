@@ -63,7 +63,7 @@ export function PeriodSummaryCards() {
                 </EmptyMedia>
                 <EmptyTitle>Sin periodo actual</EmptyTitle>
                 <EmptyDescription>
-                  Ningún periodo cubre la fecha de hoy. Crea uno en Presidencia para ver el resumen.
+                  Ningún periodo cubre la fecha de hoy. Crea uno en "Presidencia" para ver el resumen.
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>

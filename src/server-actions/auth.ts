@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { type LoginInput, loginSchema } from '@/lib/validations/auth'
+import { type LoginInput, loginSchema, NO_ACCESS_MESSAGE } from '@/lib/validations/auth'
 
 export type ActionResult = { error: string } | undefined
 
@@ -15,10 +15,22 @@ export async function login(input: LoginInput): Promise<ActionResult> {
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword(parsed.data)
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data)
 
   if (error) {
     return { error: 'Correo o contraseña inválidos' }
+  }
+
+  // Only board members (accounts with a role) may use the app. Someone taken
+  // off the board keeps their account, for history, but is turned away here.
+  const { count } = await supabase
+    .from('user_roles')
+    .select('role', { count: 'exact', head: true })
+    .eq('user_id', data.user.id)
+
+  if (!count) {
+    await supabase.auth.signOut()
+    return { error: NO_ACCESS_MESSAGE }
   }
 
   revalidatePath('/', 'layout')

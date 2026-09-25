@@ -36,13 +36,16 @@ export function residentsListQueryOptions() {
   })
 }
 
-/** Lightweight list for pickers: identity + which houses each resident is linked to. */
+/**
+ * Lightweight list for pickers: identity + which houses each resident is
+ * linked to. `email` is there for the board picker (an account needs one).
+ */
 function residentsPickerQuery() {
   return createClient()
     .from('residents')
     .select(
       `
-      id, first_name, last_name,
+      id, first_name, last_name, email,
       property_residents ( property:properties!inner ( id, number ) )
       `,
     )
