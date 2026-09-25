@@ -37,15 +37,23 @@ export function transactionsListQueryOptions() {
   })
 }
 
-/** Newest first. */
+/**
+ * Newest first. `transactions(count)` includes soft-deleted rows on purpose:
+ * the ledger is never purged, so any row at all blocks a hard delete.
+ */
 function periodsQuery() {
   return createClient()
     .from('periods')
-    .select('id, name, starts_on, ends_on, monthly_fee, late_fee, due_day')
+    .select('id, name, starts_on, ends_on, monthly_fee, late_fee, due_day, transactions(count)')
     .order('starts_on', { ascending: false })
 }
 
 export type PeriodQueryData = QueryData<ReturnType<typeof periodsQuery>>[number]
+
+/** Reads the `transactions(count)` embed of a period or category row. */
+export function transactionCount(row: { transactions: { count: number }[] }) {
+  return row.transactions[0]?.count ?? 0
+}
 
 export function periodsQueryOptions() {
   return queryOptions({
@@ -78,10 +86,11 @@ export function periodSummariesQueryOptions() {
   })
 }
 
+/** See periodsQuery for why the count includes soft-deleted movements. */
 function categoriesQuery() {
   return createClient()
     .from('transaction_categories')
-    .select('id, kind, name, key, is_active')
+    .select('id, kind, name, key, is_active, transactions(count)')
     .order('kind')
     .order('name')
 }

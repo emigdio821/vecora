@@ -49,6 +49,12 @@ export function getAvatarFallback(name: string) {
 
 const currencyFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })
 
+/**
+ * NumberField `format` for money inputs: "1,250.00" without the currency
+ * symbol, which the surrounding InputGroup shows as "$" / "MXN" addons.
+ */
+export const MONEY_FORMAT: Intl.NumberFormatOptions = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+
 /** "$1,250.00" from a number or the numeric string PostgREST returns. */
 export function formatCurrency(value: number | string): string {
   return currencyFormatter.format(typeof value === 'string' ? Number(value) : value)
@@ -56,6 +62,9 @@ export function formatCurrency(value: number | string): string {
 
 // `date` columns arrive as "YYYY-MM-DD"; parseISO reads them as *local* midnight
 // (new Date() would use UTC, which is still the previous day in Mexico).
+
+/** date-fns pattern for a "YYYY-MM-DD" date column. */
+export const ISO_DAY = 'yyyy-MM-dd'
 
 /** "12 sept 2026" from a "YYYY-MM-DD" date column. Empty when missing. */
 export function formatDay(value: string | null | undefined): string {

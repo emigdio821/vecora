@@ -1,6 +1,6 @@
 'use client'
 
-import { HeartHandshakeIcon, MapPinHouseIcon, PiggyBankIcon } from 'lucide-react'
+import { GavelIcon, HeartHandshakeIcon, MapPinHouseIcon, PiggyBankIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -35,7 +35,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
             />
           </SidebarMenuItem>
 
-          {/* <SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => setOpenMobile(false)}
               isActive={pathname === '/presidency'}
@@ -48,7 +48,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
             />
           </SidebarMenuItem>
 
-          <SidebarMenuItem>
+          {/* <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => setOpenMobile(false)}
               isActive={pathname === '/maintenance'}

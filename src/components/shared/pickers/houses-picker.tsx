@@ -65,14 +65,15 @@ export function HousesPicker(props: HousesPickerProps) {
         </ComboboxEmpty>
         <ComboboxList>
           {(id: string) => {
-            const residents = byId.get(id)?.property_residents ?? []
+            const owners = byId.get(id)?.owners ?? []
             return (
               <ComboboxItem key={id} value={id}>
                 <div className="grid gap-0.5">
                   <span className="truncate">{label(id)}</span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {residents.map((pr) => `${pr.resident.first_name} ${pr.resident.last_name}`).join(', ') ||
-                      'Sin residentes'}
+                    {owners
+                      .map(({ resident }) => `${resident.first_name} ${resident.last_name}`)
+                      .join(', ') || 'Sin propietario'}
                   </span>
                 </div>
               </ComboboxItem>

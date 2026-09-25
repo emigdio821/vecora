@@ -4,13 +4,22 @@ import type { PostgrestError } from '@supabase/supabase-js'
 import { type ActionResult, postgrestErrorMessage, UNIQUE_VIOLATION } from '@/lib/action-result'
 import { createClient } from '@/lib/supabase/server'
 import {
+  type CategoryInput,
+  categorySchema,
   type CreateTransactionInput,
   createTransactionSchema,
+  type PeriodInput,
+  periodSchema,
   type RecordFeePaymentInput,
   recordFeePaymentSchema,
   type UpdateTransactionInput,
   updateTransactionSchema,
 } from '@/lib/validations/treasury'
+
+// Postgres error codes not covered by postgrestErrorMessage.
+const FK_VIOLATION = '23503'
+const CHECK_VIOLATION = '23514'
+const EXCLUSION_VIOLATION = '23P01'
 
 function toMessage(error: PostgrestError, fallback: string) {
   return postgrestErrorMessage(error, {
@@ -18,6 +27,8 @@ function toMessage(error: PostgrestError, fallback: string) {
     unique: {
       transactions_one_per_house_month_category:
         'Esa casa ya tiene registrada la cuota de uno de los meses seleccionados',
+      transaction_categories_name_unique: 'Ya existe una categoría con ese nombre',
+      periods_name_unique: 'Ya existe un periodo con ese nombre',
     },
   })
 }
@@ -133,7 +144,7 @@ export async function createTransaction(
 
   if (error) {
     // Composite FK: the category belongs to the other kind.
-    if (error.code === '23503') {
+    if (error.code === FK_VIOLATION) {
       return { error: 'La categoría no corresponde al tipo de movimiento' }
     }
     return { error: toMessage(error, 'No se pudo registrar el movimiento, intenta nuevamente') }
@@ -231,7 +242,7 @@ export async function updateTransaction(
     .single()
 
   if (error) {
-    if (error.code === '23503') {
+    if (error.code === FK_VIOLATION) {
       return { error: 'La categoría no corresponde al tipo de movimiento' }
     }
     return { error: toMessage(error, 'No se pudo actualizar el movimiento, intenta nuevamente') }
@@ -297,4 +308,165 @@ export async function restoreTransactions(ids: string[]): Promise<ActionResult<{
   }
 
   return { data: { restored: data.length } }
+}
+
+// ---------------------------------------------------------------------------
+// categories
+// ---------------------------------------------------------------------------
+
+export async function createCategory(input: CategoryInput): Promise<ActionResult<{ id: string }>> {
+  const parsed = categorySchema.safeParse(input)
+  if (!parsed.success) {
+    return { error: 'Revisa los campos del formulario' }
+  }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('transaction_categories')
+    .insert(parsed.data)
+    .select('id')
+    .single()
+
+  if (error) {
+    return { error: toMessage(error, 'No se pudo crear la categoría, intenta nuevamente') }
+  }
+
+  return { data }
+}
+
+/** Renames a category. Its kind is fixed: movements already point at it. */
+export async function updateCategory(id: string, input: Pick<CategoryInput, 'name'>): Promise<ActionResult> {
+  const parsed = categorySchema.pick({ name: true }).safeParse(input)
+  if (!parsed.success) {
+    return { error: 'Revisa los campos del formulario' }
+  }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('transaction_categories')
+    .update(parsed.data)
+    .eq('id', id)
+    .select('id')
+    .single()
+
+  if (error) {
+    return { error: toMessage(error, 'No se pudo actualizar la categoría, intenta nuevamente') }
+  }
+  if (!data) {
+    return { error: 'No tienes permisos para realizar esta acción' }
+  }
+
+  return { data: undefined }
+}
+
+/** Retire / reinstate. Retired categories stay on past movements but leave the pickers. */
+export async function setCategoryActive(id: string, isActive: boolean): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('transaction_categories')
+    .update({ is_active: isActive })
+    .eq('id', id)
+    .select('id')
+    .single()
+
+  if (error) {
+    // transaction_categories_system_active: fee / late fee can't be retired.
+    if (error.code === CHECK_VIOLATION) {
+      return { error: 'Esta categoría la usa el sistema para las cuotas y no se puede desactivar' }
+    }
+    return { error: toMessage(error, 'No se pudo actualizar la categoría, intenta nuevamente') }
+  }
+  if (!data) {
+    return { error: 'No tienes permisos para realizar esta acción' }
+  }
+
+  return { data: undefined }
+}
+
+/** Hard delete; only possible while nothing references the category. */
+export async function deleteCategory(id: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('transaction_categories').delete().eq('id', id).select('id')
+
+  if (error) {
+    if (error.code === FK_VIOLATION) {
+      return { error: 'No se puede eliminar: hay movimientos con esta categoría. Desactívala en su lugar.' }
+    }
+    return { error: toMessage(error, 'No se pudo eliminar la categoría, intenta nuevamente') }
+  }
+  if (data.length === 0) {
+    return { error: 'No tienes permisos para realizar esta acción' }
+  }
+
+  return { data: undefined }
+}
+
+// ---------------------------------------------------------------------------
+// periods
+// ---------------------------------------------------------------------------
+
+function periodErrorMessage(error: PostgrestError, fallback: string) {
+  // periods_no_overlap: two periods can't cover the same day.
+  if (error.code === EXCLUSION_VIOLATION) {
+    return 'Las fechas se traslapan con otro periodo'
+  }
+  return toMessage(error, fallback)
+}
+
+export async function createPeriod(input: PeriodInput): Promise<ActionResult<{ id: string }>> {
+  const parsed = periodSchema.safeParse(input)
+  if (!parsed.success) {
+    return { error: 'Revisa los campos del formulario' }
+  }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('periods').insert(parsed.data).select('id').single()
+
+  if (error) {
+    return { error: periodErrorMessage(error, 'No se pudo crear el periodo, intenta nuevamente') }
+  }
+
+  return { data }
+}
+
+export async function updatePeriod(id: string, input: PeriodInput): Promise<ActionResult> {
+  const parsed = periodSchema.safeParse(input)
+  if (!parsed.success) {
+    return { error: 'Revisa los campos del formulario' }
+  }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('periods')
+    .update(parsed.data)
+    .eq('id', id)
+    .select('id')
+    .single()
+
+  if (error) {
+    return { error: periodErrorMessage(error, 'No se pudo actualizar el periodo, intenta nuevamente') }
+  }
+  if (!data) {
+    return { error: 'No tienes permisos para realizar esta acción' }
+  }
+
+  return { data: undefined }
+}
+
+/** Hard delete; only possible while the period has no movements. */
+export async function deletePeriod(id: string): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('periods').delete().eq('id', id).select('id')
+
+  if (error) {
+    if (error.code === FK_VIOLATION) {
+      return { error: 'No se puede eliminar: el periodo ya tiene movimientos registrados' }
+    }
+    return { error: toMessage(error, 'No se pudo eliminar el periodo, intenta nuevamente') }
+  }
+  if (data.length === 0) {
+    return { error: 'No tienes permisos para realizar esta acción' }
+  }
+
+  return { data: undefined }
 }

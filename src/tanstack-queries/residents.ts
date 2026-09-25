@@ -42,7 +42,7 @@ function residentsPickerQuery() {
     .from('residents')
     .select(
       `
-      id, first_name, last_name, phone, email,
+      id, first_name, last_name,
       property_residents ( property:properties!inner ( id, number ) )
       `,
     )

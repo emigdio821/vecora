@@ -47,11 +47,10 @@ export function ResidentsPicker({ scope = 'all', excludeIds, ...props }: Residen
     return resident ? `${resident.first_name} ${resident.last_name}` : ''
   }
 
+  // Just the house: contact details live in the residents section.
   function details(id: string) {
-    const resident = byId.get(id)
-    if (!resident) return ''
-    const numbers = resident.property_residents.map((pr) => pr.property.number)
-    return `${resident.phone} · ${numbers.length > 0 ? `Casa ${numbers.join(', ')}` : 'Sin casa'}`
+    const numbers = byId.get(id)?.property_residents.map((pr) => pr.property.number) ?? []
+    return numbers.length > 0 ? `Casa ${numbers.join(', ')}` : 'Sin casa'
   }
 
   const emptyMessage = isPending

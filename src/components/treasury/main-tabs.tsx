@@ -2,6 +2,7 @@
 
 import { useQueryState } from 'nuqs'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '../ui/tabs'
+import { CategoriesDataTable } from './categories/table/data-table'
 import { TransactionsDataTable } from './transactions/table/data-table'
 
 export function TreasuryMainTabs() {
@@ -11,9 +12,13 @@ export function TreasuryMainTabs() {
     <Tabs defaultValue="transactions" value={tab} onValueChange={(value) => setTab(value)}>
       <TabsList>
         <TabsTab value="transactions">Movimientos</TabsTab>
+        <TabsTab value="categories">Categorías</TabsTab>
       </TabsList>
       <TabsPanel value="transactions" keepMounted>
         <TransactionsDataTable />
+      </TabsPanel>
+      <TabsPanel value="categories" keepMounted>
+        <CategoriesDataTable />
       </TabsPanel>
     </Tabs>
   )

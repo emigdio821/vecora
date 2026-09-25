@@ -10,18 +10,17 @@ import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { NumberField, NumberFieldGroup, NumberFieldInput } from '@/components/ui/number-field'
+import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
+import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
-import { formatDay } from '@/lib/utils'
+import { formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { CreateTransactionInput } from '@/lib/validations/treasury'
 import { categoriesQueryOptions } from '@/tanstack-queries/treasury'
 import { KIND_ITEMS, PAYMENT_METHOD_ITEMS } from '../../kind'
-
-export const ISO_DAY = 'yyyy-MM-dd'
 
 const kindItemClassName = segmentedControlItemVariants({ className: 'grow', state: 'checked' })
 
@@ -161,18 +160,24 @@ export function TransactionFormFields({
               <FieldLabel>
                 Monto <span className="text-destructive">*</span>
               </FieldLabel>
-              <NumberField
-                value={field.value ?? null}
-                onValueChange={(value) => field.onChange(value)}
-                min={0}
-                locale="es-MX"
-                format={{ style: 'currency', currency: 'MXN' }}
-                disabled={lockedForFee}
-              >
-                <NumberFieldGroup>
+              <InputGroup>
+                <NumberField
+                  value={field.value ?? null}
+                  onValueChange={(value) => field.onChange(value)}
+                  min={0}
+                  locale="es-MX"
+                  format={MONEY_FORMAT}
+                  disabled={lockedForFee}
+                >
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
-                </NumberFieldGroup>
-              </NumberField>
+                </NumberField>
+                <InputGroupAddon>
+                  <InputGroupText>$</InputGroupText>
+                </InputGroupAddon>
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>MXN</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
             </Field>
           )}

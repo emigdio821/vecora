@@ -66,3 +66,29 @@ export type CreateTransactionInput = z.infer<typeof createTransactionSchema>
 export const updateTransactionSchema = createTransactionSchema
 
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>
+
+export const categorySchema = z.object({
+  kind: z.enum(TRANSACTION_KINDS),
+  // Unique per kind in the DB (case-insensitive).
+  name: requiredText('Nombre'),
+})
+
+export type CategoryInput = z.infer<typeof categorySchema>
+
+export const periodSchema = z
+  .object({
+    // Unique in the DB (case-insensitive).
+    name: requiredText('Nombre'),
+    starts_on: z.iso.date('Fecha inválida'),
+    ends_on: z.iso.date('Fecha inválida'),
+    monthly_fee: z.number('Cuota es requerida').positive('La cuota debe ser mayor a cero'),
+    late_fee: z.number('Recargo es requerido').min(0, 'El recargo no puede ser negativo'),
+    // Capped at 28 so it exists in every month.
+    due_day: z.number('Día límite es requerido').int().min(1, 'Entre 1 y 28').max(28, 'Entre 1 y 28'),
+  })
+  .refine((data) => data.ends_on > data.starts_on, {
+    path: ['ends_on'],
+    message: 'Debe ser posterior al inicio',
+  })
+
+export type PeriodInput = z.infer<typeof periodSchema>

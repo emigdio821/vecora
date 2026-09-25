@@ -36,18 +36,19 @@ export function housesListQueryOptions() {
   })
 }
 
-/** Lightweight list for pickers: number + who lives there. */
+/** Lightweight list for pickers: number + its owners (who the fee is billed to). */
 function housesPickerQuery() {
   return createClient()
     .from('properties')
     .select(
       `
       id, number,
-      property_residents ( relationship, resident:residents!inner ( id, first_name, last_name ) )
+      owners:property_residents ( resident:residents!inner ( id, first_name, last_name ) )
       `,
     )
     .is('deleted_at', null)
-    .is('property_residents.resident.deleted_at', null)
+    .eq('owners.relationship', 'owner')
+    .is('owners.resident.deleted_at', null)
 }
 
 export type PickerHouse = QueryData<ReturnType<typeof housesPickerQuery>>[number]

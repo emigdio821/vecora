@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { format } from 'date-fns'
+import { addDays, addYears, format, getYear, parseISO, startOfMonth } from 'date-fns'
 import { CircleAlertIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -20,68 +20,56 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
-import { formatCurrency, ISO_DAY } from '@/lib/utils'
-import {
-  type CreateTransactionInput,
-  createTransactionSchema,
-  type TransactionKind,
-} from '@/lib/validations/treasury'
-import { createTransaction } from '@/server-actions/treasury'
-import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
-import { KIND_LABEL } from '../../kind'
-import { TransactionFormFields } from './transaction-form-fields'
+import { ISO_DAY } from '@/lib/utils'
+import { type PeriodInput, periodSchema } from '@/lib/validations/treasury'
+import { createPeriod } from '@/server-actions/treasury'
+import { type PeriodQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
+import { PeriodFormFields } from './period-form-fields'
 
-const FORM_ID = 'create-transaction-form'
+const FORM_ID = 'create-period-form'
 
-function defaultValues(kind: TransactionKind): CreateTransactionInput {
+/**
+ * Pre-fills the next cycle: the day after the latest period ends, one year
+ * long, same rates. Without a previous period, a year starting this month.
+ */
+function defaultValues(latest: PeriodQueryData | undefined): PeriodInput {
+  const startsOn = latest ? addDays(parseISO(latest.ends_on), 1) : startOfMonth(new Date())
+  const endsOn = addDays(addYears(startsOn, 1), -1)
+
   return {
-    kind,
-    category_id: '',
-    // The schema wants a number; RHF/NumberField hand us null until typed.
-    amount: null as unknown as number,
-    occurred_on: format(new Date(), ISO_DAY),
-    payment_method: 'cash',
-    folio: '',
-    reference: '',
-    property_id: null,
-    description: '',
-    notes: '',
+    name: `${getYear(startsOn)}-${getYear(endsOn)}`,
+    starts_on: format(startsOn, ISO_DAY),
+    ends_on: format(endsOn, ISO_DAY),
+    monthly_fee: latest ? Number(latest.monthly_fee) : (null as unknown as number),
+    late_fee: latest ? Number(latest.late_fee) : 100,
+    due_day: latest?.due_day ?? 10,
   }
 }
 
-interface CreateTransactionDrawerProps extends React.ComponentProps<typeof Drawer> {
+interface CreatePeriodDrawerProps extends React.ComponentProps<typeof Drawer> {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** Which side the drawer opens on; the treasurer can still switch inside. */
-  defaultKind?: TransactionKind
+  /** Newest existing period, used to suggest the next one. */
+  latest: PeriodQueryData | undefined
 }
 
-export function CreateTransactionDrawer({
-  open,
-  onOpenChange,
-  defaultKind = 'income',
-  ...props
-}: CreateTransactionDrawerProps) {
+export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: CreatePeriodDrawerProps) {
   const queryClient = useQueryClient()
 
-  const form = useForm<CreateTransactionInput>({
-    resolver: zodResolver(createTransactionSchema),
-    defaultValues: defaultValues(defaultKind),
+  const form = useForm<PeriodInput>({
+    resolver: zodResolver(periodSchema),
+    defaultValues: defaultValues(latest),
   })
 
   const mutation = useMutation({
-    mutationFn: async (values: CreateTransactionInput) => {
-      const result = await createTransaction(values)
+    mutationFn: async (values: PeriodInput) => {
+      const result = await createPeriod(values)
       if (result.error !== undefined) throw new Error(result.error)
       return result.data
     },
     onSuccess: (_data, values) => {
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
-      toastManager.add({
-        type: 'success',
-        title: `${KIND_LABEL[values.kind]} registrado`,
-        description: `${values.description} · ${formatCurrency(values.amount)}`,
-      })
+      toastManager.add({ type: 'success', title: 'Periodo creado', description: values.name })
       onOpenChange(false)
     },
     onError: (error) => {
@@ -102,7 +90,7 @@ export function CreateTransactionDrawer({
     props.onOpenChangeComplete?.(isOpen)
 
     if (!isOpen) {
-      form.reset(defaultValues(defaultKind))
+      form.reset(defaultValues(latest))
     }
   }
 
@@ -116,10 +104,10 @@ export function CreateTransactionDrawer({
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Registrar movimiento</DrawerTitle>
+          <DrawerTitle>Nuevo periodo</DrawerTitle>
           <DrawerDescription>
-            Cualquier ingreso o egreso que no sea una cuota de mantenimiento. Las cuotas se registran con
-            "Registrar cuota".
+            Cada movimiento pertenece a un periodo según su fecha. El periodo define la cuota mensual y el
+            recargo por pago tardío.
           </DrawerDescription>
         </DrawerHeader>
 
@@ -129,7 +117,7 @@ export function CreateTransactionDrawer({
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
           >
-            <TransactionFormFields form={form} disabled={mutation.isPending} />
+            <PeriodFormFields form={form} disabled={mutation.isPending} />
 
             {form.formState.errors.root && (
               <Alert variant="error">
@@ -146,7 +134,7 @@ export function CreateTransactionDrawer({
             Cancelar
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Registrar
+            Crear
           </Button>
         </DrawerFooter>
       </DrawerPopup>

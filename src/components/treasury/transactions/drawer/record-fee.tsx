@@ -52,7 +52,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
-import { formatCurrency, formatDay, formatMonth } from '@/lib/utils'
+import { formatCurrency, formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
 import { type RecordFeePaymentInput, recordFeePaymentSchema } from '@/lib/validations/treasury'
 import { recordFeePayment } from '@/server-actions/treasury'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
@@ -60,8 +60,6 @@ import { periodsQueryOptions, TREASURY_QUERY_KEY } from '@/tanstack-queries/trea
 import { PAYMENT_METHOD_ITEMS } from '../../kind'
 
 const FORM_ID = 'record-fee-form'
-
-const ISO_DAY = 'yyyy-MM-dd'
 
 // A year back (catching up) and a year ahead (paying in advance), as "YYYY-MM-01".
 const MONTH_OPTIONS = eachMonthOfInterval({
@@ -439,26 +437,32 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
             />
 
             {preview ? (
-              <dl className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 rounded-lg border bg-muted/40 p-3 text-sm tabular-nums">
-                <dt className="text-muted-foreground">
-                  {feeMonths.length === 1 ? '1 cuota' : `${feeMonths.length} cuotas`} de{' '}
-                  {formatCurrency(preview.period.monthly_fee)}
-                </dt>
-                <dd className="text-right">{formatCurrency(preview.fees)}</dd>
-                {preview.lateMonths > 0 && (
-                  <>
+              <Alert>
+                <AlertTitle>Periodo {preview.period.name}</AlertTitle>
+                <AlertDescription>
+                  <dl className="grid grid-cols-[1fr_auto] gap-x-4 text-sm tabular-nums">
                     <dt className="text-muted-foreground">
-                      {preview.lateMonths === 1 ? '1 recargo' : `${preview.lateMonths} recargos`} de{' '}
-                      {formatCurrency(preview.period.late_fee)}
-                      {waiveLateFee && ' (condonado)'}
+                      {feeMonths.length === 1 ? '1 cuota' : `${feeMonths.length} cuotas`} de{' '}
+                      {formatCurrency(preview.period.monthly_fee)}
                     </dt>
-                    <dd className="text-right">{formatCurrency(preview.lateFees)}</dd>
-                  </>
-                )}
-                <dt className="font-medium">Total a recibir</dt>
-                <dd className="text-right font-medium">{formatCurrency(preview.total)}</dd>
-                <dd className="col-span-2 text-xs text-muted-foreground">Periodo {preview.period.name}</dd>
-              </dl>
+                    <dd className="text-right">{formatCurrency(preview.fees)}</dd>
+                    {preview.lateMonths > 0 && (
+                      <>
+                        <dt className="text-muted-foreground">
+                          {preview.lateMonths === 1 ? '1 recargo' : `${preview.lateMonths} recargos`} de{' '}
+                          {formatCurrency(preview.period.late_fee)}
+                          {waiveLateFee && ' (condonado)'}
+                        </dt>
+                        <dd className="text-right">{formatCurrency(preview.lateFees)}</dd>
+                      </>
+                    )}
+                    <dt className="font-medium">Total a recibir</dt>
+                    <dd className="text-right font-medium text-foreground">
+                      {formatCurrency(preview.total)}
+                    </dd>
+                  </dl>
+                </AlertDescription>
+              </Alert>
             ) : (
               periods && (
                 <Alert variant="warning">
