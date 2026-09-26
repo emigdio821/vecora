@@ -63,7 +63,9 @@ export function RequestFormFields({ form, disabled }: RequestFormFieldsProps) {
               <InputGroup>
                 <NumberField
                   value={field.value ?? null}
-                  onValueChange={(value) => field.onChange(value)}
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                  }}
                   min={0}
                   locale="es-MX"
                   format={MONEY_FORMAT}

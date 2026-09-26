@@ -150,7 +150,9 @@ export function DeleteResidentsAlertDialog({
             variant="destructive"
             loading={mutation.isPending}
             disabled={count === 0}
-            onClick={() => mutation.mutate()}
+            onClick={() => {
+              mutation.mutate()
+            }}
           >
             Eliminar
           </Button>

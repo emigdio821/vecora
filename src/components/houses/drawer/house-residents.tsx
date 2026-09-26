@@ -58,7 +58,14 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
         <Muted>Nadie está asignado a esta casa.</Muted>
       )}
 
-      <Button size="sm" variant="outline" disabled={disabled} onClick={() => setAssignOpen(true)}>
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={disabled}
+        onClick={() => {
+          setAssignOpen(true)
+        }}
+      >
         Asignar residentes
       </Button>
 
@@ -123,7 +130,9 @@ function UnassignResidentButton({
               size="icon-sm"
               disabled={disabled}
               variant="destructive-outline"
-              onClick={() => setConfirmOpen(true)}
+              onClick={() => {
+                setConfirmOpen(true)
+              }}
               aria-label={`Quitar a ${name} de la casa`}
             >
               <UserMinusIcon />
@@ -149,7 +158,13 @@ function UnassignResidentButton({
             <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
               Cancelar
             </AlertDialogClose>
-            <Button variant="destructive" loading={mutation.isPending} onClick={() => mutation.mutate()}>
+            <Button
+              variant="destructive"
+              loading={mutation.isPending}
+              onClick={() => {
+                mutation.mutate()
+              }}
+            >
               Quitar
             </Button>
           </AlertDialogFooter>

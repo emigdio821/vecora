@@ -67,8 +67,20 @@ export function RequestsTableActions({ request, viewer }: ActionsProps) {
 
             {viewer.canResolve && (
               <>
-                <MenuItem onClick={() => setPayOpen(true)}>Registrar pago</MenuItem>
-                <MenuItem onClick={() => setRejectOpen(true)}>Rechazar</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setPayOpen(true)
+                  }}
+                >
+                  Registrar pago
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setRejectOpen(true)
+                  }}
+                >
+                  Rechazar
+                </MenuItem>
               </>
             )}
 
@@ -76,8 +88,19 @@ export function RequestsTableActions({ request, viewer }: ActionsProps) {
 
             {viewer.canRequest && (
               <>
-                <MenuItem onClick={() => setEditOpen(true)}>Editar</MenuItem>
-                <MenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
+                <MenuItem
+                  onClick={() => {
+                    setEditOpen(true)
+                  }}
+                >
+                  Editar
+                </MenuItem>
+                <MenuItem
+                  variant="destructive"
+                  onClick={() => {
+                    setDeleteOpen(true)
+                  }}
+                >
                   Eliminar
                 </MenuItem>
               </>

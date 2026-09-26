@@ -158,7 +158,9 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                 <Select
                   items={categoryItems}
                   value={field.value || null}
-                  onValueChange={(value) => field.onChange(value ?? '')}
+                  onValueChange={(value) => {
+                    field.onChange(value ?? '')
+                  }}
                   disabled={mutation.isPending || !categories}
                 >
                   <SelectTrigger className="w-full">
@@ -241,7 +243,9 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                 <Select
                   items={PAYMENT_METHOD_ITEMS}
                   value={field.value}
-                  onValueChange={(value) => field.onChange(value)}
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                  }}
                   disabled={mutation.isPending}
                 >
                   <SelectTrigger className="w-full">

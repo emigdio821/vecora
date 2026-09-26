@@ -53,7 +53,9 @@ export function RolesField<T extends FieldValues>({
           <CheckboxGroup
             className="gap-2"
             value={field.value as string[]}
-            onValueChange={(value) => field.onChange(value)}
+            onValueChange={(value) => {
+              field.onChange(value)
+            }}
             disabled={disabled}
           >
             {roles.map((role) => (

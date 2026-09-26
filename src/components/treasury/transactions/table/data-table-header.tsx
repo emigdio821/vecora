@@ -66,7 +66,9 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
         transactions={selectedTransactions}
         open={isDeleteSelectedOpen}
         onOpenChange={setDeleteSelectedOpen}
-        onDeleted={() => table.resetRowSelection()}
+        onDeleted={() => {
+          table.resetRowSelection()
+        }}
       />
 
       <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
@@ -79,7 +81,9 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
             ref={searchInputRef}
             name="search-transactions"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              void setSearchQuery(e.target.value)
+            }}
           />
           <InputGroupAddon>
             <SearchIcon />
@@ -156,7 +160,12 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
             <MenuPopup align="end">
               <MenuGroup>
                 <MenuGroupLabel>Tipo de movimiento</MenuGroupLabel>
-                <MenuRadioGroup value={kind} onValueChange={(value: KindFilter) => void setKind(value)}>
+                <MenuRadioGroup
+                  value={kind}
+                  onValueChange={(value: KindFilter) => {
+                    void setKind(value)
+                  }}
+                >
                   {KIND_FILTER_ITEMS.map((item) => (
                     <MenuRadioItem key={item.value} value={item.value}>
                       {item.label}
@@ -190,10 +199,21 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
             </Tooltip>
           )}
 
-          <Button variant="outline" onClick={() => setCreateOpen(true)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setCreateOpen(true)
+            }}
+          >
             Registrar movimiento
           </Button>
-          <Button onClick={() => setRecordFeeOpen(true)}>Registrar cuota</Button>
+          <Button
+            onClick={() => {
+              setRecordFeeOpen(true)
+            }}
+          >
+            Registrar cuota
+          </Button>
         </div>
       </div>
     </>

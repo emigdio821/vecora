@@ -70,7 +70,13 @@ export function DeleteHallReservationAlertDialog({
           <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
             Volver
           </AlertDialogClose>
-          <Button variant="destructive" loading={mutation.isPending} onClick={() => mutation.mutate()}>
+          <Button
+            variant="destructive"
+            loading={mutation.isPending}
+            onClick={() => {
+              mutation.mutate()
+            }}
+          >
             Cancelar reservación
           </Button>
         </AlertDialogFooter>

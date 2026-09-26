@@ -77,7 +77,12 @@ export function CategoriesTableActions({ category }: ActionsProps) {
             </MenuItem>
 
             {!isSystem && (
-              <MenuItem disabled={toggleActive.isPending} onClick={() => toggleActive.mutate()}>
+              <MenuItem
+                disabled={toggleActive.isPending}
+                onClick={() => {
+                  toggleActive.mutate()
+                }}
+              >
                 {category.is_active ? 'Desactivar' : 'Activar'}
               </MenuItem>
             )}

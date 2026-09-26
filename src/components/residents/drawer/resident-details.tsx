@@ -128,7 +128,12 @@ export function ResidentDetailsDrawer({
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />}>Cerrar</DrawerClose>
-          <Button variant="outline" onClick={() => setEditOpen(true)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setEditOpen(true)
+            }}
+          >
             Editar
           </Button>
           {/* Rendered inside this popup so Base UI treats it as a nested drawer. */}

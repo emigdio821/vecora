@@ -134,7 +134,9 @@ export function AddBoardMemberDrawer({
                   </FieldLabel>
                   <ResidentsPicker
                     value={field.value || null}
-                    onValueChange={(value) => field.onChange(value ?? '')}
+                    onValueChange={(value) => {
+                      field.onChange(value ?? '')
+                    }}
                     inputRef={field.ref}
                     excludeIds={excludeIds}
                     disabled={mutation.isPending}

@@ -49,7 +49,12 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
         canGrantAdmin={viewer.isAdmin}
       />
       <RemoveBoardMemberAlertDialog member={member} open={isRemoveOpen} onOpenChange={setRemoveOpen} />
-      <InviteLinkDialog invite={invite} onOpenChange={(open) => !open && setInvite(null)} />
+      <InviteLinkDialog
+        invite={invite}
+        onOpenChange={(open) => {
+          if (!open) setInvite(null)
+        }}
+      />
 
       <Menu>
         <MenuTrigger
@@ -69,12 +74,33 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
           <MenuGroup>
             <MenuGroupLabel className="my-1.5 py-0">{member.full_name}</MenuGroupLabel>
 
-            {canManage && <MenuItem onClick={() => setEditOpen(true)}>Editar roles</MenuItem>}
+            {canManage && (
+              <MenuItem
+                onClick={() => {
+                  setEditOpen(true)
+                }}
+              >
+                Editar roles
+              </MenuItem>
+            )}
 
-            {!isSelf && <MenuItem onClick={() => resend.mutate()}>Nuevo enlace de acceso</MenuItem>}
+            {!isSelf && (
+              <MenuItem
+                onClick={() => {
+                  resend.mutate()
+                }}
+              >
+                Nuevo enlace de acceso
+              </MenuItem>
+            )}
 
             {canManage && (
-              <MenuItem variant="destructive" onClick={() => setRemoveOpen(true)}>
+              <MenuItem
+                variant="destructive"
+                onClick={() => {
+                  setRemoveOpen(true)
+                }}
+              >
                 Quitar de la mesa
               </MenuItem>
             )}

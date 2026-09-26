@@ -51,7 +51,9 @@ export function HallReservationFormFields({ form, disabled, currentId }: HallRes
             </FieldLabel>
             <HousesPicker
               value={field.value || null}
-              onValueChange={(value) => field.onChange(value ?? '')}
+              onValueChange={(value) => {
+                field.onChange(value ?? '')
+              }}
               inputRef={field.ref}
               disabled={disabled}
             />

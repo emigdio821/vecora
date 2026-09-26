@@ -105,6 +105,7 @@ export function DataTable<TData extends RowData>({
   const rowCount = table.getRowCount()
   const pageCount = table.getPageCount()
   const isPageOutOfRange = pageCount > 0 && pageIndex >= pageCount
+  const isSinglePage = pageCount <= 1
 
   const pageRanges = Array.from({ length: pageCount }, (_, i) => ({
     value: i + 1,
@@ -128,7 +129,13 @@ export function DataTable<TData extends RowData>({
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button onClick={() => table.setPageIndex(0)}>Ir a la primera página</Button>
+            <Button
+              onClick={() => {
+                table.setPageIndex(0)
+              }}
+            >
+              Ir a la primera página
+            </Button>
           </EmptyContent>
         </Empty>
       ) : (
@@ -171,64 +178,81 @@ export function DataTable<TData extends RowData>({
 
           {rowCount > 0 && (
             <CardFrameFooter className="p-2">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 whitespace-nowrap">
-                  <p className="text-sm text-muted-foreground">Mostrando</p>
-                  <Select
-                    items={pageRanges}
-                    value={pageIndex + 1}
-                    onValueChange={(value) => table.setPageIndex((value as number) - 1)}
-                  >
-                    <SelectTrigger
-                      size="sm"
-                      className="min-w-none w-fit"
-                      aria-label="Seleccionar rango de resultados"
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectPopup>
-                      {pageRanges.map((range) => (
-                        <SelectItem key={range.value} value={range.value}>
-                          {range.label}
-                        </SelectItem>
-                      ))}
-                    </SelectPopup>
-                  </Select>
-                  <p className="text-sm text-muted-foreground">
+              {/* min-h keeps the footer height when the buttons are hidden. */}
+              <div className="flex min-h-8 items-center justify-between gap-2">
+                {/* One page: nothing to pick or page through, so plain text and no buttons. */}
+                {isSinglePage ? (
+                  <p className="text-sm whitespace-nowrap text-muted-foreground">
+                    Mostrando <strong className="font-medium text-foreground">{pageRanges[0]?.label}</strong>{' '}
                     de <strong className="font-medium text-foreground">{rowCount}</strong> resultados
                   </p>
-                </div>
+                ) : (
+                  <div className="flex items-center gap-2 whitespace-nowrap">
+                    <p className="text-sm text-muted-foreground">Mostrando</p>
+                    <Select
+                      items={pageRanges}
+                      value={pageIndex + 1}
+                      onValueChange={(value) => {
+                        table.setPageIndex((value as number) - 1)
+                      }}
+                    >
+                      <SelectTrigger
+                        size="sm"
+                        className="min-w-none w-fit"
+                        aria-label="Seleccionar rango de resultados"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectPopup>
+                        {pageRanges.map((range) => (
+                          <SelectItem key={range.value} value={range.value}>
+                            {range.label}
+                          </SelectItem>
+                        ))}
+                      </SelectPopup>
+                    </Select>
+                    <p className="text-sm text-muted-foreground">
+                      de <strong className="font-medium text-foreground">{rowCount}</strong> resultados
+                    </p>
+                  </div>
+                )}
 
-                <Pagination className="justify-end">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        className="sm:*:[svg]:hidden"
-                        render={
-                          <Button
-                            size="sm"
-                            disabled={!table.getCanPreviousPage()}
-                            onClick={() => table.previousPage()}
-                            variant="outline"
-                          />
-                        }
-                      />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext
-                        className="sm:*:[svg]:hidden"
-                        render={
-                          <Button
-                            size="sm"
-                            disabled={!table.getCanNextPage()}
-                            onClick={() => table.nextPage()}
-                            variant="outline"
-                          />
-                        }
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+                {!isSinglePage && (
+                  <Pagination className="justify-end">
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          className="sm:*:[svg]:hidden"
+                          render={
+                            <Button
+                              size="sm"
+                              disabled={!table.getCanPreviousPage()}
+                              onClick={() => {
+                                table.previousPage()
+                              }}
+                              variant="outline"
+                            />
+                          }
+                        />
+                      </PaginationItem>
+                      <PaginationItem>
+                        <PaginationNext
+                          className="sm:*:[svg]:hidden"
+                          render={
+                            <Button
+                              size="sm"
+                              disabled={!table.getCanNextPage()}
+                              onClick={() => {
+                                table.nextPage()
+                              }}
+                              variant="outline"
+                            />
+                          }
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                )}
               </div>
             </CardFrameFooter>
           )}

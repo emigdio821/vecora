@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckIcon, CopyIcon, MessageCircleIcon } from 'lucide-react'
+import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { toastManager } from '@/components/ui/toast'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { InviteResult } from '@/server-actions/hoa-board'
 
 interface InviteLinkDialogProps {
@@ -66,12 +67,22 @@ export function InviteLinkDialog({ invite, onOpenChange }: InviteLinkDialogProps
               readOnly
               value={invite?.link ?? ''}
               aria-label="Enlace de acceso"
-              onFocus={(e) => e.currentTarget.select()}
+              onFocus={(e) => {
+                e.currentTarget.select()
+              }}
             />
             <InputGroupAddon align="inline-end">
-              <Button size="icon-xs" variant="ghost" aria-label="Copiar enlace" onClick={copy}>
-                {copied ? <CheckIcon className="text-success-foreground" /> : <CopyIcon />}
-              </Button>
+              <Tooltip>
+                <TooltipTrigger
+                  closeOnClick={false}
+                  render={
+                    <Button size="icon-xs" variant="ghost" aria-label="Copiar enlace" onClick={copy}>
+                      {copied ? <CheckIcon className="text-success-foreground" /> : <CopyIcon />}
+                    </Button>
+                  }
+                />
+                <TooltipContent>{copied ? 'Enlace copiado' : 'Copiar enlace'}</TooltipContent>
+              </Tooltip>
             </InputGroupAddon>
           </InputGroup>
         </DialogPanel>
@@ -89,7 +100,6 @@ export function InviteLinkDialog({ invite, onOpenChange }: InviteLinkDialogProps
                 />
               }
             >
-              <MessageCircleIcon />
               Enviar por WhatsApp
             </Button>
           )}

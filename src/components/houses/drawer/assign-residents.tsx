@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircleAlertIcon } from 'lucide-react'
-import { useId, useState } from 'react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { ResidentsPicker } from '@/components/shared/pickers/residents-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -46,7 +46,6 @@ interface AssignResidentsDrawerProps extends React.ComponentProps<typeof Drawer>
 
 export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: AssignResidentsDrawerProps) {
   const queryClient = useQueryClient()
-  const scopeSwitchId = useId()
   const [scope, setScope] = useState<'all' | 'unassigned'>('unassigned')
 
   const form = useForm<AssignResidentsInput>({
@@ -148,19 +147,20 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
               )}
             />
 
-            <div className="flex items-start gap-2">
+            <Label className="flex w-full items-start rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50">
               <Switch
-                id={scopeSwitchId}
                 checked={scope === 'unassigned'}
-                onCheckedChange={(checked) => setScope(checked ? 'unassigned' : 'all')}
+                onCheckedChange={(checked) => {
+                  setScope(checked ? 'unassigned' : 'all')
+                }}
               />
-              <div className="flex flex-col gap-1">
-                <Label htmlFor={scopeSwitchId}>Solo residentes sin casa</Label>
-                <p className="text-xs text-muted-foreground">
+              <span className="grid gap-1">
+                <span>Solo residentes sin casa</span>
+                <span className="text-xs font-normal text-muted-foreground">
                   Desactívalo para incluir a quienes ya tienen otra casa asignada.
-                </p>
-              </div>
-            </div>
+                </span>
+              </span>
+            </Label>
 
             <Controller
               name="relationship"
@@ -178,7 +178,9 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
                   <Select
                     items={RELATIONSHIP_ITEMS}
                     value={field.value}
-                    onValueChange={(value) => field.onChange(value)}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                    }}
                     disabled={mutation.isPending}
                   >
                     <SelectTrigger className="w-full">

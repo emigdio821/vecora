@@ -61,7 +61,9 @@ export function SetPasswordForm() {
                 <Button
                   size="icon-xs"
                   variant="ghost"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => {
+                    setShowPassword(!showPassword)
+                  }}
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
                   {showPassword ? <EyeOffIcon /> : <EyeIcon />}

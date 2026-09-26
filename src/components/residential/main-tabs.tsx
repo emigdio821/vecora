@@ -9,7 +9,13 @@ export function ResidentialMainTabs() {
   const [tab, setTab] = useQueryState('tab', { defaultValue: 'houses' })
 
   return (
-    <Tabs defaultValue="houses" value={tab} onValueChange={(value) => setTab(value)}>
+    <Tabs
+      defaultValue="houses"
+      value={tab}
+      onValueChange={(value) => {
+        void setTab(value)
+      }}
+    >
       <TabsList>
         <TabsTab value="houses">Casas</TabsTab>
         <TabsTab value="residents">Residentes</TabsTab>

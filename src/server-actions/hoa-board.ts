@@ -39,18 +39,23 @@ async function requireBoardManager(): Promise<{ user: CurrentUser; isAdmin: bool
 /**
  * One-time sign-in link for the invited person, pointing at our own
  * /auth/confirm route so the session lands in cookies (SSR) instead of the
- * URL hash. Works for brand-new accounts and for re-sending to existing ones.
+ * URL hash. Auth refuses `invite` once the account exists (`email_exists`), so
+ * existing accounts (re-sends, re-added members) get a `recovery` link instead;
+ * both land on /set-password.
  */
 async function createInviteLink(
   email: string,
   fullName: string,
+  hasAccount: boolean,
 ): Promise<{ error: AuthError } | { user: User; link: string }> {
   const admin = createAdminClient()
-  const { data, error } = await admin.auth.admin.generateLink({
-    type: 'invite',
-    email,
-    options: { data: { full_name: fullName } },
-  })
+  const { data, error } = hasAccount
+    ? await admin.auth.admin.generateLink({ type: 'recovery', email })
+    : await admin.auth.admin.generateLink({
+        type: 'invite',
+        email,
+        options: { data: { full_name: fullName } },
+      })
   if (error) return { error }
 
   const requestHeaders = await headers()
@@ -59,7 +64,7 @@ async function createInviteLink(
     `${requestHeaders.get('x-forwarded-proto') ?? 'http'}://${requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host')}`
   const url = new URL('/auth/confirm', origin)
   url.searchParams.set('token_hash', data.properties.hashed_token)
-  url.searchParams.set('type', 'invite')
+  url.searchParams.set('type', data.properties.verification_type)
 
   return { user: data.user, link: url.toString() }
 }
@@ -108,7 +113,8 @@ export async function addBoardMember(input: AddBoardMemberInput): Promise<Action
   }
 
   const fullName = `${resident.first_name} ${resident.last_name}`
-  const invite = await createInviteLink(resident.email, fullName)
+  const isNewAccount = resident.profile_id === null
+  const invite = await createInviteLink(resident.email, fullName, !isNewAccount)
   if ('error' in invite) {
     return {
       error:
@@ -118,7 +124,6 @@ export async function addBoardMember(input: AddBoardMemberInput): Promise<Action
     }
   }
 
-  const isNewAccount = resident.profile_id === null
   const userId = invite.user.id
 
   // Undo the account if the registry side fails; there is no history to keep yet.
@@ -164,7 +169,7 @@ export async function resendInvite(userId: string): Promise<ActionResult<InviteR
     return { error: 'El integrante no tiene correo registrado' }
   }
 
-  const invite = await createInviteLink(profile.resident.email, profile.full_name)
+  const invite = await createInviteLink(profile.resident.email, profile.full_name, true)
   if ('error' in invite) {
     return { error: 'No se pudo generar el enlace, intenta nuevamente' }
   }

@@ -174,7 +174,9 @@ function EditResidentForm({
                 <PhoneInput
                   {...field}
                   aria-invalid={fieldState.invalid}
-                  onChange={(value) => field.onChange(value ?? '')}
+                  onChange={(value) => {
+                    field.onChange(value ?? '')
+                  }}
                 />
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>

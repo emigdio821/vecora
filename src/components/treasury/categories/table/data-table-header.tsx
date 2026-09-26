@@ -1,10 +1,11 @@
 import type { Table } from '@tanstack/react-table'
-import { SearchIcon, XIcon } from 'lucide-react'
+import { InfoIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { CategoryQueryData } from '@/tanstack-queries/treasury'
 import { CreateCategoryDrawer } from '../drawer/create-category'
 
@@ -14,6 +15,7 @@ interface CategoriesDataTableHeaderProps {
 
 export function CategoriesDataTableHeader({ table }: CategoriesDataTableHeaderProps) {
   const searchInputRef = useRef<HTMLInputElement | null>(null)
+  const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-categories', parseAsString.withDefault(''))
   const tableRowsLength = table.getCoreRowModel().rows.length
@@ -36,7 +38,9 @@ export function CategoriesDataTableHeader({ table }: CategoriesDataTableHeaderPr
             ref={searchInputRef}
             name="search-categories"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              void setSearchQuery(e.target.value)
+            }}
           />
           <InputGroupAddon>
             <SearchIcon />
@@ -57,9 +61,36 @@ export function CategoriesDataTableHeader({ table }: CategoriesDataTableHeaderPr
               </Button>
             </InputGroupAddon>
           )}
+
+          <InputGroupAddon align="inline-end">
+            <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
+              <TooltipTrigger
+                closeOnClick={false}
+                render={
+                  <Button
+                    size="icon-xs"
+                    variant="ghost"
+                    className="cursor-default"
+                    onClick={() => {
+                      setSearchTooltipOpen(true)
+                    }}
+                  >
+                    <InfoIcon className="size-4" />
+                  </Button>
+                }
+              />
+              <TooltipContent>Buscar por nombre de la categoría</TooltipContent>
+            </Tooltip>
+          </InputGroupAddon>
         </InputGroup>
 
-        <Button onClick={() => setCreateOpen(true)}>Nueva categoría</Button>
+        <Button
+          onClick={() => {
+            setCreateOpen(true)
+          }}
+        >
+          Nueva categoría
+        </Button>
       </div>
     </>
   )

@@ -77,8 +77,11 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
     columnHelper.display({
       id: 'actions',
       size: 50,
-      cell: ({ row }) =>
-        viewer.isManager ? <BoardMembersTableActions member={row.original} viewer={viewer} /> : null,
+      cell: ({ row }) => {
+        if (row.original.id === viewer.id) return null
+
+        return viewer.isManager ? <BoardMembersTableActions member={row.original} viewer={viewer} /> : null
+      },
     }),
   ])
 }

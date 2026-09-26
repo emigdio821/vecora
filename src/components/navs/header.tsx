@@ -34,7 +34,9 @@ export function HeaderNav({ ...props }: React.ComponentProps<typeof SidebarGroup
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton
-            onClick={() => setOpenMobile(false)}
+            onClick={() => {
+              setOpenMobile(false)
+            }}
             isActive={pathname === '/'}
             render={
               <Link href="/">

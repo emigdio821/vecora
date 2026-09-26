@@ -24,7 +24,9 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
+              onClick={() => {
+                setOpenMobile(false)
+              }}
               isActive={pathname === '/treasury'}
               render={
                 <Link href="/treasury">
@@ -37,7 +39,9 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
+              onClick={() => {
+                setOpenMobile(false)
+              }}
               isActive={pathname === '/presidency'}
               render={
                 <Link href="/presidency">
@@ -50,7 +54,9 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
+              onClick={() => {
+                setOpenMobile(false)
+              }}
               isActive={pathname === '/maintenance'}
               render={
                 <Link href="/maintenance">
@@ -76,7 +82,9 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
+              onClick={() => {
+                setOpenMobile(false)
+              }}
               isActive={pathname === '/hoa-board'}
               render={
                 <Link href="/hoa-board">
@@ -89,7 +97,9 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
+              onClick={() => {
+                setOpenMobile(false)
+              }}
               isActive={pathname === '/residential'}
               render={
                 <Link href="/residential">

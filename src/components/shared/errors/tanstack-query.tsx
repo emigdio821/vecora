@@ -34,7 +34,12 @@ export function TanstackQueryError(props: TanstackQueryErrorProps) {
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => refetch()}>
+          <Button
+            size="sm"
+            onClick={() => {
+              refetch()
+            }}
+          >
             Reintentar
           </Button>
         </div>

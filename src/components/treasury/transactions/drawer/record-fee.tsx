@@ -200,7 +200,9 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                   </FieldLabel>
                   <HousesPicker
                     value={field.value || null}
-                    onValueChange={(value) => field.onChange(value ?? '')}
+                    onValueChange={(value) => {
+                      field.onChange(value ?? '')
+                    }}
                     inputRef={field.ref}
                     disabled={mutation.isPending}
                   />
@@ -227,7 +229,9 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                     items={MONTH_OPTIONS}
                     itemToStringLabel={formatMonth}
                     value={field.value}
-                    onValueChange={(value: string[]) => field.onChange([...value].sort())}
+                    onValueChange={(value: string[]) => {
+                      field.onChange([...value].sort())
+                    }}
                     inputRef={field.ref}
                     disabled={mutation.isPending}
                   >
@@ -350,7 +354,9 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                   <Select
                     items={PAYMENT_METHOD_ITEMS}
                     value={field.value}
-                    onValueChange={(value) => field.onChange(value)}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                    }}
                     disabled={mutation.isPending}
                   >
                     <SelectTrigger className="w-full">

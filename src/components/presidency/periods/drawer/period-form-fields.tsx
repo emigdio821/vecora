@@ -65,7 +65,12 @@ export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProp
                 <FieldLabel>
                   {name === 'starts_on' ? 'Inicio' : 'Fin'} <span className="text-destructive">*</span>
                 </FieldLabel>
-                <Popover open={openDate === name} onOpenChange={(open) => setOpenDate(open ? name : null)}>
+                <Popover
+                  open={openDate === name}
+                  onOpenChange={(open) => {
+                    setOpenDate(open ? name : null)
+                  }}
+                >
                   <PopoverTrigger
                     ref={field.ref}
                     render={
@@ -121,7 +126,9 @@ export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProp
               <InputGroup>
                 <NumberField
                   value={field.value ?? null}
-                  onValueChange={(value) => field.onChange(value)}
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                  }}
                   min={0}
                   locale="es-MX"
                   format={MONEY_FORMAT}
@@ -157,7 +164,9 @@ export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProp
               <InputGroup>
                 <NumberField
                   value={field.value ?? null}
-                  onValueChange={(value) => field.onChange(value)}
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                  }}
                   min={0}
                   locale="es-MX"
                   format={MONEY_FORMAT}
@@ -193,7 +202,9 @@ export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProp
             </FieldLabel>
             <NumberField
               value={field.value ?? null}
-              onValueChange={(value) => field.onChange(value)}
+              onValueChange={(value) => {
+                field.onChange(value)
+              }}
               min={1}
               max={28}
               step={1}

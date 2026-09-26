@@ -5,14 +5,7 @@ import type { Month } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { ChevronLeftIcon, ChevronRightIcon, ChevronsUpDownIcon } from 'lucide-react'
 import * as React from 'react'
-import {
-  Combobox,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxPopup,
-} from '@/components/ui/combobox'
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
 const buttonClassNames =
@@ -25,17 +18,17 @@ interface DropdownItem {
 }
 
 interface CalendarDropdownProps extends DropdownProps {
-  /** Text shown in the input for the selected option; the list keeps `label`. */
-  inputLabel?: (value: number) => string
+  /** Text shown in the trigger for the selected option; the list keeps `label`. */
+  triggerLabel?: (value: number) => string
 }
 
-/** Month / year selector used when `captionLayout="dropdown"`: a searchable combobox instead of a native <select>. */
+/** Month / year selector used when `captionLayout="dropdown"`: a styled select instead of a native <select>. */
 function CalendarDropdown({
   options,
   value,
   onChange,
   'aria-label': ariaLabel,
-  inputLabel,
+  triggerLabel,
 }: CalendarDropdownProps) {
   const items: DropdownItem[] =
     options?.map((option) => ({
@@ -44,37 +37,38 @@ function CalendarDropdown({
       value: option.value.toString(),
     })) ?? []
 
-  const selectedItem = items.find((item) => item.value === value?.toString())
-
   return (
-    <Combobox
+    <Select
       aria-label={ariaLabel}
-      autoHighlight
       items={items}
-      value={selectedItem}
-      itemToStringLabel={(item) => (item ? (inputLabel?.(Number(item.value)) ?? item.label) : '')}
-      onValueChange={(item: DropdownItem | null) => {
-        if (!onChange || !item) return
+      value={value?.toString()}
+      onValueChange={(newValue: string | null) => {
+        if (!onChange || !newValue) return
         // DayPicker expects a <select> change event; only `target.value` is read.
-        onChange({ target: { value: item.value } } as React.ChangeEvent<HTMLSelectElement>)
+        onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLSelectElement>)
       }}
     >
-      <ComboboxInput className="**:[input]:w-0 **:[input]:flex-1" onFocus={(e) => e.currentTarget.select()} />
-      <ComboboxPopup aria-label={ariaLabel}>
-        <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
-        <ComboboxList>
-          {(item: DropdownItem) => (
-            <ComboboxItem key={item.value} value={item} disabled={item.disabled}>
-              {item.label}
-            </ComboboxItem>
-          )}
-        </ComboboxList>
-      </ComboboxPopup>
-    </Combobox>
+      <SelectTrigger className="min-w-none">
+        <SelectValue>
+          {(selected: string | null) =>
+            selected === null
+              ? null
+              : (triggerLabel?.(Number(selected)) ?? items.find((item) => item.value === selected)?.label)
+          }
+        </SelectValue>
+      </SelectTrigger>
+      <SelectPopup aria-label={ariaLabel}>
+        {items.map((item) => (
+          <SelectItem key={item.value} value={item.value} disabled={item.disabled}>
+            {item.label}
+          </SelectItem>
+        ))}
+      </SelectPopup>
+    </Select>
   )
 }
 
-/** Full month names in the list ("septiembre"), short in the input ("sep") so month and year fit side by side. */
+/** Full month names in the list ("septiembre"), short in the trigger ("sep") so month and year fit side by side. */
 function CalendarMonthsDropdown(props: DropdownProps) {
   const { dayPickerProps } = useDayPicker()
   const localize = dayPickerProps.locale?.localize
@@ -83,7 +77,9 @@ function CalendarMonthsDropdown(props: DropdownProps) {
     <CalendarDropdown
       {...props}
       // Options are always 0–11, which is what date-fns's `Month` union is.
-      inputLabel={localize ? (month) => localize.month(month as Month, { width: 'abbreviated' }) : undefined}
+      triggerLabel={
+        localize ? (month) => localize.month(month as Month, { width: 'abbreviated' }) : undefined
+      }
     />
   )
 }

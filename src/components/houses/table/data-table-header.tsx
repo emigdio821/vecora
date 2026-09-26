@@ -37,7 +37,9 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
         houses={selectedHouses}
         open={isDeleteSelectedOpen}
         onOpenChange={setDeleteSelectedOpen}
-        onDeleted={() => table.resetRowSelection()}
+        onDeleted={() => {
+          table.resetRowSelection()
+        }}
       />
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
@@ -50,7 +52,9 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
             ref={searchInputRef}
             name="search-houses"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              void setSearchQuery(e.target.value)
+            }}
           />
           <InputGroupAddon>
             <SearchIcon />
@@ -123,7 +127,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
               setCreateOpen(true)
             }}
           >
-            Crear
+            Nueva casa
           </Button>
         </div>
       </div>

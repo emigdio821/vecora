@@ -1,5 +1,5 @@
 import type { Table } from '@tanstack/react-table'
-import { ListFilterIcon, SearchIcon, XIcon } from 'lucide-react'
+import { InfoIcon, ListFilterIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import type { DataTableFeatures } from '@/components/shared/table/features'
@@ -41,6 +41,7 @@ interface RequestsDataTableHeaderProps {
 
 export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHeaderProps) {
   const searchInputRef = useRef<HTMLInputElement | null>(null)
+  const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-requests', parseAsString.withDefault(''))
   const [status, setStatus] = useStatusFilter()
@@ -62,11 +63,13 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
             type="search"
             value={searchQuery}
             aria-label="Buscar"
-            placeholder="Buscar por concepto o persona"
+            placeholder="Buscar"
             ref={searchInputRef}
             name="search-requests"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              void setSearchQuery(e.target.value)
+            }}
           />
           <InputGroupAddon>
             <SearchIcon />
@@ -87,6 +90,27 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
               </Button>
             </InputGroupAddon>
           )}
+
+          <InputGroupAddon align="inline-end">
+            <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
+              <TooltipTrigger
+                closeOnClick={false}
+                render={
+                  <Button
+                    size="icon-xs"
+                    variant="ghost"
+                    className="cursor-default"
+                    onClick={() => {
+                      setSearchTooltipOpen(true)
+                    }}
+                  >
+                    <InfoIcon className="size-4" />
+                  </Button>
+                }
+              />
+              <TooltipContent>Buscar por concepto, detalles o quién la solicitó</TooltipContent>
+            </Tooltip>
+          </InputGroupAddon>
         </InputGroup>
 
         <div className="flex flex-wrap justify-end gap-2">
@@ -122,7 +146,12 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
             <MenuPopup align="end">
               <MenuGroup>
                 <MenuGroupLabel>Estado</MenuGroupLabel>
-                <MenuRadioGroup value={status} onValueChange={(value: StatusFilter) => void setStatus(value)}>
+                <MenuRadioGroup
+                  value={status}
+                  onValueChange={(value: StatusFilter) => {
+                    void setStatus(value)
+                  }}
+                >
                   {STATUS_FILTER_ITEMS.map((item) => (
                     <MenuRadioItem key={item.value} value={item.value}>
                       {item.label}
@@ -133,7 +162,15 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
             </MenuPopup>
           </Menu>
 
-          {viewer.canRequest && <Button onClick={() => setCreateOpen(true)}>Nueva solicitud</Button>}
+          {viewer.canRequest && (
+            <Button
+              onClick={() => {
+                setCreateOpen(true)
+              }}
+            >
+              Nueva solicitud
+            </Button>
+          )}
         </div>
       </div>
     </>

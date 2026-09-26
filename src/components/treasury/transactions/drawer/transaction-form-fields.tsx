@@ -108,7 +108,9 @@ export function TransactionFormFields({
             <Select
               items={categoryItems}
               value={field.value || null}
-              onValueChange={(value) => field.onChange(value ?? '')}
+              onValueChange={(value) => {
+                field.onChange(value ?? '')
+              }}
               disabled={lockedForFee || !categories}
             >
               <SelectTrigger className="w-full">
@@ -163,7 +165,9 @@ export function TransactionFormFields({
               <InputGroup>
                 <NumberField
                   value={field.value ?? null}
-                  onValueChange={(value) => field.onChange(value)}
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                  }}
                   min={0}
                   locale="es-MX"
                   format={MONEY_FORMAT}
@@ -248,7 +252,9 @@ export function TransactionFormFields({
             <Select
               items={PAYMENT_METHOD_ITEMS}
               value={field.value}
-              onValueChange={(value) => field.onChange(value)}
+              onValueChange={(value) => {
+                field.onChange(value)
+              }}
               disabled={disabled}
             >
               <SelectTrigger className="w-full">

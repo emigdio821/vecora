@@ -187,7 +187,9 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                   <PhoneInput
                     {...field}
                     aria-invalid={fieldState.invalid}
-                    onChange={(value) => field.onChange(value ?? '')}
+                    onChange={(value) => {
+                      field.onChange(value ?? '')
+                    }}
                   />
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
@@ -256,7 +258,9 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                     <Select
                       items={RELATIONSHIP_ITEMS}
                       value={field.value}
-                      onValueChange={(value) => field.onChange(value)}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                      }}
                       disabled={mutation.isPending}
                     >
                       <SelectTrigger className="w-full">

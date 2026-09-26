@@ -33,7 +33,9 @@ export function CategoryFormFields({ form, disabled, lockKind }: CategoryFormFie
               name={field.name}
               value={field.value}
               disabled={disabled || lockKind}
-              onValueChange={(value) => field.onChange(value)}
+              onValueChange={(value) => {
+                field.onChange(value)
+              }}
             >
               {KIND_ITEMS.map((item) => (
                 <RadioPrimitive.Root key={item.value} className={kindItemClassName} value={item.value}>

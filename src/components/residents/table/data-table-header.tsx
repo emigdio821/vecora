@@ -37,7 +37,9 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
         residents={selectedResidents}
         open={isDeleteSelectedOpen}
         onOpenChange={setDeleteSelectedOpen}
-        onDeleted={() => table.resetRowSelection()}
+        onDeleted={() => {
+          table.resetRowSelection()
+        }}
       />
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
@@ -50,7 +52,9 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
             ref={searchInputRef}
             name="search-residents"
             disabled={tableRowsLength === 0}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              void setSearchQuery(e.target.value)
+            }}
           />
           <InputGroupAddon>
             <SearchIcon />
@@ -130,7 +134,7 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
               setCreateResidentDrawerOpen(true)
             }}
           >
-            Crear
+            Nuevo residente
           </Button>
         </div>
       </div>

@@ -70,7 +70,13 @@ export function DeletePeriodAlertDialog({
           <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
             Cancelar
           </AlertDialogClose>
-          <Button variant="destructive" loading={mutation.isPending} onClick={() => mutation.mutate()}>
+          <Button
+            variant="destructive"
+            loading={mutation.isPending}
+            onClick={() => {
+              mutation.mutate()
+            }}
+          >
             Eliminar
           </Button>
         </AlertDialogFooter>

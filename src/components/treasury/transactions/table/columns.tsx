@@ -22,14 +22,18 @@ export const transactionsTableColumns = columnHelper.columns([
         checked={table.getIsAllPageRowsSelected()}
         indeterminate={table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()}
         disabled={table.getFilteredRowModel().rows.length === 0}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value) => {
+          table.toggleAllPageRowsSelected(!!value)
+        }}
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         aria-label="Seleccionar elemento"
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={(value) => {
+          row.toggleSelected(!!value)
+        }}
       />
     ),
   }),

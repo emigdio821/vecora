@@ -9,7 +9,13 @@ export function PresidencyMainTabs() {
   const [tab, setTab] = useQueryState('tab', { defaultValue: 'periods' })
 
   return (
-    <Tabs defaultValue="periods" value={tab} onValueChange={(value) => setTab(value)}>
+    <Tabs
+      defaultValue="periods"
+      value={tab}
+      onValueChange={(value) => {
+        void setTab(value)
+      }}
+    >
       <TabsList>
         <TabsTab value="periods">Periodos</TabsTab>
         <TabsTab value="hall">Terraza</TabsTab>

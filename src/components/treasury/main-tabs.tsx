@@ -9,7 +9,13 @@ export function TreasuryMainTabs() {
   const [tab, setTab] = useQueryState('tab', { defaultValue: 'transactions' })
 
   return (
-    <Tabs defaultValue="transactions" value={tab} onValueChange={(value) => setTab(value)}>
+    <Tabs
+      defaultValue="transactions"
+      value={tab}
+      onValueChange={(value) => {
+        void setTab(value)
+      }}
+    >
       <TabsList>
         <TabsTab value="transactions">Movimientos</TabsTab>
         <TabsTab value="categories">Categorías</TabsTab>
