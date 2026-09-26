@@ -13,42 +13,37 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
-import { removeBoardMember } from '@/server-actions/hoa-board'
-import { type BoardMemberQueryData, HOA_BOARD_QUERY_KEY } from '@/tanstack-queries/hoa-board'
-import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
+import { formatCurrency } from '@/lib/utils'
+import { deleteMaintenanceRequest } from '@/server-actions/maintenance'
+import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 
-interface RemoveBoardMemberAlertDialogProps extends React.ComponentProps<typeof AlertDialog> {
-  member: BoardMemberQueryData
+interface DeleteRequestAlertDialogProps extends React.ComponentProps<typeof AlertDialog> {
+  request: MaintenanceRequestQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-/** Revokes every role: the person leaves the board and can no longer sign in. */
-export function RemoveBoardMemberAlertDialog({
-  member,
+/** Pending requests only; resolved ones are history and stay. */
+export function DeleteRequestAlertDialog({
+  request,
   open,
   onOpenChange,
   ...props
-}: RemoveBoardMemberAlertDialogProps) {
+}: DeleteRequestAlertDialogProps) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const result = await removeBoardMember(member.id)
+      const result = await deleteMaintenanceRequest(request.id)
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [HOA_BOARD_QUERY_KEY] })
-      void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
-      toastManager.add({
-        type: 'success',
-        title: 'Integrante retirado',
-        description: `${member.full_name} ya no puede entrar a Resido`,
-      })
+      void queryClient.invalidateQueries({ queryKey: [MAINTENANCE_QUERY_KEY] })
+      toastManager.add({ type: 'success', title: 'Solicitud eliminada', description: request.title })
       onOpenChange(false)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo retirar', description: error.message })
+      toastManager.add({ type: 'error', title: 'No se pudo eliminar', description: error.message })
     },
   })
 
@@ -65,10 +60,9 @@ export function RemoveBoardMemberAlertDialog({
     <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Retirar a {member.full_name} de la mesa directiva?</AlertDialogTitle>
+          <AlertDialogTitle>¿Eliminar esta solicitud?</AlertDialogTitle>
           <AlertDialogDescription>
-            Perderá todos sus roles y ya no podrá entrar a la aplicación. Sus registros anteriores
-            (movimientos, reservaciones) se conservan. Podrás volver a agregarle después.
+            {request.title} · {formatCurrency(Number(request.amount))}. Esta acción no se puede deshacer.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -77,7 +71,7 @@ export function RemoveBoardMemberAlertDialog({
             Cancelar
           </AlertDialogClose>
           <Button variant="destructive" loading={mutation.isPending} onClick={() => mutation.mutate()}>
-            Retirar
+            Eliminar
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

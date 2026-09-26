@@ -55,6 +55,76 @@ export type Database = {
           },
         ]
       }
+      maintenance_requests: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          details: string | null
+          id: string
+          rejection_reason: string | null
+          requested_on: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: Database['public']['Enums']['maintenance_request_status']
+          title: string
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string
+          details?: string | null
+          id?: string
+          rejection_reason?: string | null
+          requested_on?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database['public']['Enums']['maintenance_request_status']
+          title: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          details?: string | null
+          id?: string
+          rejection_reason?: string | null
+          requested_on?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database['public']['Enums']['maintenance_request_status']
+          title?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'maintenance_requests_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'maintenance_requests_resolved_by_fkey'
+            columns: ['resolved_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'maintenance_requests_transaction_id_fkey'
+            columns: ['transaction_id']
+            isOneToOne: true
+            referencedRelation: 'transactions'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       periods: {
         Row: {
           created_at: string
@@ -472,6 +542,17 @@ export type Database = {
         }
         Returns: string
       }
+      pay_maintenance_request: {
+        Args: {
+          p_category_id: string
+          p_notes?: string
+          p_occurred_on: string
+          p_payment_method?: Database['public']['Enums']['payment_method']
+          p_reference?: string
+          p_request_id: string
+        }
+        Returns: string
+      }
       record_fee_payment: {
         Args: {
           p_amount?: number
@@ -491,9 +572,14 @@ export type Database = {
           total: number
         }[]
       }
+      reject_maintenance_request: {
+        Args: { p_reason: string; p_request_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: 'admin' | 'president' | 'treasurer' | 'security' | 'maintenance'
+      maintenance_request_status: 'pending' | 'paid' | 'rejected'
       payment_method: 'cash' | 'transfer'
       residency_relationship: 'owner' | 'tenant' | 'family'
       transaction_kind: 'income' | 'expense'
@@ -623,6 +709,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ['admin', 'president', 'treasurer', 'security', 'maintenance'],
+      maintenance_request_status: ['pending', 'paid', 'rejected'],
       payment_method: ['cash', 'transfer'],
       residency_relationship: ['owner', 'tenant', 'family'],
       transaction_kind: ['income', 'expense'],

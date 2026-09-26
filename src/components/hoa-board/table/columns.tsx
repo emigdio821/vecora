@@ -43,7 +43,7 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
     columnHelper.display({
       id: 'roles',
       size: 220,
-      header: 'Cargos',
+      header: 'Roles',
       cell: ({ row }) => {
         // Fixed order (admin first) regardless of insertion order.
         const roles = APP_ROLES.filter((role) => row.original.user_roles.some((r) => r.role === role))

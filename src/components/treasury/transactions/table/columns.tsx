@@ -3,10 +3,11 @@ import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { cn, formatCurrency, formatDay, formatMonth, normalizeString } from '@/lib/utils'
+import { cn, formatCurrency, formatDay, normalizeString } from '@/lib/utils'
 import type { TransactionQueryData } from '@/tanstack-queries/treasury'
 import { PAYMENT_METHOD_LABEL } from '../../kind'
 import { TransactionsTableActions } from './actions'
+import { TransactionDescriptionCell } from './transaction-description-cell'
 
 const columnHelper = createColumnHelper<DataTableFeatures, TransactionQueryData>()
 
@@ -44,21 +45,7 @@ export const transactionsTableColumns = columnHelper.columns([
     id: 'description',
     size: 320,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Concepto" />,
-    cell: ({ row }) => {
-      const { description, folio, fee_month, notes } = row.original
-      const details = [folio && `Folio ${folio}`, fee_month && formatMonth(fee_month)].filter(Boolean)
-
-      return (
-        <div className="grid gap-0.5">
-          <span className="truncate" title={notes ?? undefined}>
-            {description}
-          </span>
-          {details.length > 0 && (
-            <span className="truncate text-xs text-muted-foreground">{details.join(' · ')}</span>
-          )}
-        </div>
-      )
-    },
+    cell: ({ row }) => <TransactionDescriptionCell transaction={row.original} />,
     // Search box target: concept, folio, reference, category or house, accent-insensitive.
     filterFn: (row, _columnId, value: string) => {
       const filterValue = normalizeString(value)
@@ -96,16 +83,8 @@ export const transactionsTableColumns = columnHelper.columns([
   columnHelper.accessor('payment_method', {
     id: 'payment_method',
     size: 130,
-    header: 'Método',
-    cell: ({ row }) => {
-      const { payment_method, reference } = row.original
-      return (
-        <div className="grid gap-0.5">
-          <span>{PAYMENT_METHOD_LABEL[payment_method]}</span>
-          {reference && <span className="truncate text-xs text-muted-foreground">{reference}</span>}
-        </div>
-      )
-    },
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Método" />,
+    cell: ({ getValue }) => PAYMENT_METHOD_LABEL[getValue()],
   }),
 
   columnHelper.accessor((row) => Number(row.amount), {

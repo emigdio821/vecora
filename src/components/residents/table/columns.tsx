@@ -103,8 +103,8 @@ export const residentsTableColumns = columnHelper.columns([
     header: 'Casas',
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
-        {row.original.property_residents.map(({ property, relationship }) => (
-          <Badge key={property.id} variant="outline" title={RELATIONSHIP_LABEL[relationship]}>
+        {row.original.property_residents.map(({ property }) => (
+          <Badge key={property.id} variant="outline">
             {property.number}
           </Badge>
         ))}

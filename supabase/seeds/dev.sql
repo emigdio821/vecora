@@ -44,6 +44,8 @@ declare
   cat_late_fee uuid;
   cat_garden   uuid;
   cat_services uuid;
+  cat_maint    uuid;
+  tx_bulbs     uuid;
 begin
   if not is_local then
     raise notice 'seeds/dev.sql: not a local database, skipping';
@@ -162,5 +164,28 @@ begin
     (p_2a, '2026-09-27', 'Cumpleaños, hasta las 10 pm', u_president),
     (p_1b, '2026-10-04', null,                          u_president);
 
-  raise notice 'seeds/dev.sql: created 5 users, 6 properties, 8 residents, 1 period, 7 transactions, 2 hall reservations';
+  -- -------------------------------------------------------------------------
+  -- maintenance: one of each status; the paid one has its expense in the ledger
+  -- -------------------------------------------------------------------------
+  select id into cat_maint from public.transaction_categories where kind = 'expense' and name = 'Mantenimiento';
+
+  insert into public.transactions
+    (kind, category_id, period_id, amount, occurred_on, payment_method, reference, description, notes, created_by)
+  values
+    ('expense', cat_maint, per_2026, 240, '2026-09-10', 'cash', null, 'Focos LED para pasillos', null, u_treasurer)
+  returning id into tx_bulbs;
+
+  insert into public.maintenance_requests
+    (title, details, amount, requested_on, status, rejection_reason, resolved_by, resolved_at, transaction_id, created_by)
+  values
+    ('Focos LED para pasillos', '6 focos de 9 W, pasillos de los edificios 1 y 2', 240, '2026-09-09',
+      'paid', null, u_treasurer, '2026-09-10 17:00-06', tx_bulbs, u_maintenance),
+    ('Pintura para la reja principal', 'Esmalte negro, 4 litros, y brochas', 650, '2026-09-20',
+      'pending', null, null, null, null, u_maintenance),
+    ('Reparación de la bomba de agua', 'Cambio de empaque y mano de obra del plomero', 1200, '2026-09-22',
+      'pending', null, null, null, null, u_maintenance),
+    ('Manguera nueva para el jardín', null, 380, '2026-09-14',
+      'rejected', 'Ya se compró una en agosto; usar esa', u_treasurer, '2026-09-15 10:30-06', null, u_maintenance);
+
+  raise notice 'seeds/dev.sql: created 5 users, 6 properties, 8 residents, 1 period, 8 transactions, 2 hall reservations, 4 maintenance requests';
 end $$;

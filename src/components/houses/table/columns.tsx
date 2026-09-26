@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { normalizeString } from '@/lib/utils'
 import type { HouseQueryData } from '@/tanstack-queries/houses'
-import { RELATIONSHIP_LABEL } from '../relationship'
 import { HousesTableActions } from './actions'
 import { HouseNumberCell } from './house-number-cell'
 
@@ -94,8 +93,8 @@ export const housesTableColumns = columnHelper.columns([
     header: 'Residentes',
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
-        {row.original.property_residents.map(({ resident, relationship }) => (
-          <Badge key={resident.id} variant="outline" title={RELATIONSHIP_LABEL[relationship]}>
+        {row.original.property_residents.map(({ resident }) => (
+          <Badge key={resident.id} variant="outline">
             {residentName(resident)}
           </Badge>
         ))}

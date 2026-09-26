@@ -69,7 +69,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
           <MenuGroup>
             <MenuGroupLabel className="my-1.5 py-0">{member.full_name}</MenuGroupLabel>
 
-            {canManage && <MenuItem onClick={() => setEditOpen(true)}>Editar cargos</MenuItem>}
+            {canManage && <MenuItem onClick={() => setEditOpen(true)}>Editar roles</MenuItem>}
 
             {!isSelf && <MenuItem onClick={() => resend.mutate()}>Nuevo enlace de acceso</MenuItem>}
 

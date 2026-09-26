@@ -5,7 +5,7 @@ export const APP_ROLES = ['admin', 'president', 'treasurer', 'security', 'mainte
 
 export type AppRole = (typeof APP_ROLES)[number]
 
-const rolesField = z.array(z.enum(APP_ROLES)).min(1, 'Selecciona al menos un cargo')
+const rolesField = z.array(z.enum(APP_ROLES)).min(1, 'Selecciona al menos un rol')
 
 /** Give a resident an account and seat them on the board. */
 export const addBoardMemberSchema = z.object({

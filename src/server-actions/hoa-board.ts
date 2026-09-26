@@ -86,7 +86,7 @@ export async function addBoardMember(input: AddBoardMemberInput): Promise<Action
 
   const { resident_id, roles } = parsed.data
   if (roles.includes('admin') && !manager.isAdmin) {
-    return { error: 'Solo un administrador puede otorgar el cargo de administrador' }
+    return { error: 'Solo un administrador puede otorgar el rol de administrador' }
   }
 
   const supabase = await createClient()
@@ -142,7 +142,7 @@ export async function addBoardMember(input: AddBoardMemberInput): Promise<Action
       await supabase.from('residents').update({ profile_id: null }).eq('id', resident_id)
     }
     await rollback()
-    return { error: toMessage(rolesError, 'No se pudieron asignar los cargos, intenta nuevamente') }
+    return { error: toMessage(rolesError, 'No se pudieron asignar los roles, intenta nuevamente') }
   }
 
   return { data: { link: invite.link, full_name: fullName, phone: resident.phone } }
@@ -184,7 +184,7 @@ export async function updateBoardMemberRoles(
   const manager = await requireBoardManager()
   if ('error' in manager) return manager
   if (userId === manager.user.id) {
-    return { error: 'No puedes cambiar tus propios cargos. Pídele a otro integrante que lo haga.' }
+    return { error: 'No puedes cambiar tus propios roles. Pídele a otro integrante que lo haga.' }
   }
 
   const supabase = await createClient()
@@ -193,7 +193,7 @@ export async function updateBoardMemberRoles(
     .select('role')
     .eq('user_id', userId)
   if (readError) {
-    return { error: toMessage(readError, 'No se pudieron leer los cargos actuales') }
+    return { error: toMessage(readError, 'No se pudieron leer los roles actuales') }
   }
 
   const current = new Set<AppRole>(currentRows.map((r) => r.role))
@@ -202,18 +202,18 @@ export async function updateBoardMemberRoles(
   const toRemove = [...current].filter((role) => !next.has(role))
 
   if ([...toAdd, ...toRemove].includes('admin') && !manager.isAdmin) {
-    return { error: 'Solo un administrador puede otorgar o quitar el cargo de administrador' }
+    return { error: 'Solo un administrador puede otorgar o quitar el rol de administrador' }
   }
 
   if (toRemove.length > 0) {
     const { error } = await supabase.from('user_roles').delete().eq('user_id', userId).in('role', toRemove)
-    if (error) return { error: toMessage(error, 'No se pudieron actualizar los cargos, intenta nuevamente') }
+    if (error) return { error: toMessage(error, 'No se pudieron actualizar los roles, intenta nuevamente') }
   }
   if (toAdd.length > 0) {
     const { error } = await supabase
       .from('user_roles')
       .insert(toAdd.map((role) => ({ user_id: userId, role })))
-    if (error) return { error: toMessage(error, 'No se pudieron actualizar los cargos, intenta nuevamente') }
+    if (error) return { error: toMessage(error, 'No se pudieron actualizar los roles, intenta nuevamente') }
   }
 
   return { data: undefined }

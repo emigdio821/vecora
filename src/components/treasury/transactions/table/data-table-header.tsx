@@ -1,14 +1,21 @@
 import type { Table } from '@tanstack/react-table'
-import { InfoIcon, SearchIcon, Trash2Icon, XIcon } from 'lucide-react'
+import { InfoIcon, ListFilterIcon, SearchIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group'
+import {
+  Menu,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuPopup,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuTrigger,
+} from '@/components/ui/menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
 import type { TransactionQueryData } from '@/tanstack-queries/treasury'
 import { DeleteTransactionsAlertDialog } from '../dialog/delete-transactions'
 import { CreateTransactionDrawer } from '../drawer/create-transaction'
@@ -22,8 +29,6 @@ const KIND_FILTER_ITEMS: { value: KindFilter; label: string }[] = [
   { value: 'income', label: 'Ingresos' },
   { value: 'expense', label: 'Egresos' },
 ]
-
-const kindFilterItemClassName = segmentedControlItemVariants({ state: 'checked' })
 
 /** URL-backed kind filter, shared by the header (control) and the table (data). */
 export function useKindFilter() {
@@ -39,6 +44,8 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-transactions', parseAsString.withDefault(''))
   const [kind, setKind] = useKindFilter()
+  const isFiltered = kind !== 'all'
+  const activeKindLabel = KIND_FILTER_ITEMS.find((item) => item.value === kind)?.label
   const [isRecordFeeOpen, setRecordFeeOpen] = useState(false)
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [isDeleteSelectedOpen, setDeleteSelectedOpen] = useState(false)
@@ -117,18 +124,48 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
         </InputGroup>
 
         <div className="flex flex-wrap justify-end gap-2">
-          <RadioGroupPrimitive
-            className={segmentedControlRootClassName}
-            aria-label="Tipo de movimiento"
-            value={kind}
-            onValueChange={(value) => void setKind(value as KindFilter)}
-          >
-            {KIND_FILTER_ITEMS.map((item) => (
-              <RadioPrimitive.Root key={item.value} className={kindFilterItemClassName} value={item.value}>
-                {item.label}
-              </RadioPrimitive.Root>
-            ))}
-          </RadioGroupPrimitive>
+          <Menu>
+            <Tooltip>
+              <TooltipTrigger
+                closeOnClick={false}
+                render={
+                  <MenuTrigger
+                    render={
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        className="relative"
+                        aria-label={isFiltered ? `Filtros: ${activeKindLabel}` : 'Filtros'}
+                      >
+                        <ListFilterIcon className="size-4" />
+                        {/* The list is narrowed; don't let that go unnoticed. */}
+                        {isFiltered && (
+                          <span
+                            aria-hidden
+                            className="absolute -top-1 -right-1 size-2.5 rounded-full border-2 border-background bg-primary"
+                          />
+                        )}
+                      </Button>
+                    }
+                  />
+                }
+              />
+              <TooltipContent>{isFiltered ? `Filtros: ${activeKindLabel}` : 'Filtros'}</TooltipContent>
+            </Tooltip>
+
+            <MenuPopup align="end">
+              <MenuGroup>
+                <MenuGroupLabel>Tipo de movimiento</MenuGroupLabel>
+                <MenuRadioGroup value={kind} onValueChange={(value: KindFilter) => void setKind(value)}>
+                  {KIND_FILTER_ITEMS.map((item) => (
+                    <MenuRadioItem key={item.value} value={item.value}>
+                      {item.label}
+                    </MenuRadioItem>
+                  ))}
+                </MenuRadioGroup>
+              </MenuGroup>
+            </MenuPopup>
+          </Menu>
 
           {selectedRowsLength > 0 && (
             <Tooltip>

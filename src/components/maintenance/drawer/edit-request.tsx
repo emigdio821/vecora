@@ -19,41 +19,32 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
-import { type UpdateBoardMemberRolesInput, updateBoardMemberRolesSchema } from '@/lib/validations/hoa-board'
-import { updateBoardMemberRoles } from '@/server-actions/hoa-board'
-import { type BoardMemberQueryData, HOA_BOARD_QUERY_KEY } from '@/tanstack-queries/hoa-board'
-import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
-import { RolesField } from '../roles-field'
+import { type MaintenanceRequestInput, maintenanceRequestSchema } from '@/lib/validations/maintenance'
+import { updateMaintenanceRequest } from '@/server-actions/maintenance'
+import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
+import { RequestFormFields } from './request-form-fields'
 
-const FORM_ID = 'edit-board-member-form'
+const FORM_ID = 'edit-request-form'
 
-interface EditBoardMemberDrawerProps extends React.ComponentProps<typeof Drawer> {
-  member: BoardMemberQueryData
+interface EditRequestDrawerProps extends React.ComponentProps<typeof Drawer> {
+  request: MaintenanceRequestQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
-  canGrantAdmin: boolean
 }
 
-type UpdateRolesMutation = UseMutationResult<void, Error, UpdateBoardMemberRolesInput>
+type UpdateRequestMutation = UseMutationResult<void, Error, MaintenanceRequestInput>
 
-export function EditBoardMemberDrawer({
-  member,
-  open,
-  onOpenChange,
-  canGrantAdmin,
-  ...props
-}: EditBoardMemberDrawerProps) {
+export function EditRequestDrawer({ request, open, onOpenChange, ...props }: EditRequestDrawerProps) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: async (values: UpdateBoardMemberRolesInput) => {
-      const result = await updateBoardMemberRoles(member.id, values)
+    mutationFn: async (values: MaintenanceRequestInput) => {
+      const result = await updateMaintenanceRequest(request.id, values)
       if (result.error !== undefined) throw new Error(result.error)
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [HOA_BOARD_QUERY_KEY] })
-      void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Roles actualizados', description: member.full_name })
+    onSuccess: (_data, values) => {
+      void queryClient.invalidateQueries({ queryKey: [MAINTENANCE_QUERY_KEY] })
+      toastManager.add({ type: 'success', title: 'Solicitud actualizada', description: values.title })
       onOpenChange(false)
     },
   })
@@ -71,30 +62,33 @@ export function EditBoardMemberDrawer({
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar roles</DrawerTitle>
-          <DrawerDescription>{member.full_name}</DrawerDescription>
+          <DrawerTitle>Editar solicitud</DrawerTitle>
+          <DrawerDescription>Solo se puede editar mientras esté pendiente.</DrawerDescription>
         </DrawerHeader>
 
-        {/* Mounted only while the drawer is open, so the form always starts
-            from the current row and a refetch mid-edit can't reset it. */}
-        <EditBoardMemberForm member={member} mutation={mutation} canGrantAdmin={canGrantAdmin} />
+        {/* Mounted only while open, so the form starts from the current row
+            and a refetch mid-edit can't reset it. */}
+        <EditRequestForm request={request} mutation={mutation} />
       </DrawerPopup>
     </Drawer>
   )
 }
 
-function EditBoardMemberForm({
-  member,
+function EditRequestForm({
+  request,
   mutation,
-  canGrantAdmin,
 }: {
-  member: BoardMemberQueryData
-  mutation: UpdateRolesMutation
-  canGrantAdmin: boolean
+  request: MaintenanceRequestQueryData
+  mutation: UpdateRequestMutation
 }) {
-  const form = useForm<UpdateBoardMemberRolesInput>({
-    resolver: zodResolver(updateBoardMemberRolesSchema),
-    defaultValues: { roles: member.user_roles.map((r) => r.role) },
+  const form = useForm<MaintenanceRequestInput>({
+    resolver: zodResolver(maintenanceRequestSchema),
+    defaultValues: {
+      title: request.title,
+      details: request.details ?? '',
+      amount: Number(request.amount),
+      requested_on: request.requested_on,
+    },
   })
 
   return (
@@ -105,12 +99,11 @@ function EditBoardMemberForm({
           className="flex flex-col gap-4"
           onSubmit={form.handleSubmit((values) =>
             mutation.mutate(values, {
-              // Per-call callback so the error lands in this form instance.
               onError: (error) => form.setError('root', { message: error.message }),
             }),
           )}
         >
-          <RolesField form={form} name="roles" disabled={mutation.isPending} canGrantAdmin={canGrantAdmin} />
+          <RequestFormFields form={form} disabled={mutation.isPending} />
 
           {form.formState.errors.root && (
             <Alert variant="error">
