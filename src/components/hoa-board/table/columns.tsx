@@ -59,12 +59,17 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
 
     columnHelper.display({
       id: 'houses',
-      size: 110,
-      header: 'Casa',
-      cell: ({ row }) => {
-        const numbers = row.original.resident?.property_residents.map((pr) => pr.property.number) ?? []
-        return <span className="whitespace-nowrap">{numbers.join(', ')}</span>
-      },
+      size: 120,
+      header: 'Casas',
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1">
+          {row.original.resident?.property_residents.map(({ property }) => (
+            <Badge key={property.id} variant="outline">
+              {property.number}
+            </Badge>
+          ))}
+        </div>
+      ),
     }),
 
     columnHelper.display({
