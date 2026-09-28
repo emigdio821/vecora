@@ -22,6 +22,7 @@ export const SECTION_LABEL: Record<string, string> = {
   properties: 'Casas',
   residents: 'Residentes',
   property_residents: 'Casas y residentes',
+  settings: 'Ajustes',
 }
 
 export const SECTIONS = Object.keys(SECTION_LABEL)
@@ -148,6 +149,7 @@ const FIELD_LABEL: Record<string, string> = {
   user_id: 'Cuenta',
   role: 'Rol',
   relationship: 'Relación',
+  residential_name: 'Nombre del residencial',
   amount: 'Monto',
   occurred_on: 'Fecha',
   requested_on: 'Fecha',
@@ -176,7 +178,7 @@ export function fieldLabel(field: string) {
 }
 
 /** Bookkeeping columns the admin never needs to see. */
-const HIDDEN_FIELDS = new Set(['id', 'updated_at'])
+const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton'])
 
 const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee'])
 const DAY_FIELDS = new Set(['occurred_on', 'requested_on', 'reserved_on', 'starts_on', 'ends_on'])

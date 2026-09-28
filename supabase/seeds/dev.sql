@@ -138,6 +138,10 @@ begin
   -- -------------------------------------------------------------------------
   perform pg_temp.act_as(u_president);
 
+  update public.settings set residential_name = 'Loma Verde Coto 404';
+  t := t + interval '10 minutes';
+  perform pg_temp.mark(t);
+
   -- houses: A1–A5, B1–B5, C1–C5, D1–D5
   insert into public.properties (number)
   select block || n

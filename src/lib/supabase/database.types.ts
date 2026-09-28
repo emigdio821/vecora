@@ -48,7 +48,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'audit_log_actor_id_fkey'
+            foreignKeyName: 'audit_log_identity_id_fkey'
             columns: ['identity_id']
             isOneToOne: false
             referencedRelation: 'profiles'
@@ -445,6 +445,27 @@ export type Database = {
             referencedColumns: ['id']
           },
         ]
+      }
+      settings: {
+        Row: {
+          id: string
+          residential_name: string
+          singleton: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          residential_name?: string
+          singleton?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          residential_name?: string
+          singleton?: boolean
+          updated_at?: string
+        }
+        Relationships: []
       }
       transaction_categories: {
         Row: {

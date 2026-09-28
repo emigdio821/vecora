@@ -3,6 +3,8 @@
 import { ChartLineIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import type { Settings } from '@/lib/supabase/settings'
+import { DEFAULT_RESIDENTIAL_LABEL } from '@/lib/validations/settings'
 import { ResidoIcon } from '../shared/icons'
 import {
   SidebarGroupContent,
@@ -12,9 +14,14 @@ import {
   useSidebar,
 } from '../ui/sidebar'
 
-export function HeaderNav({ ...props }: React.ComponentProps<typeof SidebarGroupContent>) {
+interface HeaderNavProps extends React.ComponentProps<typeof SidebarGroupContent> {
+  settings: Settings
+}
+
+export function HeaderNav({ settings, ...props }: HeaderNavProps) {
   const pathname = usePathname()
   const { setOpenMobile } = useSidebar()
+  const residentialName = settings.residentialName || DEFAULT_RESIDENTIAL_LABEL
 
   return (
     <SidebarGroupContent className="flex flex-col gap-2" {...props}>
@@ -25,7 +32,9 @@ export function HeaderNav({ ...props }: React.ComponentProps<typeof SidebarGroup
 
             <div className="grid flex-1 text-left text-sm leading-none">
               <span className="truncate text-base font-semibold text-sidebar-accent-foreground">Resido</span>
-              <span className="truncate text-sm text-sidebar-foreground">Manejo residencial</span>
+              <span className="truncate text-sm text-sidebar-foreground" title={residentialName}>
+                {residentialName}
+              </span>
             </div>
           </div>
         </SidebarMenuItem>

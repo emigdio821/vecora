@@ -11,7 +11,8 @@ import { APP_ROLES, type AppRole } from '@/lib/validations/hoa-board'
 const ROLE_DESCRIPTION: Record<AppRole, string> = {
   admin:
     'Todo, incluyendo administrar la mesa directiva y otros administradores, y ver el "Historial" de cambios.',
-  president: '"Residencial" (casas y residentes), "Presidencia" (periodos y terraza) y "Mesa directiva".',
+  president:
+    '"Residencial" (casas y residentes), "Presidencia" (periodos y terraza), "Mesa directiva" y los "Ajustes" del residencial.',
   treasurer:
     '"Tesorería" (movimientos, cuotas y categorías), los periodos de "Presidencia" y pagar o rechazar las solicitudes de "Mantenimiento" y "Seguridad".',
   security:
