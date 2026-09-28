@@ -1,6 +1,6 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar'
 import type { CurrentUser } from '@/lib/supabase/current-user'
-// import { NavAdmin } from './navs/admin'
+import { NavAdmin } from './navs/admin'
 import { HeaderNav } from './navs/header'
 import { NavMain } from './navs/main'
 import { NavUser } from './navs/user'
@@ -17,7 +17,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
-        {/* <NavAdmin /> */}
+        {user.roles.includes('admin') && <NavAdmin />}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

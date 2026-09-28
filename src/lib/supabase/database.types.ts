@@ -3,6 +3,59 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          changed_fields: string[] | null
+          id: number
+          identity_id: string | null
+          label: string
+          new_data: Json | null
+          occurred_at: string
+          old_data: Json | null
+          operation: Database['public']['Enums']['audit_operation']
+          refs: Json
+          row_id: string | null
+          table_name: string
+          txid: number
+        }
+        Insert: {
+          changed_fields?: string[] | null
+          id?: never
+          identity_id?: string | null
+          label: string
+          new_data?: Json | null
+          occurred_at?: string
+          old_data?: Json | null
+          operation: Database['public']['Enums']['audit_operation']
+          refs?: Json
+          row_id?: string | null
+          table_name: string
+          txid?: number
+        }
+        Update: {
+          changed_fields?: string[] | null
+          id?: never
+          identity_id?: string | null
+          label?: string
+          new_data?: Json | null
+          occurred_at?: string
+          old_data?: Json | null
+          operation?: Database['public']['Enums']['audit_operation']
+          refs?: Json
+          row_id?: string | null
+          table_name?: string
+          txid?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'audit_log_actor_id_fkey'
+            columns: ['identity_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       hall_reservations: {
         Row: {
           created_at: string
@@ -667,6 +720,7 @@ export type Database = {
     }
     Enums: {
       app_role: 'admin' | 'president' | 'treasurer' | 'security' | 'maintenance'
+      audit_operation: 'insert' | 'update' | 'delete'
       payment_method: 'cash' | 'transfer'
       request_status: 'pending' | 'paid' | 'rejected'
       residency_relationship: 'owner' | 'tenant' | 'family'
@@ -798,6 +852,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ['admin', 'president', 'treasurer', 'security', 'maintenance'],
+      audit_operation: ['insert', 'update', 'delete'],
       payment_method: ['cash', 'transfer'],
       request_status: ['pending', 'paid', 'rejected'],
       residency_relationship: ['owner', 'tenant', 'family'],
