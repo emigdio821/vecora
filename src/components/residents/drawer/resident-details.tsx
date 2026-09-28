@@ -81,7 +81,7 @@ export function ResidentDetailsDrawer({
               <ul className="grid gap-2">
                 {resident.property_residents.map(({ property, relationship }) => (
                   <li key={property.id} className="flex items-center justify-between text-sm">
-                    <span className="font-medium">Casa {property.number}</span>
+                    <span className="font-medium">{property.number}</span>
                     <Badge variant="outline">{RELATIONSHIP_LABEL[relationship]}</Badge>
                   </li>
                 ))}

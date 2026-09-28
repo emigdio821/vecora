@@ -135,7 +135,7 @@ export function DeleteHousesAlertDialog({
           <ul className="max-h-48 overflow-y-auto px-6 pb-4 text-sm">
             {houses.map((house) => (
               <li key={house.id} className="truncate">
-                Casa {house.number}
+                {house.number}
               </li>
             ))}
           </ul>

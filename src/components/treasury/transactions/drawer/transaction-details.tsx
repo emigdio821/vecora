@@ -62,7 +62,7 @@ export function TransactionDetailsDrawer({
               <Detail label="Categoría">
                 <Badge variant="outline">{transaction.category.name}</Badge>
               </Detail>
-              {property && <Detail label="Casa">Casa {property.number}</Detail>}
+              {property && <Detail label="Casa">{property.number}</Detail>}
               {fee_month && <Detail label="Mes de la cuota">{formatMonth(fee_month)}</Detail>}
               {folio && <Detail label="Folio">{folio}</Detail>}
             </div>

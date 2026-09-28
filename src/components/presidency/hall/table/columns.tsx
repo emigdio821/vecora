@@ -44,7 +44,7 @@ export const hallReservationsTableColumns = columnHelper.columns([
     id: 'property',
     size: 120,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Casa" />,
-    cell: ({ getValue }) => `Casa ${getValue()}`,
+    cell: ({ getValue }) => getValue(),
     sortFn: (rowA, rowB) =>
       rowA.original.property.number.localeCompare(rowB.original.property.number, 'es', {
         numeric: true,

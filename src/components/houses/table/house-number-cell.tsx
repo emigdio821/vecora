@@ -23,7 +23,7 @@ export function HouseNumberCell({ house }: HouseNumberCellProps) {
           setDetailsOpen(true)
         }}
       >
-        <span className="truncate">Casa {house.number}</span>
+        <span className="truncate">{house.number}</span>
       </Button>
     </>
   )

@@ -73,10 +73,7 @@ export const transactionsTableColumns = columnHelper.columns([
     id: 'property',
     size: 110,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Casa" />,
-    cell: ({ row }) => {
-      const property = row.original.property
-      return property ? `Casa ${property.number}` : null
-    },
+    cell: ({ row }) => row.original.property?.number ?? null,
     sortFn: (rowA, rowB) =>
       (rowA.original.property?.number ?? '').localeCompare(rowB.original.property?.number ?? '', 'es', {
         numeric: true,
