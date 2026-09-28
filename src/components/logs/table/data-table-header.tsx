@@ -2,6 +2,7 @@ import type { Table } from '@tanstack/react-table'
 import { InfoIcon, ListFilterIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { RangePicker } from '@/components/shared/range-picker'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
@@ -26,7 +27,6 @@ import {
   useRangeFilter,
   useSectionFilter,
 } from './filters'
-import { RangePicker } from './range-picker'
 
 const SECTION_FILTER_ITEMS: { value: SectionFilter; label: string }[] = [
   { value: 'all', label: 'Todas' },

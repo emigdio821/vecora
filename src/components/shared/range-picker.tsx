@@ -17,18 +17,30 @@ import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { formatDay, ISO_DAY } from '@/lib/utils'
-import type { LogsRange } from '@/tanstack-queries/logs'
 
-interface RangePickerProps {
-  value: LogsRange
-  onChange: (range: LogsRange) => void
+export interface DayRange {
+  /** ISO day, inclusive. */
+  from: string
+  /** ISO day, inclusive. */
+  to: string
 }
 
-function toRange(from: Date, to: Date): LogsRange {
+export interface RangePreset {
+  label: string
+  range: (today: Date) => DayRange
+}
+
+interface RangePickerProps {
+  value: DayRange
+  onChange: (range: DayRange) => void
+  presets?: RangePreset[]
+}
+
+export function toRange(from: Date, to: Date): DayRange {
   return { from: format(from, ISO_DAY), to: format(to, ISO_DAY) }
 }
 
-const PRESETS: { label: string; range: (today: Date) => LogsRange }[] = [
+const DEFAULT_PRESETS: RangePreset[] = [
   { label: 'Hoy', range: (today) => toRange(today, today) },
   { label: 'Últimos 7 días', range: (today) => toRange(subDays(today, 6), today) },
   { label: 'Últimos 30 días', range: (today) => toRange(subDays(today, 29), today) },
@@ -38,9 +50,9 @@ const PRESETS: { label: string; range: (today: Date) => LogsRange }[] = [
 
 /**
  * Which days to show. The first click starts a new range and the second one
- * finishes it, in either order; only then is the URL updated.
+ * finishes it, in either order; only then does `onChange` fire.
  */
-export function RangePicker({ value, onChange }: RangePickerProps) {
+export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS }: RangePickerProps) {
   const today = new Date()
   const [isOpen, setOpen] = useState(false)
   const [month, setMonth] = useState(() => parseISO(value.from))
@@ -53,7 +65,7 @@ export function RangePicker({ value, onChange }: RangePickerProps) {
   const label =
     value.from === value.to ? formatDay(value.from) : `${formatDay(value.from)} – ${formatDay(value.to)}`
 
-  function commit(range: LogsRange) {
+  function commit(range: DayRange) {
     onChange(range)
     setMonth(parseISO(range.from))
     setDraftFrom(undefined)
@@ -76,7 +88,7 @@ export function RangePicker({ value, onChange }: RangePickerProps) {
         <div className="flex max-sm:flex-col">
           <div className="relative py-1 ps-1 max-sm:order-1 max-sm:border-t">
             <div className="flex h-full flex-col sm:border-e sm:pe-3">
-              {PRESETS.map((preset) => (
+              {presets.map((preset) => (
                 <Button
                   key={preset.label}
                   size="sm"

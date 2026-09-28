@@ -27,7 +27,7 @@ create trigger settings_set_updated_at
   for each row execute function private.set_updated_at();
 
 -- ---------------------------------------------------------------------------
--- audit: label the row with the name so the log reads "Editó Ajustes · Loma Verde"
+-- audit: label the row with the name so the log reads "Editó Ajustes - Loma Verde"
 -- ---------------------------------------------------------------------------
 create or replace function private.audit()
 returns trigger

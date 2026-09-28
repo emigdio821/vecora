@@ -63,7 +63,7 @@ export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequ
       toastManager.add({
         type: 'success',
         title: 'Solicitud enviada a tesorería',
-        description: `${values.title} · ${formatCurrency(values.amount)}`,
+        description: `${values.title} - ${formatCurrency(values.amount)}`,
       })
       onOpenChange(false)
     },

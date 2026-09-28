@@ -689,6 +689,10 @@ export type Database = {
         }
         Returns: string
       }
+      financial_report: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
       pay_maintenance_request: {
         Args: {
           p_category_id: string

@@ -57,11 +57,11 @@ export function NoticesCard() {
                 <li key={reservation.id} className="grid gap-0.5 px-6 py-3 text-sm first:pt-0 last:pb-0">
                   <span className="truncate font-medium">
                     {format(parseISO(reservation.reserved_on), "EEEE d 'de' MMMM", { locale: es })}
-                    {reservation.reserved_on === today && ' · Hoy'}
+                    {reservation.reserved_on === today && ' - Hoy'}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
                     Casa {reservation.property.number}
-                    {reservation.notes && ` · ${reservation.notes}`}
+                    {reservation.notes && ` - ${reservation.notes}`}
                   </span>
                 </li>
               ))}

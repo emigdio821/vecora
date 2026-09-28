@@ -53,7 +53,7 @@ export function EditTransactionDrawer({
       toastManager.add({
         type: 'success',
         title: 'Movimiento actualizado',
-        description: `${values.description} · ${formatCurrency(values.amount)}`,
+        description: `${values.description} - ${formatCurrency(values.amount)}`,
       })
       onOpenChange(false)
     },

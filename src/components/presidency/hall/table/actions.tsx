@@ -18,7 +18,7 @@ export function HallReservationsTableActions({ reservation }: ActionsProps) {
   const canManage = useHasRole('president', 'treasurer')
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
-  const summary = `${formatDay(reservation.reserved_on)} · Casa ${reservation.property.number}`
+  const summary = `${formatDay(reservation.reserved_on)} - Casa ${reservation.property.number}`
 
   // Every item here writes, so readers see no menu.
   if (!canManage) return null

@@ -16,7 +16,7 @@ import { LoginPageClient } from './page.client'
 export const metadata: Metadata = {
   title: {
     default: 'Iniciar sesión',
-    template: `%s · Iniciar sesión`,
+    template: `%s - Iniciar sesión`,
   },
   description: 'Ingresa tus credenciales para acceder a tu cuenta',
 }

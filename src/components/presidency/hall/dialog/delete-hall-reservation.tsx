@@ -30,7 +30,7 @@ export function DeleteHallReservationAlertDialog({
   ...props
 }: DeleteHallReservationAlertDialogProps) {
   const queryClient = useQueryClient()
-  const summary = `${formatDay(reservation.reserved_on)} · Casa ${reservation.property.number}`
+  const summary = `${formatDay(reservation.reserved_on)} - Casa ${reservation.property.number}`
 
   const mutation = useMutation({
     mutationFn: async () => {

@@ -102,18 +102,18 @@ export function entrySummary(entry: LogEntryQueryData): string {
     case 'transactions':
     case 'maintenance_requests':
     case 'security_requests':
-      return row.amount == null ? label : `${label} · ${formatCurrency(asText(row.amount))}`
+      return row.amount == null ? label : `${label} - ${formatCurrency(asText(row.amount))}`
     case 'hall_reservations':
-      return `Casa ${label} · ${formatDay(asText(row.reserved_on))}`
+      return `Casa ${label} - ${formatDay(asText(row.reserved_on))}`
     case 'property_residents': {
       const resident = refName(entry, row.resident_id) ?? 'Residente'
       const relationship = enumLabel(row.relationship)
-      return `Casa ${label} · ${resident}${relationship ? ` (${relationship.toLowerCase()})` : ''}`
+      return `Casa ${label} - ${resident}${relationship ? ` (${relationship.toLowerCase()})` : ''}`
     }
     case 'properties':
       return `Casa ${label}`
     case 'user_roles':
-      return `${enumLabel(row.role) ?? asText(row.role)} · ${label}`
+      return `${enumLabel(row.role) ?? asText(row.role)} - ${label}`
     default:
       return label
   }

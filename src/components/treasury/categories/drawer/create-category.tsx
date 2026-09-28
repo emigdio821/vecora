@@ -53,7 +53,7 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
       toastManager.add({
         type: 'success',
         title: 'Categoría creada',
-        description: `${values.name} · ${KIND_LABEL[values.kind]}`,
+        description: `${values.name} - ${KIND_LABEL[values.kind]}`,
       })
       onOpenChange(false)
     },

@@ -80,7 +80,7 @@ export function CreateTransactionDrawer({
       toastManager.add({
         type: 'success',
         title: `${KIND_LABEL[values.kind]} registrado`,
-        description: `${values.description} · ${formatCurrency(values.amount)}`,
+        description: `${values.description} - ${formatCurrency(values.amount)}`,
       })
       onOpenChange(false)
     },

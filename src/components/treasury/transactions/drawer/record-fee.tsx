@@ -136,7 +136,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
       toastManager.add({
         type: 'success',
         title: 'Cuota registrada',
-        description: `${house ? houseLabel(house) : 'Casa'}: ${months}${recargo}, ${formatCurrency(summary.total)} · Folio ${values.folio}`,
+        description: `${house ? houseLabel(house) : 'Casa'}: ${months}${recargo}, ${formatCurrency(summary.total)} - Folio ${values.folio}`,
       })
       onOpenChange(false)
     },

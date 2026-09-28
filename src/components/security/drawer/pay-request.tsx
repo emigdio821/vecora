@@ -64,7 +64,7 @@ export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayR
       toastManager.add({
         type: 'success',
         title: 'Pago registrado',
-        description: `${request.title} · ${formatCurrency(Number(request.amount))} ya está en "Tesorería"`,
+        description: `${request.title} - ${formatCurrency(Number(request.amount))} ya está en "Tesorería"`,
       })
       onOpenChange(false)
     },
@@ -85,7 +85,7 @@ export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayR
         <DrawerHeader>
           <DrawerTitle>Registrar pago</DrawerTitle>
           <DrawerDescription>
-            {request.title} · {formatCurrency(Number(request.amount))}. Se registrará como egreso en
+            {request.title} - {formatCurrency(Number(request.amount))}. Se registrará como egreso en
             "Tesorería" y la solicitud pasará a "Pagada".
           </DrawerDescription>
         </DrawerHeader>

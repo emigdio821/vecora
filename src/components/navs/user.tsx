@@ -51,7 +51,6 @@ export function NavUser({ user }: NavUserProps) {
                   </Avatar>
                   <div className="grid min-w-0 flex-1 gap-1 text-left leading-none">
                     <span className="truncate font-medium">{user.fullName}</span>
-                    {/* One row only: the button is fixed-height, so extra roles clip instead of wrapping. */}
                     <div className="flex gap-1 overflow-hidden">
                       {user.roles.length ? (
                         user.roles.map((role) => <RoleNameBadge key={role} size="sm" roleName={role} />)

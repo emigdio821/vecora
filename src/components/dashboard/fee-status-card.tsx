@@ -91,7 +91,7 @@ export function FeeStatusCard() {
                     <div className="flex items-center justify-between gap-3">
                       <span className="truncate">
                         <span className="font-medium">Casa {house.number}</span>
-                        {owners && <span className="text-muted-foreground"> · {owners}</span>}
+                        {owners && <span className="text-muted-foreground"> - {owners}</span>}
                       </span>
                       <Badge variant="warning" className="shrink-0">
                         {months.length === 1 ? '1 mes' : `${months.length} meses`}

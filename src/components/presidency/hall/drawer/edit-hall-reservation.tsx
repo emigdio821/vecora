@@ -74,7 +74,7 @@ export function EditHallReservationDrawer({
         <DrawerHeader>
           <DrawerTitle>Editar reservación</DrawerTitle>
           <DrawerDescription>
-            {formatDay(reservation.reserved_on)} · Casa {reservation.property.number}
+            {formatDay(reservation.reserved_on)} - Casa {reservation.property.number}
           </DrawerDescription>
         </DrawerHeader>
 

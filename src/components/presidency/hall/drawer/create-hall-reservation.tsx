@@ -66,7 +66,7 @@ export function CreateHallReservationDrawer({
       toastManager.add({
         type: 'success',
         title: 'Terraza reservada',
-        description: `${formatDay(values.reserved_on)}${house ? ` · ${houseLabel(house)}` : ''}`,
+        description: `${formatDay(values.reserved_on)}${house ? ` - ${houseLabel(house)}` : ''}`,
       })
       onOpenChange(false)
     },
