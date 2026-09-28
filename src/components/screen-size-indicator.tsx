@@ -1,5 +1,9 @@
-export default function ScreenSizeIndicator() {
-  if (process.env.NODE_ENV === 'production') return null
+interface ScreenSizeIndicatorProps {
+  disabled?: boolean
+}
+
+export default function ScreenSizeIndicator({ disabled }: ScreenSizeIndicatorProps) {
+  if (process.env.NODE_ENV === 'production' || disabled) return null
 
   return (
     <div className="fixed top-2 right-2 z-50 rounded bg-black px-2 py-1 font-mono text-xs text-white shadow">

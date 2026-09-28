@@ -59,7 +59,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <ToastProvider>
             <AnchoredToastProvider>{children}</AnchoredToastProvider>
           </ToastProvider>
-          <ScreenSizeIndicator />
+          <ScreenSizeIndicator disabled />
         </ThemeProvider>
       </body>
     </html>
