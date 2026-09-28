@@ -2,6 +2,7 @@
 
 import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { type PeriodQueryData, transactionCount } from '@/tanstack-queries/treasury'
@@ -13,10 +14,14 @@ interface ActionsProps {
 }
 
 export function PeriodsTableActions({ period }: ActionsProps) {
+  const canManage = useHasRole('treasurer', 'president')
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
   // Soft-deleted movements count too: the ledger is never purged.
   const canDelete = transactionCount(period) === 0
+
+  // Every item here writes, so readers see no menu.
+  if (!canManage) return null
 
   return (
     <>

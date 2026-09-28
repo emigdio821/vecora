@@ -2,6 +2,7 @@
 
 import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import type { TransactionQueryData } from '@/tanstack-queries/treasury'
@@ -12,9 +13,13 @@ interface ActionsProps {
   transaction: TransactionQueryData
 }
 
+/** Edit and delete only, so readers see no menu; details open from the concept cell. */
 export function TransactionsTableActions({ transaction }: ActionsProps) {
+  const canManage = useHasRole('treasurer')
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
+
+  if (!canManage) return null
 
   return (
     <>

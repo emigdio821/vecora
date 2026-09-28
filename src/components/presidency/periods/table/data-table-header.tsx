@@ -2,6 +2,7 @@ import type { Table } from '@tanstack/react-table'
 import { InfoIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
@@ -17,6 +18,7 @@ interface PeriodsDataTableHeaderProps {
 }
 
 export function PeriodsDataTableHeader({ table, latest }: PeriodsDataTableHeaderProps) {
+  const canManage = useHasRole('treasurer', 'president')
   const searchInputRef = useRef<HTMLInputElement | null>(null)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isCreateOpen, setCreateOpen] = useState(false)
@@ -87,13 +89,15 @@ export function PeriodsDataTableHeader({ table, latest }: PeriodsDataTableHeader
           </InputGroupAddon>
         </InputGroup>
 
-        <Button
-          onClick={() => {
-            setCreateOpen(true)
-          }}
-        >
-          Nuevo periodo
-        </Button>
+        {canManage && (
+          <Button
+            onClick={() => {
+              setCreateOpen(true)
+            }}
+          >
+            Nuevo periodo
+          </Button>
+        )}
       </div>
     </>
   )

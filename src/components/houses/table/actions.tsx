@@ -2,6 +2,7 @@
 
 import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import type { HouseQueryData } from '@/tanstack-queries/houses'
@@ -14,6 +15,7 @@ interface ActionsProps {
 }
 
 export function HousesTableActions({ house }: ActionsProps) {
+  const canManage = useHasRole('president')
   const [isDetailsOpen, setDetailsOpen] = useState(false)
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
@@ -22,8 +24,12 @@ export function HousesTableActions({ house }: ActionsProps) {
   return (
     <>
       <HouseDetailsDrawer house={house} open={isDetailsOpen} onOpenChange={setDetailsOpen} />
-      <EditHouseDrawer house={house} open={isEditOpen} onOpenChange={setEditOpen} />
-      <DeleteHousesAlertDialog houses={[house]} open={isDeleteOpen} onOpenChange={setDeleteOpen} />
+      {canManage && (
+        <>
+          <EditHouseDrawer house={house} open={isEditOpen} onOpenChange={setEditOpen} />
+          <DeleteHousesAlertDialog houses={[house]} open={isDeleteOpen} onOpenChange={setDeleteOpen} />
+        </>
+      )}
 
       <Menu>
         <MenuTrigger
@@ -45,22 +51,26 @@ export function HousesTableActions({ house }: ActionsProps) {
               Información
             </MenuItem>
 
-            <MenuItem
-              onClick={() => {
-                setEditOpen(true)
-              }}
-            >
-              Editar
-            </MenuItem>
+            {canManage && (
+              <>
+                <MenuItem
+                  onClick={() => {
+                    setEditOpen(true)
+                  }}
+                >
+                  Editar
+                </MenuItem>
 
-            <MenuItem
-              variant="destructive"
-              onClick={() => {
-                setDeleteOpen(true)
-              }}
-            >
-              Eliminar
-            </MenuItem>
+                <MenuItem
+                  variant="destructive"
+                  onClick={() => {
+                    setDeleteOpen(true)
+                  }}
+                >
+                  Eliminar
+                </MenuItem>
+              </>
+            )}
           </MenuGroup>
         </MenuPopup>
       </Menu>

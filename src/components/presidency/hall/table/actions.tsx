@@ -2,6 +2,7 @@
 
 import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { formatDay } from '@/lib/utils'
@@ -14,9 +15,13 @@ interface ActionsProps {
 }
 
 export function HallReservationsTableActions({ reservation }: ActionsProps) {
+  const canManage = useHasRole('president', 'treasurer')
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
   const summary = `${formatDay(reservation.reserved_on)} · Casa ${reservation.property.number}`
+
+  // Every item here writes, so readers see no menu.
+  if (!canManage) return null
 
   return (
     <>

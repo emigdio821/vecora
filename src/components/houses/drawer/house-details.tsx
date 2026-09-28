@@ -2,6 +2,7 @@
 
 import { CalendarPlusIcon, HistoryIcon, NotebookPenIcon, UsersIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import { CollapsibleSection, Muted, Timestamp } from '@/components/shared/details'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,6 +27,7 @@ interface HouseDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
 }
 
 export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: HouseDetailsDrawerProps) {
+  const canManage = useHasRole('president')
   const [isEditOpen, setEditOpen] = useState(false)
   const residents = sortByRelationship(house.property_residents)
 
@@ -79,16 +81,20 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />}>Cerrar</DrawerClose>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setEditOpen(true)
-            }}
-          >
-            Editar
-          </Button>
-          {/* Rendered inside this popup so Base UI treats it as a nested drawer. */}
-          <EditHouseDrawer house={house} open={isEditOpen} onOpenChange={setEditOpen} />
+          {canManage && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditOpen(true)
+                }}
+              >
+                Editar
+              </Button>
+              {/* Rendered inside this popup so Base UI treats it as a nested drawer. */}
+              <EditHouseDrawer house={house} open={isEditOpen} onOpenChange={setEditOpen} />
+            </>
+          )}
         </DrawerFooter>
       </DrawerPopup>
     </Drawer>

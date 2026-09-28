@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
@@ -16,6 +17,7 @@ interface ActionsProps {
 }
 
 export function CategoriesTableActions({ category }: ActionsProps) {
+  const canManage = useHasRole('treasurer')
   const queryClient = useQueryClient()
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
@@ -43,6 +45,9 @@ export function CategoriesTableActions({ category }: ActionsProps) {
       toastManager.add({ type: 'error', title: 'No se pudo actualizar', description: error.message })
     },
   })
+
+  // Every item here writes, so readers see no menu.
+  if (!canManage) return null
 
   return (
     <>

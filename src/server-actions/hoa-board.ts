@@ -266,13 +266,26 @@ export async function setPassword(input: SetPasswordInput): Promise<ActionResult
   }
 
   const supabase = await createClient()
+  const { data: claims } = await supabase.auth.getClaims()
+  const email = claims?.claims.email
+  if (!email) return { error: NO_PERMISSION }
+
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
-  if (error) {
+  // Someone resetting who typed the password they already had: it's still theirs, let them in.
+  if (error && error.code !== 'same_password') {
+    return { error: 'No se pudo guardar la contraseña, intenta nuevamente' }
+  }
+
+  // The link session stays marked as such (see CurrentUser.mustSetPassword), so
+  // replace it with a regular sign-in; otherwise the app keeps sending them here.
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password: parsed.data.password,
+  })
+  if (signInError) {
     return {
       error:
-        error.code === 'same_password'
-          ? 'Elige una contraseña distinta a la actual'
-          : 'No se pudo guardar la contraseña, intenta nuevamente',
+        'Se guardó la contraseña, pero no se pudo iniciar sesión. Entra con ella desde la pantalla de inicio.',
     }
   }
 

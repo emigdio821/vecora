@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/shared/table/data-table'
@@ -8,6 +10,12 @@ import { HousesDataTableHeader } from './data-table-header'
 
 export function HousesDataTable() {
   const { data: houses = [], isLoading, error, refetch } = useQuery(housesListQueryOptions())
+  const canManage = useHasRole('president')
+  // Selection only feeds bulk delete, so readers don't get the checkboxes.
+  const columns = useMemo(
+    () => (canManage ? housesTableColumns : housesTableColumns.filter((column) => column.id !== 'select')),
+    [canManage],
+  )
 
   if (error) {
     return <TanstackQueryError refetch={refetch} />
@@ -21,7 +29,7 @@ export function HousesDataTable() {
     <DataTable
       data={houses}
       tableId="houses"
-      columns={housesTableColumns}
+      columns={columns}
       getRowId={(house) => house.id}
       initialSorting={[{ id: 'number', desc: false }]}
       header={(table) => <HousesDataTableHeader table={table} />}

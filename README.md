@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Resido
 
-## Getting Started
+Administración de un residencial para la mesa directiva: casas y residentes, tesorería (cuotas, movimientos y periodos), reservas de la terraza, solicitudes de pago de mantenimiento y seguridad, y un historial de cambios para el administrador.
 
-First, run the development server:
+Next.js 16 · React · Supabase (Postgres, Auth, RLS) · Tailwind CSS · [coss ui](https://coss.com/ui) (Base UI) · TanStack Query / Table · React Hook Form + zod.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Run it locally
+
+You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
+
+1. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+2. **Start Supabase** (Postgres, Auth, Studio). The first run downloads the Docker images.
+
+   ```bash
+   npx supabase start
+   ```
+
+3. **Create `.env.local`** from the example and paste the local keys printed by `npx supabase status`:
+
+   ```bash
+   cp .env.example .env.local
+   npx supabase status
+   ```
+
+   | Variable                               | Value from `supabase status`                     |
+   | -------------------------------------- | ------------------------------------------------ |
+   | `NEXT_PUBLIC_SUPABASE_URL`             | `API_URL` (`http://127.0.0.1:54321`)             |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `PUBLISHABLE_KEY`                                |
+   | `SUPABASE_SECRET_KEY`                  | `SECRET_KEY` (server-only, never `NEXT_PUBLIC_`) |
+
+4. **Load the schema and test data**. Applies every migration and both seeds; it also wipes any local data, so run it whenever you want a clean slate.
+
+   ```bash
+   npm run db:reset
+   ```
+
+5. **Start the app**
+
+   ```bash
+   npm run dev
+   ```
+
+   Open <http://localhost:3000> and sign in with one of the accounts below.
+
+## Test accounts
+
+All local accounts use the password **`admin`**. They come from `supabase/seed.sql` (admin) and `supabase/seeds/dev.sql` (everyone else) and only exist in the local database.
+
+| Email                    | Role                           | Can write in                                                                |
+| ------------------------ | ------------------------------ | --------------------------------------------------------------------------- |
+| `admin@resido.com`       | Administrador                  | Everything, plus "Mesa directiva" and "Historial"                           |
+| `president@resido.com`   | Presidente (Ana López)         | "Residencial", "Presidencia", "Mesa directiva"                              |
+| `treasurer@resido.com`   | Tesorero (Luis Fernández)      | "Tesorería", periods and terraza in "Presidencia"; pays or rejects requests |
+| `security@resido.com`    | Seguridad (María García)       | Requests in "Seguridad"                                                     |
+| `maintenance@resido.com` | Mantenimiento (Diego Martínez) | Requests in "Mantenimiento"                                                 |
+
+Every role can read every section. The seed also creates 20 houses (A1–D5), 10 residents, the current year's period with a few payments, requests in every status, and 45 days of activity in "Historial".
+
+## Useful commands
+
+| Command                           | What it does                                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `npm run dev`                     | Development server                                                                                     |
+| `npm run db:reset`                | Recreate the local database from migrations + seeds (destroys local data)                              |
+| `npm run db:types`                | Regenerate `src/lib/supabase/database.types.ts` from the local schema — run after changing a migration |
+| `npm run typecheck`               | `tsc --noEmit`                                                                                         |
+| `npm run lint` / `npm run format` | oxlint / oxfmt                                                                                         |
+| `npx supabase status`             | Local URLs and keys; Studio is at <http://127.0.0.1:54323>                                             |
+| `npx supabase stop`               | Stop the local stack (data is kept)                                                                    |
+
+## Project layout
+
+```
+supabase/migrations/   schema, RLS policies and RPCs (one file per feature)
+supabase/seed.sql      admin account (runs everywhere)
+supabase/seeds/dev.sql local-only test data
+src/app/(authed)/      one route per section
+src/components/        UI per section (table/, drawer/, dialog/) + shared/ and ui/
+src/server-actions/    mutations, called from the client with the user's session
+src/tanstack-queries/  read queries and query keys
+src/lib/validations/   zod schemas shared by forms and server actions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Notes
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Access is invite-only: there is no sign-up page. The admin or president adds a board member in "Mesa directiva" and shares the access link; the same link is how someone resets a forgotten password.
+- Permissions are enforced by Postgres RLS; the UI hides what a role can't do, but the database is the source of truth.
+- Every insert, update and delete is recorded in `audit_log` and shown to admins in "Historial".

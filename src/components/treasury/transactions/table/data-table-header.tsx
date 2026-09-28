@@ -2,6 +2,7 @@ import type { Table } from '@tanstack/react-table'
 import { InfoIcon, ListFilterIcon, SearchIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -40,6 +41,7 @@ interface TransactionsDataTableHeaderProps {
 }
 
 export function TransactionsDataTableHeader({ table }: TransactionsDataTableHeaderProps) {
+  const canManage = useHasRole('treasurer')
   const searchInputRef = useRef<HTMLInputElement | null>(null)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-transactions', parseAsString.withDefault(''))
@@ -176,44 +178,48 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
             </MenuPopup>
           </Menu>
 
-          {selectedRowsLength > 0 && (
-            <Tooltip>
-              <TooltipTrigger
-                closeOnClick={false}
-                render={
-                  <Button
-                    variant="destructive-outline"
-                    aria-label={`Eliminar ${selectedRowsLength} movimientos seleccionados`}
-                    onClick={() => {
-                      setDeleteSelectedOpen(true)
-                    }}
-                  >
-                    <Trash2Icon className="size-4" />
-                    <Badge variant="error" size="sm" aria-hidden>
-                      {selectedRowsLength}
-                    </Badge>
-                  </Button>
-                }
-              />
-              <TooltipContent>Eliminar movimientos seleccionados</TooltipContent>
-            </Tooltip>
-          )}
+          {canManage && (
+            <>
+              {selectedRowsLength > 0 && (
+                <Tooltip>
+                  <TooltipTrigger
+                    closeOnClick={false}
+                    render={
+                      <Button
+                        variant="destructive-outline"
+                        aria-label={`Eliminar ${selectedRowsLength} movimientos seleccionados`}
+                        onClick={() => {
+                          setDeleteSelectedOpen(true)
+                        }}
+                      >
+                        <Trash2Icon className="size-4" />
+                        <Badge variant="error" size="sm" aria-hidden>
+                          {selectedRowsLength}
+                        </Badge>
+                      </Button>
+                    }
+                  />
+                  <TooltipContent>Eliminar movimientos seleccionados</TooltipContent>
+                </Tooltip>
+              )}
 
-          <Button
-            variant="outline"
-            onClick={() => {
-              setCreateOpen(true)
-            }}
-          >
-            Registrar movimiento
-          </Button>
-          <Button
-            onClick={() => {
-              setRecordFeeOpen(true)
-            }}
-          >
-            Registrar cuota
-          </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCreateOpen(true)
+                }}
+              >
+                Registrar movimiento
+              </Button>
+              <Button
+                onClick={() => {
+                  setRecordFeeOpen(true)
+                }}
+              >
+                Registrar cuota
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </>

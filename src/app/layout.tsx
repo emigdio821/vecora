@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from 'next-themes'
 import { Geist } from 'next/font/google'
 import ScreenSizeIndicator from '@/components/screen-size-indicator'
+import { AnchoredToastProvider, ToastProvider } from '@/components/ui/toast'
 import { siteConfig } from '@/lib/config/site'
 import { cn } from '@/lib/utils'
 
@@ -55,7 +56,9 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html suppressHydrationWarning lang="en" className={cn('font-sans', fontSans.variable)}>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
-          {children}
+          <ToastProvider>
+            <AnchoredToastProvider>{children}</AnchoredToastProvider>
+          </ToastProvider>
           <ScreenSizeIndicator />
         </ThemeProvider>
       </body>

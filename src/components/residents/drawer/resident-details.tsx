@@ -9,6 +9,7 @@ import {
   UserRoundIcon,
 } from 'lucide-react'
 import { useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import { CollapsibleSection, Detail, Muted, Timestamp } from '@/components/shared/details'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { Badge } from '@/components/ui/badge'
@@ -46,6 +47,7 @@ export function ResidentDetailsDrawer({
   onOpenChange,
   ...props
 }: ResidentDetailsDrawerProps) {
+  const canManage = useHasRole('president')
   const [isEditOpen, setEditOpen] = useState(false)
   const fullName = `${resident.first_name} ${resident.last_name}`
   const roles = resident.profile?.user_roles.map((r) => r.role) ?? []
@@ -128,16 +130,20 @@ export function ResidentDetailsDrawer({
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />}>Cerrar</DrawerClose>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setEditOpen(true)
-            }}
-          >
-            Editar
-          </Button>
-          {/* Rendered inside this popup so Base UI treats it as a nested drawer. */}
-          <EditResidentDrawer resident={resident} open={isEditOpen} onOpenChange={setEditOpen} />
+          {canManage && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditOpen(true)
+                }}
+              >
+                Editar
+              </Button>
+              {/* Rendered inside this popup so Base UI treats it as a nested drawer. */}
+              <EditResidentDrawer resident={resident} open={isEditOpen} onOpenChange={setEditOpen} />
+            </>
+          )}
         </DrawerFooter>
       </DrawerPopup>
     </Drawer>

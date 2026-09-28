@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/shared/table/data-table'
@@ -10,6 +11,15 @@ import { TransactionsDataTableHeader, useKindFilter } from './data-table-header'
 export function TransactionsDataTable() {
   const { data: transactions = [], isLoading, error, refetch } = useQuery(transactionsListQueryOptions())
   const [kind] = useKindFilter()
+  const canManage = useHasRole('treasurer')
+  // Selection only feeds bulk delete, so readers don't get the checkboxes.
+  const columns = useMemo(
+    () =>
+      canManage
+        ? transactionsTableColumns
+        : transactionsTableColumns.filter((column) => column.id !== 'select'),
+    [canManage],
+  )
 
   // Filter the data (not a column) so pagination counts only the visible kind.
   const visible = useMemo(
@@ -29,7 +39,7 @@ export function TransactionsDataTable() {
     <DataTable
       data={visible}
       tableId="transactions"
-      columns={transactionsTableColumns}
+      columns={columns}
       getRowId={(transaction) => transaction.id}
       initialSorting={[{ id: 'occurred_on', desc: true }]}
       header={(table) => <TransactionsDataTableHeader table={table} />}

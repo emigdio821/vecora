@@ -2,6 +2,7 @@ import type { Table } from '@tanstack/react-table'
 import { InfoIcon, SearchIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ interface HousesDataTableHeaderProps {
 }
 
 export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
+  const canManage = useHasRole('president')
   const searchInputRef = useRef<HTMLInputElement | null>(null)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isCreateOpen, setCreateOpen] = useState(false)
@@ -98,38 +100,40 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
           </InputGroupAddon>
         </InputGroup>
 
-        <div className="flex gap-2">
-          {selectedRowsLength > 0 && (
-            <Tooltip>
-              <TooltipTrigger
-                closeOnClick={false}
-                render={
-                  <Button
-                    variant="destructive-outline"
-                    aria-label={`Eliminar ${selectedRowsLength} casas seleccionadas`}
-                    onClick={() => {
-                      setDeleteSelectedOpen(true)
-                    }}
-                  >
-                    <Trash2Icon className="size-4" />
-                    <Badge variant="error" size="sm" aria-hidden>
-                      {selectedRowsLength}
-                    </Badge>
-                  </Button>
-                }
-              />
-              <TooltipContent>Eliminar casas seleccionadas</TooltipContent>
-            </Tooltip>
-          )}
+        {canManage && (
+          <div className="flex gap-2">
+            {selectedRowsLength > 0 && (
+              <Tooltip>
+                <TooltipTrigger
+                  closeOnClick={false}
+                  render={
+                    <Button
+                      variant="destructive-outline"
+                      aria-label={`Eliminar ${selectedRowsLength} casas seleccionadas`}
+                      onClick={() => {
+                        setDeleteSelectedOpen(true)
+                      }}
+                    >
+                      <Trash2Icon className="size-4" />
+                      <Badge variant="error" size="sm" aria-hidden>
+                        {selectedRowsLength}
+                      </Badge>
+                    </Button>
+                  }
+                />
+                <TooltipContent>Eliminar casas seleccionadas</TooltipContent>
+              </Tooltip>
+            )}
 
-          <Button
-            onClick={() => {
-              setCreateOpen(true)
-            }}
-          >
-            Nueva casa
-          </Button>
-        </div>
+            <Button
+              onClick={() => {
+                setCreateOpen(true)
+              }}
+            >
+              Nueva casa
+            </Button>
+          </div>
+        )}
       </div>
     </>
   )

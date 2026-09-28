@@ -2,6 +2,7 @@ import type { Table } from '@tanstack/react-table'
 import { InfoIcon, SearchIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
+import { useHasRole } from '@/components/current-user-provider'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ interface ResidentsDataTableHeaderProps {
 }
 
 export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProps) {
+  const canManage = useHasRole('president')
   const searchInputRef = useRef<HTMLInputElement | null>(null)
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isCreateResidentDrawerOpen, setCreateResidentDrawerOpen] = useState(false)
@@ -98,45 +100,47 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
           </InputGroupAddon>
         </InputGroup>
 
-        <div className="flex gap-2">
-          {selectedRowsLength > 0 && (
-            <Tooltip>
-              <TooltipTrigger
-                closeOnClick={false}
-                render={
-                  <Button
-                    variant="destructive-outline"
-                    aria-label={`Eliminar ${selectedRowsLength} residentes seleccionados`}
-                    onClick={() => {
-                      setDeleteSelectedOpen(true)
-                    }}
-                  >
-                    <Trash2Icon className="size-4" />
-                    <Badge variant="error" size="sm" aria-hidden>
-                      {selectedRowsLength}
-                    </Badge>
-                  </Button>
-                }
-              />
-              <TooltipContent>Eliminar residentes seleccionados</TooltipContent>
-            </Tooltip>
-          )}
+        {canManage && (
+          <div className="flex gap-2">
+            {selectedRowsLength > 0 && (
+              <Tooltip>
+                <TooltipTrigger
+                  closeOnClick={false}
+                  render={
+                    <Button
+                      variant="destructive-outline"
+                      aria-label={`Eliminar ${selectedRowsLength} residentes seleccionados`}
+                      onClick={() => {
+                        setDeleteSelectedOpen(true)
+                      }}
+                    >
+                      <Trash2Icon className="size-4" />
+                      <Badge variant="error" size="sm" aria-hidden>
+                        {selectedRowsLength}
+                      </Badge>
+                    </Button>
+                  }
+                />
+                <TooltipContent>Eliminar residentes seleccionados</TooltipContent>
+              </Tooltip>
+            )}
 
-          {/* {tableRowsLength > 0 && (
+            {/* {tableRowsLength > 0 && (
             <Button variant="outline" disabled>
               <span>Exportar</span>
               {selectedRowsLength > 0 && <Badge variant="outline">{selectedRowsLength}</Badge>}
             </Button>
           )} */}
 
-          <Button
-            onClick={() => {
-              setCreateResidentDrawerOpen(true)
-            }}
-          >
-            Nuevo residente
-          </Button>
-        </div>
+            <Button
+              onClick={() => {
+                setCreateResidentDrawerOpen(true)
+              }}
+            >
+              Nuevo residente
+            </Button>
+          </div>
+        )}
       </div>
     </>
   )
