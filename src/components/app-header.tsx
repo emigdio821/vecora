@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { ResidoIcon } from './shared/icons'
+import { StoaIcon } from './shared/icons'
 import { SidebarTrigger } from './ui/sidebar'
 
 export function AppHeader() {
@@ -15,8 +15,8 @@ export function AppHeader() {
           className="px-2"
           render={
             <Link href="/">
-              <ResidoIcon className="size-4" />
-              <span className="text-base font-semibold">Resido</span>
+              <StoaIcon className="size-4" />
+              <span className="text-base font-semibold">Stoa</span>
             </Link>
           }
         />

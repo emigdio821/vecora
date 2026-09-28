@@ -24,7 +24,7 @@ interface InviteLinkDialogProps {
 }
 
 function whatsappUrl({ phone, full_name, link }: InviteResult) {
-  const message = `Hola ${full_name.split(' ')[0]}, te comparto tu acceso a Resido. Abre este enlace y crea tu contraseña: ${link}`
+  const message = `Hola ${full_name.split(' ')[0]}, te comparto tu acceso a Stoa. Abre este enlace y crea tu contraseña: ${link}`
   return `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`
 }
 

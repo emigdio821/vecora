@@ -2,7 +2,7 @@ import { ShieldOffIcon } from 'lucide-react'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { AppFooter } from '@/components/app-footer'
-import { ResidoIcon } from '@/components/shared/icons'
+import { StoaIcon } from '@/components/shared/icons'
 import {
   Empty,
   EmptyContent,
@@ -30,8 +30,8 @@ export default async function NoAccessPage() {
     <main className="flex min-h-svh flex-col items-center justify-center">
       <div className="flex flex-col items-center gap-6 p-4 sm:p-6">
         <div className="flex items-center gap-2">
-          <ResidoIcon className="size-4" />
-          <span className="text-base font-semibold text-foreground">Resido</span>
+          <StoaIcon className="size-4" />
+          <span className="text-base font-semibold text-foreground">Stoa</span>
         </div>
 
         <Empty className="max-w-sm">

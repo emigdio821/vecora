@@ -30,8 +30,8 @@ export default async function SetPasswordPage() {
       <CardFrameHeader>
         <CardFrameTitle>Crea tu contraseña</CardFrameTitle>
         <CardFrameDescription>
-          Para <strong className="font-medium text-foreground">{user.email}</strong>. Con ella entrarás a
-          Resido las próximas veces, junto con tu correo.
+          Para <strong className="font-medium text-foreground">{user.email}</strong>. Con ella entrarás a Stoa
+          las próximas veces, junto con tu correo.
         </CardFrameDescription>
       </CardFrameHeader>
       <Card>

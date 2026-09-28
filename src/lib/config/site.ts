@@ -1,7 +1,7 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: 'Resido',
+  name: 'Stoa',
   description: 'An open-source and simple residential manager.',
   url: 'https://resido-app.vercel.app/',
   ogUrl: 'https://resido-app.vercel.app/api/og',
@@ -16,7 +16,7 @@ export const siteConfig = {
     },
   ],
   keywords: [
-    'Resido',
+    'Stoa',
     'React',
     'Next.js',
     'TanStack Query',

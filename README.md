@@ -1,4 +1,6 @@
-# Resido
+# Stoa
+
+> _Stoa_ (στοά): en la antigua Grecia, el pórtico techado junto al ágora donde los ciudadanos se reunían a conversar y resolver los asuntos de la ciudad. Aquí es lo mismo, pero para la mesa directiva del residencial.
 
 Administración de un residencial para la mesa directiva: casas y residentes, tesorería (cuotas, movimientos y periodos), reservas de la terraza, solicitudes de pago de mantenimiento y seguridad, y un historial de cambios para el administrador.
 

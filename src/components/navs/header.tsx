@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { Settings } from '@/lib/supabase/settings'
 import { DEFAULT_RESIDENTIAL_LABEL } from '@/lib/validations/settings'
-import { ResidoIcon } from '../shared/icons'
+import { StoaIcon } from '../shared/icons'
 import {
   SidebarGroupContent,
   SidebarMenu,
@@ -28,10 +28,10 @@ export function HeaderNav({ settings, ...props }: HeaderNavProps) {
       <SidebarMenu>
         <SidebarMenuItem>
           <div className="flex items-center gap-2 p-2">
-            <ResidoIcon className="size-5 text-sidebar-accent-foreground" />
+            <StoaIcon className="size-5 text-sidebar-accent-foreground" />
 
             <div className="grid flex-1 text-left text-sm leading-none">
-              <span className="truncate text-base font-semibold text-sidebar-accent-foreground">Resido</span>
+              <span className="truncate text-base font-semibold text-sidebar-accent-foreground">Stoa</span>
               <span className="truncate text-sm text-sidebar-foreground" title={residentialName}>
                 {residentialName}
               </span>

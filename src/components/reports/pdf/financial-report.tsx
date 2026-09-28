@@ -257,8 +257,8 @@ export function FinancialReportDocument({
     <Document
       title={`Reporte financiero - ${range}`}
       author={residentialName}
-      creator="Resido"
-      producer="Resido"
+      creator="Stoa"
+      producer="Stoa"
       language="es-MX"
     >
       <Page size="A4" style={styles.page}>

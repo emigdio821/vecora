@@ -20,8 +20,8 @@ export default async function HoaBoardPage() {
       <div className="flex flex-col gap-1">
         <h1 className="font-heading text-base font-semibold">Mesa directiva</h1>
         <p className="text-sm text-muted-foreground">
-          Solo las personas en esta lista pueden entrar a Resido. Cada integrante recibe su acceso con un
-          enlace que le compartes tú.
+          Solo las personas en esta lista pueden entrar a Stoa. Cada integrante recibe su acceso con un enlace
+          que le compartes tú.
         </p>
       </div>
 

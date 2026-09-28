@@ -109,7 +109,7 @@ export function AddBoardMemberDrawer({
           <DrawerTitle>Agregar integrante</DrawerTitle>
           <DrawerDescription>
             Se creará una cuenta para el residente y recibirás un enlace para compartirle. Con él podrá entrar
-            a Resido y crear su contraseña.
+            a Stoa y crear su contraseña.
           </DrawerDescription>
         </DrawerHeader>
 

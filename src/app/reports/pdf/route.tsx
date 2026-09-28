@@ -16,7 +16,7 @@ function fileName(residentialName: string, from: string, to: string): string {
   const slug =
     normalizeString(residentialName)
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '') || 'resido'
+      .replace(/^-|-$/g, '') || 'stoa'
   const dates = isWholeMonth(from, to) ? from.slice(0, 7) : `${from}_a_${to}`
 
   return `reporte-${slug}-${dates}.pdf`

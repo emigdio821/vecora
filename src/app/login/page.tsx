@@ -1,7 +1,7 @@
 import { CircleAlertIcon } from 'lucide-react'
 import type { Metadata } from 'next'
 import { AppFooter } from '@/components/app-footer'
-import { ResidoIcon } from '@/components/shared/icons'
+import { StoaIcon } from '@/components/shared/icons'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   Card,
@@ -31,8 +31,8 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
       <div className="p-4 sm:p-6">
         <div className="mx-auto mb-4 w-full max-w-sm">
           <div className="flex items-center justify-center gap-2">
-            <ResidoIcon className="size-4" />
-            <span className="text-base font-semibold text-foreground">Resido</span>
+            <StoaIcon className="size-4" />
+            <span className="text-base font-semibold text-foreground">Stoa</span>
           </div>
         </div>
 
