@@ -12,8 +12,9 @@ const ROLE_DESCRIPTION: Record<AppRole, string> = {
   admin: 'Todo, incluyendo administrar la mesa directiva y otros administradores.',
   president: '"Residencial" (casas y residentes), "Presidencia" (periodos y terraza) y "Mesa directiva".',
   treasurer:
-    '"Tesorería" (movimientos, cuotas y categorías), los periodos de "Presidencia" y pagar o rechazar las solicitudes de "Mantenimiento".',
-  security: 'Solo lectura por ahora.',
+    '"Tesorería" (movimientos, cuotas y categorías), los periodos de "Presidencia" y pagar o rechazar las solicitudes de "Mantenimiento" y "Seguridad".',
+  security:
+    'Envía solicitudes de pago en "Seguridad" y puede editarlas mientras estén pendientes. Solo lectura en las demás secciones.',
   maintenance:
     'Envía solicitudes de pago en "Mantenimiento" y puede editarlas mientras estén pendientes. Solo lectura en las demás secciones.',
 }

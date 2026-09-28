@@ -6,7 +6,7 @@ import {
   CircleCheckIcon,
   CircleXIcon,
   NotebookPenIcon,
-  WrenchIcon,
+  SirenIcon,
 } from 'lucide-react'
 import { CollapsibleSection, Detail, Timestamp } from '@/components/shared/details'
 import { STATUS_BADGE_VARIANT, STATUS_LABEL } from '@/components/shared/request-status'
@@ -24,10 +24,11 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { formatCurrency, formatDay } from '@/lib/utils'
-import type { MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
+import type { SecurityRequestQueryData } from '@/tanstack-queries/security'
+import { KIND_LABEL } from '../kind'
 
 interface RequestDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
-  request: MaintenanceRequestQueryData
+  request: SecurityRequestQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -45,16 +46,19 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<WrenchIcon />} title="Solicitud">
+          <CollapsibleSection icon={<SirenIcon />} title="Solicitud">
             <div className="grid grid-cols-2 gap-3">
-              <Detail label="Monto">
-                <span className="tabular-nums">{formatCurrency(Number(request.amount))}</span>
+              <Detail label="Tipo">
+                <Badge variant="outline">{KIND_LABEL[request.kind]}</Badge>
               </Detail>
-              <Detail label="Fecha del trabajo">{formatDay(request.requested_on)}</Detail>
-              <Detail label="Solicitó">{request.requester.full_name}</Detail>
               <Detail label="Estado">
                 <Badge variant={STATUS_BADGE_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
               </Detail>
+              <Detail label="Monto">
+                <span className="tabular-nums">{formatCurrency(Number(request.amount))}</span>
+              </Detail>
+              <Detail label="Fecha">{formatDay(request.requested_on)}</Detail>
+              <Detail label="Solicitó">{request.requester.full_name}</Detail>
             </div>
           </CollapsibleSection>
 

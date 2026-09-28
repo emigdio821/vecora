@@ -66,7 +66,7 @@ export type Database = {
           requested_on: string
           resolved_at: string | null
           resolved_by: string | null
-          status: Database['public']['Enums']['maintenance_request_status']
+          status: Database['public']['Enums']['request_status']
           title: string
           transaction_id: string | null
           updated_at: string
@@ -81,7 +81,7 @@ export type Database = {
           requested_on?: string
           resolved_at?: string | null
           resolved_by?: string | null
-          status?: Database['public']['Enums']['maintenance_request_status']
+          status?: Database['public']['Enums']['request_status']
           title: string
           transaction_id?: string | null
           updated_at?: string
@@ -96,7 +96,7 @@ export type Database = {
           requested_on?: string
           resolved_at?: string | null
           resolved_by?: string | null
-          status?: Database['public']['Enums']['maintenance_request_status']
+          status?: Database['public']['Enums']['request_status']
           title?: string
           transaction_id?: string | null
           updated_at?: string
@@ -316,6 +316,79 @@ export type Database = {
             columns: ['profile_id']
             isOneToOne: true
             referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      security_requests: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          details: string | null
+          id: string
+          kind: Database['public']['Enums']['security_request_kind']
+          rejection_reason: string | null
+          requested_on: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: Database['public']['Enums']['request_status']
+          title: string
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string
+          details?: string | null
+          id?: string
+          kind?: Database['public']['Enums']['security_request_kind']
+          rejection_reason?: string | null
+          requested_on?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database['public']['Enums']['request_status']
+          title: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          details?: string | null
+          id?: string
+          kind?: Database['public']['Enums']['security_request_kind']
+          rejection_reason?: string | null
+          requested_on?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database['public']['Enums']['request_status']
+          title?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'security_requests_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'security_requests_resolved_by_fkey'
+            columns: ['resolved_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'security_requests_transaction_id_fkey'
+            columns: ['transaction_id']
+            isOneToOne: true
+            referencedRelation: 'transactions'
             referencedColumns: ['id']
           },
         ]
@@ -553,6 +626,17 @@ export type Database = {
         }
         Returns: string
       }
+      pay_security_request: {
+        Args: {
+          p_category_id: string
+          p_notes?: string
+          p_occurred_on: string
+          p_payment_method?: Database['public']['Enums']['payment_method']
+          p_reference?: string
+          p_request_id: string
+        }
+        Returns: string
+      }
       record_fee_payment: {
         Args: {
           p_amount?: number
@@ -576,12 +660,17 @@ export type Database = {
         Args: { p_reason: string; p_request_id: string }
         Returns: undefined
       }
+      reject_security_request: {
+        Args: { p_reason: string; p_request_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: 'admin' | 'president' | 'treasurer' | 'security' | 'maintenance'
-      maintenance_request_status: 'pending' | 'paid' | 'rejected'
       payment_method: 'cash' | 'transfer'
+      request_status: 'pending' | 'paid' | 'rejected'
       residency_relationship: 'owner' | 'tenant' | 'family'
+      security_request_kind: 'cameras' | 'guards' | 'access' | 'equipment' | 'other'
       transaction_kind: 'income' | 'expense'
     }
     CompositeTypes: {
@@ -709,9 +798,10 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ['admin', 'president', 'treasurer', 'security', 'maintenance'],
-      maintenance_request_status: ['pending', 'paid', 'rejected'],
       payment_method: ['cash', 'transfer'],
+      request_status: ['pending', 'paid', 'rejected'],
       residency_relationship: ['owner', 'tenant', 'family'],
+      security_request_kind: ['cameras', 'guards', 'access', 'equipment', 'other'],
       transaction_kind: ['income', 'expense'],
     },
   },

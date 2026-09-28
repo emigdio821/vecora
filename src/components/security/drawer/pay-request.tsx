@@ -30,17 +30,17 @@ import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { formatCurrency, formatDay, ISO_DAY } from '@/lib/utils'
 import { type PayRequestInput, payRequestSchema } from '@/lib/validations/requests'
-import { payMaintenanceRequest } from '@/server-actions/maintenance'
-import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
+import { paySecurityRequest } from '@/server-actions/security'
+import { SECURITY_QUERY_KEY, type SecurityRequestQueryData } from '@/tanstack-queries/security'
 import { categoriesQueryOptions, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 
 const FORM_ID = 'pay-request-form'
 
 /** Preselected expense category; the treasurer can still pick another. */
-const DEFAULT_CATEGORY_NAME = 'Mantenimiento'
+const DEFAULT_CATEGORY_NAME = 'Vigilancia'
 
 interface PayRequestDrawerProps extends React.ComponentProps<typeof Drawer> {
-  request: MaintenanceRequestQueryData
+  request: SecurityRequestQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -53,12 +53,12 @@ export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayR
 
   const mutation = useMutation({
     mutationFn: async (values: PayRequestInput) => {
-      const result = await payMaintenanceRequest(request.id, values)
+      const result = await paySecurityRequest(request.id, values)
       if (result.error !== undefined) throw new Error(result.error)
       return result.data
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [MAINTENANCE_QUERY_KEY] })
+      void queryClient.invalidateQueries({ queryKey: [SECURITY_QUERY_KEY] })
       // The expense now exists in the ledger.
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
       toastManager.add({
@@ -122,7 +122,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
   })
   const paymentMethod = useWatch({ control: form.control, name: 'payment_method' })
 
-  // Preselect "Mantenimiento" once categories arrive, unless the treasurer already chose.
+  // Preselect "Vigilancia" once categories arrive, unless the treasurer already chose.
   const defaultCategoryId = categoryItems.find((c) => c.label === DEFAULT_CATEGORY_NAME)?.value
   useEffect(() => {
     if (defaultCategoryId && !form.getValues('category_id')) {

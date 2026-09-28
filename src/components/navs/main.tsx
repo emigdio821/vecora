@@ -1,6 +1,13 @@
 'use client'
 
-import { GavelIcon, HeartHandshakeIcon, MapPinHouseIcon, PiggyBankIcon, WrenchIcon } from 'lucide-react'
+import {
+  GavelIcon,
+  HeartHandshakeIcon,
+  MapPinHouseIcon,
+  PiggyBankIcon,
+  SirenIcon,
+  WrenchIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -67,9 +74,11 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
             />
           </SidebarMenuItem>
 
-          {/* <SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
+              onClick={() => {
+                setOpenMobile(false)
+              }}
               isActive={pathname === '/security'}
               render={
                 <Link href="/security">
@@ -78,7 +87,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
                 </Link>
               }
             />
-          </SidebarMenuItem> */}
+          </SidebarMenuItem>
 
           <SidebarMenuItem>
             <SidebarMenuButton

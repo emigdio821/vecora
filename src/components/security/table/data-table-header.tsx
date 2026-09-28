@@ -13,13 +13,16 @@ import {
   MenuPopup,
   MenuRadioGroup,
   MenuRadioItem,
+  MenuSeparator,
   MenuTrigger,
 } from '@/components/ui/menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { REQUEST_STATUSES, type RequestStatus } from '@/lib/validations/requests'
-import type { MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
+import { SECURITY_REQUEST_KINDS, type SecurityRequestKind } from '@/lib/validations/security'
+import type { SecurityRequestQueryData } from '@/tanstack-queries/security'
 import { CreateRequestDrawer } from '../drawer/create-request'
-import type { MaintenanceViewer } from './columns'
+import { KIND_LABEL } from '../kind'
+import type { SecurityViewer } from './columns'
 
 const STATUS_FILTERS = ['all', ...REQUEST_STATUSES] as const
 export type StatusFilter = (typeof STATUS_FILTERS)[number]
@@ -29,14 +32,27 @@ const STATUS_FILTER_ITEMS: { value: StatusFilter; label: string }[] = [
   ...REQUEST_STATUSES.map((status: RequestStatus) => ({ value: status, label: `${STATUS_LABEL[status]}s` })),
 ]
 
+const KIND_FILTERS = ['all', ...SECURITY_REQUEST_KINDS] as const
+export type KindFilter = (typeof KIND_FILTERS)[number]
+
+const KIND_FILTER_ITEMS: { value: KindFilter; label: string }[] = [
+  { value: 'all', label: 'Todos' },
+  ...SECURITY_REQUEST_KINDS.map((kind: SecurityRequestKind) => ({ value: kind, label: KIND_LABEL[kind] })),
+]
+
 /** URL-backed status filter, shared by the header (control) and the table (data). */
 export function useStatusFilter() {
   return useQueryState('status', parseAsStringLiteral(STATUS_FILTERS).withDefault('all'))
 }
 
+/** URL-backed kind filter, shared by the header (control) and the table (data). */
+export function useKindFilter() {
+  return useQueryState('kind', parseAsStringLiteral(KIND_FILTERS).withDefault('all'))
+}
+
 interface RequestsDataTableHeaderProps {
-  table: Table<DataTableFeatures, MaintenanceRequestQueryData>
-  viewer: MaintenanceViewer
+  table: Table<DataTableFeatures, SecurityRequestQueryData>
+  viewer: SecurityViewer
 }
 
 export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHeaderProps) {
@@ -45,8 +61,13 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-requests', parseAsString.withDefault(''))
   const [status, setStatus] = useStatusFilter()
-  const isFiltered = status !== 'all'
-  const activeStatusLabel = STATUS_FILTER_ITEMS.find((item) => item.value === status)?.label
+  const [kind, setKind] = useKindFilter()
+  const activeFilterLabels = [
+    status !== 'all' && STATUS_FILTER_ITEMS.find((item) => item.value === status)?.label,
+    kind !== 'all' && KIND_FILTER_ITEMS.find((item) => item.value === kind)?.label,
+  ].filter(Boolean)
+  const isFiltered = activeFilterLabels.length > 0
+  const filtersLabel = isFiltered ? `Filtros: ${activeFilterLabels.join(', ')}` : 'Filtros'
   const tableRowsLength = table.getCoreRowModel().rows.length
 
   useEffect(() => {
@@ -108,7 +129,7 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
                   </Button>
                 }
               />
-              <TooltipContent>Buscar por concepto, detalles o quién la solicitó</TooltipContent>
+              <TooltipContent>Buscar por concepto, detalles, tipo o quién la solicitó</TooltipContent>
             </Tooltip>
           </InputGroupAddon>
         </InputGroup>
@@ -121,12 +142,7 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
                 render={
                   <MenuTrigger
                     render={
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        className="relative"
-                        aria-label={isFiltered ? `Filtros: ${activeStatusLabel}` : 'Filtros'}
-                      >
+                      <Button size="icon" variant="outline" className="relative" aria-label={filtersLabel}>
                         <ListFilterIcon className="size-4" />
                         {/* The list is narrowed; don't let that go unnoticed. */}
                         {isFiltered && (
@@ -140,7 +156,7 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
                   />
                 }
               />
-              <TooltipContent>{isFiltered ? `Filtros: ${activeStatusLabel}` : 'Filtros'}</TooltipContent>
+              <TooltipContent>{filtersLabel}</TooltipContent>
             </Tooltip>
 
             <MenuPopup align="end">
@@ -153,6 +169,24 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
                   }}
                 >
                   {STATUS_FILTER_ITEMS.map((item) => (
+                    <MenuRadioItem key={item.value} value={item.value}>
+                      {item.label}
+                    </MenuRadioItem>
+                  ))}
+                </MenuRadioGroup>
+              </MenuGroup>
+
+              <MenuSeparator />
+
+              <MenuGroup>
+                <MenuGroupLabel>Tipo</MenuGroupLabel>
+                <MenuRadioGroup
+                  value={kind}
+                  onValueChange={(value: KindFilter) => {
+                    void setKind(value)
+                  }}
+                >
+                  {KIND_FILTER_ITEMS.map((item) => (
                     <MenuRadioItem key={item.value} value={item.value}>
                       {item.label}
                     </MenuRadioItem>

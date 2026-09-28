@@ -8,32 +8,32 @@ import {
   requestResolutionErrorMessage,
 } from '@/lib/action-result'
 import { createClient } from '@/lib/supabase/server'
-import { type MaintenanceRequestInput, maintenanceRequestSchema } from '@/lib/validations/maintenance'
 import {
   type PayRequestInput,
   payRequestSchema,
   type RejectRequestInput,
   rejectRequestSchema,
 } from '@/lib/validations/requests'
+import { type SecurityRequestInput, securityRequestSchema } from '@/lib/validations/security'
 
 function toMessage(error: PostgrestError, fallback: string) {
   return postgrestErrorMessage(error, { fallback })
 }
 
-export async function createMaintenanceRequest(
-  input: MaintenanceRequestInput,
+export async function createSecurityRequest(
+  input: SecurityRequestInput,
 ): Promise<ActionResult<{ id: string }>> {
-  const parsed = maintenanceRequestSchema.safeParse(input)
+  const parsed = securityRequestSchema.safeParse(input)
   if (!parsed.success) {
     return { error: 'Revisa los campos del formulario' }
   }
 
-  const { title, details, amount, requested_on } = parsed.data
+  const { kind, title, details, amount, requested_on } = parsed.data
   const supabase = await createClient()
 
   const { data, error } = await supabase
-    .from('maintenance_requests')
-    .insert({ title, details: details || null, amount, requested_on })
+    .from('security_requests')
+    .insert({ kind, title, details: details || null, amount, requested_on })
     .select('id')
     .single()
 
@@ -45,21 +45,18 @@ export async function createMaintenanceRequest(
 }
 
 /** Only while pending: RLS filters out resolved rows, which surfaces as "no permission". */
-export async function updateMaintenanceRequest(
-  id: string,
-  input: MaintenanceRequestInput,
-): Promise<ActionResult> {
-  const parsed = maintenanceRequestSchema.safeParse(input)
+export async function updateSecurityRequest(id: string, input: SecurityRequestInput): Promise<ActionResult> {
+  const parsed = securityRequestSchema.safeParse(input)
   if (!parsed.success) {
     return { error: 'Revisa los campos del formulario' }
   }
 
-  const { title, details, amount, requested_on } = parsed.data
+  const { kind, title, details, amount, requested_on } = parsed.data
   const supabase = await createClient()
 
   const { error } = await supabase
-    .from('maintenance_requests')
-    .update({ title, details: details || null, amount, requested_on })
+    .from('security_requests')
+    .update({ kind, title, details: details || null, amount, requested_on })
     .eq('id', id)
     .select('id')
     .single()
@@ -71,10 +68,10 @@ export async function updateMaintenanceRequest(
   return { data: undefined }
 }
 
-export async function deleteMaintenanceRequest(id: string): Promise<ActionResult> {
+export async function deleteSecurityRequest(id: string): Promise<ActionResult> {
   const supabase = await createClient()
 
-  const { error } = await supabase.from('maintenance_requests').delete().eq('id', id).select('id').single()
+  const { error } = await supabase.from('security_requests').delete().eq('id', id).select('id').single()
 
   if (error) {
     return { error: toMessage(error, 'No se pudo eliminar la solicitud, intenta nuevamente') }
@@ -84,7 +81,7 @@ export async function deleteMaintenanceRequest(id: string): Promise<ActionResult
 }
 
 /** Records the expense in the ledger and marks the request paid, atomically. */
-export async function payMaintenanceRequest(
+export async function paySecurityRequest(
   id: string,
   input: PayRequestInput,
 ): Promise<ActionResult<{ transaction_id: string }>> {
@@ -96,7 +93,7 @@ export async function payMaintenanceRequest(
   const { category_id, occurred_on, payment_method, reference, notes } = parsed.data
   const supabase = await createClient()
 
-  const { data, error } = await supabase.rpc('pay_maintenance_request', {
+  const { data, error } = await supabase.rpc('pay_security_request', {
     p_request_id: id,
     p_category_id: category_id,
     p_occurred_on: occurred_on,
@@ -113,7 +110,7 @@ export async function payMaintenanceRequest(
   return { data: { transaction_id: data } }
 }
 
-export async function rejectMaintenanceRequest(id: string, input: RejectRequestInput): Promise<ActionResult> {
+export async function rejectSecurityRequest(id: string, input: RejectRequestInput): Promise<ActionResult> {
   const parsed = rejectRequestSchema.safeParse(input)
   if (!parsed.success) {
     return { error: 'Revisa los campos del formulario' }
@@ -121,7 +118,7 @@ export async function rejectMaintenanceRequest(id: string, input: RejectRequestI
 
   const supabase = await createClient()
 
-  const { error } = await supabase.rpc('reject_maintenance_request', {
+  const { error } = await supabase.rpc('reject_security_request', {
     p_request_id: id,
     p_reason: parsed.data.reason,
   })

@@ -22,13 +22,13 @@ import { Form } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { type RejectRequestInput, rejectRequestSchema } from '@/lib/validations/requests'
-import { rejectMaintenanceRequest } from '@/server-actions/maintenance'
-import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
+import { rejectSecurityRequest } from '@/server-actions/security'
+import { SECURITY_QUERY_KEY, type SecurityRequestQueryData } from '@/tanstack-queries/security'
 
 const FORM_ID = 'reject-request-form'
 
 interface RejectRequestDialogProps extends React.ComponentProps<typeof Dialog> {
-  request: MaintenanceRequestQueryData
+  request: SecurityRequestQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -41,11 +41,11 @@ export function RejectRequestDialog({ request, open, onOpenChange, ...props }: R
 
   const mutation = useMutation({
     mutationFn: async (values: RejectRequestInput) => {
-      const result = await rejectMaintenanceRequest(request.id, values)
+      const result = await rejectSecurityRequest(request.id, values)
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [MAINTENANCE_QUERY_KEY] })
+      void queryClient.invalidateQueries({ queryKey: [SECURITY_QUERY_KEY] })
       toastManager.add({ type: 'success', title: 'Solicitud rechazada', description: request.title })
       onOpenChange(false)
     },
