@@ -16,7 +16,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
-import { formatDay, ISO_DAY } from '@/lib/utils'
+import { cn, formatDay, ISO_DAY } from '@/lib/utils'
 
 export interface DayRange {
   /** ISO day, inclusive. */
@@ -34,6 +34,8 @@ interface RangePickerProps {
   value: DayRange
   onChange: (range: DayRange) => void
   presets?: RangePreset[]
+  /** For the trigger button, e.g. "w-full" to line up with other fields. */
+  className?: string
 }
 
 export function toRange(from: Date, to: Date): DayRange {
@@ -52,7 +54,7 @@ const DEFAULT_PRESETS: RangePreset[] = [
  * Which days to show. The first click starts a new range and the second one
  * finishes it, in either order; only then does `onChange` fire.
  */
-export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS }: RangePickerProps) {
+export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, className }: RangePickerProps) {
   const today = new Date()
   const [isOpen, setOpen] = useState(false)
   const [month, setMonth] = useState(() => parseISO(value.from))
@@ -80,7 +82,9 @@ export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS }: Rang
         if (!nextOpen) setDraftFrom(undefined)
       }}
     >
-      <PopoverTrigger render={<Button variant="outline" className="justify-start font-normal" />}>
+      <PopoverTrigger
+        render={<Button variant="outline" className={cn('justify-start font-normal', className)} />}
+      >
         <CalendarIcon aria-hidden="true" />
         {label}
       </PopoverTrigger>

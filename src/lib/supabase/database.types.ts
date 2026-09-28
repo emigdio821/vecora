@@ -449,18 +449,21 @@ export type Database = {
       settings: {
         Row: {
           id: string
+          logo_path: string | null
           residential_name: string
           singleton: boolean
           updated_at: string
         }
         Insert: {
           id?: string
+          logo_path?: string | null
           residential_name?: string
           singleton?: boolean
           updated_at?: string
         }
         Update: {
           id?: string
+          logo_path?: string | null
           residential_name?: string
           singleton?: boolean
           updated_at?: string

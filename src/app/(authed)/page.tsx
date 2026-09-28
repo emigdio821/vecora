@@ -14,26 +14,18 @@ export default function HomePage() {
     <>
       <h1 className="font-heading text-base font-semibold">Inicio</h1>
 
-      <section aria-labelledby="reports-heading" className="flex flex-col gap-4">
-        <h2 id="reports-heading" className="font-heading text-sm font-semibold text-muted-foreground">
-          Reportes
-        </h2>
+      {/* items-start: each card keeps its own height instead of matching its neighbor. */}
+      <div className="grid items-start gap-4 lg:grid-cols-2">
         <ReportsCard />
-      </section>
+        <NoticesCard />
+      </div>
 
-      <section aria-labelledby="summary-heading" className="flex flex-col gap-4">
-        <h2 id="summary-heading" className="font-heading text-sm font-semibold text-muted-foreground">
-          Resumen general
-        </h2>
-        <PeriodSummaryCards />
+      <PeriodSummaryCards />
 
-        {/* items-start: each card keeps its own height instead of matching its neighbor. */}
-        <div className="grid items-start gap-4 lg:grid-cols-2">
-          <FeeStatusCard />
-          <PaymentRequestsCard />
-          <NoticesCard />
-        </div>
-      </section>
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        <FeeStatusCard />
+        <PaymentRequestsCard />
+      </div>
     </>
   )
 }

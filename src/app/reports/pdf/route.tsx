@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { FinancialReportDocument, isWholeMonth } from '@/components/reports/pdf/financial-report'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { getFinancialReport } from '@/lib/supabase/financial-report'
-import { getSettings } from '@/lib/supabase/settings'
+import { getLogo, getSettings } from '@/lib/supabase/settings'
 import { normalizeString } from '@/lib/utils'
 import { reportRangeSchema } from '@/lib/validations/reports'
 import { DEFAULT_RESIDENTIAL_LABEL } from '@/lib/validations/settings'
@@ -48,10 +48,12 @@ export async function GET(request: NextRequest) {
   }
 
   const residentialName = settings.residentialName || DEFAULT_RESIDENTIAL_LABEL
+  const logo = settings.logoPath ? await getLogo(settings.logoPath) : null
   const pdf = await renderToBuffer(
     <FinancialReportDocument
       report={report}
       residentialName={residentialName}
+      logo={logo}
       generatedBy={user.fullName}
       generatedAt={new Date()}
     />,

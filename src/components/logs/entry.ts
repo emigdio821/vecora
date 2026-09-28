@@ -150,6 +150,7 @@ const FIELD_LABEL: Record<string, string> = {
   role: 'Rol',
   relationship: 'Relación',
   residential_name: 'Nombre del residencial',
+  logo_path: 'Logo',
   amount: 'Monto',
   occurred_on: 'Fecha',
   requested_on: 'Fecha',

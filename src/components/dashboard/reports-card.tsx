@@ -12,6 +12,7 @@ import {
   subYears,
 } from 'date-fns'
 import { DownloadIcon, FileTextIcon } from 'lucide-react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { type DayRange, RangePicker, type RangePreset, toRange } from '@/components/shared/range-picker'
 import { Button } from '@/components/ui/button'
@@ -26,6 +27,7 @@ import {
 } from '@/components/ui/card'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { toastManager } from '@/components/ui/toast'
 import { formatMonth, ISO_DAY } from '@/lib/utils'
 
@@ -87,17 +89,18 @@ async function downloadReport(range: DayRange) {
   }, 1000)
 }
 
-type Source = 'month' | 'range'
+const REPORT_TABS = ['monthly', 'custom'] as const
 
 /** Everything report related on the home page: one month, or any range of days. */
 export function ReportsCard() {
   const today = new Date()
+  const [tab, setTab] = useQueryState('report', parseAsStringLiteral(REPORT_TABS).withDefault('monthly'))
   const [months] = useState(() => monthItems(today))
   const [month, setMonth] = useState(() => format(startOfMonth(subMonths(today, 1)), ISO_DAY))
   const [range, setRange] = useState<DayRange>(() => toRange(startOfMonth(today), today))
 
   const mutation = useMutation({
-    mutationFn: ({ range }: { range: DayRange; source: Source }) => downloadReport(range),
+    mutationFn: downloadReport,
     onSuccess: () => {
       toastManager.add({ type: 'success', title: 'Reporte descargado' })
     },
@@ -105,8 +108,6 @@ export function ReportsCard() {
       toastManager.add({ type: 'error', title: 'Error', description: error.message })
     },
   })
-
-  const isLoading = (source: Source) => mutation.isPending && mutation.variables.source === source
 
   return (
     <CardFrame className="w-full">
@@ -120,62 +121,73 @@ export function ReportsCard() {
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel className="grid gap-6 sm:grid-cols-2">
-          <div className="flex flex-col gap-3">
-            <Field>
-              <FieldLabel>Reporte mensual</FieldLabel>
-              <Select
-                items={months}
-                value={month}
-                onValueChange={(value) => {
-                  if (value) setMonth(value)
+        <CardPanel>
+          <Tabs
+            value={tab}
+            onValueChange={(value: (typeof REPORT_TABS)[number]) => {
+              void setTab(value)
+            }}
+          >
+            <TabsList>
+              <TabsTab value="monthly">Mensual</TabsTab>
+              <TabsTab value="custom">Manual</TabsTab>
+            </TabsList>
+
+            <TabsPanel value="monthly" className="flex flex-col gap-3">
+              <Field>
+                <FieldLabel>Mes</FieldLabel>
+                <Select
+                  items={months}
+                  value={month}
+                  onValueChange={(value) => {
+                    if (value) setMonth(value)
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectPopup>
+                    {months.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectPopup>
+                </Select>
+                <FieldDescription>Del día 1 al último día del mes.</FieldDescription>
+              </Field>
+              <Button
+                className="self-start"
+                loading={mutation.isPending}
+                disabled={mutation.isPending}
+                onClick={() => {
+                  mutation.mutate(monthRange(parseISO(month)))
                 }}
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectPopup>
-                  {months.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectPopup>
-              </Select>
-              <FieldDescription>Del día 1 al último día del mes.</FieldDescription>
-            </Field>
-            <Button
-              className="self-start"
-              loading={isLoading('month')}
-              disabled={mutation.isPending}
-              onClick={() => {
-                mutation.mutate({ range: monthRange(parseISO(month)), source: 'month' })
-              }}
-            >
-              <DownloadIcon />
-              Descargar PDF
-            </Button>
-          </div>
+                <DownloadIcon />
+                Descargar PDF
+              </Button>
+            </TabsPanel>
 
-          <div className="flex flex-col gap-3">
-            <Field>
-              <FieldLabel>Rango de fechas</FieldLabel>
-              <RangePicker value={range} onChange={setRange} presets={REPORT_PRESETS} />
-              <FieldDescription>Elige el primer y el último día del reporte.</FieldDescription>
-            </Field>
-            <Button
-              className="self-start"
-              variant="outline"
-              loading={isLoading('range')}
-              disabled={mutation.isPending}
-              onClick={() => {
-                mutation.mutate({ range, source: 'range' })
-              }}
-            >
-              <DownloadIcon />
-              Descargar PDF
-            </Button>
-          </div>
+            <TabsPanel value="custom" className="flex flex-col gap-3">
+              <Field>
+                <FieldLabel>Rango de fechas</FieldLabel>
+                <RangePicker value={range} onChange={setRange} presets={REPORT_PRESETS} className="w-full" />
+                <FieldDescription>Elige el primer y el último día del reporte.</FieldDescription>
+              </Field>
+              <Button
+                className="self-start"
+                loading={mutation.isPending}
+                disabled={mutation.isPending}
+                onClick={() => {
+                  mutation.mutate(range)
+                }}
+              >
+                <DownloadIcon />
+                Descargar PDF
+              </Button>
+            </TabsPanel>
+          </Tabs>
         </CardPanel>
       </Card>
     </CardFrame>

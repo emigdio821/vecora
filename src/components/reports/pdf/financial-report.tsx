@@ -1,13 +1,22 @@
-import { Document, Font, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import { join } from 'node:path'
+import { Document, Font, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns'
 import { es } from 'date-fns/locale'
 import type { FinancialReport } from '@/lib/supabase/financial-report'
 import { formatCurrency, formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
 
 // Rendered on the server by /reports/pdf. Only react-pdf primitives here: no
-// DOM, no Tailwind. Helvetica is built into every PDF reader and covers the
-// Spanish accents, so there are no fonts to ship. Not every symbol, though: a
-// math minus sign comes out blank, so stick to a plain hyphen.
+// DOM, no Tailwind.
+
+// Geist, like the app. next/font only serves woff2 to the browser, so the TTFs
+// live in assets/fonts; react-pdf embeds just the glyphs the report uses.
+Font.register({
+  family: 'Geist',
+  fonts: [
+    { src: join(process.cwd(), 'assets/fonts/Geist-Regular.ttf'), fontWeight: 400 },
+    { src: join(process.cwd(), 'assets/fonts/Geist-SemiBold.ttf'), fontWeight: 600 },
+  ],
+})
 
 // The built-in hyphenation is English ("mantenimien-to"); wrap whole words.
 Font.registerHyphenationCallback((word) => [word])
@@ -26,7 +35,7 @@ const styles = StyleSheet.create({
     paddingTop: 84,
     paddingBottom: 56,
     paddingHorizontal: 40,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Geist',
     fontSize: 9,
     color: COLOR.text,
   },
@@ -42,9 +51,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-end',
   },
-  residential: { fontSize: 13, fontFamily: 'Helvetica-Bold' },
+  brand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  // Fixed height, width from the image's own proportions (capped for wide
+  // wordmarks), so the name sits right next to it whatever the shape.
+  logo: { height: 32, maxWidth: 120, objectFit: 'contain', objectPosition: 'left' },
+  residential: { fontSize: 13, fontWeight: 600 },
   headerSubtitle: { fontSize: 9, color: COLOR.muted, marginTop: 2 },
-  headerRange: { fontSize: 10, fontFamily: 'Helvetica-Bold', textAlign: 'right' },
+  headerRange: { fontSize: 10, fontWeight: 600, textAlign: 'right' },
   footer: {
     position: 'absolute',
     bottom: 28,
@@ -56,7 +69,7 @@ const styles = StyleSheet.create({
     color: COLOR.muted,
   },
   section: { marginBottom: 18 },
-  sectionTitle: { fontSize: 11, fontFamily: 'Helvetica-Bold', marginBottom: 6 },
+  sectionTitle: { fontSize: 11, fontWeight: 600, marginBottom: 6 },
   sectionHint: { fontSize: 8, color: COLOR.muted, marginBottom: 6 },
   summary: { flexDirection: 'row', gap: 8 },
   summaryBox: {
@@ -68,7 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLOR.panel,
   },
   summaryLabel: { fontSize: 8, color: COLOR.muted, marginBottom: 3 },
-  summaryValue: { fontSize: 12, fontFamily: 'Helvetica-Bold' },
+  summaryValue: { fontSize: 12, fontWeight: 600 },
   columns: { flexDirection: 'row', gap: 12 },
   column: { flex: 1 },
   tableHeader: {
@@ -76,7 +89,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLOR.text,
     paddingBottom: 3,
-    fontFamily: 'Helvetica-Bold',
+    fontWeight: 600,
     fontSize: 8,
   },
   row: {
@@ -85,7 +98,7 @@ const styles = StyleSheet.create({
     borderBottomColor: COLOR.border,
     paddingVertical: 3,
   },
-  totalRow: { flexDirection: 'row', paddingTop: 3, fontFamily: 'Helvetica-Bold' },
+  totalRow: { flexDirection: 'row', paddingTop: 3, fontWeight: 600 },
   cell: { paddingRight: 4 },
   empty: { color: COLOR.muted, paddingVertical: 4 },
   note: { fontSize: 7.5, color: COLOR.muted, marginTop: 4 },
@@ -221,6 +234,8 @@ const PENDING_COLUMNS: Column<PendingHouse>[] = [
 interface FinancialReportDocumentProps {
   report: FinancialReport
   residentialName: string
+  /** PNG bytes; without it the header shows only the name. */
+  logo: Buffer | null
   generatedBy: string
   generatedAt: Date
 }
@@ -228,6 +243,7 @@ interface FinancialReportDocumentProps {
 export function FinancialReportDocument({
   report,
   residentialName,
+  logo,
   generatedBy,
   generatedAt,
 }: FinancialReportDocumentProps) {
@@ -247,9 +263,12 @@ export function FinancialReportDocument({
     >
       <Page size="A4" style={styles.page}>
         <View style={styles.header} fixed>
-          <View>
-            <Text style={styles.residential}>{residentialName}</Text>
-            <Text style={styles.headerSubtitle}>Reporte financiero</Text>
+          <View style={styles.brand}>
+            {logo && <Image style={styles.logo} src={{ data: logo, format: 'png' }} />}
+            <View>
+              <Text style={styles.residential}>{residentialName}</Text>
+              <Text style={styles.headerSubtitle}>Reporte financiero</Text>
+            </View>
           </View>
           <Text style={styles.headerRange}>{range}</Text>
         </View>
