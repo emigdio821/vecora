@@ -56,8 +56,9 @@ export function InviteLinkDialog({ invite, onOpenChange }: InviteLinkDialogProps
         <DialogHeader>
           <DialogTitle>Enlace de acceso para {invite?.full_name}</DialogTitle>
           <DialogDescription>
-            Compártelo por WhatsApp o cópialo. Al abrirlo, la persona creará su contraseña. El enlace solo
-            sirve una vez; si se pierde, puedes generar otro desde el menú del integrante.
+            Compártelo por WhatsApp o cópialo. Al abrirlo, la persona podrá crear su contraseña o
+            restablecerla si la olvidó. El enlace solo se puede usar una vez; si se pierde o necesitas generar
+            uno nuevo, puedes hacerlo desde el menú del integrante.
           </DialogDescription>
         </DialogHeader>
 

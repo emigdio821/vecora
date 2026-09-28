@@ -132,8 +132,6 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
       </InputGroup>
 
       <div className="flex flex-wrap justify-end gap-2">
-        <RangePicker value={range} onChange={setRange} />
-
         <Menu>
           <Tooltip>
             <TooltipTrigger
@@ -213,6 +211,8 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
             </MenuGroup>
           </MenuPopup>
         </Menu>
+
+        <RangePicker value={range} onChange={setRange} />
       </div>
     </div>
   )

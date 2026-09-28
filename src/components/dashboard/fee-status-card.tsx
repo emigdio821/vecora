@@ -18,6 +18,14 @@ import { formatMonth } from '@/lib/utils'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { houseFeeStatusQueryOptions } from '@/tanstack-queries/treasury'
 
+/** Header line: spell out the two extremes instead of "0 de 20" / "20 de 20". */
+function feeStatusDescription(upToDate: number, total: number): string {
+  if (total === 0) return 'Periodo actual'
+  if (upToDate === 0) return 'Ninguna casa está al corriente'
+  if (upToDate === total) return 'Todas las casas están al corriente'
+  return `${upToDate} de ${total} casas al corriente`
+}
+
 /**
  * Who is up to date with the monthly fee in the current period, and who is
  * not: every house missing at least one month so far, with the months owed.
@@ -46,15 +54,13 @@ export function FeeStatusCard() {
     <CardFrame className="w-full">
       <CardFrameHeader>
         <CardFrameTitle>Cuotas de mantenimiento</CardFrameTitle>
-        <CardFrameDescription>
-          {total > 0 ? `${upToDate} de ${total} casas al corriente` : 'Periodo actual'}
-        </CardFrameDescription>
+        <CardFrameDescription>{feeStatusDescription(upToDate, total)}</CardFrameDescription>
         <CardFrameAction className="text-muted-foreground">
           <CoinsIcon />
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel className={pending.length ? 'px-0' : undefined}>
+        <CardPanel className="p-0">
           {total === 0 ? (
             <Empty>
               <EmptyHeader>
@@ -76,29 +82,26 @@ export function FeeStatusCard() {
               </EmptyHeader>
             </Empty>
           ) : (
-            <ul className="flex flex-col divide-y">
-              {pending.map((house) => (
-                <li
-                  key={house.property_id}
-                  className="flex items-center justify-between gap-4 px-6 py-3 text-sm first:pt-0 last:pb-0"
-                >
-                  <div className="grid min-w-0 gap-0.5">
-                    <span className="font-medium">Casa {house.number}</span>
-                    {ownersOf(house.property_id) && (
-                      <span className="truncate text-xs text-muted-foreground">
-                        {ownersOf(house.property_id)}
+            <ul className="flex max-h-80 flex-col divide-y overflow-y-auto">
+              {pending.map((house) => {
+                const months = house.unpaid_months ?? []
+                const owners = ownersOf(house.property_id)
+                return (
+                  <li key={house.property_id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="truncate">
+                        <span className="font-medium">Casa {house.number}</span>
+                        {owners && <span className="text-muted-foreground"> · {owners}</span>}
                       </span>
-                    )}
-                  </div>
-                  <div className="flex shrink-0 flex-wrap justify-end gap-1">
-                    {(house.unpaid_months ?? []).map((month) => (
-                      <Badge key={month} variant="warning">
-                        {formatMonth(month)}
+                      <Badge variant="warning" className="shrink-0">
+                        {months.length === 1 ? '1 mes' : `${months.length} meses`}
                       </Badge>
-                    ))}
-                  </div>
-                </li>
-              ))}
+                    </div>
+                    {/* Plain text wraps; a badge per month pushed the house name off-screen. */}
+                    <p className="text-xs text-muted-foreground">{months.map(formatMonth).join(', ')}</p>
+                  </li>
+                )
+              })}
             </ul>
           )}
         </CardPanel>

@@ -33,7 +33,7 @@ export function PeriodSummaryCards() {
 
   if (periods.isPending || summaries.isPending) {
     return (
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3">
         <CardFrameSkeleton />
         <CardFrameSkeleton />
         <CardFrameSkeleton />
@@ -81,7 +81,7 @@ export function PeriodSummaryCards() {
   const balance = Number(summary.balance ?? 0)
 
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
+    <div className="grid gap-4 lg:grid-cols-3">
       <SummaryCard
         title="Ingresos"
         period={period.name}
