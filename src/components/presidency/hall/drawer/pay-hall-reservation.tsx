@@ -45,7 +45,7 @@ interface PayHallReservationDrawerProps extends React.ComponentProps<typeof Draw
 
 type PayMutation = UseMutationResult<{ transaction_id: string }, Error, PayHallReservationInput>
 
-/** Treasurer: records the rent as income in the ledger, which marks the booking paid. */
+/** Treasurer: records the fee as income in the ledger, which marks the booking paid. */
 export function PayHallReservationDrawer({
   reservation,
   open,

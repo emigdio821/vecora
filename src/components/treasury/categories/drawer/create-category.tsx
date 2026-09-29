@@ -91,7 +91,7 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
         <DrawerHeader>
           <DrawerTitle>Nueva categoría</DrawerTitle>
           <DrawerDescription>
-            Las categorías agrupan los movimientos, por ejemplo "Jardinería" o "Renta de terraza".
+            Las categorías agrupan los movimientos, por ejemplo "Jardinería" o "Donativos".
           </DrawerDescription>
         </DrawerHeader>
 

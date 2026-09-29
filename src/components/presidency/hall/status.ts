@@ -29,7 +29,7 @@ export const HALL_STATUS_BADGE_VARIANT: Record<
   cancelled: 'error',
 }
 
-/** The live rent row, if the treasurer collected it. */
+/** The live fee row, if the treasurer collected it. */
 export function hallPayment(reservation: HallReservationQueryData) {
   return reservation.movements.find((m) => m.kind === 'income')
 }

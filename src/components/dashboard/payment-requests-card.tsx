@@ -77,7 +77,7 @@ export function PaymentRequestsCard() {
         key: `hall-${r.id}`,
         href: '/presidency?tab=hall' as const,
         area: 'Terraza',
-        title: `Renta de terraza - Casa ${r.property.number}`,
+        title: `Tarifa de terraza - Casa ${r.property.number}`,
         amount: Number(r.amount),
         requested_on: r.reserved_on,
       })),
