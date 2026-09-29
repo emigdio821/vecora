@@ -19,14 +19,12 @@ export const metadata: Metadata = {
   authors: siteConfig.autors,
   keywords: siteConfig.keywords,
   metadataBase: new URL(siteConfig.url),
-  creator: 'Emigdio Torres',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon-16x16.png',
     apple: '/apple-touch-icon.png',
   },
   openGraph: {
-    title: '@luzapien, @emigdio821',
     description: siteConfig.description,
     url: siteConfig.url,
     siteName: siteConfig.name,
@@ -39,7 +37,6 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     images: [siteConfig.ogUrl],
-    creator: '@luzapien, @emigdio821',
   },
   manifest: '/site.webmanifest',
 }
