@@ -30,7 +30,7 @@ export function NoticesCard() {
   const now = useToday()
 
   if (reservations.isPending) {
-    return <CardFrameSkeleton rows={2} />
+    return <CardFrameSkeleton rows={3} />
   }
 
   if (reservations.isError) return null
@@ -52,11 +52,11 @@ export function NoticesCard() {
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel className="px-0">
+        <CardPanel className="p-0">
           {upcoming.length ? (
-            <ul className="flex flex-col divide-y">
+            <ul className="flex max-h-80 flex-col divide-y overflow-y-auto">
               {upcoming.map((reservation) => (
-                <li key={reservation.id} className="grid gap-0.5 px-6 py-3 text-sm first:pt-0 last:pb-0">
+                <li key={reservation.id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
                   <span className="truncate font-medium">
                     {format(parseISO(reservation.reserved_on), "EEEE d 'de' MMMM", { locale: es })}
                     {reservation.reserved_on === today && ' - Hoy'}

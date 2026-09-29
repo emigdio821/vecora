@@ -91,11 +91,11 @@ export function PaymentRequestsCard() {
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel className="px-0">
+        <CardPanel className="p-0">
           {shown.length ? (
-            <ul className="flex flex-col divide-y">
+            <ul className="flex max-h-80 flex-col divide-y overflow-y-auto">
               {shown.map((request) => (
-                <li key={request.key} className="px-6 py-3 text-sm first:pt-0 last:pb-0">
+                <li key={request.key} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
                   <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <span className="grid min-w-0 gap-0.5">
                       <Link href={request.href} className="truncate font-medium hover:underline">
