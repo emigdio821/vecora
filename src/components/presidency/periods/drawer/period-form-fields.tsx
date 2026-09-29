@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { NumberField, NumberFieldGroup, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
+import { useToday } from '@/hooks/use-today'
 import { formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { PeriodInput } from '@/lib/validations/treasury'
 
@@ -26,6 +27,7 @@ interface PeriodFormFieldsProps {
 export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProps) {
   const [openDate, setOpenDate] = useState<'starts_on' | 'ends_on' | null>(null)
   const startsOn = useWatch({ control: form.control, name: 'starts_on' })
+  const today = useToday()
 
   return (
     <>
@@ -89,8 +91,8 @@ export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProp
                     <Calendar
                       mode="single"
                       captionLayout="dropdown"
-                      startMonth={subYears(new Date(), 5)}
-                      endMonth={addYears(new Date(), 5)}
+                      startMonth={subYears(today, 5)}
+                      endMonth={addYears(today, 5)}
                       selected={parseISO(field.value)}
                       defaultMonth={parseISO(field.value)}
                       // The end must come after the start (same rule as the schema).
