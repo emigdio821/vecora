@@ -33,7 +33,7 @@ export function Empty({ className, ...props }: React.ComponentProps<'div'>): Rea
 export function EmptyHeader({ className, ...props }: React.ComponentProps<'div'>): React.ReactElement {
   return (
     <div
-      className={cn('flex max-w-sm flex-col items-center text-center', className)}
+      className={cn('flex flex-col items-center text-center', className)}
       data-slot="empty-header"
       {...props}
     />
