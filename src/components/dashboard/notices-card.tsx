@@ -54,7 +54,7 @@ export function NoticesCard() {
       <Card>
         <CardPanel className="p-0">
           {upcoming.length ? (
-            <ul className="flex max-h-80 flex-col divide-y overflow-y-auto">
+            <ul className="flex max-h-56 flex-col divide-y overflow-y-auto">
               {upcoming.map((reservation) => (
                 <li key={reservation.id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
                   <span className="truncate font-medium">

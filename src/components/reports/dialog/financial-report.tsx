@@ -11,20 +11,20 @@ import {
   subMonths,
   subYears,
 } from 'date-fns'
-import { DownloadIcon, FileTextIcon } from 'lucide-react'
-import { parseAsStringLiteral, useQueryState } from 'nuqs'
+import { DownloadIcon } from 'lucide-react'
 import { useState } from 'react'
 import { type DayRange, RangePicker, type RangePreset, toRange } from '@/components/shared/range-picker'
 import { Button } from '@/components/ui/button'
 import {
-  Card,
-  CardFrame,
-  CardFrameAction,
-  CardFrameDescription,
-  CardFrameHeader,
-  CardFrameTitle,
-  CardPanel,
-} from '@/components/ui/card'
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogPanel,
+  DialogPopup,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
@@ -90,12 +90,17 @@ async function downloadReport(range: DayRange) {
   }, 1000)
 }
 
-const REPORT_TABS = ['monthly', 'custom'] as const
+type ReportTab = 'monthly' | 'custom'
 
-/** Everything report related on the home page: one month, or any range of days. */
-export function ReportsCard() {
+interface FinancialReportDialogProps extends React.ComponentProps<typeof Dialog> {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+/** One month, or any range of days. The choices survive closing, so a second download is one click. */
+export function FinancialReportDialog({ open, onOpenChange, ...props }: FinancialReportDialogProps) {
   const today = useToday()
-  const [tab, setTab] = useQueryState('report', parseAsStringLiteral(REPORT_TABS).withDefault('monthly'))
+  const [tab, setTab] = useState<ReportTab>('monthly')
   const [months] = useState(() => monthItems(today))
   const [month, setMonth] = useState(() => format(startOfMonth(subMonths(today, 1)), ISO_DAY))
   const [range, setRange] = useState<DayRange>(() => toRange(startOfMonth(today), today))
@@ -104,6 +109,7 @@ export function ReportsCard() {
     mutationFn: downloadReport,
     onSuccess: () => {
       toastManager.add({ type: 'success', title: 'Reporte descargado' })
+      onOpenChange(false)
     },
     onError: (error) => {
       toastManager.add({ type: 'error', title: 'Error', description: error.message })
@@ -111,22 +117,20 @@ export function ReportsCard() {
   })
 
   return (
-    <CardFrame className="w-full">
-      <CardFrameHeader>
-        <CardFrameTitle>Reporte financiero</CardFrameTitle>
-        <CardFrameDescription>
-          PDF con ingresos, egresos, saldo y casas con cuotas pendientes.
-        </CardFrameDescription>
-        <CardFrameAction className="text-muted-foreground">
-          <FileTextIcon />
-        </CardFrameAction>
-      </CardFrameHeader>
-      <Card>
-        <CardPanel>
+    <Dialog open={open} onOpenChange={onOpenChange} {...props}>
+      <DialogPopup>
+        <DialogHeader>
+          <DialogTitle>Reporte financiero</DialogTitle>
+          <DialogDescription>
+            PDF con ingresos, egresos, saldo y casas con cuotas pendientes.
+          </DialogDescription>
+        </DialogHeader>
+
+        <DialogPanel>
           <Tabs
             value={tab}
-            onValueChange={(value: (typeof REPORT_TABS)[number]) => {
-              void setTab(value)
+            onValueChange={(value: ReportTab) => {
+              setTab(value)
             }}
           >
             <TabsList>
@@ -134,7 +138,7 @@ export function ReportsCard() {
               <TabsTab value="custom">Manual</TabsTab>
             </TabsList>
 
-            <TabsPanel value="monthly" className="flex flex-col gap-3">
+            <TabsPanel value="monthly">
               <Field>
                 <FieldLabel>Mes</FieldLabel>
                 <Select
@@ -157,40 +161,34 @@ export function ReportsCard() {
                 </Select>
                 <FieldDescription>Del día 1 al último día del mes.</FieldDescription>
               </Field>
-              <Button
-                className="self-start"
-                loading={mutation.isPending}
-                disabled={mutation.isPending}
-                onClick={() => {
-                  mutation.mutate(monthRange(parseISO(month)))
-                }}
-              >
-                <DownloadIcon />
-                Descargar PDF
-              </Button>
             </TabsPanel>
 
-            <TabsPanel value="custom" className="flex flex-col gap-3">
+            <TabsPanel value="custom">
               <Field>
                 <FieldLabel>Rango de fechas</FieldLabel>
                 <RangePicker value={range} onChange={setRange} presets={REPORT_PRESETS} className="w-full" />
                 <FieldDescription>Elige el primer y el último día del reporte.</FieldDescription>
               </Field>
-              <Button
-                className="self-start"
-                loading={mutation.isPending}
-                disabled={mutation.isPending}
-                onClick={() => {
-                  mutation.mutate(range)
-                }}
-              >
-                <DownloadIcon />
-                Descargar PDF
-              </Button>
             </TabsPanel>
           </Tabs>
-        </CardPanel>
-      </Card>
-    </CardFrame>
+        </DialogPanel>
+
+        <DialogFooter>
+          <DialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+            Cancelar
+          </DialogClose>
+          <Button
+            loading={mutation.isPending}
+            disabled={mutation.isPending}
+            onClick={() => {
+              mutation.mutate(tab === 'monthly' ? monthRange(parseISO(month)) : range)
+            }}
+          >
+            <DownloadIcon />
+            Descargar PDF
+          </Button>
+        </DialogFooter>
+      </DialogPopup>
+    </Dialog>
   )
 }

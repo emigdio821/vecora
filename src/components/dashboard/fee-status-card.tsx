@@ -82,7 +82,7 @@ export function FeeStatusCard() {
               </EmptyHeader>
             </Empty>
           ) : (
-            <ul className="flex max-h-80 flex-col divide-y overflow-y-auto">
+            <ul className="flex max-h-56 flex-col divide-y overflow-y-auto">
               {pending.map((house) => {
                 const months = house.unpaid_months ?? []
                 const owners = ownersOf(house.property_id)

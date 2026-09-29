@@ -26,7 +26,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
   return (
     <SidebarGroup {...props}>
-      <SidebarGroupLabel>Secciones</SidebarGroupLabel>
+      <SidebarGroupLabel>Áreas</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem>

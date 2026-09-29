@@ -93,7 +93,7 @@ export function PaymentRequestsCard() {
       <Card>
         <CardPanel className="p-0">
           {shown.length ? (
-            <ul className="flex max-h-80 flex-col divide-y overflow-y-auto">
+            <ul className="flex max-h-56 flex-col divide-y overflow-y-auto">
               {shown.map((request) => (
                 <li key={request.key} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
                   <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">

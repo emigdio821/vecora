@@ -86,6 +86,28 @@ export function periodSummariesQueryOptions() {
   })
 }
 
+/** Live movements of one period, just what the monthly chart adds up. */
+function periodMovementsQuery(periodId: string) {
+  return createClient()
+    .from('transactions')
+    .select('kind, amount, occurred_on')
+    .eq('period_id', periodId)
+    .is('deleted_at', null)
+}
+
+export type PeriodMovementQueryData = QueryData<ReturnType<typeof periodMovementsQuery>>[number]
+
+export function periodMovementsQueryOptions(periodId: string) {
+  return queryOptions({
+    queryKey: [TREASURY_QUERY_KEY, 'period-movements', periodId],
+    queryFn: async () => {
+      const { data, error } = await periodMovementsQuery(periodId)
+      if (error) throw error
+      return data
+    },
+  })
+}
+
 /**
  * Per live house, fee months due vs paid in the current period (DB view).
  * Empty when no period covers today.

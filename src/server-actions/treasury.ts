@@ -3,6 +3,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { type ActionResult, postgrestErrorMessage, UNIQUE_VIOLATION } from '@/lib/action-result'
 import { createClient } from '@/lib/supabase/server'
+import { formatMonth } from '@/lib/utils'
 import {
   type CategoryInput,
   categorySchema,
@@ -72,6 +73,20 @@ export async function recordFeePayment(
         error: error.message.includes('no period')
           ? 'Ningún periodo cubre esa fecha. Crea el periodo primero.'
           : 'La casa seleccionada ya no existe',
+      }
+    }
+    // Postgres only reports the first clash, so look up every selected month already paid.
+    if (error.code === UNIQUE_VIOLATION) {
+      const { data: paid } = await supabase
+        .from('transactions')
+        .select('fee_month')
+        .eq('property_id', property_id)
+        .in('fee_month', fee_months)
+        .is('deleted_at', null)
+        .order('fee_month')
+      const months = [...new Set(paid?.map((row) => formatMonth(row.fee_month)))]
+      if (months.length > 0) {
+        return { error: `Esa casa ya tiene registrada la cuota de ${months.join(', ')}` }
       }
     }
     return { error: toMessage(error, 'No se pudo registrar la cuota, intenta nuevamente') }

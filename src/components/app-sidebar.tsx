@@ -4,6 +4,7 @@ import type { Settings } from '@/lib/supabase/settings'
 import { NavAdmin } from './navs/admin'
 import { HeaderNav } from './navs/header'
 import { NavMain } from './navs/main'
+import { NavReports } from './navs/reports'
 import { NavSettings } from './navs/settings'
 import { NavUser } from './navs/user'
 
@@ -20,6 +21,7 @@ export function AppSidebar({ user, settings, ...props }: AppSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
+        <NavReports />
       </SidebarContent>
       <SidebarFooter>
         {user.roles.includes('admin') && <NavAdmin />}
