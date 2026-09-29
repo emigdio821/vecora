@@ -7,7 +7,7 @@ export const hallReservationSchema = z.object({
   property_id: z.uuid('Selecciona una casa'),
   // Unique in the DB: one live booking per day.
   reserved_on: z.iso.date('Fecha inválida'),
-  // Paid in full when booking; 0 = sin costo.
+  // Optional extra fee (e.g. electricity), paid in full when booking; 0 = free.
   amount: z.number('Monto es requerido').nonnegative('El monto no puede ser negativo'),
   notes: z.string().trim(),
 })

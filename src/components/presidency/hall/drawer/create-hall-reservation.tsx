@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { CircleAlertIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
@@ -25,33 +25,19 @@ import { formatDay, ISO_DAY } from '@/lib/utils'
 import { type HallReservationInput, hallReservationSchema } from '@/lib/validations/presidency'
 import { createHallReservation } from '@/server-actions/presidency'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
-import {
-  type HallReservationQueryData,
-  hallReservationsQueryOptions,
-  PRESIDENCY_QUERY_KEY,
-} from '@/tanstack-queries/presidency'
+import { PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
 import { HallReservationFormFields } from './hall-reservation-form-fields'
 
 const FORM_ID = 'create-hall-reservation-form'
 
-function defaultValues(amount: number | undefined): HallReservationInput {
+function defaultValues(): HallReservationInput {
   return {
     property_id: '',
     reserved_on: format(new Date(), ISO_DAY),
-    amount: amount ?? (null as unknown as number),
+    // Free unless the booking carries an extra fee.
+    amount: 0,
     notes: '',
   }
-}
-
-/** The price of the latest paid-for booking, so the usual rent is one click away. */
-function lastAmount(reservations: HallReservationQueryData[] | undefined): number | undefined {
-  const latest = reservations
-    ?.filter((r) => Number(r.amount) > 0)
-    .reduce<HallReservationQueryData | undefined>(
-      (last, r) => (!last || r.created_at > last.created_at ? r : last),
-      undefined,
-    )
-  return latest ? Number(latest.amount) : undefined
 }
 
 interface CreateHallReservationDrawerProps extends React.ComponentProps<typeof Drawer> {
@@ -65,11 +51,10 @@ export function CreateHallReservationDrawer({
   ...props
 }: CreateHallReservationDrawerProps) {
   const queryClient = useQueryClient()
-  const { data: reservations } = useQuery(hallReservationsQueryOptions())
 
   const form = useForm<HallReservationInput>({
     resolver: zodResolver(hallReservationSchema),
-    defaultValues: defaultValues(lastAmount(reservations)),
+    defaultValues: defaultValues(),
   })
 
   const mutation = useMutation({
@@ -109,7 +94,7 @@ export function CreateHallReservationDrawer({
     props.onOpenChangeComplete?.(isOpen)
 
     if (!isOpen) {
-      form.reset(defaultValues(lastAmount(reservations)))
+      form.reset(defaultValues())
     }
   }
 
@@ -125,8 +110,8 @@ export function CreateHallReservationDrawer({
         <DrawerHeader>
           <DrawerTitle>Reservar terraza</DrawerTitle>
           <DrawerDescription>
-            La terraza se aparta por día completo y solo una casa puede usarla cada día. El cobro queda
-            pendiente para la tesorería.
+            La terraza se aparta por día completo y solo una casa puede usarla cada día. Es gratuita; si lleva
+            una tarifa, el cobro queda pendiente para la tesorería.
           </DrawerDescription>
         </DrawerHeader>
 
