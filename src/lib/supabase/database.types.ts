@@ -58,6 +58,9 @@ export type Database = {
       }
       hall_reservations: {
         Row: {
+          amount: number
+          cancelled_at: string | null
+          cancelled_by: string | null
           created_at: string
           created_by: string
           id: string
@@ -67,6 +70,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          amount: number
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           created_at?: string
           created_by?: string
           id?: string
@@ -76,6 +82,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          amount?: number
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           created_at?: string
           created_by?: string
           id?: string
@@ -85,6 +94,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: 'hall_reservations_cancelled_by_fkey'
+            columns: ['cancelled_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
           {
             foreignKeyName: 'hall_reservations_created_by_fkey'
             columns: ['created_by']
@@ -517,6 +533,7 @@ export type Database = {
           description: string
           fee_month: string | null
           folio: string | null
+          hall_reservation_id: string | null
           id: string
           kind: Database['public']['Enums']['transaction_kind']
           notes: string | null
@@ -537,6 +554,7 @@ export type Database = {
           description: string
           fee_month?: string | null
           folio?: string | null
+          hall_reservation_id?: string | null
           id?: string
           kind: Database['public']['Enums']['transaction_kind']
           notes?: string | null
@@ -557,6 +575,7 @@ export type Database = {
           description?: string
           fee_month?: string | null
           folio?: string | null
+          hall_reservation_id?: string | null
           id?: string
           kind?: Database['public']['Enums']['transaction_kind']
           notes?: string | null
@@ -587,6 +606,13 @@ export type Database = {
             columns: ['deleted_by']
             isOneToOne: false
             referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'transactions_hall_reservation_id_fkey'
+            columns: ['hall_reservation_id']
+            isOneToOne: false
+            referencedRelation: 'hall_reservations'
             referencedColumns: ['id']
           },
           {
@@ -686,6 +712,17 @@ export type Database = {
       }
     }
     Functions: {
+      cancel_hall_reservation: {
+        Args: {
+          p_notes?: string
+          p_occurred_on?: string
+          p_payment_method?: Database['public']['Enums']['payment_method']
+          p_reference?: string
+          p_refund_amount?: number
+          p_reservation_id: string
+        }
+        Returns: undefined
+      }
       create_resident: {
         Args: {
           p_email?: string
@@ -699,6 +736,17 @@ export type Database = {
         Returns: string
       }
       financial_report: { Args: { p_from: string; p_to: string }; Returns: Json }
+      pay_hall_reservation: {
+        Args: {
+          p_folio?: string
+          p_notes?: string
+          p_occurred_on: string
+          p_payment_method?: Database['public']['Enums']['payment_method']
+          p_reference?: string
+          p_reservation_id: string
+        }
+        Returns: string
+      }
       pay_maintenance_request: {
         Args: {
           p_category_id: string

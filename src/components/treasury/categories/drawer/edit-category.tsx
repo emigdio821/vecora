@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
+import { systemCategorySource } from '@/lib/system-categories'
 import { type CategoryInput, categorySchema } from '@/lib/validations/treasury'
 import { updateCategory } from '@/server-actions/treasury'
 import { type CategoryQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
@@ -86,8 +87,8 @@ function EditCategoryForm({
     resolver: zodResolver(categorySchema),
     defaultValues: { kind: category.kind, name: category.name },
   })
-  // "Cuota de mantenimiento" and "Recargo": record_fee_payment looks them up by key.
-  const isSystem = category.key !== null
+  // "Cuota de mantenimiento", "Recargo" and the terraza ones: the RPCs look them up by key.
+  const { key } = category
 
   return (
     <>
@@ -102,13 +103,13 @@ function EditCategoryForm({
             }),
           )}
         >
-          {isSystem && (
+          {key !== null && (
             <Alert variant="info">
               <InfoIcon />
               <AlertTitle>Categoría del sistema</AlertTitle>
               <AlertDescription>
-                "Registrar cuota" usa esta categoría. Puedes cambiarle el nombre, pero no desactivarla ni
-                eliminarla.
+                {systemCategorySource(key)} usa esta categoría. Puedes cambiarle el nombre, pero no
+                desactivarla ni eliminarla.
               </AlertDescription>
             </Alert>
           )}

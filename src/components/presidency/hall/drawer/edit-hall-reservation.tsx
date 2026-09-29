@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import { CircleAlertIcon } from 'lucide-react'
+import { CircleAlertIcon, InfoIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -23,6 +23,7 @@ import { formatDay } from '@/lib/utils'
 import { type HallReservationInput, hallReservationSchema } from '@/lib/validations/presidency'
 import { updateHallReservation } from '@/server-actions/presidency'
 import { type HallReservationQueryData, PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
+import { hallPayment } from '../status'
 import { HallReservationFormFields } from './hall-reservation-form-fields'
 
 const FORM_ID = 'edit-hall-reservation-form'
@@ -98,9 +99,11 @@ function EditHallReservationForm({
     defaultValues: {
       property_id: reservation.property.id,
       reserved_on: reservation.reserved_on,
+      amount: Number(reservation.amount),
       notes: reservation.notes ?? '',
     },
   })
+  const isPaid = hallPayment(reservation) !== undefined
 
   return (
     <>
@@ -115,7 +118,23 @@ function EditHallReservationForm({
             }),
           )}
         >
-          <HallReservationFormFields form={form} disabled={mutation.isPending} currentId={reservation.id} />
+          {isPaid && (
+            <Alert variant="info">
+              <InfoIcon />
+              <AlertTitle>Reservación pagada</AlertTitle>
+              <AlertDescription>
+                El pago ya está en "Tesorería", así que la casa y el monto no se pueden cambiar. Puedes mover
+                la fecha.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <HallReservationFormFields
+            form={form}
+            disabled={mutation.isPending}
+            currentId={reservation.id}
+            lockPaidFields={isPaid}
+          />
 
           {form.formState.errors.root && (
             <Alert variant="error">

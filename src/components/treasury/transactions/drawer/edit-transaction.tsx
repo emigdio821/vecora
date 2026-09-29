@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
+import { systemCategorySource } from '@/lib/system-categories'
 import { formatCurrency } from '@/lib/utils'
 import { type UpdateTransactionInput, updateTransactionSchema } from '@/lib/validations/treasury'
 import { updateTransaction } from '@/server-actions/treasury'
@@ -110,8 +111,9 @@ function EditTransactionForm({
     resolver: zodResolver(updateTransactionSchema),
     defaultValues: toFormValues(transaction),
   })
-  // Fee and late-fee rows come from record_fee_payment (category key is set).
-  const isFee = transaction.category.key !== null
+  // Fee, late-fee and terraza rows come from their RPCs (category key is set).
+  const { key } = transaction.category
+  const isFee = key !== null
 
   return (
     <>
@@ -126,13 +128,13 @@ function EditTransactionForm({
             }),
           )}
         >
-          {isFee && (
+          {key !== null && (
             <Alert variant="info">
               <InfoIcon />
-              <AlertTitle>Cuota registrada con "Registrar cuota"</AlertTitle>
+              <AlertTitle>Registrado desde {systemCategorySource(key)}</AlertTitle>
               <AlertDescription>
                 Aquí solo puedes corregir el folio, el método de pago, la referencia y las notas. Para cambiar
-                el monto, el mes o la casa, elimina el movimiento y registra la cuota de nuevo.
+                lo demás, elimina el movimiento y regístralo de nuevo desde {systemCategorySource(key)}.
               </AlertDescription>
             </Alert>
           )}

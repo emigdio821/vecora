@@ -2,39 +2,62 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { addYears, format, parseISO, startOfToday } from 'date-fns'
-import { ChevronsUpDownIcon } from 'lucide-react'
+import { ChevronsUpDownIcon, TriangleAlertIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Controller, type UseFormReturn } from 'react-hook-form'
+import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
 import { HousesPicker } from '@/components/shared/pickers/houses-picker'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
+import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
-import { formatDay, ISO_DAY } from '@/lib/utils'
+import { formatDay, formatMonth, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { HallReservationInput } from '@/lib/validations/presidency'
 import { hallReservationsQueryOptions } from '@/tanstack-queries/presidency'
+import { houseFeeStatusQueryOptions } from '@/tanstack-queries/treasury'
 
 interface HallReservationFormFieldsProps {
   form: UseFormReturn<HallReservationInput>
   disabled?: boolean
   /** Editing: this booking's own day must stay selectable. */
   currentId?: string
+  /** Editing a paid booking: the ledger already has its house and amount. */
+  lockPaidFields?: boolean
 }
 
 /** Shared by the create and edit drawers. */
-export function HallReservationFormFields({ form, disabled, currentId }: HallReservationFormFieldsProps) {
+export function HallReservationFormFields({
+  form,
+  disabled,
+  currentId,
+  lockPaidFields,
+}: HallReservationFormFieldsProps) {
   const [isDateOpen, setDateOpen] = useState(false)
   const today = useToday()
   const { data: reservations } = useQuery(hallReservationsQueryOptions())
+  const { data: feeStatus } = useQuery(houseFeeStatusQueryOptions())
+  const propertyId = useWatch({ control: form.control, name: 'property_id' })
 
   // Days already booked by someone else are greyed out; the DB enforces it
-  // too (unique reserved_on), this just saves a failed submit.
+  // too (unique reserved_on), this just saves a failed submit. Cancelled
+  // bookings no longer hold their day.
   const takenDays = useMemo(
-    () => (reservations ?? []).filter((r) => r.id !== currentId).map((r) => parseISO(r.reserved_on)),
+    () =>
+      (reservations ?? [])
+        .filter((r) => r.id !== currentId && !r.cancelled_at)
+        .map((r) => parseISO(r.reserved_on)),
     [reservations, currentId],
   )
+
+  // A warning only: the board doesn't block a booking over missing fees. Once
+  // paid the house is settled, so there's nothing left to warn about.
+  const unpaidMonths = lockPaidFields
+    ? []
+    : (feeStatus?.find((h) => h.property_id === propertyId)?.unpaid_months ?? [])
 
   return (
     <>
@@ -57,13 +80,24 @@ export function HallReservationFormFields({ form, disabled, currentId }: HallRes
                 field.onChange(value ?? '')
               }}
               inputRef={field.ref}
-              disabled={disabled}
+              disabled={disabled || lockPaidFields}
             />
             <FieldDescription>La casa que aparta la terraza.</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
       />
+
+      {unpaidMonths.length > 0 && (
+        <Alert variant="warning">
+          <TriangleAlertIcon />
+          <AlertTitle>Casa con cuotas pendientes</AlertTitle>
+          <AlertDescription>
+            Debe {unpaidMonths.length === 1 ? '1 mes' : `${unpaidMonths.length} meses`}:{' '}
+            {unpaidMonths.map((month) => formatMonth(month)).join(', ')}. Puedes reservar de todos modos.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Controller
         name="reserved_on"
@@ -110,6 +144,47 @@ export function HallReservationFormFields({ form, disabled, currentId }: HallRes
               </PopoverPopup>
             </Popover>
             <FieldDescription>Los días ya apartados aparecen deshabilitados.</FieldDescription>
+            <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+          </Field>
+        )}
+      />
+
+      <Controller
+        name="amount"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field
+            name={field.name}
+            invalid={fieldState.invalid}
+            touched={fieldState.isTouched}
+            dirty={fieldState.isDirty}
+          >
+            <FieldLabel>
+              Monto <span className="text-destructive">*</span>
+            </FieldLabel>
+            <InputGroup>
+              <NumberField
+                value={field.value ?? null}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                }}
+                min={0}
+                locale="es-MX"
+                format={MONEY_FORMAT}
+                disabled={disabled || lockPaidFields}
+              >
+                <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
+              </NumberField>
+              <InputGroupAddon>
+                <InputGroupText>$</InputGroupText>
+              </InputGroupAddon>
+              <InputGroupAddon align="inline-end">
+                <InputGroupText>MXN</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
+            <FieldDescription>
+              Se paga completo al reservar. Si la reservación es gratuita, deja el monto en $0.
+            </FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}

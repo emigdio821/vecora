@@ -3,10 +3,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { ReceiptTextIcon } from 'lucide-react'
 import Link from 'next/link'
+import { hallReservationStatus } from '@/components/presidency/hall/status'
 import { KIND_LABEL as SECURITY_KIND_LABEL } from '@/components/security/kind'
-import { STATUS_BADGE_VARIANT, STATUS_LABEL } from '@/components/shared/request-status'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
-import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardFrame,
@@ -18,20 +17,17 @@ import {
 } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { formatCurrency, formatDay } from '@/lib/utils'
-import type { RequestStatus } from '@/lib/validations/requests'
 import { maintenanceRequestsQueryOptions } from '@/tanstack-queries/maintenance'
+import { hallReservationsQueryOptions } from '@/tanstack-queries/presidency'
 import { securityRequestsQueryOptions } from '@/tanstack-queries/security'
-
-const MAX_REQUESTS = 6
 
 interface PaymentRequest {
   key: string
-  href: '/maintenance' | '/security'
+  href: '/maintenance' | '/security' | '/presidency?tab=hall'
   area: string
   title: string
   amount: number
   requested_on: string
-  status: RequestStatus
 }
 
 function pendingDescription(pending: number): string {
@@ -40,46 +36,52 @@ function pendingDescription(pending: number): string {
 }
 
 /**
- * "Mantenimiento" and "Seguridad" payment requests in one list: the pending
- * ones first (they're what the treasurer has to act on), then the latest.
+ * What the treasurer still has to pay or collect across "Mantenimiento",
+ * "Seguridad" and "Terraza", oldest first. Resolved ones live in each area.
  */
 export function PaymentRequestsCard() {
   const maintenance = useQuery(maintenanceRequestsQueryOptions())
   const security = useQuery(securityRequestsQueryOptions())
+  const hall = useQuery(hallReservationsQueryOptions())
 
-  if (maintenance.isPending || security.isPending) {
+  if (maintenance.isPending || security.isPending || hall.isPending) {
     return <CardFrameSkeleton rows={3} />
   }
 
-  if (maintenance.isError || security.isError) return null
+  if (maintenance.isError || security.isError || hall.isError) return null
 
-  const requests: PaymentRequest[] = [
-    ...maintenance.data.map((r) => ({
-      key: `maintenance-${r.id}`,
-      href: '/maintenance' as const,
-      area: 'Mantenimiento',
-      title: r.title,
-      amount: r.amount,
-      requested_on: r.requested_on,
-      status: r.status,
-    })),
-    ...security.data.map((r) => ({
-      key: `security-${r.id}`,
-      href: '/security' as const,
-      area: `Seguridad - ${SECURITY_KIND_LABEL[r.kind]}`,
-      title: r.title,
-      amount: r.amount,
-      requested_on: r.requested_on,
-      status: r.status,
-    })),
-  ]
-  const pending = requests
-    .filter((r) => r.status === 'pending')
-    .sort((a, b) => a.requested_on.localeCompare(b.requested_on))
-  const resolved = requests
-    .filter((r) => r.status !== 'pending')
-    .sort((a, b) => b.requested_on.localeCompare(a.requested_on))
-  const shown = [...pending, ...resolved].slice(0, MAX_REQUESTS)
+  const pending: PaymentRequest[] = [
+    ...maintenance.data
+      .filter((r) => r.status === 'pending')
+      .map((r) => ({
+        key: `maintenance-${r.id}`,
+        href: '/maintenance' as const,
+        area: 'Mantenimiento',
+        title: r.title,
+        amount: r.amount,
+        requested_on: r.requested_on,
+      })),
+    ...security.data
+      .filter((r) => r.status === 'pending')
+      .map((r) => ({
+        key: `security-${r.id}`,
+        href: '/security' as const,
+        area: `Seguridad - ${SECURITY_KIND_LABEL[r.kind]}`,
+        title: r.title,
+        amount: r.amount,
+        requested_on: r.requested_on,
+      })),
+    ...hall.data
+      .filter((r) => hallReservationStatus(r) === 'pending')
+      .map((r) => ({
+        key: `hall-${r.id}`,
+        href: '/presidency?tab=hall' as const,
+        area: 'Terraza',
+        title: `Renta de terraza - Casa ${r.property.number}`,
+        amount: Number(r.amount),
+        requested_on: r.reserved_on,
+      })),
+  ].sort((a, b) => a.requested_on.localeCompare(b.requested_on))
 
   return (
     <CardFrame className="w-full">
@@ -92,9 +94,9 @@ export function PaymentRequestsCard() {
       </CardFrameHeader>
       <Card>
         <CardPanel className="p-0">
-          {shown.length ? (
+          {pending.length ? (
             <ul className="flex max-h-56 flex-col divide-y overflow-y-auto">
-              {shown.map((request) => (
+              {pending.map((request) => (
                 <li key={request.key} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
                   <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <span className="grid min-w-0 gap-0.5">
@@ -105,11 +107,8 @@ export function PaymentRequestsCard() {
                         {request.area} - {formatDay(request.requested_on)}
                       </span>
                     </span>
-                    <span className="flex shrink-0 flex-col items-end gap-1">
-                      <span className="font-medium tabular-nums">{formatCurrency(request.amount)}</span>
-                      <Badge variant={STATUS_BADGE_VARIANT[request.status]} size="sm">
-                        {STATUS_LABEL[request.status]}
-                      </Badge>
+                    <span className="shrink-0 font-medium tabular-nums">
+                      {formatCurrency(request.amount)}
                     </span>
                   </div>
                 </li>
@@ -121,9 +120,9 @@ export function PaymentRequestsCard() {
                 <EmptyMedia variant="icon">
                   <ReceiptTextIcon />
                 </EmptyMedia>
-                <EmptyTitle>Sin solicitudes</EmptyTitle>
+                <EmptyTitle>Todo al día</EmptyTitle>
                 <EmptyDescription>
-                  Aquí aparecerán las solicitudes de "Mantenimiento" y "Seguridad".
+                  Aquí aparecerán las solicitudes pendientes de "Mantenimiento", "Seguridad" y "Terraza".
                 </EmptyDescription>
               </EmptyHeader>
             </Empty>

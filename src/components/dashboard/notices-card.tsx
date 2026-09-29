@@ -36,9 +36,10 @@ export function NoticesCard() {
   if (reservations.isError) return null
 
   const today = format(now, ISO_DAY)
-  // The query is newest first; the notices read soonest first.
+  // The query is newest first; the notices read soonest first. A cancelled
+  // booking no longer happens.
   const upcoming = reservations.data
-    .filter((r) => r.reserved_on >= today)
+    .filter((r) => r.reserved_on >= today && !r.cancelled_at)
     .sort((a, b) => a.reserved_on.localeCompare(b.reserved_on))
     .slice(0, MAX_NOTICES)
 

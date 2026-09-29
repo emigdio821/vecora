@@ -32,9 +32,17 @@ export function sectionLabel(tableName: string) {
 }
 
 /** Derived from the operation and, for updates, from what changed. */
-export type LogAction = 'created' | 'updated' | 'deleted' | 'restored' | 'paid' | 'rejected'
+export type LogAction = 'created' | 'updated' | 'deleted' | 'restored' | 'paid' | 'rejected' | 'cancelled'
 
-export const ACTIONS: LogAction[] = ['created', 'updated', 'deleted', 'restored', 'paid', 'rejected']
+export const ACTIONS: LogAction[] = [
+  'created',
+  'updated',
+  'deleted',
+  'restored',
+  'paid',
+  'rejected',
+  'cancelled',
+]
 
 export const ACTION_LABEL: Record<LogAction, string> = {
   created: 'Creó',
@@ -43,6 +51,7 @@ export const ACTION_LABEL: Record<LogAction, string> = {
   restored: 'Restauró',
   paid: 'Pagó',
   rejected: 'Rechazó',
+  cancelled: 'Canceló',
 }
 
 export const ACTION_BADGE_VARIANT: Record<LogAction, React.ComponentProps<typeof Badge>['variant']> = {
@@ -52,6 +61,7 @@ export const ACTION_BADGE_VARIANT: Record<LogAction, React.ComponentProps<typeof
   restored: 'secondary',
   paid: 'success',
   rejected: 'warning',
+  cancelled: 'warning',
 }
 
 export function entryAction(entry: LogEntryQueryData): LogAction {
@@ -68,6 +78,8 @@ export function entryAction(entry: LogEntryQueryData): LogAction {
     if (after.status === 'paid') return 'paid'
     if (after.status === 'rejected') return 'rejected'
   }
+  // Paid terraza bookings are cancelled, not deleted, by the treasurer's RPC.
+  if (changed.includes('cancelled_at')) return 'cancelled'
   return 'updated'
 }
 
@@ -103,8 +115,10 @@ export function entrySummary(entry: LogEntryQueryData): string {
     case 'maintenance_requests':
     case 'security_requests':
       return row.amount == null ? label : `${label} - ${formatCurrency(asText(row.amount))}`
-    case 'hall_reservations':
-      return `Casa ${label} - ${formatDay(asText(row.reserved_on))}`
+    case 'hall_reservations': {
+      const summary = `Casa ${label} - ${formatDay(asText(row.reserved_on))}`
+      return row.amount == null ? summary : `${summary} - ${formatCurrency(asText(row.amount))}`
+    }
     case 'property_residents': {
       const resident = refName(entry, row.resident_id) ?? 'Residente'
       const relationship = enumLabel(row.relationship)
@@ -165,10 +179,13 @@ const FIELD_LABEL: Record<string, string> = {
   status: 'Estado',
   rejection_reason: 'Motivo del rechazo',
   transaction_id: 'Movimiento',
+  hall_reservation_id: 'Reservación de terraza',
   created_by: 'Creó',
   granted_by: 'Otorgó',
   resolved_by: 'Resolvió',
   resolved_at: 'Resuelta',
+  cancelled_at: 'Cancelada',
+  cancelled_by: 'Canceló',
   deleted_at: 'Eliminada',
   deleted_by: 'Eliminó',
   created_at: 'Creada',
@@ -183,7 +200,7 @@ const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton'])
 
 const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee'])
 const DAY_FIELDS = new Set(['occurred_on', 'requested_on', 'reserved_on', 'starts_on', 'ends_on'])
-const TIMESTAMP_FIELDS = new Set(['created_at', 'resolved_at', 'deleted_at'])
+const TIMESTAMP_FIELDS = new Set(['created_at', 'resolved_at', 'cancelled_at', 'deleted_at'])
 
 /** Enum values don't collide across tables, so one flat map is enough. */
 const ENUM_LABEL: Record<string, string> = {

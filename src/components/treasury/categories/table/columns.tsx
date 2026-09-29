@@ -2,6 +2,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
+import { systemCategorySource } from '@/lib/system-categories'
 import { normalizeString } from '@/lib/utils'
 import type { CategoryQueryData } from '@/tanstack-queries/treasury'
 import { KIND_LABEL } from '../../kind'
@@ -19,7 +20,9 @@ export const categoriesTableColumns = columnHelper.columns([
       return (
         <div className="grid gap-0.5">
           <span className="truncate">{name}</span>
-          {key !== null && <span className="text-xs text-muted-foreground">La usa "Registrar cuota"</span>}
+          {key !== null && (
+            <span className="text-xs text-muted-foreground">La usa {systemCategorySource(key)}</span>
+          )}
         </div>
       )
     },

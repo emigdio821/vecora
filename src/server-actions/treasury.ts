@@ -3,6 +3,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { type ActionResult, postgrestErrorMessage, UNIQUE_VIOLATION } from '@/lib/action-result'
 import { createClient } from '@/lib/supabase/server'
+import { systemCategorySource } from '@/lib/system-categories'
 import { formatMonth } from '@/lib/utils'
 import {
   type CategoryInput,
@@ -28,10 +29,16 @@ function toMessage(error: PostgrestError, fallback: string) {
     unique: {
       transactions_one_per_house_month_category:
         'Esa casa ya tiene registrada la cuota de uno de los meses seleccionados',
+      transactions_one_per_hall_reservation_category:
+        'Esa reservación de terraza ya tiene su pago registrado',
       transaction_categories_name_unique: 'Ya existe una categoría con ese nombre',
       periods_name_unique: 'Ya existe un periodo con ese nombre',
     },
   })
+}
+
+function systemCategoryMessage(key: string) {
+  return `Los movimientos de esa categoría se registran desde ${systemCategorySource(key)}`
 }
 
 export interface FeePaymentSummary {
@@ -119,14 +126,15 @@ export async function createTransaction(
   } = parsed.data
   const supabase = await createClient()
 
-  // Fees need a fee_month and the period's rates; only record_fee_payment knows how.
+  // Fees need a fee_month and the period's rates, terraza rows their booking;
+  // only the RPCs know how.
   const { data: category } = await supabase
     .from('transaction_categories')
     .select('key')
     .eq('id', category_id)
     .maybeSingle()
   if (category?.key) {
-    return { error: 'Las cuotas y recargos se registran con "Registrar cuota"' }
+    return { error: systemCategoryMessage(category.key) }
   }
 
   const { data: period } = await supabase
@@ -201,9 +209,10 @@ export async function updateTransaction(
   }
 
   // Fee and late-fee rows are produced by record_fee_payment from the period's
-  // rates and due day. Editing their amount, date, month or house here would
-  // silently break that; only the receipt details can change. Anything else is
-  // fixed by deleting the receipt and recording it again.
+  // rates and due day, terraza rows from their booking. Editing their amount,
+  // date, month or house here would silently break that; only the receipt
+  // details can change. Anything else is fixed by deleting the receipt and
+  // recording it again.
   if (current.category.key) {
     const { data, error } = await supabase
       .from('transactions')
@@ -224,7 +233,7 @@ export async function updateTransaction(
     .eq('id', category_id)
     .maybeSingle()
   if (category?.key) {
-    return { error: 'Las cuotas y recargos se registran con "Registrar cuota"' }
+    return { error: systemCategoryMessage(category.key) }
   }
 
   // The date may have moved into another period.

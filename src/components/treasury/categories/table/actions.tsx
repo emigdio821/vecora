@@ -21,7 +21,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
   const queryClient = useQueryClient()
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
-  // System categories (fee / late fee) can only be renamed.
+  // System categories (fee, late fee, terraza) can only be renamed.
   const isSystem = category.key !== null
   // Soft-deleted movements count too: the ledger is never purged.
   const canDelete = !isSystem && transactionCount(category) === 0
