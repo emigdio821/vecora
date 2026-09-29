@@ -52,6 +52,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
+import { useToday } from '@/hooks/use-today'
 import { formatCurrency, formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
 import { type RecordFeePaymentInput, recordFeePaymentSchema } from '@/lib/validations/treasury'
 import { recordFeePayment } from '@/server-actions/treasury'
@@ -89,6 +90,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
   const queryClient = useQueryClient()
   const waiveSwitchId = useId()
   const [isDateOpen, setDateOpen] = useState(false)
+  const today = useToday()
   const { data: periods } = useQuery(periodsQueryOptions())
 
   const form = useForm<RecordFeePaymentInput>({
@@ -302,8 +304,8 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                         <Calendar
                           mode="single"
                           captionLayout="dropdown"
-                          startMonth={subYears(new Date(), 5)}
-                          endMonth={addYears(new Date(), 1)}
+                          startMonth={subYears(today, 5)}
+                          endMonth={addYears(today, 1)}
                           selected={parseISO(field.value)}
                           defaultMonth={parseISO(field.value)}
                           onSelect={(date) => {

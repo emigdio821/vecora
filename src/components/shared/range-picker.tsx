@@ -16,6 +16,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
+import { useToday } from '@/hooks/use-today'
 import { cn, formatDay, ISO_DAY } from '@/lib/utils'
 
 export interface DayRange {
@@ -55,7 +56,7 @@ const DEFAULT_PRESETS: RangePreset[] = [
  * finishes it, in either order; only then does `onChange` fire.
  */
 export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, className }: RangePickerProps) {
-  const today = new Date()
+  const today = useToday()
   const [isOpen, setOpen] = useState(false)
   const [month, setMonth] = useState(() => parseISO(value.from))
   /** The start of a range being picked; the current range shows until then. */

@@ -28,6 +28,7 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
+import { useToday } from '@/hooks/use-today'
 import { formatCurrency, formatDay, ISO_DAY } from '@/lib/utils'
 import { type PayRequestInput, payRequestSchema } from '@/lib/validations/requests'
 import { payMaintenanceRequest } from '@/server-actions/maintenance'
@@ -99,6 +100,7 @@ export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayR
 
 function PayRequestForm({ mutation }: { mutation: PayMutation }) {
   const [isDateOpen, setDateOpen] = useState(false)
+  const today = useToday()
   const { data: categories } = useQuery(categoriesQueryOptions())
 
   // Expense categories the treasurer can book this under (fee categories are income anyway).
@@ -114,7 +116,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
     resolver: zodResolver(payRequestSchema),
     defaultValues: {
       category_id: '',
-      occurred_on: format(new Date(), ISO_DAY),
+      occurred_on: format(today, ISO_DAY),
       payment_method: 'cash',
       reference: '',
       notes: '',
@@ -211,8 +213,8 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                     <Calendar
                       mode="single"
                       captionLayout="dropdown"
-                      startMonth={subYears(new Date(), 2)}
-                      endMonth={addYears(new Date(), 1)}
+                      startMonth={subYears(today, 2)}
+                      endMonth={addYears(today, 1)}
                       selected={parseISO(field.value)}
                       defaultMonth={parseISO(field.value)}
                       onSelect={(date) => {

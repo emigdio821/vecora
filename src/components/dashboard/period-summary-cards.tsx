@@ -23,6 +23,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty'
+import { useToday } from '@/hooks/use-today'
 import { cn, formatCurrency, ISO_DAY } from '@/lib/utils'
 import { periodSummariesQueryOptions, periodsQueryOptions } from '@/tanstack-queries/treasury'
 
@@ -30,6 +31,7 @@ import { periodSummariesQueryOptions, periodsQueryOptions } from '@/tanstack-que
 export function PeriodSummaryCards() {
   const periods = useQuery(periodsQueryOptions())
   const summaries = useQuery(periodSummariesQueryOptions())
+  const now = useToday()
 
   if (periods.isPending || summaries.isPending) {
     return (
@@ -43,7 +45,7 @@ export function PeriodSummaryCards() {
 
   if (periods.isError || summaries.isError) return null
 
-  const today = format(new Date(), ISO_DAY)
+  const today = format(now, ISO_DAY)
   const period = periods.data.find((p) => p.starts_on <= today && today <= p.ends_on)
   const summary = period && summaries.data.find((s) => s.period_id === period.id)
 

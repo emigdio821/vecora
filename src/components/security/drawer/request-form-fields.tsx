@@ -13,6 +13,7 @@ import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useToday } from '@/hooks/use-today'
 import { formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { SecurityRequestInput } from '@/lib/validations/security'
 import { KIND_DESCRIPTION, KIND_ITEMS } from '../kind'
@@ -25,6 +26,7 @@ interface RequestFormFieldsProps {
 /** Shared by the create and edit drawers. */
 export function RequestFormFields({ form, disabled }: RequestFormFieldsProps) {
   const [isDateOpen, setDateOpen] = useState(false)
+  const today = useToday()
   const kind = useWatch({ control: form.control, name: 'kind' })
 
   return (
@@ -158,8 +160,8 @@ export function RequestFormFields({ form, disabled }: RequestFormFieldsProps) {
                   <Calendar
                     mode="single"
                     captionLayout="dropdown"
-                    startMonth={subYears(new Date(), 2)}
-                    endMonth={addYears(new Date(), 1)}
+                    startMonth={subYears(today, 2)}
+                    endMonth={addYears(today, 1)}
                     selected={parseISO(field.value)}
                     defaultMonth={parseISO(field.value)}
                     onSelect={(date) => {

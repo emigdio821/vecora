@@ -29,6 +29,7 @@ import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { toastManager } from '@/components/ui/toast'
+import { useToday } from '@/hooks/use-today'
 import { formatMonth, ISO_DAY } from '@/lib/utils'
 
 /** How far back the monthly picker goes. */
@@ -93,7 +94,7 @@ const REPORT_TABS = ['monthly', 'custom'] as const
 
 /** Everything report related on the home page: one month, or any range of days. */
 export function ReportsCard() {
-  const today = new Date()
+  const today = useToday()
   const [tab, setTab] = useQueryState('report', parseAsStringLiteral(REPORT_TABS).withDefault('monthly'))
   const [months] = useState(() => monthItems(today))
   const [month, setMonth] = useState(() => format(startOfMonth(subMonths(today, 1)), ISO_DAY))

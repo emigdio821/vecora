@@ -16,6 +16,7 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useToday } from '@/hooks/use-today'
 import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
 import { formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { CreateTransactionInput } from '@/lib/validations/treasury'
@@ -44,6 +45,7 @@ export function TransactionFormFields({
   lockFeeFields,
 }: TransactionFormFieldsProps) {
   const [isDateOpen, setDateOpen] = useState(false)
+  const today = useToday()
   const { data: categories } = useQuery(categoriesQueryOptions())
   const [kind, paymentMethod, categoryId] = useWatch({
     control: form.control,
@@ -219,8 +221,8 @@ export function TransactionFormFields({
                   <Calendar
                     mode="single"
                     captionLayout="dropdown"
-                    startMonth={subYears(new Date(), 5)}
-                    endMonth={addYears(new Date(), 1)}
+                    startMonth={subYears(today, 5)}
+                    endMonth={addYears(today, 1)}
                     selected={parseISO(field.value)}
                     defaultMonth={parseISO(field.value)}
                     onSelect={(date) => {

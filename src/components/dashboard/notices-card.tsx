@@ -15,6 +15,7 @@ import {
   CardPanel,
 } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { useToday } from '@/hooks/use-today'
 import { ISO_DAY } from '@/lib/utils'
 import { hallReservationsQueryOptions } from '@/tanstack-queries/presidency'
 
@@ -26,6 +27,7 @@ const MAX_NOTICES = 5
  */
 export function NoticesCard() {
   const reservations = useQuery(hallReservationsQueryOptions())
+  const now = useToday()
 
   if (reservations.isPending) {
     return <CardFrameSkeleton rows={2} />
@@ -33,7 +35,7 @@ export function NoticesCard() {
 
   if (reservations.isError) return null
 
-  const today = format(new Date(), ISO_DAY)
+  const today = format(now, ISO_DAY)
   // The query is newest first; the notices read soonest first.
   const upcoming = reservations.data
     .filter((r) => r.reserved_on >= today)

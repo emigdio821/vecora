@@ -11,6 +11,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
+import { useToday } from '@/hooks/use-today'
 import { formatDay, ISO_DAY } from '@/lib/utils'
 import type { HallReservationInput } from '@/lib/validations/presidency'
 import { hallReservationsQueryOptions } from '@/tanstack-queries/presidency'
@@ -25,6 +26,7 @@ interface HallReservationFormFieldsProps {
 /** Shared by the create and edit drawers. */
 export function HallReservationFormFields({ form, disabled, currentId }: HallReservationFormFieldsProps) {
   const [isDateOpen, setDateOpen] = useState(false)
+  const today = useToday()
   const { data: reservations } = useQuery(hallReservationsQueryOptions())
 
   // Days already booked by someone else are greyed out; the DB enforces it
@@ -96,7 +98,7 @@ export function HallReservationFormFields({ form, disabled, currentId }: HallRes
                   mode="single"
                   captionLayout="dropdown"
                   startMonth={startOfToday()}
-                  endMonth={addYears(new Date(), 1)}
+                  endMonth={addYears(today, 1)}
                   selected={parseISO(field.value)}
                   defaultMonth={parseISO(field.value)}
                   disabled={[{ before: startOfToday() }, ...takenDays]}

@@ -13,7 +13,7 @@ export type Database = {
           occurred_at: string
           old_data: Json | null
           operation: Database['public']['Enums']['audit_operation']
-          refs: Json
+          refs: NonNullable<Json>
           row_id: string | null
           table_name: string
           txid: number
@@ -27,7 +27,7 @@ export type Database = {
           occurred_at?: string
           old_data?: Json | null
           operation: Database['public']['Enums']['audit_operation']
-          refs?: Json
+          refs?: NonNullable<Json>
           row_id?: string | null
           table_name: string
           txid?: number
@@ -41,7 +41,7 @@ export type Database = {
           occurred_at?: string
           old_data?: Json | null
           operation?: Database['public']['Enums']['audit_operation']
-          refs?: Json
+          refs?: NonNullable<Json>
           row_id?: string | null
           table_name?: string
           txid?: number
@@ -695,10 +695,7 @@ export type Database = {
         }
         Returns: string
       }
-      financial_report: {
-        Args: { p_from: string; p_to: string }
-        Returns: Json
-      }
+      financial_report: { Args: { p_from: string; p_to: string }; Returns: Json }
       pay_maintenance_request: {
         Args: {
           p_category_id: string
@@ -740,14 +737,8 @@ export type Database = {
           total: number
         }[]
       }
-      reject_maintenance_request: {
-        Args: { p_reason: string; p_request_id: string }
-        Returns: undefined
-      }
-      reject_security_request: {
-        Args: { p_reason: string; p_request_id: string }
-        Returns: undefined
-      }
+      reject_maintenance_request: { Args: { p_reason: string; p_request_id: string }; Returns: undefined }
+      reject_security_request: { Args: { p_reason: string; p_request_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: 'admin' | 'president' | 'treasurer' | 'security' | 'maintenance'
@@ -778,9 +769,7 @@ export type Tables<
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never) = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
@@ -804,9 +793,7 @@ export type TablesInsert<
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never) = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
@@ -829,9 +816,7 @@ export type TablesUpdate<
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never) = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
@@ -854,9 +839,7 @@ export type Enums<
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never) = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
     ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
@@ -871,9 +854,7 @@ export type CompositeTypes<
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never) = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
     ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
