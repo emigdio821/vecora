@@ -219,6 +219,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          is_main_admin: boolean
           updated_at: string
           welcomed_at: string | null
         }
@@ -226,6 +227,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id: string
+          is_main_admin?: boolean
           updated_at?: string
           welcomed_at?: string | null
         }
@@ -233,6 +235,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          is_main_admin?: boolean
           updated_at?: string
           welcomed_at?: string | null
         }

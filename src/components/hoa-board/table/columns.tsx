@@ -83,9 +83,17 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
       id: 'actions',
       size: 50,
       cell: ({ row }) => {
-        if (row.original.id === viewer.id) return null
+        const member = row.original
+        const isAdminRow = member.user_roles.some((r) => r.role === 'admin')
+        // Mirrors the server: nobody manages their own seat or the main admin's;
+        // admins only by admins.
+        const canManage =
+          viewer.isManager &&
+          member.id !== viewer.id &&
+          !member.is_main_admin &&
+          (viewer.isAdmin || !isAdminRow)
 
-        return viewer.isManager ? <BoardMembersTableActions member={row.original} viewer={viewer} /> : null
+        return canManage ? <BoardMembersTableActions member={member} viewer={viewer} /> : null
       },
     }),
   ])

@@ -14,7 +14,7 @@ function boardMembersQuery() {
     .from('profiles')
     .select(
       `
-      id, full_name,
+      id, full_name, is_main_admin,
       user_roles!user_id!inner ( role ),
       resident:residents!profile_id (
         id, first_name, last_name, email, phone,

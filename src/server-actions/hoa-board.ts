@@ -17,8 +17,13 @@ import {
 } from '@/lib/validations/hoa-board'
 
 const NO_PERMISSION = 'No tienes permisos para realizar esta acción'
+// Raised by the guards on the main admin (admin@vecora.com).
+const MAIN_ADMIN_PROTECTED = 'P0004'
 
 function toMessage(error: PostgrestError, fallback: string) {
+  if (error.code === MAIN_ADMIN_PROTECTED) {
+    return 'La cuenta principal de administración no se puede quitar ni perder su rol'
+  }
   return postgrestErrorMessage(error, { fallback })
 }
 
@@ -161,10 +166,14 @@ export async function resendInvite(userId: string): Promise<ActionResult<InviteR
   const supabase = await createClient()
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, resident:residents!profile_id ( email, phone )')
+    .select('full_name, user_roles!user_id ( role ), resident:residents!profile_id ( email, phone )')
     .eq('id', userId)
     .maybeSingle()
 
+  // The link signs in as that person, so it's as good as their account.
+  if (profile?.user_roles.some((r) => r.role === 'admin') && !manager.isAdmin) {
+    return { error: 'Solo un administrador puede generar un enlace para otro administrador' }
+  }
   if (!profile?.resident?.email) {
     return { error: 'El integrante no tiene correo registrado' }
   }

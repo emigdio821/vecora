@@ -23,11 +23,6 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
   const [isRemoveOpen, setRemoveOpen] = useState(false)
   const [invite, setInvite] = useState<InviteResult | null>(null)
 
-  const isSelf = member.id === viewer.id
-  const isAdminRow = member.user_roles.some((r) => r.role === 'admin')
-  // Mirrors the server: nobody edits their own seat; admins only by admins.
-  const canManage = !isSelf && (viewer.isAdmin || !isAdminRow)
-
   const resend = useMutation({
     mutationFn: async () => {
       const result = await resendInvite(member.id)
@@ -74,36 +69,30 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
           <MenuGroup>
             <MenuGroupLabel className="my-1.5 py-0">{member.full_name}</MenuGroupLabel>
 
-            {canManage && (
-              <MenuItem
-                onClick={() => {
-                  setEditOpen(true)
-                }}
-              >
-                Editar roles
-              </MenuItem>
-            )}
+            <MenuItem
+              onClick={() => {
+                setEditOpen(true)
+              }}
+            >
+              Editar roles
+            </MenuItem>
 
-            {!isSelf && (
-              <MenuItem
-                onClick={() => {
-                  resend.mutate()
-                }}
-              >
-                Nuevo enlace de acceso
-              </MenuItem>
-            )}
+            <MenuItem
+              onClick={() => {
+                resend.mutate()
+              }}
+            >
+              Nuevo enlace de acceso
+            </MenuItem>
 
-            {canManage && (
-              <MenuItem
-                variant="destructive"
-                onClick={() => {
-                  setRemoveOpen(true)
-                }}
-              >
-                Quitar de la mesa
-              </MenuItem>
-            )}
+            <MenuItem
+              variant="destructive"
+              onClick={() => {
+                setRemoveOpen(true)
+              }}
+            >
+              Quitar de la mesa
+            </MenuItem>
           </MenuGroup>
         </MenuPopup>
       </Menu>

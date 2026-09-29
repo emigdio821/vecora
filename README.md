@@ -102,20 +102,23 @@ The app runs on Vercel against a hosted Supabase project.
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | A publishable key                                       |
    | `SUPABASE_SECRET_KEY`                  | A secret key (server-only, needed to add board members) |
 
-4. **Create the first admin.** Nobody can sign in until an account has a role.
-   1. Authentication → Users → **Add user** → **Create new user**, with a real email and a strong password, and check **Auto Confirm User**.
-   2. In the SQL Editor, give it the admin role and a name (the name is shown in the sidebar):
-
-      ```sql
-      insert into public.user_roles (user_id, role)
-      select id, 'admin' from auth.users where email = 'you@example.com';
-
-      update public.profiles
-      set full_name = 'Your Name'
-      where id = (select id from auth.users where email = 'you@example.com');
-      ```
+4. **Create the main admin.** Nobody can sign in until an account has a role. In Authentication → Users → **Add user** → **Create new user**, enter `admin@vecora.com` and a strong password, and check **Auto Confirm User**. The database names the account "Vecora Admin" and grants it the admin role on its own.
 
 5. **Deploy**, sign in as the admin, set the residential's name and logo in "Ajustes", and add the board members in "Mesa directiva".
+
+### The main admin
+
+`admin@vecora.com` is the app's own account, not a resident's. It can't be deleted, lose the admin role, change its email or its name ("Vecora Admin"); the database refuses all four, including from the dashboard. Other admins are residents and are removed in "Mesa directiva" like anyone else.
+
+Nobody receives mail at `vecora.com`, so the dashboard's password reset email won't arrive. Change the password in the SQL Editor instead:
+
+```sql
+update auth.users
+set encrypted_password = extensions.crypt('the-new-password', extensions.gen_salt('bf'))
+where email = 'admin@vecora.com';
+```
+
+### Reset
 
 To wipe the hosted database and re-apply every migration, run `npx supabase db reset --linked --no-seed`. Without `--no-seed` it would also create the local test accounts, all with the password `admin`. A reset can't be undone; `npx supabase db dump --linked --data-only -f backup.sql` saves the data first.
 

@@ -11,8 +11,11 @@ alter table public.settings add column logo_path text;
 
 comment on column public.settings.logo_path is 'File in the "branding" bucket. Null means no logo.';
 
+-- `db reset --linked` leaves the storage schema alone, so the bucket can
+-- outlive a reset; keep it rather than fail.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('branding', 'branding', false, 1048576, array['image/png']);
+values ('branding', 'branding', false, 1048576, array['image/png'])
+on conflict (id) do nothing;
 
 create policy "branding: members can read"
   on storage.objects for select to authenticated
