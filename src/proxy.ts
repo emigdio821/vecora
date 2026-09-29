@@ -10,9 +10,10 @@ export const config = {
     /*
      * Run on every path except:
      * - _next/static, _next/image (build assets)
-     * - metadata files (favicon.ico, site.webmanifest, robots.txt) and common
-     *   image files; signed out, they'd get the login page's HTML instead
+     * - metadata files (favicon.ico, site.webmanifest, robots.txt), the OG
+     *   image (api/og) and common image files; signed out, they'd get the
+     *   login page's HTML instead
      */
-    '/((?!_next/static|_next/image|favicon.ico|site.webmanifest|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|site.webmanifest|robots.txt|api/og|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
