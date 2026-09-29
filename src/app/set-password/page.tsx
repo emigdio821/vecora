@@ -8,11 +8,13 @@ import {
   CardFrameTitle,
   CardPanel,
 } from '@/components/ui/card'
+import { siteConfig } from '@/lib/config/site'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { SetPasswordForm } from './set-password-form'
 
 export const metadata: Metadata = {
   title: 'Crear contraseña',
+  description: `Crea la contraseña con la que entrarás a ${siteConfig.name}.`,
 }
 
 /**

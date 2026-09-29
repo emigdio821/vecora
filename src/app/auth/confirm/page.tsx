@@ -14,11 +14,25 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty'
+import { siteConfig } from '@/lib/config/site'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { ConfirmAccessButton } from './confirm-access-button'
 
+const description = `Recibiste un enlace de acceso a ${siteConfig.name}. Ábrelo para crear tu contraseña.`
+
+// The link is shared over WhatsApp, so the preview (openGraph) matters more
+// than the tab title. openGraph replaces the root layout's whole object.
 export const metadata: Metadata = {
-  title: 'Acceso a Vecora',
+  title: 'Confirmar acceso',
+  description,
+  openGraph: {
+    title: `Tu acceso a ${siteConfig.name}`,
+    description,
+    siteName: siteConfig.name,
+    locale: 'es-MX',
+    type: 'website',
+    images: siteConfig.ogUrl,
+  },
 }
 
 /**
@@ -66,7 +80,7 @@ export default async function ConfirmAccessPage({ searchParams }: PageProps<'/au
               </EmptyMedia>
               <EmptyTitle>Tu acceso a Vecora</EmptyTitle>
               <EmptyDescription>
-                La mesa directiva te envió este enlace. Continúa para crear tu contraseña.
+                Este es tu enlace de acceso a Vecora. Continúa para crear tu contraseña.
               </EmptyDescription>
             </EmptyHeader>
           )}

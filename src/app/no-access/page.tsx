@@ -11,12 +11,14 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty'
+import { siteConfig } from '@/lib/config/site'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { NO_ACCESS_MESSAGE } from '@/lib/validations/auth'
 import { LogoutButton } from './logout-button'
 
 export const metadata: Metadata = {
   title: 'Sin acceso',
+  description: `Tu cuenta aún no tiene acceso a ${siteConfig.name}.`,
 }
 
 /** Signed in, but not on the board. Reached from the (authed) layout. */

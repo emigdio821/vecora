@@ -11,14 +11,12 @@ import {
   CardFrameTitle,
   CardPanel,
 } from '@/components/ui/card'
+import { siteConfig } from '@/lib/config/site'
 import { LoginPageClient } from './page.client'
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Iniciar sesión',
-    template: `%s - Iniciar sesión`,
-  },
-  description: 'Ingresa tus credenciales para acceder a tu cuenta',
+  title: 'Iniciar sesión',
+  description: `Entra a ${siteConfig.name} con tu correo y contraseña.`,
 }
 
 export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
@@ -48,7 +46,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
                   <CircleAlertIcon />
                   <AlertTitle>El enlace de invitación ya no es válido</AlertTitle>
                   <AlertDescription>
-                    Puede haber caducado o ya se usó. Pide a la mesa directiva que te envíe uno nuevo.
+                    Puede haber caducado o ya se usó. Pide un enlace nuevo a quien te lo envió.
                   </AlertDescription>
                 </Alert>
               )}
