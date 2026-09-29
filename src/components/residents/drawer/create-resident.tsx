@@ -207,7 +207,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>Correo</FieldLabel>
-                  <Input {...field} type="email" autoComplete="email" />
+                  <Input {...field} inputMode="email" autoComplete="email" />
                   <FieldDescription>
                     Opcional. Necesario si se le crea una cuenta para iniciar sesión.
                   </FieldDescription>

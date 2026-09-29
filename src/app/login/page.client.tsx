@@ -48,7 +48,7 @@ export function LoginPageClient() {
               Correo
               <span className="text-destructive">*</span>
             </FieldLabel>
-            <Input {...field} type="email" autoComplete="email" />
+            <Input {...field} inputMode="email" autoComplete="email" />
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
