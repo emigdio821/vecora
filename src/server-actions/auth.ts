@@ -1,5 +1,6 @@
 'use server'
 
+import type { EmailOtpType } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -35,6 +36,26 @@ export async function login(input: LoginInput): Promise<ActionResult> {
 
   revalidatePath('/', 'layout')
   redirect('/')
+}
+
+/**
+ * Spends the one-time access link from server-actions/hoa-board.ts, turning it
+ * into a cookie session, then sends the person to choose a password. Only
+ * runs from the "Continuar" button on /auth/confirm: link previews (WhatsApp)
+ * and email scanners open the URL with a GET, which must never use the token.
+ */
+export async function confirmAccessLink(tokenHash: string, type: EmailOtpType): Promise<ActionResult> {
+  const supabase = await createClient()
+
+  // Drop a previous session from this browser only; other devices stay signed in.
+  const { data: current } = await supabase.auth.getClaims()
+  if (current) await supabase.auth.signOut({ scope: 'local' })
+
+  const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash })
+  if (error) redirect('/login?error=invite')
+
+  revalidatePath('/', 'layout')
+  redirect('/set-password')
 }
 
 /**

@@ -43,7 +43,7 @@ async function requireBoardManager(): Promise<{ user: CurrentUser; isAdmin: bool
 
 /**
  * One-time sign-in link for the invited person, pointing at our own
- * /auth/confirm route so the session lands in cookies (SSR) instead of the
+ * /auth/confirm page so the session lands in cookies (SSR) instead of the
  * URL hash. Auth refuses `invite` once the account exists (`email_exists`), so
  * existing accounts (re-sends, re-added members) get a `recovery` link instead;
  * both land on /set-password.
