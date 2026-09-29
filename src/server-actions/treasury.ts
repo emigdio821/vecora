@@ -1,7 +1,14 @@
 'use server'
 
 import type { PostgrestError } from '@supabase/supabase-js'
-import { type ActionResult, postgrestErrorMessage, UNIQUE_VIOLATION } from '@/lib/action-result'
+import {
+  type ActionResult,
+  EXCLUSION_VIOLATION,
+  FOLIO_TAKEN_MESSAGE,
+  isFolioTaken,
+  postgrestErrorMessage,
+  UNIQUE_VIOLATION,
+} from '@/lib/action-result'
 import { createClient } from '@/lib/supabase/server'
 import { systemCategorySource } from '@/lib/system-categories'
 import { formatMonth } from '@/lib/utils'
@@ -21,9 +28,9 @@ import {
 // Postgres error codes not covered by postgrestErrorMessage.
 const FK_VIOLATION = '23503'
 const CHECK_VIOLATION = '23514'
-const EXCLUSION_VIOLATION = '23P01'
 
 function toMessage(error: PostgrestError, fallback: string) {
+  if (isFolioTaken(error)) return FOLIO_TAKEN_MESSAGE
   return postgrestErrorMessage(error, {
     fallback,
     unique: {
@@ -305,7 +312,10 @@ export async function deleteTransactions(ids: string[]): Promise<ActionResult<{ 
   return { data: { deleted: data.length } }
 }
 
-/** Undoes a soft delete. Fails with 23505 if the same fee month was re-recorded meanwhile. */
+/**
+ * Undoes a soft delete. Fails with 23505 if the same fee month was re-recorded
+ * meanwhile, or 23P01 if its folio went to another receipt.
+ */
 export async function restoreTransactions(ids: string[]): Promise<ActionResult<{ restored: number }>> {
   const uniqueIds = [...new Set(ids)]
   if (uniqueIds.length === 0) {
@@ -323,7 +333,10 @@ export async function restoreTransactions(ids: string[]): Promise<ActionResult<{
   if (error) {
     const message = toMessage(error, 'No se pudieron restaurar los movimientos, intenta nuevamente')
     return {
-      error: error.code === UNIQUE_VIOLATION ? `No se pudo restaurar: ${message.toLowerCase()}` : message,
+      error:
+        error.code === UNIQUE_VIOLATION || isFolioTaken(error)
+          ? `No se pudo restaurar: ${message.toLowerCase()}`
+          : message,
     }
   }
 

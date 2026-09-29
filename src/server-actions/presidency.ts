@@ -1,7 +1,13 @@
 'use server'
 
 import type { PostgrestError } from '@supabase/supabase-js'
-import { type ActionResult, postgrestErrorMessage, requestResolutionErrorMessage } from '@/lib/action-result'
+import {
+  type ActionResult,
+  FOLIO_TAKEN_MESSAGE,
+  isFolioTaken,
+  postgrestErrorMessage,
+  requestResolutionErrorMessage,
+} from '@/lib/action-result'
 import { createClient } from '@/lib/supabase/server'
 import {
   type CancelHallReservationInput,
@@ -30,6 +36,7 @@ function toMessage(error: PostgrestError, fallback: string) {
 
 /** Errors from pay_hall_reservation / cancel_hall_reservation. */
 function toResolutionMessage(error: PostgrestError, fallback: string) {
+  if (isFolioTaken(error)) return FOLIO_TAKEN_MESSAGE
   if (error.message.includes('already paid')) return 'Esta reservación ya tiene su pago registrado'
   if (error.message.includes('cancelled')) return 'Esta reservación ya fue cancelada'
   if (error.message.includes('no cost')) return 'Esta reservación es sin costo, no hay nada que cobrar'

@@ -11,6 +11,14 @@ const RLS_VIOLATION = '42501'
 // it out (Postgres reports 0 rows instead of an error in that case).
 const NO_ROWS = 'PGRST116'
 export const UNIQUE_VIOLATION = '23505'
+export const EXCLUSION_VIOLATION = '23P01'
+
+/** transactions_folio_one_receipt: the receipt book never repeats a folio. */
+export function isFolioTaken(error: PostgrestError) {
+  return error.code === EXCLUSION_VIOLATION && error.message.includes('transactions_folio_one_receipt')
+}
+
+export const FOLIO_TAKEN_MESSAGE = 'Ese folio ya se usó en otro recibo'
 
 interface PostgrestMessageOptions {
   /** Shown for anything not recognised below. */
