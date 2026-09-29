@@ -1,7 +1,7 @@
 'use client'
 
 import type { EmailOtpType } from '@supabase/supabase-js'
-import { useTransition } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { confirmAccessLink } from '@/server-actions/auth'
 
@@ -11,18 +11,28 @@ interface ConfirmAccessButtonProps {
   children: React.ReactNode
 }
 
-/** The click that spends the link; the action redirects either way. */
+/**
+ * The click that spends the link. Like the login form, it stays loading while
+ * the action's redirect navigates away, and only stops if the action returns.
+ */
 export function ConfirmAccessButton({ tokenHash, type, children }: ConfirmAccessButtonProps) {
-  const [isPending, startTransition] = useTransition()
+  const [isLoading, setLoading] = useState(false)
+
+  async function handleClick() {
+    setLoading(true)
+    const result = await confirmAccessLink(tokenHash, type)
+
+    if (result?.error) {
+      setLoading(false)
+    }
+  }
 
   return (
     <Button
-      disabled={isPending}
-      loading={isPending}
+      disabled={isLoading}
+      loading={isLoading}
       onClick={() => {
-        startTransition(async () => {
-          await confirmAccessLink(tokenHash, type)
-        })
+        void handleClick()
       }}
     >
       {children}
