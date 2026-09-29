@@ -35,7 +35,6 @@ function cameFromAccessLink(amr: Array<{ method: string } | string> | undefined)
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
-  console.log('Auth claims data:', data)
   if (!data) return null
 
   const { sub: id, email, amr } = data.claims

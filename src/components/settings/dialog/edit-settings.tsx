@@ -181,7 +181,7 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
       <FieldLabel>Logo</FieldLabel>
       <div className="flex items-center gap-4">
         {/* White like the report page, so the preview shows how it will print. */}
-        <div className="flex size-20 shrink-0 items-center justify-center rounded-lg border bg-white p-2">
+        <div className="flex size-20 shrink-0 items-center justify-center rounded-lg border bg-muted p-2">
           {logoUrl.data ? (
             // Already a small PNG behind an expiring link: nothing for the optimizer to do.
             <Image

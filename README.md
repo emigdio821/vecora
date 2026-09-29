@@ -1,8 +1,10 @@
-# Stoa
+# Vecora
 
-> _Stoa_ (στοά): en la antigua Grecia, el pórtico techado junto al ágora donde los ciudadanos se reunían a conversar y resolver los asuntos de la ciudad. Aquí es lo mismo, pero para la mesa directiva del residencial.
+> _Vecora_: from _vecino_ (Spanish for "neighbor") and _ágora_, the square where citizens of ancient Greece met to talk and settle the city's affairs. This is the neighbors' agora, where the HOA board runs the residential.
 
-Administración de un residencial para la mesa directiva: casas y residentes, tesorería (cuotas, movimientos y periodos), reservas de la terraza, solicitudes de pago de mantenimiento y seguridad, y un historial de cambios para el administrador.
+Residential management for the HOA board (the _mesa directiva_): houses and residents, treasury (fees, transactions and periods), terrace bookings, maintenance and security payment requests, and a change history for the admin.
+
+The app itself is in Spanish (es-MX); code, comments and docs are in English.
 
 Next.js 16 · React · Supabase (Postgres, Auth, RLS) · Tailwind CSS · [coss ui](https://coss.com/ui) (Base UI) · TanStack Query / Table · React Hook Form + zod.
 
@@ -55,11 +57,11 @@ All local accounts use the password **`admin`**. They come from `supabase/seed.s
 
 | Email                    | Role                           | Can write in                                                                |
 | ------------------------ | ------------------------------ | --------------------------------------------------------------------------- |
-| `admin@resido.com`       | Administrador                  | Everything, plus "Mesa directiva" and "Historial"                           |
-| `president@resido.com`   | Presidente (Ana López)         | "Residencial", "Presidencia", "Mesa directiva"                              |
-| `treasurer@resido.com`   | Tesorero (Luis Fernández)      | "Tesorería", periods and terraza in "Presidencia"; pays or rejects requests |
-| `security@resido.com`    | Seguridad (María García)       | Requests in "Seguridad"                                                     |
-| `maintenance@resido.com` | Mantenimiento (Diego Martínez) | Requests in "Mantenimiento"                                                 |
+| `admin@vecora.com`       | Administrador                  | Everything, plus "Mesa directiva" and "Historial"                           |
+| `president@vecora.com`   | Presidente (Ana López)         | "Residencial", "Presidencia", "Mesa directiva"                              |
+| `treasurer@vecora.com`   | Tesorero (Luis Fernández)      | "Tesorería", periods and terraza in "Presidencia"; pays or rejects requests |
+| `security@vecora.com`    | Seguridad (María García)       | Requests in "Seguridad"                                                     |
+| `maintenance@vecora.com` | Mantenimiento (Diego Martínez) | Requests in "Mantenimiento"                                                 |
 
 Every role can read every section. The seed also creates 20 houses (A1–D5), 10 residents, the current year's period with a few payments, requests in every status, and 45 days of activity in "Historial".
 

@@ -1,10 +1,10 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: 'Stoa',
+  name: 'Vecora',
   description: 'An open-source and simple residential manager.',
-  url: 'https://resido-app.vercel.app/',
-  ogUrl: 'https://resido-app.vercel.app/api/og',
+  url: 'https://vecora.vercel.app/',
+  ogUrl: 'https://vecora.vercel.app/api/og',
   autors: [
     {
       name: 'María Rodríguez',
@@ -16,7 +16,7 @@ export const siteConfig = {
     },
   ],
   keywords: [
-    'Stoa',
+    'Vecora',
     'React',
     'Next.js',
     'TanStack Query',

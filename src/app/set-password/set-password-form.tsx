@@ -30,7 +30,7 @@ export function SetPasswordForm() {
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
-      toastManager.add({ type: 'success', title: 'Contraseña guardada', description: 'Bienvenido a Stoa' })
+      toastManager.add({ type: 'success', title: 'Contraseña guardada', description: 'Bienvenido a Vecora' })
       router.replace('/')
     },
     onError: (error) => {

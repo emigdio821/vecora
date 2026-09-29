@@ -43,7 +43,7 @@ export function RemoveBoardMemberAlertDialog({
       toastManager.add({
         type: 'success',
         title: 'Integrante retirado',
-        description: `${member.full_name} ya no puede entrar a Stoa`,
+        description: `${member.full_name} ya no puede entrar a Vecora`,
       })
       onOpenChange(false)
     },

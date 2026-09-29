@@ -4,11 +4,11 @@
 -- hosted project even if someone runs `db push --include-seed`.
 --
 -- Test logins (password for all: "admin"), one per role:
---   admin@resido.com        admin        (account from seed.sql)
---   president@resido.com    president
---   treasurer@resido.com    treasurer
---   security@resido.com     security
---   maintenance@resido.com  maintenance
+--   admin@vecora.com        admin        (account from seed.sql)
+--   president@vecora.com    president
+--   treasurer@vecora.com    treasurer
+--   security@vecora.com     security
+--   maintenance@vecora.com  maintenance
 --
 -- 10 residents (the 4 board members above + 6 without an account), phones
 -- +523139612222 upward. The admin runs the app and is not a resident. 20
@@ -86,7 +86,7 @@ begin
     return;
   end if;
 
-  if exists (select 1 from auth.users where email = 'president@resido.com') then
+  if exists (select 1 from auth.users where email = 'president@vecora.com') then
     raise notice 'seeds/dev.sql: dev data already present, skipping';
     return;
   end if;
@@ -112,10 +112,10 @@ begin
     '{"provider":"email","providers":["email"]}', jsonb_build_object('full_name', u.full_name), now(), now(),
     '', '', '', '', '', '', '', ''
   from (values
-    (u_president,   'president@resido.com',   'Ana López'),
-    (u_treasurer,   'treasurer@resido.com',   'Luis Fernández'),
-    (u_security,    'security@resido.com',    'María García'),
-    (u_maintenance, 'maintenance@resido.com', 'Diego Martínez')
+    (u_president,   'president@vecora.com',   'Ana López'),
+    (u_treasurer,   'treasurer@vecora.com',   'Luis Fernández'),
+    (u_security,    'security@vecora.com',    'María García'),
+    (u_maintenance, 'maintenance@vecora.com', 'Diego Martínez')
   ) as u(id, email, full_name);
 
   insert into auth.identities (id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at)
@@ -161,10 +161,10 @@ begin
   -- residents: board members are residents with an account + role; the admin is not one
   insert into public.residents (id, profile_id, first_name, last_name, phone, email, notes) values
     (r_roberto, null,         'Roberto', 'Salinas',   '+523139612222', 'roberto@example.com',    null),
-    (r_ana,    u_president,   'Ana',     'López',     '+523139612223', 'president@resido.com',   null),
-    (r_luis,   u_treasurer,   'Luis',    'Fernández', '+523139612224', 'treasurer@resido.com',   null),
-    (r_maria,  u_security,    'María',   'García',    '+523139612225', 'security@resido.com',    null),
-    (r_diego,  u_maintenance, 'Diego',   'Martínez',  '+523139612226', 'maintenance@resido.com', 'Dueño de dos casas'),
+    (r_ana,    u_president,   'Ana',     'López',     '+523139612223', 'president@vecora.com',   null),
+    (r_luis,   u_treasurer,   'Luis',    'Fernández', '+523139612224', 'treasurer@vecora.com',   null),
+    (r_maria,  u_security,    'María',   'García',    '+523139612225', 'security@vecora.com',    null),
+    (r_diego,  u_maintenance, 'Diego',   'Martínez',  '+523139612226', 'maintenance@vecora.com', 'Dueño de dos casas'),
     (r_sofia,  null,          'Sofía',   'Rivera',    '+523139612227', null,                     'Pareja de María'),
     (r_carmen, null,          'Carmen',  'Ortega',    '+523139612228', 'carmen@example.com',     'Inquilina en C1'),
     (r_pablo,  null,          'Pablo',   'Ortega',    '+523139612229', null,                     'Hijo de Carmen'),

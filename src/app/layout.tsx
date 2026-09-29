@@ -21,9 +21,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   creator: 'Emigdio Torres',
   icons: {
-    icon: 'favicon.ico',
-    shortcut: 'images/favicon-16x16.png',
-    apple: 'images/apple-touch-icon.png',
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
   },
   openGraph: {
     title: '@luzapien, @emigdio821',
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     images: [siteConfig.ogUrl],
     creator: '@luzapien, @emigdio821',
   },
-  // manifest: '/site.webmanifest',
+  manifest: '/site.webmanifest',
 }
 
 export const viewport: Viewport = {

@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { AppFooter } from '@/components/app-footer'
-import { StoaIcon } from '@/components/shared/icons'
+import { VecoraIcon } from '@/components/shared/icons'
 import { Button } from '@/components/ui/button'
 import {
   Empty,
@@ -42,8 +42,8 @@ export default async function ReplaceSessionPage({ searchParams }: PageProps<'/a
     <main className="flex min-h-svh flex-col items-center justify-center">
       <div className="flex flex-col items-center gap-6 p-4 sm:p-6">
         <div className="flex items-center gap-2">
-          <StoaIcon className="size-4" />
-          <span className="text-base font-semibold text-foreground">Stoa</span>
+          <VecoraIcon className="size-4" />
+          <span className="text-base font-semibold text-foreground">Vecora</span>
         </div>
 
         <Empty className="max-w-sm">

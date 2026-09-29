@@ -3,7 +3,7 @@
 -- Runs automatically on `supabase start` / `supabase db reset` (local).
 -- To apply to the hosted project once: `npx supabase db push --include-seed`
 --
--- Credentials: admin@resido.com / admin
+-- Credentials: admin@vecora.com / admin
 -- CHANGE THE PASSWORD right after the first hosted login.
 --
 -- Idempotent: safe to re-run; does nothing if the user already exists.
@@ -11,7 +11,7 @@
 do $$
 declare
   admin_id constant uuid := 'a0000000-0000-4000-8000-000000000001';
-  admin_email constant text := 'admin@resido.com';
+  admin_email constant text := 'admin@vecora.com';
   admin_password constant text := 'admin';
 begin
   if exists (select 1 from auth.users where email = admin_email) then
@@ -30,7 +30,7 @@ begin
   ) values (
     '00000000-0000-0000-0000-000000000000', admin_id, 'authenticated', 'authenticated', admin_email,
     extensions.crypt(admin_password, extensions.gen_salt('bf')), now(),
-    '{"provider":"email","providers":["email"]}', '{"full_name":"Resido Admin"}',
+    '{"provider":"email","providers":["email"]}', '{"full_name":"Vecora Admin"}',
     now(), now(),
     '', '', '', '', '', '', '', ''
   );
