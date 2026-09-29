@@ -13,7 +13,10 @@ import {
 function toMessage(error: PostgrestError, fallback: string) {
   return postgrestErrorMessage(error, {
     fallback,
-    unique: { residents_email_unique: 'Ya existe un residente con ese correo' },
+    unique: {
+      residents_email_unique: 'Ya existe un residente con ese correo',
+      residents_email_account: 'Ese correo ya lo usa una cuenta de la mesa directiva',
+    },
     uniqueFallback: 'Ya existe un residente con esos datos',
   })
 }
