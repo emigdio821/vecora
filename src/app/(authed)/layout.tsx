@@ -4,6 +4,7 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { CurrentUserProvider } from '@/components/current-user-provider'
 import { AppProviders } from '@/components/providers'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { WelcomeDialog } from '@/components/welcome-dialog'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { getSettings } from '@/lib/supabase/settings'
 
@@ -39,6 +40,7 @@ export default async function AuthedLayout({ children }: LayoutProps<'/'>) {
             </section>
           </SidebarInset>
         </SidebarProvider>
+        <WelcomeDialog />
       </CurrentUserProvider>
     </AppProviders>
   )

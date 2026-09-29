@@ -96,7 +96,7 @@ export function PaymentRequestsCard() {
             <ul className="flex flex-col divide-y">
               {shown.map((request) => (
                 <li key={request.key} className="px-6 py-3 text-sm first:pt-0 last:pb-0">
-                  <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <span className="grid min-w-0 gap-0.5">
                       <Link href={request.href} className="truncate font-medium hover:underline">
                         {request.title}

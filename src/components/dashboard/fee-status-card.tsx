@@ -88,7 +88,7 @@ export function FeeStatusCard() {
                 const owners = ownersOf(house.property_id)
                 return (
                   <li key={house.property_id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
                       <span className="truncate">
                         <span className="font-medium">Casa {house.number}</span>
                         {owners && <span className="text-muted-foreground"> - {owners}</span>}

@@ -15,6 +15,8 @@ export interface CurrentUser {
    * /set-password; setPassword() swaps them for a normal one.
    */
   mustSetPassword: boolean
+  /** Already closed the welcome dialog, on any device. */
+  welcomed: boolean
 }
 
 /**
@@ -41,7 +43,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, user_roles!user_id ( role )')
+    .select('full_name, welcomed_at, user_roles!user_id ( role )')
     .eq('id', id)
     .maybeSingle()
 
@@ -51,5 +53,6 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     fullName: profile?.full_name || email?.split('@')[0] || 'Usuario',
     roles: profile?.user_roles.map((r) => r.role) ?? [],
     mustSetPassword: cameFromAccessLink(amr),
+    welcomed: !!profile?.welcomed_at,
   }
 })

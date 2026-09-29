@@ -9,8 +9,9 @@ import { RoleNameBadge } from '../shared/role-name-badge'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { Badge } from '../ui/badge'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuSeparator, MenuTrigger } from '../ui/menu'
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '../ui/sidebar'
 import { toastManager } from '../ui/toast'
+import { useWelcomeParam } from '../welcome-dialog'
 
 interface NavUserProps {
   user: CurrentUser
@@ -19,6 +20,8 @@ interface NavUserProps {
 export function NavUser({ user }: NavUserProps) {
   const queryClient = useQueryClient()
   const router = useRouter()
+  const { setOpenMobile } = useSidebar()
+  const [, setWelcome] = useWelcomeParam()
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -74,6 +77,16 @@ export function NavUser({ user }: NavUserProps) {
             </MenuGroup>
 
             <MenuSeparator />
+
+            <MenuItem
+              onClick={() => {
+                // On mobile the sidebar is a sheet that would sit over the dialog.
+                setOpenMobile(false)
+                void setWelcome(true)
+              }}
+            >
+              Ver introducción
+            </MenuItem>
 
             <MenuItem
               disabled={logoutMutation.isPending}

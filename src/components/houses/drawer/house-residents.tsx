@@ -40,7 +40,7 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
       {residents.length ? (
         <ul className="grid gap-3">
           {residents.map(({ resident, relationship }) => (
-            <li key={resident.id} className="flex items-center justify-between gap-3 text-sm">
+            <li key={resident.id} className="flex items-center justify-between gap-2 text-sm">
               <div className="grid min-w-0 gap-0.5">
                 <span className="truncate font-medium">
                   {resident.first_name} {resident.last_name}
