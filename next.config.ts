@@ -4,9 +4,11 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // The PDF reads its fonts from disk at render time, out of reach of tracing.
+  // The PDF and the link-preview image read their fonts from disk at render
+  // time, out of reach of tracing.
   outputFileTracingIncludes: {
     '/reports/pdf': ['./assets/fonts/*.ttf'],
+    '/api/og': ['./assets/fonts/*.ttf'],
   },
   experimental: {
     serverActions: {

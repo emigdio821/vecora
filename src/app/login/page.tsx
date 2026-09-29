@@ -12,12 +12,13 @@ import {
   CardPanel,
 } from '@/components/ui/card'
 import { siteConfig } from '@/lib/config/site'
+import { pageMetadata } from '@/lib/metadata'
 import { LoginPageClient } from './page.client'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Iniciar sesión',
   description: `Entra a ${siteConfig.name} con tu correo y contraseña.`,
-}
+})
 
 export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
   // /auth/confirm sends people here when an invite link is expired or reused.

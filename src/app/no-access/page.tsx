@@ -12,14 +12,15 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import { siteConfig } from '@/lib/config/site'
+import { pageMetadata } from '@/lib/metadata'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { NO_ACCESS_MESSAGE } from '@/lib/validations/auth'
 import { LogoutButton } from './logout-button'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Sin acceso',
   description: `Tu cuenta aún no tiene acceso a ${siteConfig.name}.`,
-}
+})
 
 /** Signed in, but not on the board. Reached from the (authed) layout. */
 export default async function NoAccessPage() {

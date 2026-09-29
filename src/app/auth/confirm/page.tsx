@@ -15,25 +15,15 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import { siteConfig } from '@/lib/config/site'
+import { pageMetadata } from '@/lib/metadata'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { ConfirmAccessButton } from './confirm-access-button'
 
-const description = `Recibiste un enlace de acceso a ${siteConfig.name}. Ábrelo para crear tu contraseña.`
-
-// The link is shared over WhatsApp, so the preview (openGraph) matters more
-// than the tab title. openGraph replaces the root layout's whole object.
-export const metadata: Metadata = {
+// The link is shared over WhatsApp, so this is also its preview.
+export const metadata: Metadata = pageMetadata({
   title: 'Confirmar acceso',
-  description,
-  openGraph: {
-    title: `Tu acceso a ${siteConfig.name}`,
-    description,
-    siteName: siteConfig.name,
-    locale: 'es-MX',
-    type: 'website',
-    images: siteConfig.ogUrl,
-  },
-}
+  description: `Recibiste un enlace de acceso a ${siteConfig.name}. Ábrelo para crear tu contraseña.`,
+})
 
 /**
  * Lands the access link generated in server-actions/hoa-board.ts. Opening it
