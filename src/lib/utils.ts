@@ -1,54 +1,14 @@
 import { type ClassValue, clsx } from 'clsx'
+import { format, isValid, parseISO } from 'date-fns'
+import { es } from 'date-fns/locale'
 import { twMerge } from 'tailwind-merge'
-import type { PaymentStatus, PaymentType } from '@/db/schema/zod/payments'
-
-const DEFAULT_LOCALE: Intl.LocalesArgument = 'es-MX'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
 
-export function normalizeString(str: string): string {
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-}
-
-export function formatDate(
-  date: ConstructorParameters<typeof Date>[0],
-  options?: Intl.DateTimeFormatOptions,
-): string {
-  return new Date(date).toLocaleString(DEFAULT_LOCALE, {
-    year: 'numeric',
-    month: 'long',
-    day: '2-digit',
-    ...options,
-  })
-}
-
-export function getAllMonthsMap(): Record<number, string> {
-  const months = Array.from({ length: 12 }, (_, i) => {
-    const date = new Date(0, i)
-    const month = date.toLocaleString(DEFAULT_LOCALE, { month: 'long' })
-
-    return month.charAt(0).toUpperCase() + month.slice(1)
-  })
-
-  return Object.fromEntries(months.map((month, i) => [i + 1, month]))
-}
-
-export function getPaymentTypeLabel(type: PaymentType): string {
-  const typeLabels: Record<PaymentType, string> = {
-    monthly_fee: 'Cuota mensual',
-    extra: 'Extra',
-    other: 'Otro',
-  }
-
-  return typeLabels[type] || type
-}
-
 export function getRoleLabel(roleName: string): string {
   switch (roleName) {
-    case 'super_admin':
-      return 'Super administrador'
     case 'admin':
       return 'Administrador'
     case 'president':
@@ -59,28 +19,59 @@ export function getRoleLabel(roleName: string): string {
       return 'Mantenimiento'
     case 'security':
       return 'Seguridad'
-    case 'resident':
-      return 'Residente'
     default:
       return roleName
   }
 }
 
-export function getPaymentStatusLabel(status: PaymentStatus): string {
-  switch (status) {
-    case 'paid':
-      return 'Pagado'
-    case 'pending':
-      return 'Pendiente'
-    default:
-      return status
-  }
+/** Lowercase and strip accents so "López" matches "lopez". */
+export function normalizeString(value: string | null | undefined): string {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+}
+
+/** "22 sept 2026, 10:15 a.m." from an ISO timestamp or Date. Empty when missing or invalid. */
+export function formatDate(value: string | number | Date | null | undefined): string {
+  if (value == null) return ''
+  const date = value instanceof Date ? value : new Date(value)
+  return isValid(date) ? format(date, 'd MMM yyyy, h:mm aaaa', { locale: es }) : ''
 }
 
 export function getAvatarFallback(name: string) {
   if (!name) return null
 
-  const fallabck = `${name.split(' ')[0].charAt(0)}${name.split(' ')[1]?.charAt(0) ?? ''}`
+  const fallabck = name.split(' ')[0].charAt(0) ?? ''
 
   return fallabck
+}
+
+const currencyFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })
+
+/**
+ * NumberField `format` for money inputs: "1,250.00" without the currency
+ * symbol, which the surrounding InputGroup shows as "$" / "MXN" addons.
+ */
+export const MONEY_FORMAT: Intl.NumberFormatOptions = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+
+/** "$1,250.00" from a number or the numeric string PostgREST returns. */
+export function formatCurrency(value: number | string): string {
+  return currencyFormatter.format(typeof value === 'string' ? Number(value) : value)
+}
+
+// `date` columns arrive as "YYYY-MM-DD"; parseISO reads them as *local* midnight
+// (new Date() would use UTC, which is still the previous day in Mexico).
+
+/** date-fns pattern for a "YYYY-MM-DD" date column. */
+export const ISO_DAY = 'yyyy-MM-dd'
+
+/** "12 sept 2026" from a "YYYY-MM-DD" date column. Empty when missing. */
+export function formatDay(value: string | null | undefined): string {
+  return value ? format(parseISO(value), 'd MMM yyyy', { locale: es }) : ''
+}
+
+/** "septiembre 2026" from a "YYYY-MM-DD" date column (day ignored). Empty when missing. */
+export function formatMonth(value: string | null | undefined): string {
+  return value ? format(parseISO(value), 'MMMM yyyy', { locale: es }) : ''
 }

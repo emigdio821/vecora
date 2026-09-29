@@ -1,23 +1,98 @@
-import { IconChevronLeft, IconChevronRight, IconChevronsDown } from '@tabler/icons-react'
-import { type CustomComponents, DayPicker, type DropdownProps } from 'react-day-picker'
-import { STARTING_YEAR } from '@/lib/constants'
-import { cn, formatDate } from '@/lib/utils'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from './select'
+'use client'
+
+import { DayPicker, type DropdownProps, useDayPicker } from '@daypicker/react'
+import type { Month } from 'date-fns'
+import { es } from 'date-fns/locale'
+import { ChevronLeftIcon, ChevronRightIcon, ChevronsUpDownIcon } from 'lucide-react'
+import * as React from 'react'
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 
 const buttonClassNames =
-  "relative flex size-(--cell-size) focus-visible:border-ring focus-visible:ring-[3px] outline-none focus-visible:ring-ring/50 aria-disabled:pointer-events-none aria-disabled:opacity-64 text-base sm:text-sm items-center justify-center rounded-[var(--cell-radius)] text-foreground not-in-data-selected:hover:bg-accent disabled:pointer-events-none disabled:opacity-64 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
+  "relative flex size-(--cell-size) text-base sm:text-sm items-center justify-center rounded-lg text-foreground not-in-data-selected:hover:bg-accent disabled:pointer-events-none disabled:opacity-64 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
 
-function Calendar({
+interface DropdownItem {
+  disabled?: boolean
+  label: string
+  value: string
+}
+
+interface CalendarDropdownProps extends DropdownProps {
+  /** Text shown in the trigger for the selected option; the list keeps `label`. */
+  triggerLabel?: (value: number) => string
+}
+
+/** Month / year selector used when `captionLayout="dropdown"`: a styled select instead of a native <select>. */
+function CalendarDropdown({
+  options,
+  value,
+  onChange,
+  'aria-label': ariaLabel,
+  triggerLabel,
+}: CalendarDropdownProps) {
+  const items: DropdownItem[] =
+    options?.map((option) => ({
+      disabled: option.disabled,
+      label: option.label,
+      value: option.value.toString(),
+    })) ?? []
+
+  return (
+    <Select
+      aria-label={ariaLabel}
+      items={items}
+      value={value?.toString()}
+      onValueChange={(newValue: string | null) => {
+        if (!onChange || !newValue) return
+        // DayPicker expects a <select> change event; only `target.value` is read.
+        onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLSelectElement>)
+      }}
+    >
+      <SelectTrigger className="min-w-none">
+        <SelectValue>
+          {(selected: string | null) =>
+            selected === null
+              ? null
+              : (triggerLabel?.(Number(selected)) ?? items.find((item) => item.value === selected)?.label)
+          }
+        </SelectValue>
+      </SelectTrigger>
+      <SelectPopup aria-label={ariaLabel}>
+        {items.map((item) => (
+          <SelectItem key={item.value} value={item.value} disabled={item.disabled}>
+            {item.label}
+          </SelectItem>
+        ))}
+      </SelectPopup>
+    </Select>
+  )
+}
+
+/** Full month names in the list ("septiembre"), short in the trigger ("sep") so month and year fit side by side. */
+function CalendarMonthsDropdown(props: DropdownProps) {
+  const { dayPickerProps } = useDayPicker()
+  const localize = dayPickerProps.locale?.localize
+
+  return (
+    <CalendarDropdown
+      {...props}
+      // Options are always 0–11, which is what date-fns's `Month` union is.
+      triggerLabel={
+        localize ? (month) => localize.month(month as Month, { width: 'abbreviated' }) : undefined
+      }
+    />
+  )
+}
+
+export function Calendar({
   className,
   classNames,
-  formatters,
   showOutsideDays = true,
-  captionLayout = 'dropdown',
   components: userComponents,
+  mode = 'single',
+  locale = es,
   ...props
-}: React.ComponentProps<typeof DayPicker>) {
-  const fromYear = new Date(STARTING_YEAR, 0)
-
+}: React.ComponentProps<typeof DayPicker>): React.ReactElement {
   const defaultClassNames = {
     button_next: buttonClassNames,
     button_previous: buttonClassNames,
@@ -25,11 +100,11 @@ function Calendar({
     day: 'size-(--cell-size) text-sm py-px',
     day_button: cn(
       buttonClassNames,
-      'in-data-disabled:pointer-events-none in-[.range-middle]:rounded-none in-[.range-end:not(.range-start)]:rounded-s-none in-[.range-start:not(.range-end)]:rounded-e-none in-[.range-middle]:in-data-selected:bg-accent in-data-selected:bg-primary in-[.range-middle]:in-data-selected:text-foreground in-data-disabled:text-muted-foreground/70 in-data-outside:text-muted-foreground/70 in-data-selected:in-data-outside:text-primary-foreground in-data-selected:text-primary-foreground in-data-disabled:line-through outline-none in-[[data-selected]:not(.range-middle)]:transition-[border-radius,box-shadow] focus-visible:z-1 focus-visible:ring-[3px] focus-visible:ring-ring/50',
+      'outline-none focus-visible:z-1 focus-visible:ring-[3px] focus-visible:ring-ring/50 in-data-outside:text-muted-foreground/72 in-data-selected:bg-primary in-data-selected:text-primary-foreground in-data-selected:in-data-outside:text-primary-foreground in-data-disabled:pointer-events-none in-data-disabled:text-muted-foreground/72 in-data-disabled:line-through in-[.range-end:not(.range-start)]:rounded-s-none in-[.range-middle]:rounded-none in-[.range-middle]:in-data-selected:bg-accent in-[.range-middle]:in-data-selected:text-foreground in-[.range-start:not(.range-end)]:rounded-e-none in-[[data-selected]:not(.range-middle)]:transition-[border-radius,box-shadow]',
     ),
     dropdown: 'absolute bg-popover inset-0 opacity-0',
     dropdown_root:
-      "relative has-focus:border-ring has-focus:ring-ring/50 has-focus:ring-[3px] border border-input shadow-xs/5 rounded-[var(--cell-radius)] px-[calc(--spacing(3)-1px)] h-9 sm:h-8 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:-me-1",
+      "relative has-focus:border-ring has-focus:ring-ring/50 has-focus:ring-[3px] border border-input shadow-xs/5 rounded-lg px-[calc(--spacing(3)-1px)] h-9 sm:h-8 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:-me-1",
     dropdowns:
       'w-full flex items-center text-base sm:text-sm justify-center h-(--cell-size) gap-1.5 *:[span]:font-medium',
     hidden: 'invisible',
@@ -43,8 +118,8 @@ function Calendar({
     range_start: 'range-start',
     today:
       '*:after:pointer-events-none *:after:absolute *:after:bottom-1 *:after:start-1/2 *:after:z-1 *:after:size-[3px] *:after:-translate-x-1/2 *:after:rounded-full *:after:bg-primary [&[data-selected]:not(.range-middle)>*]:after:bg-background [&[data-disabled]>*]:after:bg-foreground/30',
-    week_number: 'size-(--cell-size) p-0 text-xs font-medium text-muted-foreground/70',
-    weekday: 'size-(--cell-size) p-0 text-xs font-medium text-muted-foreground/70',
+    week_number: 'size-(--cell-size) p-0 text-xs font-medium text-muted-foreground/72',
+    weekday: 'size-(--cell-size) p-0 text-xs font-medium text-muted-foreground/72',
   }
   const mergedClassNames: typeof defaultClassNames = Object.keys(defaultClassNames).reduce(
     (acc, key) => {
@@ -58,7 +133,9 @@ function Calendar({
     { ...defaultClassNames } as typeof defaultClassNames,
   )
 
-  const defaultComponents: Partial<CustomComponents> = {
+  const defaultComponents = {
+    Dropdown: CalendarDropdown,
+    MonthsDropdown: CalendarMonthsDropdown,
     Chevron: ({
       className,
       orientation,
@@ -66,18 +143,17 @@ function Calendar({
     }: {
       className?: string
       orientation?: 'left' | 'right' | 'up' | 'down'
-    }) => {
+    }): React.ReactElement => {
       if (orientation === 'left') {
-        return <IconChevronLeft className={cn(className, 'rtl:rotate-180')} {...props} aria-hidden="true" />
+        return <ChevronLeftIcon className={cn(className, 'rtl:rotate-180')} {...props} aria-hidden="true" />
       }
 
       if (orientation === 'right') {
-        return <IconChevronRight className={cn(className, 'rtl:rotate-180')} {...props} aria-hidden="true" />
+        return <ChevronRightIcon className={cn(className, 'rtl:rotate-180')} {...props} aria-hidden="true" />
       }
 
-      return <IconChevronsDown className={className} {...props} aria-hidden="true" />
+      return <ChevronsUpDownIcon className={className} {...props} aria-hidden="true" />
     },
-    Dropdown: CalendarDropdown,
   }
 
   const mergedComponents = {
@@ -85,89 +161,16 @@ function Calendar({
     ...userComponents,
   }
 
-  return (
-    <DayPicker
-      startMonth={fromYear}
-      disabled={{ before: fromYear }}
-      className={cn(
-        'w-fit [--cell-radius:var(--radius-md)] [--cell-size:--spacing(9)] sm:[--cell-size:--spacing(8)]',
-        className,
-      )}
-      classNames={mergedClassNames}
-      components={mergedComponents}
-      captionLayout={captionLayout}
-      data-slot="calendar"
-      formatters={{
-        formatMonthDropdown: (date) => {
-          const month = formatDate(date, { month: 'short', day: undefined, year: undefined })
-          return month.charAt(0).toUpperCase() + month.slice(1)
-        },
-        formatCaption: (date) => {
-          const month = formatDate(date, { month: 'long', day: undefined, year: undefined })
-          const year = formatDate(date, { month: undefined, day: undefined, year: 'numeric' })
-          return `${month.charAt(0).toUpperCase() + month.slice(1)} ${year}`
-        },
-        formatWeekdayName: (date) => {
-          const weekday = formatDate(date, {
-            weekday: 'short',
-            day: undefined,
-            month: undefined,
-            year: undefined,
-          })
-          return weekday.charAt(0).toUpperCase() + weekday.slice(1)
-        },
-        ...formatters,
-      }}
-      mode="single"
-      showOutsideDays={showOutsideDays}
-      {...props}
-    />
-  )
-}
-
-interface DropdownItem {
-  disabled?: boolean
-  label: string
-  value: string
-}
-
-function CalendarDropdown(props: DropdownProps) {
-  const { options, value, onChange, 'aria-label': ariaLabel, name } = props
-
-  const items: DropdownItem[] =
-    options?.map((option) => ({
-      disabled: option.disabled,
-      label: option.label,
-      value: option.value.toString(),
-    })) ?? []
-
-  const selectedItem = items.find((item) => item.value === value?.toString())
-
-  const handleValueChange = (newValue: DropdownItem | null) => {
-    if (onChange && newValue) {
-      const syntheticEvent = {
-        target: { value: newValue.value },
-      } as React.ChangeEvent<HTMLSelectElement>
-      onChange(syntheticEvent)
-    }
+  const dayPickerProps = {
+    className: cn('w-fit [--cell-size:--spacing(10)] sm:[--cell-size:--spacing(9)]', className),
+    classNames: mergedClassNames,
+    components: mergedComponents,
+    'data-slot': 'calendar',
+    locale,
+    mode,
+    showOutsideDays,
+    ...props,
   }
 
-  return (
-    <Select onValueChange={handleValueChange} value={selectedItem}>
-      <SelectTrigger aria-label={ariaLabel} name={name}>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent className="max-h-80 min-w-24">
-        <SelectGroup>
-          {items.map((option) => (
-            <SelectItem key={option.value} value={option}>
-              <span>{option.label}</span>
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  )
+  return <DayPicker {...(dayPickerProps as React.ComponentProps<typeof DayPicker>)} />
 }
-
-export { Calendar }

@@ -1,143 +1,103 @@
-import { IconLogout, IconMoon, IconRefresh, IconSelector, IconSettings, IconSun } from '@tabler/icons-react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { useTheme } from 'next-themes'
-import { userProfileQueryOptions } from '@/api/tanstack-queries/user'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { authClient } from '@/lib/auth/client'
-import { logger } from '@/lib/logger'
+'use client'
+
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
+import type { CurrentUser } from '@/lib/supabase/current-user'
 import { getAvatarFallback } from '@/lib/utils'
+import { logout } from '@/server-actions/auth'
 import { RoleNameBadge } from '../shared/role-name-badge'
 import { Avatar, AvatarFallback } from '../ui/avatar'
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar'
-import { Skeleton } from '../ui/skeleton'
+import { Badge } from '../ui/badge'
+import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuSeparator, MenuTrigger } from '../ui/menu'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '../ui/sidebar'
+import { toastManager } from '../ui/toast'
+import { useWelcomeParam } from '../welcome-dialog'
 
-export function NavUser() {
-  const navigate = useNavigate()
+interface NavUserProps {
+  user: CurrentUser
+}
+
+export function NavUser({ user }: NavUserProps) {
   const queryClient = useQueryClient()
-  const { theme, setTheme } = useTheme()
+  const router = useRouter()
+  const { setOpenMobile } = useSidebar()
+  const [, setWelcome] = useWelcomeParam()
 
-  const { data: profile, isLoading, error, refetch } = useQuery(userProfileQueryOptions())
-
-  async function handleLogOut() {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: async () => {
-          queryClient.clear()
-          navigate({ to: '/login' })
-        },
-        onError: (error) => {
-          logger.error('Error during sign out:', error)
-        },
-      },
-    })
-  }
-
-  if (isLoading) return <Skeleton className="h-12 rounded-lg" />
-
-  if (error || !profile)
-    return (
-      <SidebarMenuButton onClick={() => refetch()} size="lg">
-        <div className="grid flex-1 text-left text-sm leading-tight">
-          <span className="truncate font-medium">Refetch profile</span>
-        </div>
-        <IconRefresh className="ml-auto size-4" />
-      </SidebarMenuButton>
-    )
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const result = await logout()
+      if (result?.error) throw new Error(result.error)
+    },
+    onSuccess: () => {
+      queryClient.clear()
+      router.replace('/login')
+    },
+    onError: (error) => {
+      toastManager.add({ type: 'error', title: 'Error', description: error.message })
+    },
+  })
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger
+        <Menu>
+          <MenuTrigger
             render={
               <SidebarMenuButton
                 size="lg"
+                aria-label="Menú de usuario"
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <Avatar>
-                    <AvatarFallback>{getAvatarFallback(profile.user.name)}</AvatarFallback>
+                    <AvatarFallback>{getAvatarFallback(user.fullName)}</AvatarFallback>
                   </Avatar>
-                  <div>
-                    <p className="truncate font-medium">{profile.user.name.split(' ')[0]}</p>
-                    <p className="truncate text-muted-foreground text-xs">{profile.user.email}</p>
+                  <div className="grid min-w-0 flex-1 gap-1 text-left leading-none">
+                    <span className="truncate font-medium">{user.fullName}</span>
+                    <div className="flex gap-1 overflow-hidden">
+                      {user.roles.length ? (
+                        user.roles.map((role) => <RoleNameBadge key={role} size="sm" roleName={role} />)
+                      ) : (
+                        <Badge variant="outline" size="sm">
+                          Miembro
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <IconSelector className="ml-auto size-4 text-muted-foreground" />
               </SidebarMenuButton>
             }
           />
-          <DropdownMenuContent className="w-(--anchor-width)" align="center">
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="line-clamp-2">{profile.user.name}</DropdownMenuLabel>
+          <MenuPopup className="w-(--anchor-width)" align="center">
+            <MenuGroup>
+              <div>
+                <MenuGroupLabel className="line-clamp-2 pb-0">{user.fullName}</MenuGroupLabel>
+                <MenuGroupLabel className="line-clamp-2 py-0">{user.email}</MenuGroupLabel>
+              </div>
+            </MenuGroup>
 
-              {profile.user.role && (
-                <DropdownMenuLabel>
-                  <div className="flex flex-wrap gap-1">
-                    <RoleNameBadge className="text-xs" roleName={profile.user.role} />
-                  </div>
-                </DropdownMenuLabel>
-              )}
+            <MenuSeparator />
 
-              <DropdownMenuSeparator />
+            <MenuItem
+              onClick={() => {
+                // On mobile the sidebar is a sheet that would sit over the dialog.
+                setOpenMobile(false)
+                void setWelcome(true)
+              }}
+            >
+              Ver introducción
+            </MenuItem>
 
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <IconMoon className="hidden size-4 dark:block" />
-                  <IconSun className="size-4 dark:hidden" />
-                  <span>Apariencia</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuCheckboxItem checked={theme === 'light'} onClick={() => setTheme('light')}>
-                      Claro
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem checked={theme === 'dark'} onClick={() => setTheme('dark')}>
-                      Oscuro
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem checked={theme === 'system'} onClick={() => setTheme('system')}>
-                      Sistema
-                    </DropdownMenuCheckboxItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
-            </DropdownMenuGroup>
-
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                render={
-                  <Link to="/settings">
-                    <IconSettings className="size-4" />
-                    Configuración
-                  </Link>
-                }
-              />
-            </DropdownMenuGroup>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={handleLogOut}>
-                <IconLogout className="size-4" />
-                Cerrar sesión
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            <MenuItem
+              disabled={logoutMutation.isPending}
+              onClick={() => {
+                logoutMutation.mutate()
+              }}
+            >
+              Cerrar sesión
+            </MenuItem>
+          </MenuPopup>
+        </Menu>
       </SidebarMenuItem>
     </SidebarMenu>
   )

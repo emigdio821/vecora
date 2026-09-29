@@ -1,15 +1,24 @@
-import { ThemeProvider } from 'next-themes'
-import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
-import { Toaster } from './ui/sonner'
+'use client'
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { TooltipProvider } from './ui/tooltip'
 
-export function Providers({ children }: { children: React.ReactNode }) {
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 2 },
+  },
+})
+
+export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
-    <NuqsAdapter>
-      <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
+    <QueryClientProvider client={queryClient}>
+      <NuqsAdapter>
         <TooltipProvider delay={200}>{children}</TooltipProvider>
-        <Toaster />
-      </ThemeProvider>
-    </NuqsAdapter>
+      </NuqsAdapter>
+
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   )
 }

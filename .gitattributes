@@ -1,0 +1,26 @@
+# Enforce LF line endings for all text files, in the repo and working tree.
+# Git auto-detects text vs binary; `eol=lf` overrides core.autocrlf on checkout.
+* text=auto eol=lf
+
+# Windows scripts must keep CRLF to run correctly (defensive; none tracked today).
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Treat common binary assets as binary so Git never rewrites their bytes.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.mp4 binary
+*.webm binary

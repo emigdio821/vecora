@@ -1,5 +1,8 @@
-import { IconHomeShield, IconLogs, IconUsersGroup } from '@tabler/icons-react'
-import { Link, useLocation } from '@tanstack/react-router'
+'use client'
+
+import { HistoryIcon } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,16 +13,10 @@ import {
   useSidebar,
 } from '../ui/sidebar'
 
+/** Rendered by the sidebar only for admins; the pages check the role again. */
 export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
-  const location = useLocation()
-  const { pathname } = location
+  const pathname = usePathname()
   const { setOpenMobile } = useSidebar()
-  // const { profile } = useRouteContext({ from: '/_authed' })
-  // const isAdmin = useIsAdmin()
-
-  // if (!profile || !isAdmin) {
-  //   return null
-  // }
 
   return (
     <SidebarGroup {...props}>
@@ -28,38 +25,14 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
-              isActive={pathname === '/admin/profiles'}
+              onClick={() => {
+                setOpenMobile(false)
+              }}
+              isActive={pathname === '/logs'}
               render={
-                <Link to="/admin/profiles">
-                  <IconUsersGroup className="size-4" />
-                  <span>Perfiles</span>
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
-              isActive={pathname === '/admin/residential'}
-              render={
-                <Link to="/admin/residential">
-                  <IconHomeShield className="size-4" />
-                  <span>Residencial</span>
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => setOpenMobile(false)}
-              isActive={pathname === '/admin/audit'}
-              render={
-                <Link to="/admin/audit">
-                  <IconLogs className="size-4" />
-                  <span>Auditoría</span>
+                <Link href="/logs">
+                  <HistoryIcon className="size-4" />
+                  <span>Historial</span>
                 </Link>
               }
             />
