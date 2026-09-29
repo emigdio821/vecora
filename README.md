@@ -77,11 +77,53 @@ Every role can read every section. The seed also creates 20 houses (A1–D5), 10
 | `npx supabase status`             | Local URLs and keys; Studio is at <http://127.0.0.1:54323>                                             |
 | `npx supabase stop`               | Stop the local stack (data is kept)                                                                    |
 
+## Deploy
+
+The app runs on Vercel against a hosted Supabase project.
+
+1. **Push the schema** to the hosted project. Seeds are not pushed, so production starts with no accounts.
+
+   ```bash
+   npx supabase login
+   npx supabase link --project-ref <project-ref>
+   npx supabase db push --dry-run   # lists the migrations it would apply
+   npx supabase db push
+   ```
+
+2. **Configure Auth** in the Supabase dashboard, under Authentication:
+   - **Sign In / Providers**: turn off "Allow new users to sign up", and leave the **Email** provider on (turning it off also disables password login).
+   - **URL Configuration**: set the Site URL to the app's URL (e.g. `https://vecora.vercel.app`) and add `https://vecora.vercel.app/**` to the redirect URLs.
+
+3. **Set the environment variables** in Vercel, from Project Settings → API Keys in the Supabase dashboard:
+
+   | Variable                               | Value                                                   |
+   | -------------------------------------- | ------------------------------------------------------- |
+   | `NEXT_PUBLIC_SUPABASE_URL`             | `https://<project-ref>.supabase.co`                     |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | A publishable key                                       |
+   | `SUPABASE_SECRET_KEY`                  | A secret key (server-only, needed to add board members) |
+
+4. **Create the first admin.** Nobody can sign in until an account has a role.
+   1. Authentication → Users → **Add user** → **Create new user**, with a real email and a strong password, and check **Auto Confirm User**.
+   2. In the SQL Editor, give it the admin role and a name (the name is shown in the sidebar):
+
+      ```sql
+      insert into public.user_roles (user_id, role)
+      select id, 'admin' from auth.users where email = 'you@example.com';
+
+      update public.profiles
+      set full_name = 'Your Name'
+      where id = (select id from auth.users where email = 'you@example.com');
+      ```
+
+5. **Deploy**, sign in as the admin, set the residential's name and logo in "Ajustes", and add the board members in "Mesa directiva".
+
+To wipe the hosted database and re-apply every migration, run `npx supabase db reset --linked --no-seed`. Without `--no-seed` it would also create the local test accounts, all with the password `admin`. A reset can't be undone; `npx supabase db dump --linked --data-only -f backup.sql` saves the data first.
+
 ## Project layout
 
 ```
 supabase/migrations/   schema, RLS policies and RPCs (one file per feature)
-supabase/seed.sql      admin account (runs everywhere)
+supabase/seed.sql      local admin account
 supabase/seeds/dev.sql local-only test data
 src/app/(authed)/      one route per section
 src/components/        UI per section (table/, drawer/, dialog/) + shared/ and ui/
