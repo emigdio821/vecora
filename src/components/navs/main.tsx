@@ -19,6 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '../ui/sidebar'
+import { LinkPendingIndicator } from './link-pending-indicator'
 
 export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
   const pathname = usePathname()
@@ -39,6 +40,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
                 <Link href="/treasury">
                   <PiggyBankIcon className="size-4" />
                   <span>Tesorería</span>
+                  <LinkPendingIndicator />
                 </Link>
               }
             />
@@ -54,6 +56,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
                 <Link href="/presidency">
                   <GavelIcon className="size-4" />
                   <span>Presidencia</span>
+                  <LinkPendingIndicator />
                 </Link>
               }
             />
@@ -69,6 +72,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
                 <Link href="/maintenance">
                   <WrenchIcon className="size-4" />
                   <span>Mantenimiento</span>
+                  <LinkPendingIndicator />
                 </Link>
               }
             />
@@ -84,6 +88,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
                 <Link href="/security">
                   <SirenIcon className="size-4" />
                   <span>Seguridad</span>
+                  <LinkPendingIndicator />
                 </Link>
               }
             />
@@ -99,6 +104,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
                 <Link href="/hoa-board">
                   <HeartHandshakeIcon className="size-4" />
                   <span>Mesa directiva</span>
+                  <LinkPendingIndicator />
                 </Link>
               }
             />
@@ -114,6 +120,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
                 <Link href="/residential">
                   <MapPinHouseIcon className="size-4" />
                   <span>Residencial</span>
+                  <LinkPendingIndicator />
                 </Link>
               }
             />

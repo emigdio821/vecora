@@ -12,6 +12,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '../ui/sidebar'
+import { LinkPendingIndicator } from './link-pending-indicator'
 
 /** Rendered by the sidebar only for admins; the pages check the role again. */
 export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
@@ -33,6 +34,7 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
                 <Link href="/logs">
                   <HistoryIcon className="size-4" />
                   <span>Historial</span>
+                  <LinkPendingIndicator />
                 </Link>
               }
             />

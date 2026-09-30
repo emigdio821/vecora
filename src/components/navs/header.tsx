@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '../ui/sidebar'
+import { LinkPendingIndicator } from './link-pending-indicator'
 
 interface HeaderNavProps extends React.ComponentProps<typeof SidebarGroupContent> {
   settings: Settings
@@ -51,6 +52,7 @@ export function HeaderNav({ settings, ...props }: HeaderNavProps) {
               <Link href="/">
                 <ChartLineIcon className="size-4" />
                 <span>Inicio</span>
+                <LinkPendingIndicator />
               </Link>
             }
           />
