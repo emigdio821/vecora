@@ -206,6 +206,8 @@ const FIELD_LABEL: Record<string, string> = {
   deleted_at: 'Fecha de eliminación',
   deleted_by: 'Eliminado por',
   created_at: 'Fecha de registro',
+  is_main_admin: 'Administrador principal',
+  welcomed_at: 'Vio la introducción',
 }
 
 export function fieldLabel(field: string) {
@@ -217,7 +219,7 @@ const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton', 'key'])
 
 const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee'])
 const DAY_FIELDS = new Set(['occurred_on', 'requested_on', 'reserved_on', 'starts_on', 'ends_on'])
-const TIMESTAMP_FIELDS = new Set(['created_at', 'resolved_at', 'cancelled_at', 'deleted_at'])
+const TIMESTAMP_FIELDS = new Set(['created_at', 'resolved_at', 'cancelled_at', 'deleted_at', 'welcomed_at'])
 
 /** Enum values don't collide across tables, so one flat map is enough. */
 const ENUM_LABEL: Record<string, string> = {
