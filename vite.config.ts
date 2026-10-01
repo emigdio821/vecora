@@ -5,8 +5,6 @@ import { nitro } from 'nitro/vite'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  // NEXT_PUBLIC_ keeps the env names shared with the Next.js deployment.
-  envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
   resolve: { tsconfigPaths: true },
   server: { port: 3000 },
   // Native binary: dev's dependency optimizer can't bundle it.

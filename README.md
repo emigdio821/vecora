@@ -6,7 +6,7 @@ Residential management for the HOA board (the _mesa directiva_): houses and resi
 
 The app itself is in Spanish (es-MX); code, comments and docs are in English.
 
-Next.js 16 · React · Supabase (Postgres, Auth, RLS) · Tailwind CSS · [coss ui](https://coss.com/ui) (Base UI) · TanStack Query / Table · React Hook Form + zod.
+TanStack Start (Vite + Nitro) · React · Supabase (Postgres, Auth, RLS) · Tailwind CSS · [coss ui](https://coss.com/ui) (Base UI) · TanStack Query / Table · React Hook Form + zod.
 
 ## Run it locally
 
@@ -31,11 +31,11 @@ You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
    npx supabase status
    ```
 
-   | Variable                               | Value from `supabase status`                     |
-   | -------------------------------------- | ------------------------------------------------ |
-   | `NEXT_PUBLIC_SUPABASE_URL`             | `API_URL` (`http://127.0.0.1:54321`)             |
-   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `PUBLISHABLE_KEY`                                |
-   | `SUPABASE_SECRET_KEY`                  | `SECRET_KEY` (server-only, never `NEXT_PUBLIC_`) |
+   | Variable                        | Value from `supabase status`              |
+   | ------------------------------- | ----------------------------------------- |
+   | `VITE_SUPABASE_URL`             | `API_URL` (`http://127.0.0.1:54321`)      |
+   | `VITE_SUPABASE_PUBLISHABLE_KEY` | `PUBLISHABLE_KEY`                         |
+   | `SUPABASE_SECRET_KEY`           | `SECRET_KEY` (server-only, never `VITE_`) |
 
 4. **Load the schema and test data**. Applies every migration and both seeds; it also wipes any local data, so run it whenever you want a clean slate.
 
@@ -96,11 +96,13 @@ The app runs on Vercel against a hosted Supabase project.
 
 3. **Set the environment variables** in Vercel, from Project Settings → API Keys in the Supabase dashboard:
 
-   | Variable                               | Value                                                   |
-   | -------------------------------------- | ------------------------------------------------------- |
-   | `NEXT_PUBLIC_SUPABASE_URL`             | `https://<project-ref>.supabase.co`                     |
-   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | A publishable key                                       |
-   | `SUPABASE_SECRET_KEY`                  | A secret key (server-only, needed to add board members) |
+   | Variable                        | Value                                                   |
+   | ------------------------------- | ------------------------------------------------------- |
+   | `VITE_SUPABASE_URL`             | `https://<project-ref>.supabase.co`                     |
+   | `VITE_SUPABASE_PUBLISHABLE_KEY` | A publishable key                                       |
+   | `SUPABASE_SECRET_KEY`           | A secret key (server-only, needed to add board members) |
+
+   The `VITE_` values are bundled into the browser code at build time, so redeploy after changing them.
 
 4. **Create the main admin.** Nobody can sign in until an account has a role. In Authentication → Users → **Add user** → **Create new user**, enter `admin@vecora.com` and a strong password, and check **Auto Confirm User**. The database names the account "Vecora Admin" and grants it the admin role on its own.
 
@@ -128,9 +130,10 @@ To wipe the hosted database and re-apply every migration, run `npx supabase db r
 supabase/migrations/   schema, RLS policies and RPCs (one file per feature)
 supabase/seed.sql      local admin account
 supabase/seeds/dev.sql local-only test data
-src/app/(authed)/      one route per section
+src/routes/_authed/    one route per section (TanStack Router file routes)
+src/routes/_auth/      login, set-password and the auth callbacks
 src/components/        UI per section (table/, drawer/, dialog/) + shared/ and ui/
-src/server-actions/    mutations, called from the client with the user's session
+src/server-actions/    mutations (server functions), called from the client with the user's session
 src/tanstack-queries/  read queries and query keys
 src/lib/validations/   zod schemas shared by forms and server actions
 ```

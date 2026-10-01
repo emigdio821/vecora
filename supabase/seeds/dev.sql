@@ -296,8 +296,8 @@ begin
   -- -------------------------------------------------------------------------
   perform pg_temp.act_as(u_president);
 
-  insert into public.hall_reservations (property_id, reserved_on, notes)
-  values ((select id from public.properties where number = 'B1'), current_date + 10, 'Cumpleaños, 40 personas');
+  insert into public.hall_reservations (property_id, reserved_on, amount, notes)
+  values ((select id from public.properties where number = 'B1'), current_date + 10, 0, 'Cumpleaños, 40 personas');
   t := now() - interval '3 days 4 hours';
   perform pg_temp.mark(t);
 
