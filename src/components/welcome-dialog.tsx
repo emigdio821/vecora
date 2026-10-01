@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import {
   EyeIcon,
+  FileTextIcon,
   GavelIcon,
   HeartHandshakeIcon,
   HistoryIcon,
@@ -198,16 +199,18 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
             tienes permiso.
           </InfoRow>
           <InfoRow icon={HouseIcon} title="Inicio">
-            El resumen del periodo, las cuotas pendientes, las solicitudes de pago y el reporte financiero en
-            PDF.
+            El resumen del periodo, las cuotas pendientes y las solicitudes de pago.
+          </InfoRow>
+          <InfoRow icon={FileTextIcon} title="Reporte financiero">
+            En "Reportes", en el menú lateral, descarga en PDF los ingresos, egresos y cuotas pendientes de
+            las fechas que elijas.
           </InfoRow>
           <InfoRow icon={HistoryIcon} title="Cada cambio queda registrado">
             Todo lo que se crea, edita o elimina queda registrado en la aplicación con la información de quién
             lo hizo y cuándo.
           </InfoRow>
-          <InfoRow icon={UserIcon} title="¿Tienes prisa?">
-            Puedes ver la introducción cuando quieras, solo toca tu nombre en el menú lateral y elige "Ver
-            introducción".
+          <InfoRow icon={UserIcon} title="Vuelve a verla cuando quieras">
+            Toca tu nombre en el menú lateral y elige "Ver introducción".
           </InfoRow>
         </InfoList>
       ),
@@ -222,8 +225,8 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
         <div className="flex flex-col gap-4">
           <InfoList>
             <InfoRow icon={HeartHandshakeIcon} title="Invita a la mesa directiva">
-              Agrega a cada integrante en "Mesa directiva" y compártele su enlace de acceso por WhatsApp o
-              como prefieras. Con él crea su contraseña.
+              Agrega a cada integrante en "Mesa directiva" y envíale el enlace de acceso que se genera, por
+              WhatsApp o como prefieras. Al abrirlo, creará su contraseña para entrar.
             </InfoRow>
             <InfoRow icon={SettingsIcon} title="Ajustes">
               Pon el nombre del residencial y su logo; se usan en el menú y en los reportes.
