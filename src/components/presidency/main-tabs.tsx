@@ -1,5 +1,3 @@
-'use client'
-
 import { useQueryState } from 'nuqs'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '../ui/tabs'
 import { HallReservationsDataTable } from './hall/table/data-table'

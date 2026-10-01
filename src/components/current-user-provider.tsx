@@ -1,5 +1,3 @@
-'use client'
-
 import { createContext, useContext } from 'react'
 import type { AppRole, CurrentUser } from '@/lib/supabase/current-user'
 

@@ -1,5 +1,3 @@
-'use client'
-
 import { DayPicker, type DropdownProps, useDayPicker } from '@daypicker/react'
 import type { Month } from 'date-fns'
 import { es } from 'date-fns/locale'

@@ -1,7 +1,5 @@
-'use client'
-
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
+import { useNavigate } from '@tanstack/react-router'
 import type { CurrentUser } from '@/lib/supabase/current-user'
 import { getAvatarFallback } from '@/lib/utils'
 import { logout } from '@/server-actions/auth'
@@ -19,7 +17,7 @@ interface NavUserProps {
 
 export function NavUser({ user }: NavUserProps) {
   const queryClient = useQueryClient()
-  const router = useRouter()
+  const navigate = useNavigate()
   const { setOpenMobile } = useSidebar()
   const [, setWelcome] = useWelcomeParam()
 
@@ -28,9 +26,9 @@ export function NavUser({ user }: NavUserProps) {
       const result = await logout()
       if (result?.error) throw new Error(result.error)
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.clear()
-      router.replace('/login')
+      await navigate({ to: '/login', replace: true })
     },
     onError: (error) => {
       toastManager.add({ type: 'error', title: 'Error', description: error.message })

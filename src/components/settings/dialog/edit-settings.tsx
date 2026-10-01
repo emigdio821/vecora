@@ -1,10 +1,6 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, type UseMutationResult, useQuery } from '@tanstack/react-query'
+import { useMutation, type UseMutationResult, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CircleAlertIcon, ImageIcon, Trash2Icon, UploadIcon } from 'lucide-react'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { RemoveLogoAlertDialog } from '@/components/settings/dialog/remove-logo'
@@ -33,7 +29,7 @@ import {
   settingsSchema,
 } from '@/lib/validations/settings'
 import { updateSettings, uploadLogo } from '@/server-actions/settings'
-import { logoUrlQueryOptions } from '@/tanstack-queries/settings'
+import { logoUrlQueryOptions, SETTINGS_QUERY_KEY } from '@/tanstack-queries/settings'
 
 const FORM_ID = 'edit-settings-form'
 
@@ -45,9 +41,9 @@ interface EditSettingsDialogProps extends React.ComponentProps<typeof Dialog> {
 
 type UpdateSettingsMutation = UseMutationResult<void, Error, SettingsInput>
 
-/** President: the residential's details. The sidebar reads them server-side, hence the refresh. */
+/** President: the residential's details. The sidebar reads them from the settings query. */
 export function EditSettingsDialog({ settings, open, onOpenChange, ...props }: EditSettingsDialogProps) {
-  const router = useRouter()
+  const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationFn: async (values: SettingsInput) => {
@@ -55,7 +51,7 @@ export function EditSettingsDialog({ settings, open, onOpenChange, ...props }: E
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
-      router.refresh()
+      void queryClient.invalidateQueries({ queryKey: [SETTINGS_QUERY_KEY] })
       toastManager.add({ type: 'success', title: 'Ajustes guardados' })
       onOpenChange(false)
     },
@@ -152,7 +148,7 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
  * so the size check here only spares uploading something it would refuse.
  */
 function LogoField({ logoPath }: { logoPath: string | null }) {
-  const router = useRouter()
+  const queryClient = useQueryClient()
   const inputRef = useRef<HTMLInputElement>(null)
   const logoUrl = useQuery(logoUrlQueryOptions(logoPath))
   const [isRemoveOpen, setRemoveOpen] = useState(false)
@@ -168,7 +164,7 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
-      router.refresh()
+      void queryClient.invalidateQueries({ queryKey: [SETTINGS_QUERY_KEY] })
       toastManager.add({ type: 'success', title: 'Logo actualizado' })
     },
     onError: (error) => {
@@ -183,13 +179,11 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
         {/* White like the report page, so the preview shows how it will print. */}
         <div className="flex size-20 shrink-0 items-center justify-center rounded-lg border bg-muted p-2">
           {logoUrl.data ? (
-            // Already a small PNG behind an expiring link: nothing for the optimizer to do.
-            <Image
+            <img
               src={logoUrl.data}
               alt="Logo del residencial"
               width={64}
               height={64}
-              unoptimized
               className="size-full object-contain"
             />
           ) : (

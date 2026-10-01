@@ -1,0 +1,116 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { CircleAlertIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
+import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Form } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { type LoginInput, loginSchema } from '@/lib/validations/auth'
+import { login } from '@/server-actions/auth'
+import { USER_QUERY_KEY } from '@/tanstack-queries/session'
+
+export function LoginForm() {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setLoading] = useState(false)
+
+  const form = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  })
+
+  async function onSubmit(values: LoginInput) {
+    setLoading(true)
+    const result = await login(values)
+
+    if (result?.error) {
+      setLoading(false)
+      form.setError('root', { message: result.error })
+      return
+    }
+
+    // The cache still holds the signed-out user; the guards must ask again.
+    queryClient.removeQueries({ queryKey: [USER_QUERY_KEY] })
+    await navigate({ to: '/', replace: true })
+  }
+
+  return (
+    <Form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-4">
+      <Controller
+        name="email"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field
+            name={field.name}
+            invalid={fieldState.invalid}
+            touched={fieldState.isTouched}
+            dirty={fieldState.isDirty}
+          >
+            <FieldLabel>
+              Correo
+              <span className="text-destructive">*</span>
+            </FieldLabel>
+            <Input {...field} inputMode="email" autoComplete="email" />
+            <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+          </Field>
+        )}
+      />
+      <Controller
+        name="password"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field
+            name={field.name}
+            invalid={fieldState.invalid}
+            touched={fieldState.isTouched}
+            dirty={fieldState.isDirty}
+          >
+            <FieldLabel>
+              Contraseña
+              <span className="text-destructive">*</span>
+            </FieldLabel>
+
+            <InputGroup>
+              <InputGroupInput
+                type={showPassword ? 'text' : 'password'}
+                aria-label="Contraseña con alternar visibilidad"
+                {...field}
+              />
+              <InputGroupAddon align="inline-end">
+                <Button
+                  size="icon-xs"
+                  variant="ghost"
+                  onClick={() => {
+                    setShowPassword(!showPassword)
+                  }}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </Button>
+              </InputGroupAddon>
+            </InputGroup>
+            <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+          </Field>
+        )}
+      />
+
+      {form.formState.errors.root && (
+        <Alert variant="error">
+          <CircleAlertIcon />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
+        </Alert>
+      )}
+
+      <Button type="submit" disabled={isLoading} loading={isLoading}>
+        Inicia sesión
+      </Button>
+    </Form>
+  )
+}

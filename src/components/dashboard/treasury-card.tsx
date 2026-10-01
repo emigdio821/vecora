@@ -1,5 +1,3 @@
-'use client'
-
 import { areaY, d3Curve, defineChart, lineY } from '@tanstack/charts'
 import { crosshair } from '@tanstack/charts/crosshair'
 import { decorative } from '@tanstack/charts/mark/decorative'
@@ -9,11 +7,11 @@ import { scaleOrdinal } from '@tanstack/charts/scales/ordinal'
 import { scalePoint } from '@tanstack/charts/scales/point'
 import { tooltip } from '@tanstack/charts/tooltip'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { curveMonotoneX } from 'd3-shape'
 import { eachMonthOfInterval, format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { CalendarOffIcon, ChartAreaIcon } from 'lucide-react'
-import Link from 'next/link'
 import { useMemo } from 'react'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import { Button } from '@/components/ui/button'
@@ -140,7 +138,7 @@ export function TreasuryCard() {
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
-                <Button variant="outline" render={<Link href="/presidency?tab=periods" />}>
+                <Button variant="outline" render={<Link to="/presidency" search={{ tab: 'periods' }} />}>
                   Ir a Periodos
                 </Button>
               </EmptyContent>

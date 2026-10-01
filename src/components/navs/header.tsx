@@ -1,8 +1,5 @@
-'use client'
-
+import { Link, useLocation } from '@tanstack/react-router'
 import { ChartLineIcon } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import type { Settings } from '@/lib/supabase/settings'
 import { DEFAULT_RESIDENTIAL_LABEL } from '@/lib/validations/settings'
 import { VecoraIcon } from '../shared/icons'
@@ -20,7 +17,7 @@ interface HeaderNavProps extends React.ComponentProps<typeof SidebarGroupContent
 }
 
 export function HeaderNav({ settings, ...props }: HeaderNavProps) {
-  const pathname = usePathname()
+  const pathname = useLocation({ select: (location) => location.pathname })
   const { setOpenMobile } = useSidebar()
   const residentialName = settings.residentialName || DEFAULT_RESIDENTIAL_LABEL
 
@@ -49,10 +46,10 @@ export function HeaderNav({ settings, ...props }: HeaderNavProps) {
             }}
             isActive={pathname === '/'}
             render={
-              <Link href="/">
+              <Link to="/">
                 <ChartLineIcon className="size-4" />
                 <span>Inicio</span>
-                <LinkPendingIndicator />
+                <LinkPendingIndicator to="/" />
               </Link>
             }
           />

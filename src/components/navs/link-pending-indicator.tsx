@@ -1,16 +1,15 @@
-'use client'
-
+import { type LinkProps, useMatchRoute } from '@tanstack/react-router'
 import { LoaderIcon } from 'lucide-react'
-import { useLinkStatus } from 'next/link'
 import { cn } from '@/lib/utils'
 
 /**
- * Goes inside a sidebar <Link>: a spinner while its page is on the way. It
- * fades in after 200 ms, so quick navigations show nothing, and always takes
- * its space so the label doesn't shift.
+ * Goes inside a sidebar <Link>: a spinner while its page (`to`, same as the
+ * link's) is on the way. It fades in after 200 ms, so quick navigations show
+ * nothing, and always takes its space so the label doesn't shift.
  */
-export function LinkPendingIndicator() {
-  const { pending } = useLinkStatus()
+export function LinkPendingIndicator({ to }: { to: LinkProps['to'] }) {
+  const matchRoute = useMatchRoute()
+  const pending = !!matchRoute({ to, pending: true })
 
   return (
     <LoaderIcon

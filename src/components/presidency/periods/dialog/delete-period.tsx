@@ -1,5 +1,3 @@
-'use client'
-
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {

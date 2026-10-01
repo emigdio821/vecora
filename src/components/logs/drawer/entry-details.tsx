@@ -1,5 +1,3 @@
-'use client'
-
 import { ArrowRightIcon, LayersIcon, ListIcon, ScrollTextIcon } from 'lucide-react'
 import { CollapsibleSection, Detail, Muted } from '@/components/shared/details'
 import { Badge } from '@/components/ui/badge'

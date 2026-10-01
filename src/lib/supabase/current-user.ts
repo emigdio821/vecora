@@ -1,4 +1,4 @@
-import { cache } from 'react'
+import '@tanstack/react-start/server-only'
 import type { Database } from '@/lib/supabase/database.types'
 import { createClient } from '@/lib/supabase/server'
 
@@ -30,11 +30,11 @@ function cameFromAccessLink(amr: Array<{ method: string } | string> | undefined)
 }
 
 /**
- * Current signed-in user with profile and roles, for server components.
- * Wrapped in React `cache` so the layout and pages in the same request
- * share one round trip. Returns null when signed out.
+ * Current signed-in user with profile and roles, for server code. Routes read
+ * it through fetchCurrentUser and the ['user'] query, so a request makes one
+ * round trip. Returns null when signed out.
  */
-export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
+export async function getCurrentUser(): Promise<CurrentUser | null> {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
   if (!data) return null
@@ -55,4 +55,4 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     mustSetPassword: cameFromAccessLink(amr),
     welcomed: !!profile?.welcomed_at,
   }
-})
+}

@@ -1,5 +1,3 @@
-'use client'
-
 import { FileTextIcon } from 'lucide-react'
 import { useState } from 'react'
 import { FinancialReportDialog } from '@/components/reports/dialog/financial-report'

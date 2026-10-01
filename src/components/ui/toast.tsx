@@ -1,5 +1,3 @@
-'use client'
-
 import { Toast } from '@base-ui/react/toast'
 import { CircleAlertIcon, CircleCheckIcon, InfoIcon, LoaderCircleIcon, TriangleAlertIcon } from 'lucide-react'
 import type React from 'react'

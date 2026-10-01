@@ -1,20 +1,22 @@
-import { join } from 'node:path'
 import { Document, Font, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns'
 import { es } from 'date-fns/locale'
 import type { FinancialReport } from '@/lib/supabase/financial-report'
 import { formatCurrency, formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
+import geistRegularUrl from '../../../../assets/fonts/Geist-Regular.ttf?inline'
+import geistSemiBoldUrl from '../../../../assets/fonts/Geist-SemiBold.ttf?inline'
 
 // Rendered on the server by /reports/pdf. Only react-pdf primitives here: no
 // DOM, no Tailwind.
 
-// Geist, like the app. next/font only serves woff2 to the browser, so the TTFs
-// live in assets/fonts; react-pdf embeds just the glyphs the report uses.
+// Geist, like the app. The app's fontsource package only ships woff2, so the
+// TTFs live in assets/fonts, bundled as data URLs; react-pdf embeds just the
+// glyphs the report uses.
 Font.register({
   family: 'Geist',
   fonts: [
-    { src: join(process.cwd(), 'assets/fonts/Geist-Regular.ttf'), fontWeight: 400 },
-    { src: join(process.cwd(), 'assets/fonts/Geist-SemiBold.ttf'), fontWeight: 600 },
+    { src: geistRegularUrl, fontWeight: 400 },
+    { src: geistSemiBoldUrl, fontWeight: 600 },
   ],
 })
 

@@ -1,6 +1,4 @@
-'use client'
-
-import { useTheme } from 'next-themes'
+import { type Theme, useTheme } from '@/components/theme-provider'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -16,13 +14,11 @@ import { Field, FieldItem, FieldLabel } from '@/components/ui/field'
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset'
 import { Radio, RadioGroup } from '@/components/ui/radio-group'
 
-const THEMES = [
+const THEMES: Array<{ value: Theme; label: string }> = [
   { value: 'system', label: 'Sistema' },
   { value: 'light', label: 'Claro' },
   { value: 'dark', label: 'Oscuro' },
-] as const
-
-type Theme = (typeof THEMES)[number]['value']
+]
 
 interface AppearanceDialogProps extends React.ComponentProps<typeof Dialog> {
   open: boolean
@@ -30,7 +26,7 @@ interface AppearanceDialogProps extends React.ComponentProps<typeof Dialog> {
 }
 
 /**
- * Per-device preference (next-themes stores it in this browser), so it applies
+ * Per-device preference (ThemeProvider stores it in this browser), so it applies
  * on click and there is nothing to save. Based on coss particle p-radio-group-6.
  */
 export function AppearanceDialog({ open, onOpenChange, ...props }: AppearanceDialogProps) {
@@ -49,7 +45,7 @@ export function AppearanceDialog({ open, onOpenChange, ...props }: AppearanceDia
             <FieldsetLegend className="text-sm font-medium">Elige un tema</FieldsetLegend>
             <RadioGroup
               className="flex-row flex-wrap gap-4"
-              value={theme ?? 'system'}
+              value={theme}
               onValueChange={(value) => {
                 setTheme(value as Theme)
               }}

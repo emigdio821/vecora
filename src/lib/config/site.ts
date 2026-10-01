@@ -18,7 +18,7 @@ export const siteConfig = {
   keywords: [
     'Vecora',
     'React',
-    'Next.js',
+    'TanStack Start',
     'TanStack Query',
     'Residential Manager',
     'Tailwind',

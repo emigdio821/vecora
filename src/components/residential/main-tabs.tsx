@@ -1,5 +1,3 @@
-'use client'
-
 import { useQueryState } from 'nuqs'
 import { HousesDataTable } from '../houses/table/data-table'
 import { ResidentsDataTable } from '../residents/table/data-table'

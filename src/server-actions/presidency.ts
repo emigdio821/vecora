@@ -1,6 +1,5 @@
-'use server'
-
 import type { PostgrestError } from '@supabase/supabase-js'
+import { createServerFn } from '@tanstack/react-start'
 import {
   type ActionResult,
   FOLIO_TAKEN_MESSAGE,
@@ -45,120 +44,135 @@ function toResolutionMessage(error: PostgrestError, fallback: string) {
   return requestResolutionErrorMessage(error, fallback)
 }
 
-export async function createHallReservation(
-  input: HallReservationInput,
-): Promise<ActionResult<{ id: string }>> {
-  const parsed = hallReservationSchema.safeParse(input)
-  if (!parsed.success) {
-    return { error: 'Revisa los campos del formulario' }
-  }
+const createHallReservationFn = createServerFn({ method: 'POST' })
+  .validator((input: HallReservationInput) => input)
+  .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
+    const parsed = hallReservationSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
 
-  const { property_id, reserved_on, amount, notes } = parsed.data
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('hall_reservations')
-    .insert({ property_id, reserved_on, amount, notes: notes || null })
-    .select('id')
-    .single()
+    const { property_id, reserved_on, amount, notes } = parsed.data
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('hall_reservations')
+      .insert({ property_id, reserved_on, amount, notes: notes || null })
+      .select('id')
+      .single()
 
-  if (error) {
-    return { error: toMessage(error, 'No se pudo registrar la reservación, intenta nuevamente') }
-  }
+    if (error) {
+      return { error: toMessage(error, 'No se pudo registrar la reservación, intenta nuevamente') }
+    }
 
-  return { data }
-}
+    return { data }
+  })
+
+export const createHallReservation = (input: HallReservationInput) => createHallReservationFn({ data: input })
 
 /** Not once cancelled (RLS). Once paid, the guard trigger keeps the house and amount. */
-export async function updateHallReservation(id: string, input: HallReservationInput): Promise<ActionResult> {
-  const parsed = hallReservationSchema.safeParse(input)
-  if (!parsed.success) {
-    return { error: 'Revisa los campos del formulario' }
-  }
+const updateHallReservationFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: HallReservationInput }) => data)
+  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+    const parsed = hallReservationSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
 
-  const { property_id, reserved_on, amount, notes } = parsed.data
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('hall_reservations')
-    .update({ property_id, reserved_on, amount, notes: notes || null })
-    .eq('id', id)
-    .select('id')
-    .single()
+    const { property_id, reserved_on, amount, notes } = parsed.data
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('hall_reservations')
+      .update({ property_id, reserved_on, amount, notes: notes || null })
+      .eq('id', id)
+      .select('id')
+      .single()
 
-  if (error) {
-    return { error: toMessage(error, 'No se pudo actualizar la reservación, intenta nuevamente') }
-  }
-  if (!data) {
-    return { error: 'No tienes permisos para realizar esta acción' }
-  }
+    if (error) {
+      return { error: toMessage(error, 'No se pudo actualizar la reservación, intenta nuevamente') }
+    }
+    if (!data) {
+      return { error: 'No tienes permisos para realizar esta acción' }
+    }
 
-  return { data: undefined }
-}
+    return { data: undefined }
+  })
+
+export const updateHallReservation = (id: string, input: HallReservationInput) =>
+  updateHallReservationFn({ data: { id, input } })
 
 /** Unpaid bookings only; a paid one is cancelled with cancelHallReservation. */
-export async function deleteHallReservation(id: string): Promise<ActionResult> {
-  const supabase = await createClient()
-  const { data, error } = await supabase.from('hall_reservations').delete().eq('id', id).select('id')
+const deleteHallReservationFn = createServerFn({ method: 'POST' })
+  .validator((id: string) => id)
+  .handler(async ({ data: id }): Promise<ActionResult> => {
+    const supabase = await createClient()
+    const { data, error } = await supabase.from('hall_reservations').delete().eq('id', id).select('id')
 
-  if (error) {
-    return { error: toMessage(error, 'No se pudo cancelar la reservación, intenta nuevamente') }
-  }
-  if (data.length === 0) {
-    return { error: 'No tienes permisos para realizar esta acción' }
-  }
+    if (error) {
+      return { error: toMessage(error, 'No se pudo cancelar la reservación, intenta nuevamente') }
+    }
+    if (data.length === 0) {
+      return { error: 'No tienes permisos para realizar esta acción' }
+    }
 
-  return { data: undefined }
-}
-
-export async function payHallReservation(
-  id: string,
-  input: PayHallReservationInput,
-): Promise<ActionResult<{ transaction_id: string }>> {
-  const parsed = payHallReservationSchema.safeParse(input)
-  if (!parsed.success) {
-    return { error: 'Revisa los campos del formulario' }
-  }
-
-  const { occurred_on, folio, payment_method, reference, notes } = parsed.data
-  const supabase = await createClient()
-  const { data, error } = await supabase.rpc('pay_hall_reservation', {
-    p_reservation_id: id,
-    p_occurred_on: occurred_on,
-    p_folio: folio,
-    p_payment_method: payment_method,
-    p_reference: reference || undefined,
-    p_notes: notes || undefined,
+    return { data: undefined }
   })
 
-  if (error) {
-    return { error: toResolutionMessage(error, 'No se pudo registrar el pago, intenta nuevamente') }
-  }
+export const deleteHallReservation = (id: string) => deleteHallReservationFn({ data: id })
 
-  return { data: { transaction_id: data } }
-}
+const payHallReservationFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: PayHallReservationInput }) => data)
+  .handler(async ({ data: { id, input } }): Promise<ActionResult<{ transaction_id: string }>> => {
+    const parsed = payHallReservationSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
 
-export async function cancelHallReservation(
-  id: string,
-  input: CancelHallReservationInput,
-): Promise<ActionResult> {
-  const parsed = cancelHallReservationSchema.safeParse(input)
-  if (!parsed.success) {
-    return { error: 'Revisa los campos del formulario' }
-  }
+    const { occurred_on, folio, payment_method, reference, notes } = parsed.data
+    const supabase = await createClient()
+    const { data, error } = await supabase.rpc('pay_hall_reservation', {
+      p_reservation_id: id,
+      p_occurred_on: occurred_on,
+      p_folio: folio,
+      p_payment_method: payment_method,
+      p_reference: reference || undefined,
+      p_notes: notes || undefined,
+    })
 
-  const { refund_amount, occurred_on, payment_method, reference, notes } = parsed.data
-  const supabase = await createClient()
-  const { error } = await supabase.rpc('cancel_hall_reservation', {
-    p_reservation_id: id,
-    p_refund_amount: refund_amount,
-    p_occurred_on: occurred_on,
-    p_payment_method: payment_method,
-    p_reference: reference || undefined,
-    p_notes: notes || undefined,
+    if (error) {
+      return { error: toResolutionMessage(error, 'No se pudo registrar el pago, intenta nuevamente') }
+    }
+
+    return { data: { transaction_id: data } }
   })
 
-  if (error) {
-    return { error: toResolutionMessage(error, 'No se pudo cancelar la reservación, intenta nuevamente') }
-  }
+export const payHallReservation = (id: string, input: PayHallReservationInput) =>
+  payHallReservationFn({ data: { id, input } })
 
-  return { data: undefined }
-}
+const cancelHallReservationFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: CancelHallReservationInput }) => data)
+  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+    const parsed = cancelHallReservationSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
+
+    const { refund_amount, occurred_on, payment_method, reference, notes } = parsed.data
+    const supabase = await createClient()
+    const { error } = await supabase.rpc('cancel_hall_reservation', {
+      p_reservation_id: id,
+      p_refund_amount: refund_amount,
+      p_occurred_on: occurred_on,
+      p_payment_method: payment_method,
+      p_reference: reference || undefined,
+      p_notes: notes || undefined,
+    })
+
+    if (error) {
+      return { error: toResolutionMessage(error, 'No se pudo cancelar la reservación, intenta nuevamente') }
+    }
+
+    return { data: undefined }
+  })
+
+export const cancelHallReservation = (id: string, input: CancelHallReservationInput) =>
+  cancelHallReservationFn({ data: { id, input } })

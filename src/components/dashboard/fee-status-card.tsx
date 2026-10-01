@@ -1,5 +1,3 @@
-'use client'
-
 import { useQuery } from '@tanstack/react-query'
 import { CalendarOffIcon, CoinsIcon } from 'lucide-react'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
