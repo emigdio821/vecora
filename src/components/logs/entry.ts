@@ -12,13 +12,13 @@ export type RowData = Record<string, unknown>
 /** Same order as the sidebar so the filter feels familiar. */
 export const SECTION_LABEL: Record<string, string> = {
   transactions: 'Movimientos',
-  transaction_categories: 'Categorías',
+  transaction_categories: 'Categorías de movimientos',
   periods: 'Periodos',
   hall_reservations: 'Terraza',
   maintenance_requests: 'Mantenimiento',
   security_requests: 'Seguridad',
   user_roles: 'Mesa directiva',
-  profiles: 'Cuentas',
+  profiles: 'Cuentas de acceso',
   properties: 'Casas',
   residents: 'Residentes',
   property_residents: 'Casas y residentes',
@@ -197,23 +197,23 @@ const FIELD_LABEL: Record<string, string> = {
   rejection_reason: 'Motivo del rechazo',
   transaction_id: 'Movimiento',
   hall_reservation_id: 'Reservación de terraza',
-  created_by: 'Creó',
-  granted_by: 'Otorgó',
-  resolved_by: 'Resolvió',
-  resolved_at: 'Resuelta',
-  cancelled_at: 'Cancelada',
-  cancelled_by: 'Canceló',
-  deleted_at: 'Eliminada',
-  deleted_by: 'Eliminó',
-  created_at: 'Creada',
+  created_by: 'Registrado por',
+  granted_by: 'Otorgado por',
+  resolved_by: 'Resuelto por',
+  resolved_at: 'Fecha de resolución',
+  cancelled_at: 'Fecha de cancelación',
+  cancelled_by: 'Cancelado por',
+  deleted_at: 'Fecha de eliminación',
+  deleted_by: 'Eliminado por',
+  created_at: 'Fecha de registro',
 }
 
 export function fieldLabel(field: string) {
   return FIELD_LABEL[field] ?? field
 }
 
-/** Bookkeeping columns the admin never needs to see. */
-const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton'])
+/** Bookkeeping columns nobody needs to see; `key` is a category's internal code. */
+const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton', 'key'])
 
 const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee'])
 const DAY_FIELDS = new Set(['occurred_on', 'requested_on', 'reserved_on', 'starts_on', 'ends_on'])

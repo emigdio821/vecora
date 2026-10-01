@@ -17,8 +17,8 @@ function LogsPage() {
       <div className="flex flex-col gap-1">
         <h1 className="font-heading text-base font-semibold">Historial</h1>
         <p className="text-sm text-muted-foreground">
-          Todo lo que se ha creado, editado o eliminado en la aplicación, quién lo hizo y cuándo. No se puede
-          modificar.
+          Aquí queda registrado cada cambio en la aplicación: qué se hizo, quién lo hizo y cuándo. Nadie puede
+          editar ni borrar este historial.
         </p>
       </div>
 
