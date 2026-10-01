@@ -13,8 +13,8 @@
 -- 10 residents (the 4 board members above + 6 without an account), phones
 -- +523139612222 upward. The admin runs the app and is not a resident. 20
 -- houses A1–D5; some empty, one resident without a house. One
--- period for the current year with some fee payments, an expense, and a few
--- maintenance / security requests in every status.
+-- period for the current year with fee payments and expenses every month
+-- since January, and a few maintenance / security requests in every status.
 --
 -- Every step runs *as* the board member who would do it in the app
 -- (pg_temp.act_as), so created_by and the "Historial" identity are right, and
@@ -77,6 +77,13 @@ declare
   v_period_id      uuid;
   v_maintenance_id uuid;
   v_cameras_id     uuid;
+
+  -- for the "Recibo CFE <mes>" notes of the back-filled months
+  months  constant text[] := array['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                                   'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  v_month date;
+  v_house record;
+  v_folio int := 0;
 
   -- when the seeded activity "happened"; steps below add to it
   t timestamptz := now() - interval '45 days';
@@ -207,6 +214,68 @@ begin
   t := t + interval '2 days 3 hours';
   perform pg_temp.mark(t);
 
+  -- the months before this one, from the paper book: each occupied house's
+  -- fee, the gardener, the electricity bill and a few repairs, so the
+  -- dashboard chart has every month since January
+  v_month := year_start;
+  while v_month < this_month loop
+    for v_house in
+      select * from (values
+        ('A1', 3,  'cash'),
+        ('A2', 5,  'transfer'),
+        ('A3', 8,  'cash'),
+        ('B1', 2,  'transfer'),
+        ('B2', 9,  'cash'),
+        ('C1', 14, 'cash')  -- the tenant always pays after the 10th: the RPC adds the recargo
+      ) as v(number, day, method)
+      order by v.day
+    loop
+      -- A1 and B1 pay last month further down; C1 fell behind in July and August
+      continue when v_month = prev_month and v_house.number in ('A1', 'B1');
+      continue when v_house.number = 'C1' and extract(month from v_month) in (7, 8);
+
+      v_folio := v_folio + 1;
+      perform public.record_fee_payment(
+        (select id from public.properties where number = v_house.number),
+        array[v_month], v_month + (v_house.day - 1), lpad(v_folio::text, 4, '0'),
+        v_house.method::public.payment_method,
+        case when v_house.method = 'transfer' then 'SPEI ' || (7700000 + v_folio) end);
+      t := t + interval '2 minutes';
+      perform pg_temp.mark(t);
+    end loop;
+
+    insert into public.transactions (kind, category_id, period_id, amount, occurred_on, payment_method, description)
+    values ('expense', (select id from public.transaction_categories where name = 'Jardinería'), v_period_id,
+            1200, v_month + 4, 'cash', 'Jardinería mensual');
+    t := t + interval '2 minutes';
+    perform pg_temp.mark(t);
+
+    -- last month's bill is the one entered further down; summer bills run higher
+    if v_month < prev_month then
+      insert into public.transactions (kind, category_id, period_id, amount, occurred_on, payment_method, reference, description, notes)
+      values ('expense', (select id from public.transaction_categories where name = 'Servicios'), v_period_id,
+              950 + 40 * extract(month from v_month)::int, v_month + 11, 'transfer', 'CFE ' || to_char(v_month, 'YYYYMM'),
+              'Luz de áreas comunes',
+              'Recibo CFE ' || months[extract(month from v_month - interval '1 month')::int]);
+      t := t + interval '2 minutes';
+      perform pg_temp.mark(t);
+    end if;
+
+    insert into public.transactions (kind, category_id, period_id, amount, occurred_on, payment_method, description)
+    select 'expense', (select id from public.transaction_categories where name = r.category), v_period_id,
+           r.amount, v_month + 17, 'cash', r.description
+    from (values
+      (3, 'Mantenimiento', 650,  'Reparación de la bomba de agua'),
+      (4, 'Vigilancia',    1800, 'Mantenimiento de cámaras'),
+      (6, 'Mantenimiento', 2400, 'Impermeabilización de la caseta')
+    ) as r(month, category, amount, description)
+    where r.month = extract(month from v_month);
+    t := t + interval '2 minutes';
+    perform pg_temp.mark(t);
+
+    v_month := (v_month + interval '1 month')::date;
+  end loop;
+
   -- A1 pays two months in cash on one paper receipt
   perform public.record_fee_payment(
     (select id from public.properties where number = 'A1'),
@@ -319,7 +388,7 @@ begin
   perform pg_temp.act_as(u_treasurer);
 
   update public.transactions set notes = 'Recibo CFE, periodo Agosto–Septiembre'
-  where description = 'Luz de áreas comunes';
+  where reference = 'CFE 0045612';
   t := now() - interval '3 hours';
   perform pg_temp.mark(t);
 
