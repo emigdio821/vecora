@@ -22,6 +22,7 @@ export function BoardMembersDataTableHeader({ table, viewer }: BoardMembersDataT
   const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isAddOpen, setAddOpen] = useState(false)
   const [invite, setInvite] = useState<InviteResult | null>(null)
+  const [isInviteDialogOpen, setInviteDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useQueryState('search-board', parseAsString.withDefault(''))
   const tableRowsLength = table.getCoreRowModel().rows.length
 
@@ -35,12 +36,20 @@ export function BoardMembersDataTableHeader({ table, viewer }: BoardMembersDataT
         open={isAddOpen}
         onOpenChange={setAddOpen}
         canGrantAdmin={viewer.isAdmin}
-        onInvited={setInvite}
+        onInvited={(result) => {
+          setInvite(result)
+          setInviteDialogOpen(true)
+        }}
       />
       <InviteLinkDialog
         invite={invite}
-        onOpenChange={(open) => {
-          if (!open) setInvite(null)
+        open={isInviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+        // Keep the invite until the close animation ends, so the name doesn't vanish mid-fade.
+        onOpenChangeComplete={(open) => {
+          if (!open) {
+            setInvite(null)
+          }
         }}
       />
 
