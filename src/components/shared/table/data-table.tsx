@@ -27,6 +27,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import type { DataTableFeatures } from './features'
@@ -48,8 +49,12 @@ interface DataTableProps<TData extends RowData> {
    */
   tableId?: string
   emptyMessage?: string
+  /** Skeleton rows in the body while the header and column titles stay usable. */
+  isLoading?: boolean
   className?: string
 }
+
+const LOADING_ROWS = 5
 
 export function DataTable<TData extends RowData>({
   data,
@@ -60,6 +65,7 @@ export function DataTable<TData extends RowData>({
   getRowId,
   tableId,
   emptyMessage = 'Sin resultados.',
+  isLoading = false,
   className,
 }: DataTableProps<TData>) {
   // Page lives in the URL (1-based there, 0-based here) so a refresh keeps it.
@@ -154,23 +160,35 @@ export function DataTable<TData extends RowData>({
             </TableHeader>
 
             <TableBody>
-              {rows.length ? (
-                rows.map((row) => (
-                  <TableRow data-state={row.getIsSelected() ? 'selected' : undefined} key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              {isLoading &&
+                Array.from({ length: LOADING_ROWS }, (_, index) => (
+                  <TableRow className="hover:bg-transparent" key={index}>
+                    {table.getVisibleLeafColumns().map((column) => (
+                      <TableCell key={column.id}>
+                        <Skeleton className="h-4 w-full max-w-32" />
                       </TableCell>
                     ))}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell className="h-24 text-center" colSpan={columns.length}>
-                    {emptyMessage}
-                  </TableCell>
-                </TableRow>
-              )}
+                ))}
+
+              {!isLoading &&
+                (rows.length ? (
+                  rows.map((row) => (
+                    <TableRow data-state={row.getIsSelected() ? 'selected' : undefined} key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell className="h-24 text-center" colSpan={columns.length}>
+                      {emptyMessage}
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
 

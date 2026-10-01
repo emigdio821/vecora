@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
-import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/shared/table/data-table'
 import { logEntriesQueryOptions } from '@/tanstack-queries/logs'
 import { entryAction, identityName } from '../entry'
@@ -32,10 +31,6 @@ export function LogsDataTable() {
     return <TanstackQueryError refetch={refetch} />
   }
 
-  if (isLoading) {
-    return <TableGenericSkeleton />
-  }
-
   return (
     <DataTable
       data={visible}
@@ -45,6 +40,7 @@ export function LogsDataTable() {
       initialSorting={[{ id: 'occurred_at', desc: true }]}
       header={(table) => <LogsDataTableHeader table={table} />}
       emptyMessage="Sin cambios en estas fechas."
+      isLoading={isLoading}
     />
   )
 }
