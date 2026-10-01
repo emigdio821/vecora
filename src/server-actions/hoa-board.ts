@@ -60,7 +60,10 @@ async function createInviteLink(
         email,
         options: { data: { full_name: fullName } },
       })
-  if (error) return { error }
+  if (error) {
+    console.error('generateLink failed', error)
+    return { error }
+  }
 
   const origin = getRequestHeader('origin') ?? getRequestUrl({ xForwardedHost: true }).origin
   const url = new URL('/auth/confirm', origin)
