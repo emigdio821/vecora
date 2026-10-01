@@ -315,6 +315,12 @@ const setPasswordFn = createServerFn({ method: 'POST' })
       }
     }
 
+    // Sign out every other device. Auth already ends the other sessions on a
+    // password change, but keeps the link session we just replaced, and does
+    // nothing on the same_password path.
+    const { error: signOutError } = await supabase.auth.signOut({ scope: 'others' })
+    if (signOutError) console.error('signOut others failed', signOutError)
+
     return { data: undefined }
   })
 
