@@ -12,14 +12,16 @@ export function capitalize(value: string): string {
 }
 
 /**
- * Spanish, but with capitalized months ("Septiembre 2026", "12 Sep 2026")
- * across the app. Use it instead of date-fns's `es` for every format.
+ * Spanish, but with capitalized months and days ("Septiembre 2026",
+ * "12 Sep 2026", "Lunes", "Lu") across the app. Use it instead of date-fns's
+ * `es` for every format.
  */
 export const esLocale: Locale = {
   ...es,
   localize: {
     ...es.localize,
     month: (month, options) => capitalize(es.localize.month(month, options)),
+    day: (day, options) => capitalize(es.localize.day(day, options)),
   },
 }
 
