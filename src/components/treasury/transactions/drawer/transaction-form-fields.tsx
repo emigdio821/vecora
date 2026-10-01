@@ -1,5 +1,3 @@
-'use client'
-
 import { useQuery } from '@tanstack/react-query'
 import { addYears, format, parseISO, subYears } from 'date-fns'
 import { ChevronsUpDownIcon } from 'lucide-react'

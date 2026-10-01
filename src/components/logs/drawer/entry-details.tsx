@@ -1,5 +1,3 @@
-'use client'
-
 import { ArrowRightIcon, LayersIcon, ListIcon, ScrollTextIcon } from 'lucide-react'
 import { CollapsibleSection, Detail, Muted } from '@/components/shared/details'
 import { Badge } from '@/components/ui/badge'
@@ -35,6 +33,11 @@ interface EntryDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
   onOpenChange: (open: boolean) => void
 }
 
+function changesTitle(entry: LogEntryQueryData) {
+  if (entry.operation === 'update') return 'Qué cambió'
+  return entry.operation === 'insert' ? 'Datos registrados' : 'Datos eliminados'
+}
+
 /** Read-only: the log can't be changed from the app. */
 export function EntryDetailsDrawer({
   entry,
@@ -49,17 +52,19 @@ export function EntryDetailsDrawer({
 
   return (
     <Drawer position="right" open={open} onOpenChange={onOpenChange} {...props}>
-      <DrawerPopup variant="inset">
+      <DrawerPopup variant="inset" className="max-w-lg">
         <DrawerHeader>
           <DrawerTitle>{entrySummary(entry)}</DrawerTitle>
-          <DrawerDescription>Detalle del cambio</DrawerDescription>
+          <DrawerDescription>
+            {identityName(entry)} {ACTION_LABEL[action].toLowerCase()} esto el {formatDate(entry.occurred_at)}
+          </DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<ScrollTextIcon />} title="Cambio">
+          <CollapsibleSection icon={<ScrollTextIcon />} title="Resumen">
             <div className="grid grid-cols-2 gap-3">
-              <Detail label="Identidad">{identityName(entry)}</Detail>
-              <Detail label="Fecha y hora">
+              <Detail label="Quién">{identityName(entry)}</Detail>
+              <Detail label="Cuándo">
                 <span className="tabular-nums">{formatDate(entry.occurred_at)}</span>
               </Detail>
               <Detail label="Acción">
@@ -71,11 +76,7 @@ export function EntryDetailsDrawer({
             </div>
           </CollapsibleSection>
 
-          <CollapsibleSection
-            icon={<ListIcon />}
-            title={isUpdate ? 'Campos que cambiaron' : 'Datos'}
-            count={changes.length}
-          >
+          <CollapsibleSection icon={<ListIcon />} title={changesTitle(entry)} count={changes.length}>
             {changes.length ? (
               <dl className="grid gap-3">
                 {changes.map(({ field, before, after }) => (
@@ -106,15 +107,21 @@ export function EntryDetailsDrawer({
           </CollapsibleSection>
 
           {related.length > 0 && (
-            <CollapsibleSection icon={<LayersIcon />} title="Cambios relacionados" count={related.length}>
-              <ul className="grid gap-2 text-sm">
+            <CollapsibleSection icon={<LayersIcon />} title="Hecho al mismo tiempo" count={related.length}>
+              <p className="mb-3 text-sm text-muted-foreground">
+                Otros cambios que se guardaron junto con este. Por ejemplo, al pagar una solicitud también se
+                registra su movimiento.
+              </p>
+              <ul className="grid gap-3 text-sm">
                 {related.map((other) => {
                   const otherAction = entryAction(other)
                   return (
-                    <li key={other.id} className="flex flex-wrap items-center gap-2">
-                      <Badge variant={ACTION_BADGE_VARIANT[otherAction]}>{ACTION_LABEL[otherAction]}</Badge>
-                      <Badge variant="outline">{sectionLabel(other.table_name)}</Badge>
-                      <span className="truncate">{entrySummary(other)}</span>
+                    <li key={other.id} className="grid gap-1">
+                      <span className="flex flex-wrap gap-2">
+                        <Badge variant={ACTION_BADGE_VARIANT[otherAction]}>{ACTION_LABEL[otherAction]}</Badge>
+                        <Badge variant="outline">{sectionLabel(other.table_name)}</Badge>
+                      </span>
+                      <span className="min-w-0 wrap-break-word">{entrySummary(other)}</span>
                     </li>
                   )
                 })}

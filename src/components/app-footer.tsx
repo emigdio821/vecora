@@ -1,6 +1,7 @@
+import { useToday } from '@/hooks/use-today'
+
 export function AppFooter() {
-  // oxlint-disable-next-line react/purity -- server component: renders once, never re-renders
-  const year = new Date().getFullYear()
+  const year = useToday().getFullYear()
 
   return (
     <footer className="mt-auto flex items-center justify-center gap-2 p-4 sm:p-6">

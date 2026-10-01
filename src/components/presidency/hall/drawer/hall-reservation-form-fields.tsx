@@ -1,5 +1,3 @@
-'use client'
-
 import { useQuery } from '@tanstack/react-query'
 import { addYears, format, parseISO, startOfToday } from 'date-fns'
 import { ChevronsUpDownIcon, TriangleAlertIcon } from 'lucide-react'

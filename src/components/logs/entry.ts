@@ -12,13 +12,13 @@ export type RowData = Record<string, unknown>
 /** Same order as the sidebar so the filter feels familiar. */
 export const SECTION_LABEL: Record<string, string> = {
   transactions: 'Movimientos',
-  transaction_categories: 'Categorías',
+  transaction_categories: 'Categorías de movimientos',
   periods: 'Periodos',
   hall_reservations: 'Terraza',
   maintenance_requests: 'Mantenimiento',
   security_requests: 'Seguridad',
   user_roles: 'Mesa directiva',
-  profiles: 'Cuentas',
+  profiles: 'Cuentas de acceso',
   properties: 'Casas',
   residents: 'Residentes',
   property_residents: 'Casas y residentes',
@@ -32,7 +32,15 @@ export function sectionLabel(tableName: string) {
 }
 
 /** Derived from the operation and, for updates, from what changed. */
-export type LogAction = 'created' | 'updated' | 'deleted' | 'restored' | 'paid' | 'rejected' | 'cancelled'
+export type LogAction =
+  | 'created'
+  | 'updated'
+  | 'deleted'
+  | 'restored'
+  | 'paid'
+  | 'rejected'
+  | 'reopened'
+  | 'cancelled'
 
 export const ACTIONS: LogAction[] = [
   'created',
@@ -41,6 +49,7 @@ export const ACTIONS: LogAction[] = [
   'restored',
   'paid',
   'rejected',
+  'reopened',
   'cancelled',
 ]
 
@@ -51,6 +60,7 @@ export const ACTION_LABEL: Record<LogAction, string> = {
   restored: 'Restauró',
   paid: 'Pagó',
   rejected: 'Rechazó',
+  reopened: 'Reabrió',
   cancelled: 'Canceló',
 }
 
@@ -61,6 +71,7 @@ export const ACTION_BADGE_VARIANT: Record<LogAction, React.ComponentProps<typeof
   restored: 'secondary',
   paid: 'success',
   rejected: 'warning',
+  reopened: 'secondary',
   cancelled: 'warning',
 }
 
@@ -73,10 +84,11 @@ export function entryAction(entry: LogEntryQueryData): LogAction {
 
   // Houses, residents and transactions are soft-deleted: an update to deleted_at.
   if (changed.includes('deleted_at')) return after.deleted_at ? 'deleted' : 'restored'
-  // Requests leave "pending" only through the treasurer's RPCs.
+  // Request status changes only through the treasurer's RPCs; back to pending is a reopen.
   if (changed.includes('status')) {
     if (after.status === 'paid') return 'paid'
     if (after.status === 'rejected') return 'rejected'
+    if (after.status === 'pending') return 'reopened'
   }
   // Paid terraza bookings are cancelled, not deleted, by the treasurer's RPC.
   if (changed.includes('cancelled_at')) return 'cancelled'
@@ -111,7 +123,12 @@ export function entrySummary(entry: LogEntryQueryData): string {
   const { label } = entry
 
   switch (entry.table_name) {
-    case 'transactions':
+    case 'transactions': {
+      // Descriptions don't name the house; the movement's property does.
+      const house = refName(entry, row.property_id)
+      const summary = house ? `${label} - Casa ${house}` : label
+      return row.amount == null ? summary : `${summary} - ${formatCurrency(asText(row.amount))}`
+    }
     case 'maintenance_requests':
     case 'security_requests':
       return row.amount == null ? label : `${label} - ${formatCurrency(asText(row.amount))}`
@@ -180,23 +197,23 @@ const FIELD_LABEL: Record<string, string> = {
   rejection_reason: 'Motivo del rechazo',
   transaction_id: 'Movimiento',
   hall_reservation_id: 'Reservación de terraza',
-  created_by: 'Creó',
-  granted_by: 'Otorgó',
-  resolved_by: 'Resolvió',
-  resolved_at: 'Resuelta',
-  cancelled_at: 'Cancelada',
-  cancelled_by: 'Canceló',
-  deleted_at: 'Eliminada',
-  deleted_by: 'Eliminó',
-  created_at: 'Creada',
+  created_by: 'Registrado por',
+  granted_by: 'Otorgado por',
+  resolved_by: 'Resuelto por',
+  resolved_at: 'Fecha de resolución',
+  cancelled_at: 'Fecha de cancelación',
+  cancelled_by: 'Cancelado por',
+  deleted_at: 'Fecha de eliminación',
+  deleted_by: 'Eliminado por',
+  created_at: 'Fecha de registro',
 }
 
 export function fieldLabel(field: string) {
   return FIELD_LABEL[field] ?? field
 }
 
-/** Bookkeeping columns the admin never needs to see. */
-const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton'])
+/** Bookkeeping columns nobody needs to see; `key` is a category's internal code. */
+const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton', 'key'])
 
 const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee'])
 const DAY_FIELDS = new Set(['occurred_on', 'requested_on', 'reserved_on', 'starts_on', 'ends_on'])

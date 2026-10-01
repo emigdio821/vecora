@@ -1,5 +1,3 @@
-'use client'
-
 import { Controller, type UseFormReturn } from 'react-hook-form'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'

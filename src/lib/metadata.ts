@@ -1,4 +1,3 @@
-import type { Metadata } from 'next'
 import { siteConfig } from '@/lib/config/site'
 
 interface PageText {
@@ -15,27 +14,31 @@ export function ogImageUrl({ title, description }: PageText = {}) {
   return query ? `${siteConfig.ogUrl}?${query}` : siteConfig.ogUrl
 }
 
+/** "Residencial - Vecora"; the router has no title template, so routes build it here. */
+export function pageTitle(title?: string) {
+  return title ? `${title} - ${siteConfig.name}` : siteConfig.name
+}
+
 /**
- * Title, description and link preview for a public page. Next merges metadata
- * shallowly, so a page's openGraph/twitter replace the root layout's whole
- * objects; this rebuilds them around the page's own text and image.
+ * Title, description and link preview for a public page. The deepest route's
+ * tag wins per name/property, so these replace the root's defaults.
  */
-export function pageMetadata({ title, description }: PageText): Metadata {
+export function pageHead({ title, description }: PageText) {
   const image = ogImageUrl({ title, description })
+  const descriptionTags = description
+    ? [
+        { name: 'description', content: description },
+        { property: 'og:description', content: description },
+        { name: 'twitter:description', content: description },
+      ]
+    : []
+
   return {
-    title,
-    description,
-    openGraph: {
-      description,
-      siteName: siteConfig.name,
-      locale: 'es-MX',
-      type: 'website',
-      images: image,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      description,
-      images: [image],
-    },
+    meta: [
+      { title: pageTitle(title) },
+      ...descriptionTags,
+      { property: 'og:image', content: image },
+      { name: 'twitter:image', content: image },
+    ],
   }
 }

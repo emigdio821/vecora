@@ -1,5 +1,3 @@
-'use client'
-
 import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -18,8 +16,9 @@ import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { InviteResult } from '@/server-actions/hoa-board'
 
-interface InviteLinkDialogProps {
+interface InviteLinkDialogProps extends React.ComponentProps<typeof Dialog> {
   invite: InviteResult | null
+  open: boolean
   onOpenChange: (open: boolean) => void
 }
 
@@ -32,7 +31,7 @@ function whatsappUrl({ phone, full_name, link }: InviteResult) {
  * Hands the one-time invite link to whoever is adding the member. The link is
  * not emailed; the board shares it by WhatsApp or pastes it wherever suits.
  */
-export function InviteLinkDialog({ invite, onOpenChange }: InviteLinkDialogProps) {
+export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: InviteLinkDialogProps) {
   const [copied, setCopied] = useState(false)
 
   async function copy() {
@@ -51,7 +50,7 @@ export function InviteLinkDialog({ invite, onOpenChange }: InviteLinkDialogProps
   }
 
   return (
-    <Dialog open={invite !== null} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} disablePointerDismissal {...props}>
       <DialogPopup>
         <DialogHeader>
           <DialogTitle>Enlace de acceso para {invite?.full_name}</DialogTitle>

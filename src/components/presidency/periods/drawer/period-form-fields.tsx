@@ -1,5 +1,3 @@
-'use client'
-
 import { addDays, addYears, format, parseISO, subYears } from 'date-fns'
 import { ChevronsUpDownIcon, InfoIcon } from 'lucide-react'
 import { useState } from 'react'

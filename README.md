@@ -140,3 +140,4 @@ src/lib/validations/   zod schemas shared by forms and server actions
 - Access is invite-only: there is no sign-up page. The admin or president adds a board member in "Mesa directiva" and shares the access link; the same link is how someone resets a forgotten password.
 - Permissions are enforced by Postgres RLS; the UI hides what a role can't do, but the database is the source of truth.
 - Every insert, update and delete is recorded in `audit_log` and shown to admins in "Historial".
+- test

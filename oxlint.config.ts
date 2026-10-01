@@ -1,8 +1,14 @@
 import { defineConfig } from 'oxlint'
 
 export default defineConfig({
-  ignorePatterns: ['.claude', '.agents', '**/src/components/ui/**', '**/src/lib/supabase/database.types.ts'],
-  plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'promise', 'nextjs', 'react', 'react-perf', 'jsx-a11y'],
+  ignorePatterns: [
+    '.claude',
+    '.agents',
+    '**/src/components/ui/**',
+    '**/src/lib/supabase/database.types.ts',
+    '**/src/routeTree.gen.ts',
+  ],
+  plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'promise', 'react', 'react-perf', 'jsx-a11y'],
   rules: {
     'object-shorthand': 'error',
     'react/rules-of-hooks': 'error',

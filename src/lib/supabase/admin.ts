@@ -1,4 +1,4 @@
-import 'server-only'
+import '@tanstack/react-start/server-only'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
 

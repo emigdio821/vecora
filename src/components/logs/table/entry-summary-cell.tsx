@@ -1,5 +1,3 @@
-'use client'
-
 import type { Table } from '@tanstack/react-table'
 import { useState } from 'react'
 import type { DataTableFeatures } from '@/components/shared/table/features'

@@ -1,5 +1,3 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
 import { CircleAlertIcon } from 'lucide-react'

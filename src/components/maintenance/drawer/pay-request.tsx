@@ -1,5 +1,3 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, type UseMutationResult, useQuery, useQueryClient } from '@tanstack/react-query'
 import { addYears, format, parseISO, subYears } from 'date-fns'

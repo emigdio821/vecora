@@ -1,5 +1,4 @@
-'use server'
-
+import { createServerFn } from '@tanstack/react-start'
 import sharp from 'sharp'
 import { type ActionResult, postgrestErrorMessage } from '@/lib/action-result'
 import { getCurrentUser } from '@/lib/supabase/current-user'
@@ -10,34 +9,38 @@ import { LOGO_BUCKET, logoFileSchema, type SettingsInput, settingsSchema } from 
 const LOGO_SIZE = 512
 
 /** President (or admin) edits the residential's details. RLS enforces the role. */
-export async function updateSettings(input: SettingsInput): Promise<ActionResult> {
-  const parsed = settingsSchema.safeParse(input)
-  if (!parsed.success) {
-    return { error: 'Revisa los campos del formulario' }
-  }
-
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('settings')
-    .update(parsed.data)
-    .eq('singleton', true)
-    .select('id')
-    .maybeSingle()
-
-  if (error) {
-    return {
-      error: postgrestErrorMessage(error, {
-        fallback: 'No se pudieron guardar los ajustes, intenta nuevamente',
-      }),
+const updateSettingsFn = createServerFn({ method: 'POST' })
+  .validator((input: SettingsInput) => input)
+  .handler(async ({ data: input }): Promise<ActionResult> => {
+    const parsed = settingsSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
     }
-  }
-  // RLS filtered the row out: not president nor admin.
-  if (!data) {
-    return { error: 'No tienes permisos para realizar esta acción' }
-  }
 
-  return { data: undefined }
-}
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('settings')
+      .update(parsed.data)
+      .eq('singleton', true)
+      .select('id')
+      .maybeSingle()
+
+    if (error) {
+      return {
+        error: postgrestErrorMessage(error, {
+          fallback: 'No se pudieron guardar los ajustes, intenta nuevamente',
+        }),
+      }
+    }
+    // RLS filtered the row out: not president nor admin.
+    if (!data) {
+      return { error: 'No tienes permisos para realizar esta acción' }
+    }
+
+    return { data: undefined }
+  })
+
+export const updateSettings = (input: SettingsInput) => updateSettingsFn({ data: input })
 
 /**
  * Whatever the president uploads ends up as a light PNG: turned upright,
@@ -84,46 +87,52 @@ async function setLogoPath(path: string | null): Promise<ActionResult> {
 }
 
 /** President (or admin) uploads the residential's logo. RLS enforces the role. */
-export async function uploadLogo(formData: FormData): Promise<ActionResult> {
-  const parsed = logoFileSchema.safeParse(formData.get('logo'))
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Selecciona una imagen' }
-  }
+const uploadLogoFn = createServerFn({ method: 'POST' })
+  .validator((formData: FormData) => formData)
+  .handler(async ({ data: formData }): Promise<ActionResult> => {
+    const parsed = logoFileSchema.safeParse(formData.get('logo'))
+    if (!parsed.success) {
+      return { error: parsed.error.issues[0]?.message ?? 'Selecciona una imagen' }
+    }
 
-  // Processing the image is the expensive part: turn others away before it.
-  const user = await getCurrentUser()
-  if (!user?.roles.some((role) => role === 'president' || role === 'admin')) {
-    return { error: 'No tienes permisos para realizar esta acción' }
-  }
+    // Processing the image is the expensive part: turn others away before it.
+    const user = await getCurrentUser()
+    if (!user?.roles.some((role) => role === 'president' || role === 'admin')) {
+      return { error: 'No tienes permisos para realizar esta acción' }
+    }
 
-  let png: Buffer
-  try {
-    png = await optimizeLogo(await parsed.data.arrayBuffer())
-  } catch (error) {
-    console.error('logo optimization failed', error)
-    return { error: 'No se pudo leer la imagen, prueba con otro archivo' }
-  }
+    let png: Buffer
+    try {
+      png = await optimizeLogo(await parsed.data.arrayBuffer())
+    } catch (error) {
+      console.error('logo optimization failed', error)
+      return { error: 'No se pudo leer la imagen, prueba con otro archivo' }
+    }
 
-  // A new name every time, so no cache ever serves the previous logo.
-  const path = `logo-${Date.now()}.png`
-  const supabase = await createClient()
-  const { error: uploadError } = await supabase.storage
-    .from(LOGO_BUCKET)
-    .upload(path, png, { contentType: 'image/png', cacheControl: '31536000' })
+    // A new name every time, so no cache ever serves the previous logo.
+    const path = `logo-${Date.now()}.png`
+    const supabase = await createClient()
+    const { error: uploadError } = await supabase.storage
+      .from(LOGO_BUCKET)
+      .upload(path, png, { contentType: 'image/png', cacheControl: '31536000' })
 
-  if (uploadError) {
-    console.error('logo upload failed', uploadError)
-    return { error: 'No se pudo subir el logo, intenta nuevamente' }
-  }
+    if (uploadError) {
+      console.error('logo upload failed', uploadError)
+      return { error: 'No se pudo subir el logo, intenta nuevamente' }
+    }
 
-  const result = await setLogoPath(path)
-  if (result.error !== undefined) {
-    await supabase.storage.from(LOGO_BUCKET).remove([path])
-  }
+    const result = await setLogoPath(path)
+    if (result.error !== undefined) {
+      await supabase.storage.from(LOGO_BUCKET).remove([path])
+    }
 
-  return result
-}
+    return result
+  })
 
-export async function removeLogo(): Promise<ActionResult> {
-  return setLogoPath(null)
-}
+export const uploadLogo = (formData: FormData) => uploadLogoFn({ data: formData })
+
+const removeLogoFn = createServerFn({ method: 'POST' }).handler((): Promise<ActionResult> =>
+  setLogoPath(null),
+)
+
+export const removeLogo = () => removeLogoFn()

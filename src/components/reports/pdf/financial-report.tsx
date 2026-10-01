@@ -1,20 +1,21 @@
-import { join } from 'node:path'
 import { Document, Font, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns'
-import { es } from 'date-fns/locale'
 import type { FinancialReport } from '@/lib/supabase/financial-report'
-import { formatCurrency, formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
+import { capitalize, esLocale, formatCurrency, formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
+import geistRegularUrl from '../../../../assets/fonts/Geist-Regular.ttf?inline'
+import geistSemiBoldUrl from '../../../../assets/fonts/Geist-SemiBold.ttf?inline'
 
 // Rendered on the server by /reports/pdf. Only react-pdf primitives here: no
 // DOM, no Tailwind.
 
-// Geist, like the app. next/font only serves woff2 to the browser, so the TTFs
-// live in assets/fonts; react-pdf embeds just the glyphs the report uses.
+// Geist, like the app. The app's fontsource package only ships woff2, so the
+// TTFs live in assets/fonts, bundled as data URLs; react-pdf embeds just the
+// glyphs the report uses.
 Font.register({
   family: 'Geist',
   fonts: [
-    { src: join(process.cwd(), 'assets/fonts/Geist-Regular.ttf'), fontWeight: 400 },
-    { src: join(process.cwd(), 'assets/fonts/Geist-SemiBold.ttf'), fontWeight: 600 },
+    { src: geistRegularUrl, fontWeight: 400 },
+    { src: geistSemiBoldUrl, fontWeight: 600 },
   ],
 })
 
@@ -161,10 +162,6 @@ function Table<T>({ columns, rows, emptyText, total, repeatHeader }: TableProps<
   )
 }
 
-function capitalize(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1)
-}
-
 /** The range covers exactly one calendar month, e.g. 2026-08-01 to 2026-08-31. */
 export function isWholeMonth(from: string, to: string): boolean {
   const start = parseISO(from)
@@ -173,7 +170,7 @@ export function isWholeMonth(from: string, to: string): boolean {
 
 /** "Agosto 2026" for a whole month, "1 ago 2026 – 15 ago 2026" otherwise. */
 export function rangeLabel(from: string, to: string): string {
-  if (isWholeMonth(from, to)) return capitalize(formatMonth(from))
+  if (isWholeMonth(from, to)) return formatMonth(from)
   if (from === to) return formatDay(from)
   return `${formatDay(from)} – ${formatDay(to)}`
 }
@@ -184,6 +181,14 @@ const generatedAtFormatter = new Intl.DateTimeFormat('es-MX', {
   timeStyle: 'short',
   timeZone: 'America/Mexico_City',
 })
+
+/** "1 de Octubre de 2026, 9:19", months capitalized like the rest of the app. */
+function formatGeneratedAt(date: Date): string {
+  return generatedAtFormatter
+    .formatToParts(date)
+    .map((part) => (part.type === 'month' ? capitalize(part.value) : part.value))
+    .join('')
+}
 
 function byHouse(a: string, b: string): number {
   return a.localeCompare(b, 'es', { numeric: true })
@@ -215,12 +220,12 @@ function monthRuns(months: string[]): string {
 
   return runs
     .map(({ first, last }) => {
-      if (first === last) return capitalize(formatMonth(first))
+      if (first === last) return formatMonth(first)
       const firstLabel =
         first.slice(0, 4) === last.slice(0, 4)
-          ? format(parseISO(first), 'MMMM', { locale: es })
+          ? format(parseISO(first), 'MMMM', { locale: esLocale })
           : formatMonth(first)
-      return `${capitalize(firstLabel)} – ${capitalize(formatMonth(last))}`
+      return `${firstLabel} – ${formatMonth(last)}`
     })
     .join(', ')
 }
@@ -335,7 +340,7 @@ export function FinancialReportDocument({
 
         <View style={styles.footer} fixed>
           <Text>
-            Generado el {generatedAtFormatter.format(generatedAt)} por {generatedBy}
+            Generado el {formatGeneratedAt(generatedAt)} por {generatedBy}
           </Text>
           <Text render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`} />
         </View>

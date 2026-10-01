@@ -13,12 +13,6 @@
       "skillPath": "apps/ui/skills/coss-particles/SKILL.md",
       "computedHash": "fd04aeb6c61c0f3271bc124d63d40b21594cb694178df49575d309cec2a4eda5"
     },
-    "next-cache-components-optimizer": {
-      "source": "vercel/next.js",
-      "sourceType": "github",
-      "skillPath": "skills/next-cache-components-optimizer/SKILL.md",
-      "computedHash": "c62f6c13119c4e9027268edaa07291c33d74a676e1bd93583349c07efd990f6b"
-    },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",

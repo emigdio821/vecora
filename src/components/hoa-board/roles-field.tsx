@@ -1,5 +1,3 @@
-'use client'
-
 import { Controller, type FieldValues, type Path, type UseFormReturn } from 'react-hook-form'
 import { Checkbox } from '@/components/ui/checkbox'
 import { CheckboxGroup } from '@/components/ui/checkbox-group'

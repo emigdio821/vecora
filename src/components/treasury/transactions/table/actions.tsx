@@ -1,5 +1,3 @@
-'use client'
-
 import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'

@@ -790,6 +790,8 @@ export type Database = {
       }
       reject_maintenance_request: { Args: { p_reason: string; p_request_id: string }; Returns: undefined }
       reject_security_request: { Args: { p_reason: string; p_request_id: string }; Returns: undefined }
+      reopen_maintenance_request: { Args: { p_request_id: string }; Returns: undefined }
+      reopen_security_request: { Args: { p_request_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: 'admin' | 'president' | 'treasurer' | 'security' | 'maintenance'

@@ -1,5 +1,3 @@
-'use client'
-
 import { areaY, d3Curve, defineChart, lineY } from '@tanstack/charts'
 import { crosshair } from '@tanstack/charts/crosshair'
 import { decorative } from '@tanstack/charts/mark/decorative'
@@ -9,11 +7,10 @@ import { scaleOrdinal } from '@tanstack/charts/scales/ordinal'
 import { scalePoint } from '@tanstack/charts/scales/point'
 import { tooltip } from '@tanstack/charts/tooltip'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { curveMonotoneX } from 'd3-shape'
 import { eachMonthOfInterval, format, parseISO } from 'date-fns'
-import { es } from 'date-fns/locale'
 import { CalendarOffIcon, ChartAreaIcon } from 'lucide-react'
-import Link from 'next/link'
 import { useMemo } from 'react'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import { Button } from '@/components/ui/button'
@@ -36,7 +33,7 @@ import {
 } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToday } from '@/hooks/use-today'
-import { cn, formatCurrency, ISO_DAY } from '@/lib/utils'
+import { cn, esLocale, formatCurrency, ISO_DAY } from '@/lib/utils'
 import {
   type PeriodMovementQueryData,
   type PeriodQueryData,
@@ -140,7 +137,7 @@ export function TreasuryCard() {
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
-                <Button variant="outline" render={<Link href="/presidency?tab=periods" />}>
+                <Button variant="outline" render={<Link to="/presidency" search={{ tab: 'periods' }} />}>
                   Ir a Periodos
                 </Button>
               </EmptyContent>
@@ -250,7 +247,7 @@ function MonthlyFlowChart({ period, today }: { period: PeriodQueryData; today: s
             scale: () => scalePoint<string>().padding(0.25),
             axis: {
               line: false,
-              ticks: { size: 0, format: (month) => format(monthDate(month), 'MMM', { locale: es }) },
+              ticks: { size: 0, format: (month) => format(monthDate(month), 'MMM', { locale: esLocale }) },
             },
           },
           y: {
@@ -270,7 +267,7 @@ function MonthlyFlowChart({ period, today }: { period: PeriodQueryData; today: s
           placement: ['right', 'left', 'top'],
           sort: 'color-domain',
           content: (points) => ({
-            title: format(monthDate(String(points[0]?.xValue ?? '')), 'MMMM yyyy', { locale: es }),
+            title: format(monthDate(String(points[0]?.xValue ?? '')), 'MMMM yyyy', { locale: esLocale }),
             rows: points.map((point) => ({
               label: String(point.groupLabel),
               value: formatCurrency(point.datum.amount),
@@ -308,7 +305,7 @@ function MonthlyFlowChart({ period, today }: { period: PeriodQueryData; today: s
         <tbody>
           {months.map((t) => (
             <tr key={t.month}>
-              <th scope="row">{format(monthDate(t.month), 'MMMM yyyy', { locale: es })}</th>
+              <th scope="row">{format(monthDate(t.month), 'MMMM yyyy', { locale: esLocale })}</th>
               <td>{formatCurrency(t.income)}</td>
               <td>{formatCurrency(t.expense)}</td>
             </tr>

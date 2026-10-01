@@ -1,5 +1,3 @@
-'use client'
-
 import { CalendarPlusIcon, HistoryIcon, NotebookPenIcon, UsersIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'

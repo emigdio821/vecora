@@ -1,7 +1,7 @@
 import { defineConfig } from 'oxfmt'
 
 export default defineConfig({
-  ignore: ['.claude', '.agents'],
+  ignorePatterns: ['.claude', '.agents', '**/src/routeTree.gen.ts'],
   tabWidth: 2,
   semi: false,
   useTabs: false,
@@ -13,7 +13,7 @@ export default defineConfig({
   },
   sortTailwindcss: {
     preserveWhitespace: false,
-    stylesheet: './src/app/globals.css',
+    stylesheet: './src/styles/globals.css',
     functions: ['clsx', 'cva', 'tw', 'tw.*', 'cn'],
     attributes: ['className', 'iconClassName', 'class'],
   },

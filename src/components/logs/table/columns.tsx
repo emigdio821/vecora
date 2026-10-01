@@ -27,7 +27,7 @@ export const logsTableColumns = columnHelper.columns([
   columnHelper.accessor((row) => identityName(row), {
     id: 'identity',
     size: 160,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Identidad" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title="Quién" />,
     cell: ({ getValue }) => <span className="truncate">{getValue()}</span>,
   }),
 

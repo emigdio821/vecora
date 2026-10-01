@@ -1,8 +1,6 @@
-'use client'
-
 import { useQuery } from '@tanstack/react-query'
+import { Link, type LinkOptions, linkOptions } from '@tanstack/react-router'
 import { ReceiptTextIcon } from 'lucide-react'
-import Link from 'next/link'
 import { hallReservationStatus } from '@/components/presidency/hall/status'
 import { KIND_LABEL as SECURITY_KIND_LABEL } from '@/components/security/kind'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
@@ -23,8 +21,8 @@ import { securityRequestsQueryOptions } from '@/tanstack-queries/security'
 
 interface PaymentRequest {
   key: string
-  href: '/maintenance' | '/security' | '/presidency?tab=hall'
-  area: string
+  link: LinkOptions
+  section: string
   title: string
   amount: number
   requested_on: string
@@ -37,7 +35,7 @@ function pendingDescription(pending: number): string {
 
 /**
  * What the treasurer still has to pay or collect across "Mantenimiento",
- * "Seguridad" and "Terraza", oldest first. Resolved ones live in each area.
+ * "Seguridad" and "Terraza", oldest first. Resolved ones live in each section.
  */
 export function PaymentRequestsCard() {
   const maintenance = useQuery(maintenanceRequestsQueryOptions())
@@ -55,8 +53,8 @@ export function PaymentRequestsCard() {
       .filter((r) => r.status === 'pending')
       .map((r) => ({
         key: `maintenance-${r.id}`,
-        href: '/maintenance' as const,
-        area: 'Mantenimiento',
+        link: linkOptions({ to: '/maintenance' }),
+        section: 'Mantenimiento',
         title: r.title,
         amount: r.amount,
         requested_on: r.requested_on,
@@ -65,8 +63,8 @@ export function PaymentRequestsCard() {
       .filter((r) => r.status === 'pending')
       .map((r) => ({
         key: `security-${r.id}`,
-        href: '/security' as const,
-        area: `Seguridad - ${SECURITY_KIND_LABEL[r.kind]}`,
+        link: linkOptions({ to: '/security' }),
+        section: `Seguridad - ${SECURITY_KIND_LABEL[r.kind]}`,
         title: r.title,
         amount: r.amount,
         requested_on: r.requested_on,
@@ -75,8 +73,8 @@ export function PaymentRequestsCard() {
       .filter((r) => hallReservationStatus(r) === 'pending')
       .map((r) => ({
         key: `hall-${r.id}`,
-        href: '/presidency?tab=hall' as const,
-        area: 'Terraza',
+        link: linkOptions({ to: '/presidency', search: { tab: 'hall' } }),
+        section: 'Terraza',
         title: `Tarifa de terraza - Casa ${r.property.number}`,
         amount: Number(r.amount),
         requested_on: r.reserved_on,
@@ -100,11 +98,11 @@ export function PaymentRequestsCard() {
                 <li key={request.key} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
                   <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <span className="grid min-w-0 gap-0.5">
-                      <Link href={request.href} className="truncate font-medium hover:underline">
+                      <Link {...request.link} className="truncate font-medium hover:underline">
                         {request.title}
                       </Link>
                       <span className="truncate text-xs text-muted-foreground">
-                        {request.area} - {formatDay(request.requested_on)}
+                        {request.section} - {formatDay(request.requested_on)}
                       </span>
                     </span>
                     <span className="shrink-0 font-medium tabular-nums">

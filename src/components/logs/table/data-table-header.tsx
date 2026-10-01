@@ -126,7 +126,7 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
                 </Button>
               }
             />
-            <TooltipContent>Buscar por resumen, identidad o sección</TooltipContent>
+            <TooltipContent>Buscar por resumen, persona o sección</TooltipContent>
           </Tooltip>
         </InputGroupAddon>
       </InputGroup>
@@ -194,7 +194,7 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
             <MenuSeparator />
 
             <MenuGroup>
-              <MenuGroupLabel>Identidad</MenuGroupLabel>
+              <MenuGroupLabel>Quién</MenuGroupLabel>
               <MenuRadioGroup
                 value={identity}
                 onValueChange={(value: string) => {

@@ -1,5 +1,3 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircleAlertIcon } from 'lucide-react'
@@ -234,7 +232,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                     disabled={mutation.isPending}
                   />
                   <FieldDescription>
-                    Opcional. Si vive en más de una casa, podrás asignarle las demás desde la pestaña "Casas".
+                    Opcional. Si tiene más de una casa, podrás asignarle las demás desde la pestaña "Casas".
                   </FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>

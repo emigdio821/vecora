@@ -1,10 +1,26 @@
 import { type ClassValue, clsx } from 'clsx'
-import { format, isValid, parseISO } from 'date-fns'
+import { format, isValid, type Locale, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
+}
+
+export function capitalize(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1)
+}
+
+/**
+ * Spanish, but with capitalized months ("Septiembre 2026", "12 Sep 2026")
+ * across the app. Use it instead of date-fns's `es` for every format.
+ */
+export const esLocale: Locale = {
+  ...es,
+  localize: {
+    ...es.localize,
+    month: (month, options) => capitalize(es.localize.month(month, options)),
+  },
 }
 
 export function getRoleLabel(roleName: string): string {
@@ -32,11 +48,11 @@ export function normalizeString(value: string | null | undefined): string {
     .toLowerCase()
 }
 
-/** "22 sept 2026, 10:15 a.m." from an ISO timestamp or Date. Empty when missing or invalid. */
+/** "22 Sep 2026, 10:15 a.m." from an ISO timestamp or Date. Empty when missing or invalid. */
 export function formatDate(value: string | number | Date | null | undefined): string {
   if (value == null) return ''
   const date = value instanceof Date ? value : new Date(value)
-  return isValid(date) ? format(date, 'd MMM yyyy, h:mm aaaa', { locale: es }) : ''
+  return isValid(date) ? format(date, 'd MMM yyyy, h:mm aaaa', { locale: esLocale }) : ''
 }
 
 export function getAvatarFallback(name: string) {
@@ -66,12 +82,12 @@ export function formatCurrency(value: number | string): string {
 /** date-fns pattern for a "YYYY-MM-DD" date column. */
 export const ISO_DAY = 'yyyy-MM-dd'
 
-/** "12 sept 2026" from a "YYYY-MM-DD" date column. Empty when missing. */
+/** "12 Sep 2026" from a "YYYY-MM-DD" date column. Empty when missing. */
 export function formatDay(value: string | null | undefined): string {
-  return value ? format(parseISO(value), 'd MMM yyyy', { locale: es }) : ''
+  return value ? format(parseISO(value), 'd MMM yyyy', { locale: esLocale }) : ''
 }
 
-/** "septiembre 2026" from a "YYYY-MM-DD" date column (day ignored). Empty when missing. */
+/** "Septiembre 2026" from a "YYYY-MM-DD" date column (day ignored). Empty when missing. */
 export function formatMonth(value: string | null | undefined): string {
-  return value ? format(parseISO(value), 'MMMM yyyy', { locale: es }) : ''
+  return value ? format(parseISO(value), 'MMMM yyyy', { locale: esLocale }) : ''
 }

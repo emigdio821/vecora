@@ -1,5 +1,3 @@
-'use client'
-
 import { CalendarPlusIcon, HistoryIcon, NotebookPenIcon, ReceiptTextIcon, WalletIcon } from 'lucide-react'
 import { CollapsibleSection, Detail, Timestamp } from '@/components/shared/details'
 import { Badge } from '@/components/ui/badge'

@@ -50,13 +50,16 @@ export function postgrestErrorMessage(
   }
 }
 
-// Raised by the pay/reject request RPCs ("Mantenimiento" and "Seguridad").
+// Raised by the pay/reject/reopen request RPCs ("Mantenimiento" and "Seguridad").
 const NOT_FOUND = 'P0002'
 const ALREADY_RESOLVED = 'P0003'
 export const FK_VIOLATION = '23503'
 
-/** Maps an error from `pay_*_request` / `reject_*_request` to a user-facing message. */
+/** Maps an error from `pay_*_request` / `reject_*_request` / `reopen_*_request` to a user-facing message. */
 export function requestResolutionErrorMessage(error: PostgrestError, fallback: string): string {
+  if (error.code === ALREADY_RESOLVED && error.message.includes('not rejected')) {
+    return 'Esta solicitud ya fue reabierta por alguien más'
+  }
   if (error.code === ALREADY_RESOLVED) return 'Esta solicitud ya fue resuelta por alguien más'
   if (error.code === NOT_FOUND && error.message.includes('no period')) {
     return 'Ningún periodo cubre esa fecha. Crea el periodo primero.'

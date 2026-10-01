@@ -1,4 +1,4 @@
-import { cache } from 'react'
+import '@tanstack/react-start/server-only'
 import { createClient } from '@/lib/supabase/server'
 import { LOGO_BUCKET } from '@/lib/validations/settings'
 
@@ -10,16 +10,16 @@ export interface Settings {
 }
 
 /**
- * The single public.settings row, read once per request (the authed layout
- * hands it down). Reports can call this too. A read failure falls back to
- * empty values so the app still renders with its generic labels.
+ * The single public.settings row (the authed layout loads it and hands it
+ * down). Reports can call this too. A read failure falls back to empty values
+ * so the app still renders with its generic labels.
  */
-export const getSettings = cache(async (): Promise<Settings> => {
+export async function getSettings(): Promise<Settings> {
   const supabase = await createClient()
   const { data } = await supabase.from('settings').select('residential_name, logo_path').maybeSingle()
 
   return { residentialName: data?.residential_name ?? '', logoPath: data?.logo_path ?? null }
-})
+}
 
 /** The logo's PNG bytes, for the report. Null when it can't be read: the report goes without it. */
 export async function getLogo(path: string): Promise<Buffer | null> {

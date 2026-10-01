@@ -1,6 +1,5 @@
-'use client'
-
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import {
   EyeIcon,
   GavelIcon,
@@ -16,7 +15,6 @@ import {
   UserIcon,
   WrenchIcon,
 } from 'lucide-react'
-import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { useCurrentUser } from '@/components/current-user-provider'
@@ -33,6 +31,7 @@ import {
 } from '@/components/ui/dialog'
 import type { AppRole } from '@/lib/supabase/current-user'
 import { markWelcomed } from '@/server-actions/profile'
+import { USER_QUERY_KEY } from '@/tanstack-queries/session'
 
 /** `?welcome=true` reopens the dialog; the user menu sets it. */
 export function useWelcomeParam() {
@@ -104,11 +103,18 @@ const ABILITIES: Ability[] = [
  */
 export function WelcomeDialog() {
   const user = useCurrentUser()
+  const queryClient = useQueryClient()
   const [isRequested, setRequested] = useWelcomeParam()
   const [isFirstVisit, setFirstVisit] = useState(!user.welcomed)
 
   // Nothing to tell the user if it fails: the dialog just shows up once more.
-  const mutation = useMutation({ mutationFn: markWelcomed })
+  const mutation = useMutation({
+    mutationFn: markWelcomed,
+    onSuccess: () => {
+      // The cached user still says not welcomed; refetch it on the next navigation.
+      void queryClient.invalidateQueries({ queryKey: [USER_QUERY_KEY] })
+    },
+  })
 
   function markSeen() {
     if (isFirstVisit) {
@@ -226,7 +232,7 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
           <Button
             className="self-start"
             variant="outline"
-            render={<Link href="/hoa-board" />}
+            render={<Link to="/hoa-board" />}
             onClick={onLeave}
           >
             <HeartHandshakeIcon />

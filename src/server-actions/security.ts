@@ -1,6 +1,5 @@
-'use server'
-
 import type { PostgrestError } from '@supabase/supabase-js'
+import { createServerFn } from '@tanstack/react-start'
 import {
   type ActionResult,
   FK_VIOLATION,
@@ -20,114 +19,153 @@ function toMessage(error: PostgrestError, fallback: string) {
   return postgrestErrorMessage(error, { fallback })
 }
 
-export async function createSecurityRequest(
-  input: SecurityRequestInput,
-): Promise<ActionResult<{ id: string }>> {
-  const parsed = securityRequestSchema.safeParse(input)
-  if (!parsed.success) {
-    return { error: 'Revisa los campos del formulario' }
-  }
+const createSecurityRequestFn = createServerFn({ method: 'POST' })
+  .validator((input: SecurityRequestInput) => input)
+  .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
+    const parsed = securityRequestSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
 
-  const { kind, title, details, amount, requested_on } = parsed.data
-  const supabase = await createClient()
+    const { kind, title, details, amount, requested_on } = parsed.data
+    const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('security_requests')
-    .insert({ kind, title, details: details || null, amount, requested_on })
-    .select('id')
-    .single()
+    const { data, error } = await supabase
+      .from('security_requests')
+      .insert({ kind, title, details: details || null, amount, requested_on })
+      .select('id')
+      .single()
 
-  if (error) {
-    return { error: toMessage(error, 'No se pudo registrar la solicitud, intenta nuevamente') }
-  }
+    if (error) {
+      return { error: toMessage(error, 'No se pudo registrar la solicitud, intenta nuevamente') }
+    }
 
-  return { data }
-}
+    return { data }
+  })
+
+export const createSecurityRequest = (input: SecurityRequestInput) => createSecurityRequestFn({ data: input })
 
 /** Only while pending: RLS filters out resolved rows, which surfaces as "no permission". */
-export async function updateSecurityRequest(id: string, input: SecurityRequestInput): Promise<ActionResult> {
-  const parsed = securityRequestSchema.safeParse(input)
-  if (!parsed.success) {
-    return { error: 'Revisa los campos del formulario' }
-  }
+const updateSecurityRequestFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: SecurityRequestInput }) => data)
+  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+    const parsed = securityRequestSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
 
-  const { kind, title, details, amount, requested_on } = parsed.data
-  const supabase = await createClient()
+    const { kind, title, details, amount, requested_on } = parsed.data
+    const supabase = await createClient()
 
-  const { error } = await supabase
-    .from('security_requests')
-    .update({ kind, title, details: details || null, amount, requested_on })
-    .eq('id', id)
-    .select('id')
-    .single()
+    const { error } = await supabase
+      .from('security_requests')
+      .update({ kind, title, details: details || null, amount, requested_on })
+      .eq('id', id)
+      .select('id')
+      .single()
 
-  if (error) {
-    return { error: toMessage(error, 'No se pudo actualizar la solicitud, intenta nuevamente') }
-  }
+    if (error) {
+      return { error: toMessage(error, 'No se pudo actualizar la solicitud, intenta nuevamente') }
+    }
 
-  return { data: undefined }
-}
+    return { data: undefined }
+  })
 
-export async function deleteSecurityRequest(id: string): Promise<ActionResult> {
-  const supabase = await createClient()
+export const updateSecurityRequest = (id: string, input: SecurityRequestInput) =>
+  updateSecurityRequestFn({ data: { id, input } })
 
-  const { error } = await supabase.from('security_requests').delete().eq('id', id).select('id').single()
+const deleteSecurityRequestFn = createServerFn({ method: 'POST' })
+  .validator((id: string) => id)
+  .handler(async ({ data: id }): Promise<ActionResult> => {
+    const supabase = await createClient()
 
-  if (error) {
-    return { error: toMessage(error, 'No se pudo eliminar la solicitud, intenta nuevamente') }
-  }
+    const { error } = await supabase.from('security_requests').delete().eq('id', id).select('id').single()
 
-  return { data: undefined }
-}
+    if (error) {
+      return { error: toMessage(error, 'No se pudo eliminar la solicitud, intenta nuevamente') }
+    }
+
+    return { data: undefined }
+  })
+
+export const deleteSecurityRequest = (id: string) => deleteSecurityRequestFn({ data: id })
 
 /** Records the expense in the ledger and marks the request paid, atomically. */
-export async function paySecurityRequest(
-  id: string,
-  input: PayRequestInput,
-): Promise<ActionResult<{ transaction_id: string }>> {
-  const parsed = payRequestSchema.safeParse(input)
-  if (!parsed.success) {
-    return { error: 'Revisa los campos del formulario' }
-  }
-
-  const { category_id, occurred_on, payment_method, reference, notes } = parsed.data
-  const supabase = await createClient()
-
-  const { data, error } = await supabase.rpc('pay_security_request', {
-    p_request_id: id,
-    p_category_id: category_id,
-    p_occurred_on: occurred_on,
-    p_payment_method: payment_method,
-    p_reference: reference || undefined,
-    p_notes: notes || undefined,
-  })
-
-  if (error) {
-    if (error.code === FK_VIOLATION) return { error: 'La categoría debe ser de egreso' }
-    return { error: requestResolutionErrorMessage(error, 'No se pudo registrar el pago, intenta nuevamente') }
-  }
-
-  return { data: { transaction_id: data } }
-}
-
-export async function rejectSecurityRequest(id: string, input: RejectRequestInput): Promise<ActionResult> {
-  const parsed = rejectRequestSchema.safeParse(input)
-  if (!parsed.success) {
-    return { error: 'Revisa los campos del formulario' }
-  }
-
-  const supabase = await createClient()
-
-  const { error } = await supabase.rpc('reject_security_request', {
-    p_request_id: id,
-    p_reason: parsed.data.reason,
-  })
-
-  if (error) {
-    return {
-      error: requestResolutionErrorMessage(error, 'No se pudo rechazar la solicitud, intenta nuevamente'),
+const paySecurityRequestFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: PayRequestInput }) => data)
+  .handler(async ({ data: { id, input } }): Promise<ActionResult<{ transaction_id: string }>> => {
+    const parsed = payRequestSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
     }
-  }
 
-  return { data: undefined }
-}
+    const { category_id, occurred_on, payment_method, reference, notes } = parsed.data
+    const supabase = await createClient()
+
+    const { data, error } = await supabase.rpc('pay_security_request', {
+      p_request_id: id,
+      p_category_id: category_id,
+      p_occurred_on: occurred_on,
+      p_payment_method: payment_method,
+      p_reference: reference || undefined,
+      p_notes: notes || undefined,
+    })
+
+    if (error) {
+      if (error.code === FK_VIOLATION) return { error: 'La categoría debe ser de egreso' }
+      return {
+        error: requestResolutionErrorMessage(error, 'No se pudo registrar el pago, intenta nuevamente'),
+      }
+    }
+
+    return { data: { transaction_id: data } }
+  })
+
+export const paySecurityRequest = (id: string, input: PayRequestInput) =>
+  paySecurityRequestFn({ data: { id, input } })
+
+const rejectSecurityRequestFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: RejectRequestInput }) => data)
+  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+    const parsed = rejectRequestSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
+
+    const supabase = await createClient()
+
+    const { error } = await supabase.rpc('reject_security_request', {
+      p_request_id: id,
+      p_reason: parsed.data.reason,
+    })
+
+    if (error) {
+      return {
+        error: requestResolutionErrorMessage(error, 'No se pudo rechazar la solicitud, intenta nuevamente'),
+      }
+    }
+
+    return { data: undefined }
+  })
+
+export const rejectSecurityRequest = (id: string, input: RejectRequestInput) =>
+  rejectSecurityRequestFn({ data: { id, input } })
+
+/** Rejected → pending again, so the same request can be fixed and paid. */
+const reopenSecurityRequestFn = createServerFn({ method: 'POST' })
+  .validator((id: string) => id)
+  .handler(async ({ data: id }): Promise<ActionResult> => {
+    const supabase = await createClient()
+
+    const { error } = await supabase.rpc('reopen_security_request', { p_request_id: id })
+
+    if (error) {
+      return {
+        error: requestResolutionErrorMessage(error, 'No se pudo reabrir la solicitud, intenta nuevamente'),
+      }
+    }
+
+    return { data: undefined }
+  })
+
+export const reopenSecurityRequest = (id: string) => reopenSecurityRequestFn({ data: id })

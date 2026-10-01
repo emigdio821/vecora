@@ -232,7 +232,7 @@ begin
   insert into public.transactions (kind, category_id, period_id, amount, occurred_on, payment_method, reference, description, notes)
   values (
     'expense', (select id from public.transaction_categories where name = 'Servicios'), v_period_id,
-    1240.50, greatest(current_date - 24, year_start), 'transfer', 'CFE 0045612', 'Luz de áreas comunes', 'Recibo CFE agosto'
+    1240.50, greatest(current_date - 24, year_start), 'transfer', 'CFE 0045612', 'Luz de áreas comunes', 'Recibo CFE Agosto'
   );
   t := t + interval '1 day 30 minutes';
   perform pg_temp.mark(t);
@@ -318,7 +318,7 @@ begin
   -- -------------------------------------------------------------------------
   perform pg_temp.act_as(u_treasurer);
 
-  update public.transactions set notes = 'Recibo CFE, periodo agosto–septiembre'
+  update public.transactions set notes = 'Recibo CFE, periodo Agosto–Septiembre'
   where description = 'Luz de áreas comunes';
   t := now() - interval '3 hours';
   perform pg_temp.mark(t);

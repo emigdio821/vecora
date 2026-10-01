@@ -1,7 +1,4 @@
-'use client'
-
-import { useMutation } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {
   AlertDialog,
@@ -15,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { removeLogo } from '@/server-actions/settings'
+import { SETTINGS_QUERY_KEY } from '@/tanstack-queries/settings'
 
 interface RemoveLogoAlertDialogProps extends React.ComponentProps<typeof AlertDialog> {
   open: boolean
@@ -23,7 +21,7 @@ interface RemoveLogoAlertDialogProps extends React.ComponentProps<typeof AlertDi
 
 /** Opened from "Ajustes"; the file is deleted, so it has to be uploaded again to get it back. */
 export function RemoveLogoAlertDialog({ open, onOpenChange, ...props }: RemoveLogoAlertDialogProps) {
-  const router = useRouter()
+  const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -31,7 +29,7 @@ export function RemoveLogoAlertDialog({ open, onOpenChange, ...props }: RemoveLo
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
-      router.refresh()
+      void queryClient.invalidateQueries({ queryKey: [SETTINGS_QUERY_KEY] })
       toastManager.add({ type: 'success', title: 'Logo eliminado' })
       onOpenChange(false)
     },

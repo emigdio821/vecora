@@ -1,5 +1,3 @@
-'use client'
-
 import { useMutation } from '@tanstack/react-query'
 import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -22,6 +20,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
   const [isEditOpen, setEditOpen] = useState(false)
   const [isRemoveOpen, setRemoveOpen] = useState(false)
   const [invite, setInvite] = useState<InviteResult | null>(null)
+  const [isInviteDialogOpen, setInviteDialogOpen] = useState(false)
 
   const resend = useMutation({
     mutationFn: async () => {
@@ -29,7 +28,10 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
       if (result.error !== undefined) throw new Error(result.error)
       return result.data
     },
-    onSuccess: setInvite,
+    onSuccess: (result) => {
+      setInvite(result)
+      setInviteDialogOpen(true)
+    },
     onError: (error) => {
       toastManager.add({ type: 'error', title: 'No se pudo generar el enlace', description: error.message })
     },
@@ -46,8 +48,13 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
       <RemoveBoardMemberAlertDialog member={member} open={isRemoveOpen} onOpenChange={setRemoveOpen} />
       <InviteLinkDialog
         invite={invite}
-        onOpenChange={(open) => {
-          if (!open) setInvite(null)
+        open={isInviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+        // Keep the invite until the close animation ends, so the name doesn't vanish mid-fade.
+        onOpenChangeComplete={(open) => {
+          if (!open) {
+            setInvite(null)
+          }
         }}
       />
 
