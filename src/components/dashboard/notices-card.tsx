@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import { format, parseISO } from 'date-fns'
-import { es } from 'date-fns/locale'
 import { CalendarDaysIcon, PartyPopperIcon } from 'lucide-react'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import {
@@ -14,7 +13,7 @@ import {
 } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { useToday } from '@/hooks/use-today'
-import { ISO_DAY } from '@/lib/utils'
+import { esLocale, ISO_DAY } from '@/lib/utils'
 import { hallReservationsQueryOptions } from '@/tanstack-queries/presidency'
 
 const MAX_NOTICES = 5
@@ -57,7 +56,7 @@ export function NoticesCard() {
               {upcoming.map((reservation) => (
                 <li key={reservation.id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
                   <span className="truncate font-medium">
-                    {format(parseISO(reservation.reserved_on), "EEEE d 'de' MMMM", { locale: es })}
+                    {format(parseISO(reservation.reserved_on), "EEEE d 'de' MMMM", { locale: esLocale })}
                     {reservation.reserved_on === today && ' - Hoy'}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">

@@ -1,12 +1,13 @@
 -- Fee and terraza descriptions no longer end in " - Casa A1": every movement
 -- already carries its house (property_id), and the lists show it in its own
--- column. "Cuota agosto 2026 - Casa A1" becomes "Cuota agosto 2026".
+-- column. "Cuota agosto 2026 - Casa A1" becomes "Cuota Agosto 2026" (the app
+-- capitalizes month names).
 
 -- ---------------------------------------------------------------------------
 -- terraza: the day alone for descriptions; the audit refs keep the house
 -- ---------------------------------------------------------------------------
 
--- "3 octubre 2026": the tail of the fee / refund description.
+-- "3 Octubre 2026": the tail of the fee / refund description.
 create function private.hall_reservation_day(p_reserved_on date)
 returns text
 language sql
@@ -14,14 +15,14 @@ immutable
 set search_path = ''
 as $$
   select extract(day from p_reserved_on)::int || ' '
-    || (array['enero','febrero','marzo','abril','mayo','junio',
-              'julio','agosto','septiembre','octubre','noviembre','diciembre'])[extract(month from p_reserved_on)::int]
+    || (array['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+              'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'])[extract(month from p_reserved_on)::int]
     || ' ' || extract(year from p_reserved_on)::int;
 $$;
 
 revoke execute on function private.hall_reservation_day(date) from public, anon, authenticated;
 
--- "3 octubre 2026 - Casa A1": names a booking in the audit log.
+-- "3 Octubre 2026 - Casa A1": names a booking in the audit log.
 create or replace function private.hall_reservation_label(p_reserved_on date, p_property_id uuid)
 returns text
 language sql
@@ -200,8 +201,8 @@ declare
   v_amount       numeric;
   v_month        date;
   v_is_late      boolean;
-  v_months       constant text[] := array['enero','febrero','marzo','abril','mayo','junio',
-                                          'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  v_months       constant text[] := array['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                                          'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   v_label        text;
 begin
   if p_fee_months is null or cardinality(p_fee_months) = 0 then

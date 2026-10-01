@@ -1,10 +1,9 @@
 import { DayPicker, type DropdownProps, useDayPicker } from '@daypicker/react'
 import type { Month } from 'date-fns'
-import { es } from 'date-fns/locale'
 import { ChevronLeftIcon, ChevronRightIcon, ChevronsUpDownIcon } from 'lucide-react'
 import * as React from 'react'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { cn } from '@/lib/utils'
+import { cn, esLocale } from '@/lib/utils'
 
 const buttonClassNames =
   "relative flex size-(--cell-size) text-base sm:text-sm items-center justify-center rounded-lg text-foreground not-in-data-selected:hover:bg-accent disabled:pointer-events-none disabled:opacity-64 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
@@ -66,7 +65,7 @@ function CalendarDropdown({
   )
 }
 
-/** Full month names in the list ("septiembre"), short in the trigger ("sep") so month and year fit side by side. */
+/** Full month names in the list ("Septiembre"), short in the trigger ("Sep") so month and year fit side by side. */
 function CalendarMonthsDropdown(props: DropdownProps) {
   const { dayPickerProps } = useDayPicker()
   const localize = dayPickerProps.locale?.localize
@@ -88,7 +87,7 @@ export function Calendar({
   showOutsideDays = true,
   components: userComponents,
   mode = 'single',
-  locale = es,
+  locale = esLocale,
   ...props
 }: React.ComponentProps<typeof DayPicker>): React.ReactElement {
   const defaultClassNames = {

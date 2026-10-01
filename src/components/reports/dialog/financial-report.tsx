@@ -37,16 +37,12 @@ function monthRange(month: Date): DayRange {
   return toRange(startOfMonth(month), endOfMonth(month))
 }
 
-function capitalize(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1)
-}
-
 /** Newest first; the running month is included and marked as such. */
 function monthItems(today: Date): { value: string; label: string }[] {
   return Array.from({ length: MONTHS_BACK }, (_, i) => {
     const month = startOfMonth(subMonths(today, i))
     const value = format(month, ISO_DAY)
-    const label = capitalize(formatMonth(value))
+    const label = formatMonth(value)
     return { value, label: i === 0 ? `${label} (en curso)` : label }
   })
 }
