@@ -123,7 +123,12 @@ export function entrySummary(entry: LogEntryQueryData): string {
   const { label } = entry
 
   switch (entry.table_name) {
-    case 'transactions':
+    case 'transactions': {
+      // Descriptions don't name the house; the movement's property does.
+      const house = refName(entry, row.property_id)
+      const summary = house ? `${label} - Casa ${house}` : label
+      return row.amount == null ? summary : `${summary} - ${formatCurrency(asText(row.amount))}`
+    }
     case 'maintenance_requests':
     case 'security_requests':
       return row.amount == null ? label : `${label} - ${formatCurrency(asText(row.amount))}`
