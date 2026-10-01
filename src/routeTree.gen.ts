@@ -9,22 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthAuthConfirmRouteImport } from './routes/_auth/auth/confirm'
+import { Route as AuthRouteRouteImport } from './routes/_auth/route'
+import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthNoAccessRouteImport } from './routes/_auth/no-access'
-import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AuthSetPasswordRouteImport } from './routes/_auth/set-password'
-import { Route as AuthedHoaBoardRouteImport } from './routes/_authed/hoa-board'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AuthedHoaBoardRouteImport } from './routes/_authed/hoa-board'
 import { Route as AuthedLogsRouteImport } from './routes/_authed/logs'
 import { Route as AuthedMaintenanceRouteImport } from './routes/_authed/maintenance'
 import { Route as AuthedPresidencyRouteImport } from './routes/_authed/presidency'
 import { Route as AuthedResidentialRouteImport } from './routes/_authed/residential'
-import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
 import { Route as AuthedSecurityRouteImport } from './routes/_authed/security'
 import { Route as AuthedTreasuryRouteImport } from './routes/_authed/treasury'
 import { Route as ApiOgRouteImport } from './routes/api/og'
 import { Route as ReportsPdfRouteImport } from './routes/reports/pdf'
+import { Route as AuthAuthConfirmRouteImport } from './routes/_auth/auth/confirm'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
@@ -347,7 +347,9 @@ const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthAuthConfirmRoute: AuthAuthConfirmRoute,
 }
 
-const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(AuthRouteRouteChildren)
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
+)
 
 interface AuthedRouteRouteChildren {
   AuthedHoaBoardRoute: typeof AuthedHoaBoardRoute
@@ -371,7 +373,9 @@ const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedIndexRoute: AuthedIndexRoute,
 }
 
-const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(AuthedRouteRouteChildren)
+const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
+  AuthedRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
@@ -379,10 +383,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApiOgRoute: ApiOgRoute,
   ReportsPdfRoute: ReportsPdfRoute,
 }
-export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
-import type { createStart } from '@tanstack/react-start'
 import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true

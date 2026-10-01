@@ -3,6 +3,17 @@
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/geist';
 
+/* Arial scaled to Geist's metrics (the values next/font generates), so text
+   doesn't shift when the real font swaps in. */
+@font-face {
+  font-family: 'Geist Fallback';
+  src: local('Arial');
+  ascent-override: 95.94%;
+  descent-override: 28.16%;
+  line-gap-override: 0%;
+  size-adjust: 104.76%;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -10,7 +21,7 @@
   --breakpoint-4xl: 2000px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-mono: var(--font-mono);
   --color-sidebar-ring: var(--sidebar-ring);
