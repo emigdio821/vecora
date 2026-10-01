@@ -13,7 +13,7 @@ export function createAdminClient() {
     throw new Error('SUPABASE_SECRET_KEY is not set')
   }
 
-  return createSupabaseClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, secretKey, {
+  return createSupabaseClient<Database>(process.env.VITE_SUPABASE_URL!, secretKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   })
 }
