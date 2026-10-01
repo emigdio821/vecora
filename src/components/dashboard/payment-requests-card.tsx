@@ -22,7 +22,7 @@ import { securityRequestsQueryOptions } from '@/tanstack-queries/security'
 interface PaymentRequest {
   key: string
   link: LinkOptions
-  area: string
+  section: string
   title: string
   amount: number
   requested_on: string
@@ -35,7 +35,7 @@ function pendingDescription(pending: number): string {
 
 /**
  * What the treasurer still has to pay or collect across "Mantenimiento",
- * "Seguridad" and "Terraza", oldest first. Resolved ones live in each area.
+ * "Seguridad" and "Terraza", oldest first. Resolved ones live in each section.
  */
 export function PaymentRequestsCard() {
   const maintenance = useQuery(maintenanceRequestsQueryOptions())
@@ -54,7 +54,7 @@ export function PaymentRequestsCard() {
       .map((r) => ({
         key: `maintenance-${r.id}`,
         link: linkOptions({ to: '/maintenance' }),
-        area: 'Mantenimiento',
+        section: 'Mantenimiento',
         title: r.title,
         amount: r.amount,
         requested_on: r.requested_on,
@@ -64,7 +64,7 @@ export function PaymentRequestsCard() {
       .map((r) => ({
         key: `security-${r.id}`,
         link: linkOptions({ to: '/security' }),
-        area: `Seguridad - ${SECURITY_KIND_LABEL[r.kind]}`,
+        section: `Seguridad - ${SECURITY_KIND_LABEL[r.kind]}`,
         title: r.title,
         amount: r.amount,
         requested_on: r.requested_on,
@@ -74,7 +74,7 @@ export function PaymentRequestsCard() {
       .map((r) => ({
         key: `hall-${r.id}`,
         link: linkOptions({ to: '/presidency', search: { tab: 'hall' } }),
-        area: 'Terraza',
+        section: 'Terraza',
         title: `Tarifa de terraza - Casa ${r.property.number}`,
         amount: Number(r.amount),
         requested_on: r.reserved_on,
@@ -102,7 +102,7 @@ export function PaymentRequestsCard() {
                         {request.title}
                       </Link>
                       <span className="truncate text-xs text-muted-foreground">
-                        {request.area} - {formatDay(request.requested_on)}
+                        {request.section} - {formatDay(request.requested_on)}
                       </span>
                     </span>
                     <span className="shrink-0 font-medium tabular-nums">
