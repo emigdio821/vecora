@@ -32,7 +32,15 @@ export function sectionLabel(tableName: string) {
 }
 
 /** Derived from the operation and, for updates, from what changed. */
-export type LogAction = 'created' | 'updated' | 'deleted' | 'restored' | 'paid' | 'rejected' | 'cancelled'
+export type LogAction =
+  | 'created'
+  | 'updated'
+  | 'deleted'
+  | 'restored'
+  | 'paid'
+  | 'rejected'
+  | 'reopened'
+  | 'cancelled'
 
 export const ACTIONS: LogAction[] = [
   'created',
@@ -41,6 +49,7 @@ export const ACTIONS: LogAction[] = [
   'restored',
   'paid',
   'rejected',
+  'reopened',
   'cancelled',
 ]
 
@@ -51,6 +60,7 @@ export const ACTION_LABEL: Record<LogAction, string> = {
   restored: 'Restauró',
   paid: 'Pagó',
   rejected: 'Rechazó',
+  reopened: 'Reabrió',
   cancelled: 'Canceló',
 }
 
@@ -61,6 +71,7 @@ export const ACTION_BADGE_VARIANT: Record<LogAction, React.ComponentProps<typeof
   restored: 'secondary',
   paid: 'success',
   rejected: 'warning',
+  reopened: 'secondary',
   cancelled: 'warning',
 }
 
@@ -73,10 +84,11 @@ export function entryAction(entry: LogEntryQueryData): LogAction {
 
   // Houses, residents and transactions are soft-deleted: an update to deleted_at.
   if (changed.includes('deleted_at')) return after.deleted_at ? 'deleted' : 'restored'
-  // Requests leave "pending" only through the treasurer's RPCs.
+  // Request status changes only through the treasurer's RPCs; back to pending is a reopen.
   if (changed.includes('status')) {
     if (after.status === 'paid') return 'paid'
     if (after.status === 'rejected') return 'rejected'
+    if (after.status === 'pending') return 'reopened'
   }
   // Paid terraza bookings are cancelled, not deleted, by the treasurer's RPC.
   if (changed.includes('cancelled_at')) return 'cancelled'

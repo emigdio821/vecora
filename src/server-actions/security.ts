@@ -150,3 +150,22 @@ const rejectSecurityRequestFn = createServerFn({ method: 'POST' })
 
 export const rejectSecurityRequest = (id: string, input: RejectRequestInput) =>
   rejectSecurityRequestFn({ data: { id, input } })
+
+/** Rejected → pending again, so the same request can be fixed and paid. */
+const reopenSecurityRequestFn = createServerFn({ method: 'POST' })
+  .validator((id: string) => id)
+  .handler(async ({ data: id }): Promise<ActionResult> => {
+    const supabase = await createClient()
+
+    const { error } = await supabase.rpc('reopen_security_request', { p_request_id: id })
+
+    if (error) {
+      return {
+        error: requestResolutionErrorMessage(error, 'No se pudo reabrir la solicitud, intenta nuevamente'),
+      }
+    }
+
+    return { data: undefined }
+  })
+
+export const reopenSecurityRequest = (id: string) => reopenSecurityRequestFn({ data: id })

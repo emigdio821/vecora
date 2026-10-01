@@ -151,3 +151,22 @@ const rejectMaintenanceRequestFn = createServerFn({ method: 'POST' })
 
 export const rejectMaintenanceRequest = (id: string, input: RejectRequestInput) =>
   rejectMaintenanceRequestFn({ data: { id, input } })
+
+/** Rejected → pending again, so the same request can be fixed and paid. */
+const reopenMaintenanceRequestFn = createServerFn({ method: 'POST' })
+  .validator((id: string) => id)
+  .handler(async ({ data: id }): Promise<ActionResult> => {
+    const supabase = await createClient()
+
+    const { error } = await supabase.rpc('reopen_maintenance_request', { p_request_id: id })
+
+    if (error) {
+      return {
+        error: requestResolutionErrorMessage(error, 'No se pudo reabrir la solicitud, intenta nuevamente'),
+      }
+    }
+
+    return { data: undefined }
+  })
+
+export const reopenMaintenanceRequest = (id: string) => reopenMaintenanceRequestFn({ data: id })
