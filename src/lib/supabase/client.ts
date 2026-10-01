@@ -6,8 +6,5 @@ import type { Database } from './database.types'
  * Safe to call on every render; the library caches the instance in the browser.
  */
 export function createClient() {
-  return createBrowserClient<Database>(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-  )
+  return createBrowserClient<Database>(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY)
 }

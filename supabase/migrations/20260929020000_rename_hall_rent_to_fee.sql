@@ -1,12 +1,6 @@
 -- The terraza is free; a booking only carries an optional extra fee (e.g.
--- electricity), so "Renta de terraza" becomes "Tarifa de terraza". The
--- category key stays hall_rent. Past movements keep the description they
--- were recorded with.
-
--- Only if the treasurer hasn't renamed it already.
-update public.transaction_categories
-   set name = 'Tarifa de terraza'
- where key = 'hall_rent' and name = 'Renta de terraza';
+-- electricity), so its payment reads "Tarifa de terraza" (the category's
+-- name since 20260924210000_treasury.sql). The category key stays hall_rent.
 
 create or replace function public.pay_hall_reservation(
   p_reservation_id uuid,

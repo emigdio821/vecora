@@ -3,7 +3,7 @@
 -- Model
 --   * A reservation carries its price (amount), paid in full when booking.
 --     0 means "sin costo": there is nothing to collect.
---   * Collecting it is an income row in "Renta de terraza" linked back via
+--   * Collecting it is an income row in "Tarifa de terraza" linked back via
 --     transactions.hall_reservation_id. The status is derived, never stored:
 --     paid while that row is live. Deleting the income in "Movimientos" puts
 --     the reservation back to pending; restoring it marks it paid again.
@@ -12,18 +12,9 @@
 --     what was paid) is an expense in "Reembolso de terraza". The income stays
 --     where it was, so a refund in a later month doesn't rewrite a past report.
 --   * An unpaid reservation is still simply deleted by the board.
---   * Both categories are system categories (key): "Movimientos" can't create
---     them by hand and only lets their receipt details change.
-
--- ---------------------------------------------------------------------------
--- categories
--- ---------------------------------------------------------------------------
--- "Renta de terraza" already exists (seeded as "Renta de salón"); key it by
--- name, and create it if the treasurer renamed or removed it.
-insert into public.transaction_categories (kind, name, key) values
-  ('income',  'Renta de terraza',     'hall_rent'),
-  ('expense', 'Reembolso de terraza', 'hall_refund')
-on conflict (kind, lower(name)) do update set key = excluded.key, is_active = true;
+--   * Both categories are system categories (key, seeded in
+--     20260924210000_treasury.sql): "Movimientos" can't create them by hand
+--     and only lets their receipt details change.
 
 -- ---------------------------------------------------------------------------
 -- hall_reservations: price and cancellation

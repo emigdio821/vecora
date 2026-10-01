@@ -91,7 +91,7 @@ create unique index transaction_categories_name_unique
   on public.transaction_categories (kind, lower(name));
 
 comment on table public.transaction_categories is 'Income / expense categories. Retire with is_active = false; rows referenced by transactions cannot be deleted.';
-comment on column public.transaction_categories.key is 'App-known handle (fee, late_fee). Null for user-defined categories.';
+comment on column public.transaction_categories.key is 'App-known handle (fee, late_fee, hall_rent, hall_refund). Null for user-defined categories.';
 
 create trigger transaction_categories_set_updated_at
   before update on public.transaction_categories
@@ -101,8 +101,9 @@ insert into public.transaction_categories (kind, name, key) values
   ('income',  'Cuota de mantenimiento', 'fee'),
   ('income',  'Recargo',                'late_fee'),
   ('income',  'Multa',                  null),
-  ('income',  'Renta de salón',         null),
+  ('income',  'Tarifa de terraza',      'hall_rent'),
   ('income',  'Otro ingreso',           null),
+  ('expense', 'Reembolso de terraza',   'hall_refund'),
   ('expense', 'Mantenimiento',          null),
   ('expense', 'Servicios',              null),
   ('expense', 'Jardinería',             null),

@@ -31,11 +31,11 @@ You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
    npx supabase status
    ```
 
-   | Variable                        | Value from `supabase status`              |
-   | ------------------------------- | ----------------------------------------- |
-   | `VITE_SUPABASE_URL`             | `API_URL` (`http://127.0.0.1:54321`)      |
-   | `VITE_SUPABASE_PUBLISHABLE_KEY` | `PUBLISHABLE_KEY`                         |
-   | `SUPABASE_SECRET_KEY`           | `SECRET_KEY` (server-only, never `VITE_`) |
+   | Variable              | Value from `supabase status`              |
+   | --------------------- | ----------------------------------------- |
+   | `VITE_SUPABASE_URL`   | `API_URL` (`http://127.0.0.1:54321`)      |
+   | `VITE_SUPABASE_KEY`   | `PUBLISHABLE_KEY`                         |
+   | `SUPABASE_SECRET_KEY` | `SECRET_KEY` (server-only, never `VITE_`) |
 
 4. **Load the schema and test data**. Applies every migration and both seeds; it also wipes any local data, so run it whenever you want a clean slate.
 
@@ -96,11 +96,11 @@ The app runs on Vercel against a hosted Supabase project.
 
 3. **Set the environment variables** in Vercel, from Project Settings → API Keys in the Supabase dashboard:
 
-   | Variable                        | Value                                                   |
-   | ------------------------------- | ------------------------------------------------------- |
-   | `VITE_SUPABASE_URL`             | `https://<project-ref>.supabase.co`                     |
-   | `VITE_SUPABASE_PUBLISHABLE_KEY` | A publishable key                                       |
-   | `SUPABASE_SECRET_KEY`           | A secret key (server-only, needed to add board members) |
+   | Variable              | Value                                                   |
+   | --------------------- | ------------------------------------------------------- |
+   | `VITE_SUPABASE_URL`   | `https://<project-ref>.supabase.co`                     |
+   | `VITE_SUPABASE_KEY`   | A publishable key                                       |
+   | `SUPABASE_SECRET_KEY` | A secret key (server-only, needed to add board members) |
 
    The `VITE_` values are bundled into the browser code at build time, so redeploy after changing them.
 
