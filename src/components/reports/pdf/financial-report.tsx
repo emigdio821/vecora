@@ -182,12 +182,17 @@ const generatedAtFormatter = new Intl.DateTimeFormat('es-MX', {
   timeZone: 'America/Mexico_City',
 })
 
-/** "1 de Octubre de 2026, 9:19", months capitalized like the rest of the app. */
+/**
+ * "2 de Octubre de 2026 a las 3:15 p.m.", months capitalized like the rest of
+ * the app. Intl puts a narrow no-break space (U+202F) before "p.m.", which the
+ * PDF font has no glyph for, so every space becomes a plain one.
+ */
 function formatGeneratedAt(date: Date): string {
   return generatedAtFormatter
     .formatToParts(date)
     .map((part) => (part.type === 'month' ? capitalize(part.value) : part.value))
     .join('')
+    .replace(/\s/g, ' ')
 }
 
 function byHouse(a: string, b: string): number {
