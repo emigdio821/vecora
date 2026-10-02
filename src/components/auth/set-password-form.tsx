@@ -18,6 +18,7 @@ export function SetPasswordForm() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setLoading] = useState(false)
 
   const form = useForm<SetPasswordInput>({
     resolver: zodResolver(setPasswordSchema),
@@ -26,16 +27,18 @@ export function SetPasswordForm() {
 
   const mutation = useMutation({
     mutationFn: async (values: SetPasswordInput) => {
+      setLoading(true)
       const result = await setPassword(values)
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: async () => {
-      toastManager.add({ type: 'success', title: 'Contraseña guardada', description: 'Bienvenido a Vecora' })
+      toastManager.add({ type: 'success', title: 'Contraseña guardada' })
       // The new session no longer needs a password; the guards must see that.
       queryClient.removeQueries({ queryKey: [USER_QUERY_KEY] })
       await navigate({ to: '/', replace: true })
     },
     onError: (error) => {
+      setLoading(false)
       form.setError('root', { message: error.message })
     },
   })
@@ -107,7 +110,7 @@ export function SetPasswordForm() {
         </Alert>
       )}
 
-      <Button type="submit" disabled={mutation.isPending} loading={mutation.isPending}>
+      <Button type="submit" disabled={isLoading} loading={isLoading}>
         Guardar contraseña
       </Button>
     </Form>
