@@ -270,6 +270,18 @@
     @apply border-border outline-ring/50;
   }
 
+  :root {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
   code,
   kbd,
   samp,
