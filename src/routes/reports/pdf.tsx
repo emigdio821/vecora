@@ -11,15 +11,17 @@ import { DEFAULT_RESIDENTIAL_LABEL } from '@/lib/validations/settings'
 // Any board member can pull a report; the same gate as the _authed layout,
 // which doesn't run for server routes. The data itself goes through RLS.
 
-/** "reporte-loma-verde-coto-404-2026-08.pdf", or "…-2026-08-01_a_2026-08-15.pdf" for a custom range. */
+/**
+ * "vecora-reporte-loma-verde-coto-404-2026-08.pdf", or "…-2026-08-01_a_2026-08-15.pdf"
+ * for a custom range. Without a residential name it's just "vecora-reporte-2026-08.pdf".
+ */
 function fileName(residentialName: string, from: string, to: string): string {
-  const slug =
-    normalizeString(residentialName)
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '') || 'vecora'
+  const slug = normalizeString(residentialName)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
   const dates = isWholeMonth(from, to) ? from.slice(0, 7) : `${from}_a_${to}`
 
-  return `reporte-${slug}-${dates}.pdf`
+  return `${['vecora-reporte', slug, dates].filter(Boolean).join('-')}.pdf`
 }
 
 export const Route = createFileRoute('/reports/pdf')({
