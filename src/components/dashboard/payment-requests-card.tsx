@@ -96,8 +96,8 @@ export function PaymentRequestsCard() {
             <ul className="flex max-h-56 flex-col divide-y overflow-y-auto">
               {pending.map((request) => (
                 <li key={request.key} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
-                  <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="grid min-w-0 gap-0.5">
+                  <div className="flex min-w-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="grid max-w-full min-w-0 gap-0.5">
                       <Link {...request.link} className="truncate font-medium hover:underline">
                         {request.title}
                       </Link>

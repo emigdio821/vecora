@@ -17,8 +17,7 @@ function HomePage() {
 
       <TreasuryCard />
 
-      {/* items-start: each card keeps its own height instead of matching its neighbor. */}
-      <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <FeeStatusCard />
         <PaymentRequestsCard />
       </div>

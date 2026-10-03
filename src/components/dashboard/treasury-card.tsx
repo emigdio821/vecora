@@ -173,8 +173,7 @@ function PeriodTreasury({
       </CardFrameHeader>
       <Card>
         <CardPanel className="grid min-w-0 gap-6">
-          {/* Also the chart's legend: the swatches name the two series. */}
-          <dl className="grid grid-cols-3 gap-2 sm:gap-4">
+          <dl className="grid gap-2 sm:grid-cols-3 sm:gap-4">
             <Total label="Ingresos" swatch="bg-(--chart-income)" value={summary.total_income ?? 0} />
             <Total label="Egresos" swatch="bg-(--chart-expense)" value={summary.total_expense ?? 0} />
             <Total
@@ -202,7 +201,7 @@ function Total({
   className?: string
 }) {
   return (
-    <div className="grid gap-1">
+    <div className="flex items-center justify-between gap-2 sm:grid sm:gap-1">
       <dt className="flex items-center gap-2 text-sm text-muted-foreground">
         {swatch && <span aria-hidden className={cn('h-0.5 w-3 rounded-full', swatch)} />}
         {label}
@@ -293,25 +292,29 @@ function MonthlyFlowChart({ period, today }: { period: PeriodQueryData; today: s
           ariaDescription="Áreas por mes: ingresos en verde y egresos en rojo. La tabla que sigue tiene los montos exactos."
         />
       </div>
-      <table className="sr-only">
-        <caption>Ingresos y egresos por mes, periodo {period.name}</caption>
-        <thead>
-          <tr>
-            <th scope="col">Mes</th>
-            <th scope="col">Ingresos</th>
-            <th scope="col">Egresos</th>
-          </tr>
-        </thead>
-        <tbody>
-          {months.map((t) => (
-            <tr key={t.month}>
-              <th scope="row">{format(monthDate(t.month), 'MMMM yyyy', { locale: esLocale })}</th>
-              <td>{formatCurrency(t.income)}</td>
-              <td>{formatCurrency(t.expense)}</td>
+      {/* sr-only on the wrapper: a table ignores its 1px width and overflow, and
+          at full width it made the page scroll sideways on phones. */}
+      <div className="sr-only">
+        <table>
+          <caption>Ingresos y egresos por mes, periodo {period.name}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Mes</th>
+              <th scope="col">Ingresos</th>
+              <th scope="col">Egresos</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {months.map((t) => (
+              <tr key={t.month}>
+                <th scope="row">{format(monthDate(t.month), 'MMMM yyyy', { locale: esLocale })}</th>
+                <td>{formatCurrency(t.income)}</td>
+                <td>{formatCurrency(t.expense)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   )
 }
