@@ -1,5 +1,5 @@
+import { IconShieldOff } from '@tabler/icons-react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { ShieldOffIcon } from 'lucide-react'
 import { LogoutButton } from '@/components/auth/logout-button'
 import {
   Empty,
@@ -35,7 +35,7 @@ function NoAccessPage() {
     <Empty className="max-w-sm">
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <ShieldOffIcon />
+          <IconShieldOff />
         </EmptyMedia>
         <EmptyTitle>Sin acceso</EmptyTitle>
         <EmptyDescription>

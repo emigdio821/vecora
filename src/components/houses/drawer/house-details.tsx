@@ -1,4 +1,4 @@
-import { CalendarPlusIcon, HistoryIcon, NotebookPenIcon, UsersIcon } from 'lucide-react'
+import { IconCalendarPlus, IconHistory, IconNotes, IconUsers } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { CollapsibleSection, Muted, Timestamp } from '@/components/shared/details'
@@ -38,7 +38,7 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<UsersIcon />} title="Residentes" count={residents.length}>
+          <CollapsibleSection icon={<IconUsers />} title="Residentes" count={residents.length}>
             {residents.length ? (
               <ul className="grid gap-3">
                 {residents.map(({ resident, relationship }) => (
@@ -66,14 +66,14 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
           </CollapsibleSection>
 
           {house.notes && (
-            <CollapsibleSection icon={<NotebookPenIcon />} title="Notas">
+            <CollapsibleSection icon={<IconNotes />} title="Notas">
               <p className="text-sm whitespace-pre-wrap">{house.notes}</p>
             </CollapsibleSection>
           )}
 
           <dl className="grid grid-cols-2 gap-3 px-1 pt-1">
-            <Timestamp icon={<CalendarPlusIcon />} label="Creada" value={house.created_at} />
-            <Timestamp icon={<HistoryIcon />} label="Actualizada" value={house.updated_at} />
+            <Timestamp icon={<IconCalendarPlus />} label="Creada" value={house.created_at} />
+            <Timestamp icon={<IconHistory />} label="Actualizada" value={house.updated_at} />
           </dl>
         </DrawerPanel>
 

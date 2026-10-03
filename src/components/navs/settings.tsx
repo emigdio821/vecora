@@ -1,4 +1,4 @@
-import { SettingsIcon, SunMoonIcon } from 'lucide-react'
+import { IconSettings, IconSunMoon } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { AppearanceDialog } from '@/components/settings/dialog/appearance'
@@ -36,7 +36,7 @@ export function NavSettings({ settings, ...props }: NavSettingsProps) {
                 setOpenDialog('appearance')
               }}
             >
-              <SunMoonIcon className="size-4" />
+              <IconSunMoon className="size-4" />
               <span>Apariencia</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -48,7 +48,7 @@ export function NavSettings({ settings, ...props }: NavSettingsProps) {
                   setOpenDialog('settings')
                 }}
               >
-                <SettingsIcon className="size-4" />
+                <IconSettings className="size-4" />
                 <span>Ajustes</span>
               </SidebarMenuButton>
             </SidebarMenuItem>

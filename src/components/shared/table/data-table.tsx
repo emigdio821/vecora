@@ -1,3 +1,4 @@
+import { IconAlertTriangle } from '@tabler/icons-react'
 import type {
   ColumnDef,
   PaginationState,
@@ -6,7 +7,6 @@ import type {
   Table as TableType,
 } from '@tanstack/react-table'
 import { flexRender, functionalUpdate, useTable } from '@tanstack/react-table'
-import { TriangleAlertIcon } from 'lucide-react'
 import { parseAsIndex, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -124,7 +124,7 @@ export function DataTable<TData extends RowData>({
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">
-              <TriangleAlertIcon />
+              <IconAlertTriangle />
             </EmptyMedia>
             <EmptyTitle>Página fuera de rango</EmptyTitle>
             <EmptyDescription>

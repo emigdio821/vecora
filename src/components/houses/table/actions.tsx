@@ -1,4 +1,4 @@
-import { EllipsisIcon } from 'lucide-react'
+import { IconDots } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
@@ -33,7 +33,7 @@ export function HousesTableActions({ house }: ActionsProps) {
         <MenuTrigger
           render={
             <Button size="icon" variant="ghost" className="ml-auto" aria-label={`Acciones de ${label}`}>
-              <EllipsisIcon className="size-4" />
+              <IconDots className="size-4" />
             </Button>
           }
         />

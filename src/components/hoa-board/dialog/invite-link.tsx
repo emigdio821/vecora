@@ -1,4 +1,4 @@
-import { CheckIcon, CopyIcon } from 'lucide-react'
+import { IconCheck, IconCopy } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -77,7 +77,7 @@ export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: Invit
                   closeOnClick={false}
                   render={
                     <Button size="icon-xs" variant="ghost" aria-label="Copiar enlace" onClick={copy}>
-                      {copied ? <CheckIcon className="text-success-foreground" /> : <CopyIcon />}
+                      {copied ? <IconCheck className="text-success-foreground" /> : <IconCopy />}
                     </Button>
                   }
                 />

@@ -1,12 +1,12 @@
-import { Link, useLocation } from '@tanstack/react-router'
 import {
-  GavelIcon,
-  HeartHandshakeIcon,
-  MapPinHouseIcon,
-  PiggyBankIcon,
-  SirenIcon,
-  WrenchIcon,
-} from 'lucide-react'
+  IconBuildingCommunity,
+  IconGavel,
+  IconHeartHandshake,
+  IconPigMoney,
+  IconTool,
+  IconUrgent,
+} from '@tabler/icons-react'
+import { Link, useLocation } from '@tanstack/react-router'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -35,7 +35,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               isActive={pathname === '/treasury'}
               render={
                 <Link to="/treasury">
-                  <PiggyBankIcon className="size-4" />
+                  <IconPigMoney className="size-4" />
                   <span>Tesorería</span>
                   <LinkPendingIndicator to="/treasury" />
                 </Link>
@@ -51,7 +51,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               isActive={pathname === '/presidency'}
               render={
                 <Link to="/presidency">
-                  <GavelIcon className="size-4" />
+                  <IconGavel className="size-4" />
                   <span>Presidencia</span>
                   <LinkPendingIndicator to="/presidency" />
                 </Link>
@@ -67,7 +67,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               isActive={pathname === '/maintenance'}
               render={
                 <Link to="/maintenance">
-                  <WrenchIcon className="size-4" />
+                  <IconTool className="size-4" />
                   <span>Mantenimiento</span>
                   <LinkPendingIndicator to="/maintenance" />
                 </Link>
@@ -83,7 +83,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               isActive={pathname === '/security'}
               render={
                 <Link to="/security">
-                  <SirenIcon className="size-4" />
+                  <IconUrgent className="size-4" />
                   <span>Seguridad</span>
                   <LinkPendingIndicator to="/security" />
                 </Link>
@@ -99,7 +99,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               isActive={pathname === '/hoa-board'}
               render={
                 <Link to="/hoa-board">
-                  <HeartHandshakeIcon className="size-4" />
+                  <IconHeartHandshake className="size-4" />
                   <span>Mesa directiva</span>
                   <LinkPendingIndicator to="/hoa-board" />
                 </Link>
@@ -115,7 +115,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               isActive={pathname === '/residential'}
               render={
                 <Link to="/residential">
-                  <MapPinHouseIcon className="size-4" />
+                  <IconBuildingCommunity className="size-4" />
                   <span>Residencial</span>
                   <LinkPendingIndicator to="/residential" />
                 </Link>

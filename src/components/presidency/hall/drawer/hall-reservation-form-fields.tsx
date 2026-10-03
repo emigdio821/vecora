@@ -1,6 +1,6 @@
+import { IconAlertTriangle, IconSelector } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { addYears, format, parseISO, startOfToday } from 'date-fns'
-import { ChevronsUpDownIcon, TriangleAlertIcon } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
 import { HousesPicker } from '@/components/shared/pickers/houses-picker'
@@ -109,7 +109,7 @@ export function HallReservationFormFields({
 
       {unpaidMonths.length > 0 && (
         <Alert variant="warning">
-          <TriangleAlertIcon />
+          <IconAlertTriangle />
           <AlertTitle>Casa con cuotas pendientes</AlertTitle>
           <AlertDescription>
             Debe {unpaidMonths.length === 1 ? '1 mes' : `${unpaidMonths.length} meses`}:{' '}
@@ -142,7 +142,7 @@ export function HallReservationFormFields({
                     className="w-full justify-between pr-2"
                   >
                     <span className="truncate font-normal">{formatDay(field.value)}</span>
-                    <ChevronsUpDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+                    <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                   </Button>
                 }
               />

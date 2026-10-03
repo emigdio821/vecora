@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { CircleAlertIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -113,7 +113,7 @@ export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequ
 
             {form.formState.errors.root && (
               <Alert variant="error">
-                <CircleAlertIcon />
+                <IconAlertCircle />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>

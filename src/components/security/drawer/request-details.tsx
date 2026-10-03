@@ -1,11 +1,11 @@
 import {
-  BanknoteIcon,
-  CalendarPlusIcon,
-  CircleCheckIcon,
-  CircleXIcon,
-  NotebookPenIcon,
-  SirenIcon,
-} from 'lucide-react'
+  IconCalendarPlus,
+  IconCash,
+  IconCircleCheck,
+  IconCircleX,
+  IconNotes,
+  IconUrgent,
+} from '@tabler/icons-react'
 import { CollapsibleSection, Detail, Timestamp } from '@/components/shared/details'
 import { STATUS_BADGE_VARIANT, STATUS_LABEL } from '@/components/shared/request-status'
 import { PAYMENT_METHOD_LABEL } from '@/components/treasury/kind'
@@ -44,7 +44,7 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<SirenIcon />} title="Solicitud">
+          <CollapsibleSection icon={<IconUrgent />} title="Solicitud">
             <div className="grid grid-cols-2 gap-3">
               <Detail label="Tipo">
                 <Badge variant="outline">{KIND_LABEL[request.kind]}</Badge>
@@ -61,13 +61,13 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
           </CollapsibleSection>
 
           {request.details && (
-            <CollapsibleSection icon={<NotebookPenIcon />} title="Detalles">
+            <CollapsibleSection icon={<IconNotes />} title="Detalles">
               <p className="text-sm whitespace-pre-wrap">{request.details}</p>
             </CollapsibleSection>
           )}
 
           {status === 'paid' && transaction && (
-            <CollapsibleSection icon={<BanknoteIcon />} title="Pago">
+            <CollapsibleSection icon={<IconCash />} title="Pago">
               <div className="grid grid-cols-2 gap-3">
                 <Detail label="Fecha del pago">{formatDay(transaction.occurred_on)}</Detail>
                 <Detail label="Método de pago">{PAYMENT_METHOD_LABEL[transaction.payment_method]}</Detail>
@@ -78,7 +78,7 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
           )}
 
           {status === 'rejected' && (
-            <CollapsibleSection icon={<CircleXIcon />} title="Rechazo">
+            <CollapsibleSection icon={<IconCircleX />} title="Rechazo">
               <Detail label="Motivo">
                 <p className="font-normal whitespace-pre-wrap">{request.rejection_reason}</p>
               </Detail>
@@ -87,9 +87,9 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
           )}
 
           <dl className="grid grid-cols-2 gap-3 px-1 pt-1">
-            <Timestamp icon={<CalendarPlusIcon />} label="Enviada" value={request.created_at} />
+            <Timestamp icon={<IconCalendarPlus />} label="Enviada" value={request.created_at} />
             {request.resolved_at && (
-              <Timestamp icon={<CircleCheckIcon />} label="Resuelta" value={request.resolved_at} />
+              <Timestamp icon={<IconCircleCheck />} label="Resuelta" value={request.resolved_at} />
             )}
           </dl>
         </DrawerPanel>

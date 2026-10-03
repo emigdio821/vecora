@@ -1,4 +1,5 @@
 import type { DateRange } from '@daypicker/react'
+import { IconCalendar } from '@tabler/icons-react'
 import {
   endOfMonth,
   format,
@@ -9,7 +10,6 @@ import {
   subDays,
   subYears,
 } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -84,7 +84,7 @@ export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, classN
       <PopoverTrigger
         render={<Button variant="outline" className={cn('justify-start font-normal', className)} />}
       >
-        <CalendarIcon aria-hidden="true" />
+        <IconCalendar aria-hidden="true" />
         {label}
       </PopoverTrigger>
       <PopoverPopup>

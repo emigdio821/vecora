@@ -1,5 +1,5 @@
+import { IconHome, IconHomeX } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { HouseIcon, UnlinkIcon } from 'lucide-react'
 import { useState } from 'react'
 import { RELATIONSHIP_LABEL } from '@/components/houses/relationship'
 import { CollapsibleSection, Muted } from '@/components/shared/details'
@@ -39,7 +39,7 @@ export function ResidentHouses({ resident, disabled }: ResidentHousesProps) {
   )
 
   return (
-    <CollapsibleSection icon={<HouseIcon />} title="Casas" count={links.length}>
+    <CollapsibleSection icon={<IconHome />} title="Casas" count={links.length}>
       {links.length ? (
         <ul className="grid gap-3">
           {links.map(({ property, relationship }) => (
@@ -133,7 +133,7 @@ function UnassignHouseButton({
               }}
               aria-label={`Quitar la casa ${house.number}`}
             >
-              <UnlinkIcon />
+              <IconHomeX />
             </Button>
           }
         />

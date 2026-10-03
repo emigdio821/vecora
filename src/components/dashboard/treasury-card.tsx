@@ -1,3 +1,4 @@
+import { IconCalendarOff, IconChartArea } from '@tabler/icons-react'
 import { areaY, d3Curve, defineChart, lineY } from '@tanstack/charts'
 import { crosshair } from '@tanstack/charts/crosshair'
 import { decorative } from '@tanstack/charts/mark/decorative'
@@ -10,7 +11,6 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { curveMonotoneX } from 'd3-shape'
 import { eachMonthOfInterval, format, parseISO } from 'date-fns'
-import { CalendarOffIcon, ChartAreaIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import { Button } from '@/components/ui/button'
@@ -129,7 +129,7 @@ export function TreasuryCard() {
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
-                  <CalendarOffIcon />
+                  <IconCalendarOff />
                 </EmptyMedia>
                 <EmptyTitle>Sin periodo actual</EmptyTitle>
                 <EmptyDescription>
@@ -168,7 +168,7 @@ function PeriodTreasury({
         <CardFrameTitle>Tesorería</CardFrameTitle>
         <CardFrameDescription>Periodo {period.name}</CardFrameDescription>
         <CardFrameAction className="text-muted-foreground">
-          <ChartAreaIcon />
+          <IconChartArea />
         </CardFrameAction>
       </CardFrameHeader>
       <Card>

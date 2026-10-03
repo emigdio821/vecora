@@ -1,4 +1,4 @@
-import { EllipsisIcon } from 'lucide-react'
+import { IconDots } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
@@ -42,7 +42,7 @@ export function ResidentsTableActions({ resident }: ActionsProps) {
               className="ml-auto"
               aria-label={`Acciones de ${residentFullName}`}
             >
-              <EllipsisIcon className="size-4" />
+              <IconDots className="size-4" />
             </Button>
           }
         />

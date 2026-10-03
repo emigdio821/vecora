@@ -1,6 +1,6 @@
 import type { EmailOtpType } from '@supabase/supabase-js'
+import { IconKey, IconUserX } from '@tabler/icons-react'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import { KeyRoundIcon, UserRoundXIcon } from 'lucide-react'
 import { z } from 'zod'
 import { ConfirmAccessButton } from '@/components/auth/confirm-access-button'
 import { Button } from '@/components/ui/button'
@@ -52,7 +52,7 @@ function ConfirmAccessPage() {
       {user ? (
         <EmptyHeader>
           <EmptyMedia variant="icon">
-            <UserRoundXIcon />
+            <IconUserX />
           </EmptyMedia>
           <EmptyTitle>Ya hay una sesión iniciada</EmptyTitle>
           <EmptyDescription>
@@ -64,7 +64,7 @@ function ConfirmAccessPage() {
       ) : (
         <EmptyHeader>
           <EmptyMedia variant="icon">
-            <KeyRoundIcon />
+            <IconKey />
           </EmptyMedia>
           <EmptyTitle>Tu acceso a Vecora</EmptyTitle>
           <EmptyDescription>

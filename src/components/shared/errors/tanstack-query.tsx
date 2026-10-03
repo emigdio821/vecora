@@ -1,4 +1,4 @@
-import { BugIcon } from 'lucide-react'
+import { IconBug } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import {
   Empty,
@@ -27,7 +27,7 @@ export function TanstackQueryError(props: TanstackQueryErrorProps) {
     <Empty {...emptyProps}>
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <BugIcon />
+          <IconBug />
         </EmptyMedia>
         <EmptyTitle>{errorTitle}</EmptyTitle>
         <EmptyDescription>{errorDescription}</EmptyDescription>

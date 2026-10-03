@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle, IconEye, IconEyeOff } from '@tabler/icons-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { CircleAlertIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -91,7 +91,7 @@ export function LoginForm() {
                   }}
                   aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                  {showPassword ? <IconEyeOff /> : <IconEye />}
                 </Button>
               </InputGroupAddon>
             </InputGroup>
@@ -102,7 +102,7 @@ export function LoginForm() {
 
       {form.formState.errors.root && (
         <Alert variant="error">
-          <CircleAlertIcon />
+          <IconAlertCircle />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
         </Alert>

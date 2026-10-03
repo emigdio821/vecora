@@ -1,6 +1,6 @@
 import { DayPicker, type DropdownProps, useDayPicker } from '@daypicker/react'
+import { IconChevronLeft, IconChevronRight, IconSelector } from '@tabler/icons-react'
 import type { Month } from 'date-fns'
-import { ChevronLeftIcon, ChevronRightIcon, ChevronsUpDownIcon } from 'lucide-react'
 import * as React from 'react'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn, esLocale } from '@/lib/utils'
@@ -142,14 +142,14 @@ export function Calendar({
       orientation?: 'left' | 'right' | 'up' | 'down'
     }): React.ReactElement => {
       if (orientation === 'left') {
-        return <ChevronLeftIcon className={cn(className, 'rtl:rotate-180')} {...props} aria-hidden="true" />
+        return <IconChevronLeft className={cn(className, 'rtl:rotate-180')} {...props} aria-hidden="true" />
       }
 
       if (orientation === 'right') {
-        return <ChevronRightIcon className={cn(className, 'rtl:rotate-180')} {...props} aria-hidden="true" />
+        return <IconChevronRight className={cn(className, 'rtl:rotate-180')} {...props} aria-hidden="true" />
       }
 
-      return <ChevronsUpDownIcon className={className} {...props} aria-hidden="true" />
+      return <IconSelector className={className} {...props} aria-hidden="true" />
     },
   }
 

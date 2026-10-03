@@ -1,5 +1,5 @@
+import { IconHistory } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
-import { HistoryIcon } from 'lucide-react'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -29,7 +29,7 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
               isActive={pathname === '/logs'}
               render={
                 <Link to="/logs">
-                  <HistoryIcon className="size-4" />
+                  <IconHistory className="size-4" />
                   <span>Historial</span>
                   <LinkPendingIndicator to="/logs" />
                 </Link>

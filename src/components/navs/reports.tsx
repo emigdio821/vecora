@@ -1,4 +1,4 @@
-import { FileTextIcon } from 'lucide-react'
+import { IconFileText } from '@tabler/icons-react'
 import { useState } from 'react'
 import { FinancialReportDialog } from '@/components/reports/dialog/financial-report'
 import {
@@ -25,7 +25,7 @@ export function NavReports({ ...props }: React.ComponentProps<typeof SidebarGrou
                 setOpen(true)
               }}
             >
-              <FileTextIcon className="size-4" />
+              <IconFileText className="size-4" />
               <span>Reporte financiero</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CircleAlertIcon } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { RELATIONSHIP_ITEMS } from '@/components/houses/relationship'
 import { HousesPicker } from '@/components/shared/pickers/houses-picker'
@@ -181,7 +181,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
 
             {form.formState.errors.root && (
               <Alert variant="error">
-                <CircleAlertIcon />
+                <IconAlertCircle />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>

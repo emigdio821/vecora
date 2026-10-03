@@ -1,5 +1,5 @@
+import { IconFilter, IconInfoCircle, IconSearch, IconX } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { InfoIcon, ListFilterIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { STATUS_LABEL } from '@/components/shared/request-status'
@@ -72,7 +72,7 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
             }}
           />
           <InputGroupAddon>
-            <SearchIcon />
+            <IconSearch />
           </InputGroupAddon>
 
           {searchQuery && (
@@ -86,7 +86,7 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
                   void setSearchQuery('')
                 }}
               >
-                <XIcon aria-hidden />
+                <IconX aria-hidden />
               </Button>
             </InputGroupAddon>
           )}
@@ -104,7 +104,7 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
                       setSearchTooltipOpen(true)
                     }}
                   >
-                    <InfoIcon className="size-4" />
+                    <IconInfoCircle className="size-4" />
                   </Button>
                 }
               />
@@ -127,7 +127,7 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
                         className="relative"
                         aria-label={isFiltered ? `Filtros: ${activeStatusLabel}` : 'Filtros'}
                       >
-                        <ListFilterIcon className="size-4" />
+                        <IconFilter className="size-4" />
                         {/* The list is narrowed; don't let that go unnoticed. */}
                         {isFiltered && (
                           <span

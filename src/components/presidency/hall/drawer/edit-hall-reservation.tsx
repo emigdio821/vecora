@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle, IconInfoCircle } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import { CircleAlertIcon, InfoIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -118,7 +118,7 @@ function EditHallReservationForm({
         >
           {isPaid && (
             <Alert variant="info">
-              <InfoIcon />
+              <IconInfoCircle />
               <AlertTitle>Reservación pagada</AlertTitle>
               <AlertDescription>
                 El pago ya está en "Tesorería", así que la casa y el monto no se pueden cambiar. Puedes mover
@@ -136,7 +136,7 @@ function EditHallReservationForm({
 
           {form.formState.errors.root && (
             <Alert variant="error">
-              <CircleAlertIcon />
+              <IconAlertCircle />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>

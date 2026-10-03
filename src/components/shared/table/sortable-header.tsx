@@ -1,5 +1,5 @@
+import { IconChevronDown, IconChevronUp, IconSelector } from '@tabler/icons-react'
 import type { Column, RowData } from '@tanstack/react-table'
-import { ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuCheckboxItem, MenuPopup, MenuTrigger, MenuGroup } from '@/components/ui/menu'
 import { cn } from '@/lib/utils'
@@ -30,9 +30,9 @@ export function DataTableSortableHeader<TData extends RowData, TValue>({
           render={
             <Button variant="ghost" size="sm" className="gap-2 text-inherit">
               <span className="text-sm">{title}</span>
-              {isAscSorted && <ChevronUpIcon className="size-4" />}
-              {isDescSorted && <ChevronDownIcon className="size-4" />}
-              {!column.getIsSorted() && <ChevronsUpDownIcon className="size-4" />}
+              {isAscSorted && <IconChevronUp className="size-4" />}
+              {isDescSorted && <IconChevronDown className="size-4" />}
+              {!column.getIsSorted() && <IconSelector className="size-4" />}
             </Button>
           }
         />

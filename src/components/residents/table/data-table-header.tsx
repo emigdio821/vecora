@@ -1,5 +1,5 @@
+import { IconInfoCircle, IconSearch, IconTrash, IconX } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { InfoIcon, SearchIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
@@ -59,7 +59,7 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
             }}
           />
           <InputGroupAddon>
-            <SearchIcon />
+            <IconSearch />
           </InputGroupAddon>
 
           {searchQuery && (
@@ -73,7 +73,7 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
                   void setSearchQuery('')
                 }}
               >
-                <XIcon aria-hidden />
+                <IconX aria-hidden />
               </Button>
             </InputGroupAddon>
           )}
@@ -91,7 +91,7 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
                       setSearchTooltipOpen(true)
                     }}
                   >
-                    <InfoIcon className="size-4" />
+                    <IconInfoCircle className="size-4" />
                   </Button>
                 }
               />
@@ -114,7 +114,7 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
                         setDeleteSelectedOpen(true)
                       }}
                     >
-                      <Trash2Icon className="size-4" />
+                      <IconTrash className="size-4" />
                       <Badge variant="error" size="sm" aria-hidden>
                         {selectedRowsLength}
                       </Badge>

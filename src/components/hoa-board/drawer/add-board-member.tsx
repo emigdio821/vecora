@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CircleAlertIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { ResidentsPicker } from '@/components/shared/pickers/residents-picker'
@@ -157,7 +157,7 @@ export function AddBoardMemberDrawer({
 
             {form.formState.errors.root && (
               <Alert variant="error">
-                <CircleAlertIcon />
+                <IconAlertCircle />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>

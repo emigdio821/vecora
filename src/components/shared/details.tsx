@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from 'lucide-react'
+import { IconChevronDown } from '@tabler/icons-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -43,7 +43,7 @@ export function CollapsibleSection({
             className="-me-3 [&_svg]:transition-transform data-panel-open:[&_svg]:rotate-180"
             aria-label={`Mostrar u ocultar ${title.toLowerCase()}`}
           >
-            <ChevronDownIcon />
+            <IconChevronDown />
           </CollapsibleTrigger>
         </FrameHeader>
         <CollapsiblePanel>

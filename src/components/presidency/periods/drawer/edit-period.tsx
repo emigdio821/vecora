@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import { CircleAlertIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -107,7 +107,7 @@ function EditPeriodForm({ period, mutation }: { period: PeriodQueryData; mutatio
 
           {form.formState.errors.root && (
             <Alert variant="error">
-              <CircleAlertIcon />
+              <IconAlertCircle />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>

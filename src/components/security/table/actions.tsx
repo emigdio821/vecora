@@ -1,4 +1,4 @@
-import { EllipsisIcon } from 'lucide-react'
+import { IconDots } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -65,7 +65,7 @@ export function RequestsTableActions({ request, viewer }: ActionsProps) {
               className="ml-auto"
               aria-label={`Acciones de ${request.title}`}
             >
-              <EllipsisIcon className="size-4" />
+              <IconDots className="size-4" />
             </Button>
           }
         />

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle, IconPhoto, IconTrash, IconUpload } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CircleAlertIcon, ImageIcon, Trash2Icon, UploadIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { RemoveLogoAlertDialog } from '@/components/settings/dialog/remove-logo'
@@ -123,7 +123,7 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
 
           {form.formState.errors.root && (
             <Alert variant="error">
-              <CircleAlertIcon />
+              <IconAlertCircle />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
@@ -187,7 +187,7 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
               className="size-full object-contain"
             />
           ) : (
-            <ImageIcon className="size-6 text-muted-foreground/60" />
+            <IconPhoto className="size-6 text-muted-foreground/60" />
           )}
         </div>
         <div className="flex flex-col flex-wrap gap-2">
@@ -200,7 +200,7 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
               inputRef.current?.click()
             }}
           >
-            <UploadIcon />
+            <IconUpload />
             {logoPath ? 'Cambiar logo' : 'Subir logo'}
           </Button>
           {logoPath && (
@@ -212,7 +212,7 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
                 setRemoveOpen(true)
               }}
             >
-              <Trash2Icon />
+              <IconTrash />
               Quitar
             </Button>
           )}

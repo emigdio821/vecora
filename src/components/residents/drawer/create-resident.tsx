@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CircleAlertIcon } from 'lucide-react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { RELATIONSHIP_ITEMS } from '@/components/houses/relationship'
 import { PhoneInput } from '@/components/shared/phone-input'
@@ -298,7 +298,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
 
             {form.formState.errors.root && (
               <Alert variant="error">
-                <CircleAlertIcon />
+                <IconAlertCircle />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>

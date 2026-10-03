@@ -1,5 +1,5 @@
+import { IconLoader } from '@tabler/icons-react'
 import { type LinkProps, useMatchRoute } from '@tanstack/react-router'
-import { LoaderIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /**
@@ -12,7 +12,7 @@ export function LinkPendingIndicator({ to }: { to: LinkProps['to'] }) {
   const pending = !!matchRoute({ to, pending: true })
 
   return (
-    <LoaderIcon
+    <IconLoader
       aria-hidden
       className={cn(
         'ms-auto size-3.5 text-muted-foreground opacity-0',

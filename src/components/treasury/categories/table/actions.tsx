@@ -1,5 +1,5 @@
+import { IconDots } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
@@ -61,7 +61,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
               className="ml-auto"
               aria-label={`Acciones de ${category.name}`}
             >
-              <EllipsisIcon className="size-4" />
+              <IconDots className="size-4" />
             </Button>
           }
         />

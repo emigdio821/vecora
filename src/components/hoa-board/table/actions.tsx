@@ -1,5 +1,5 @@
+import { IconDots } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
-import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
@@ -68,7 +68,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
               aria-label={`Acciones de ${member.full_name}`}
               loading={resend.isPending}
             >
-              <EllipsisIcon className="size-4" />
+              <IconDots className="size-4" />
             </Button>
           }
         />

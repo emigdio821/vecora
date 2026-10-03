@@ -1,4 +1,4 @@
-import { ArrowRightIcon, LayersIcon, ListIcon, ScrollTextIcon } from 'lucide-react'
+import { IconArrowRight, IconList, IconScript, IconStack2 } from '@tabler/icons-react'
 import { CollapsibleSection, Detail, Muted } from '@/components/shared/details'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -61,7 +61,7 @@ export function EntryDetailsDrawer({
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<ScrollTextIcon />} title="Resumen">
+          <CollapsibleSection icon={<IconScript />} title="Resumen">
             <div className="grid grid-cols-2 gap-3">
               <Detail label="Quién">{identityName(entry)}</Detail>
               <Detail label="Cuándo">
@@ -76,7 +76,7 @@ export function EntryDetailsDrawer({
             </div>
           </CollapsibleSection>
 
-          <CollapsibleSection icon={<ListIcon />} title={changesTitle(entry)} count={changes.length}>
+          <CollapsibleSection icon={<IconList />} title={changesTitle(entry)} count={changes.length}>
             {changes.length ? (
               <dl className="grid gap-3">
                 {changes.map(({ field, before, after }) => (
@@ -88,7 +88,7 @@ export function EntryDetailsDrawer({
                           <span className="whitespace-pre-wrap text-muted-foreground line-through">
                             {before || <Muted>Vacío</Muted>}
                           </span>
-                          <ArrowRightIcon
+                          <IconArrowRight
                             aria-label="cambió a"
                             className="size-3.5 shrink-0 text-muted-foreground"
                           />
@@ -107,7 +107,7 @@ export function EntryDetailsDrawer({
           </CollapsibleSection>
 
           {related.length > 0 && (
-            <CollapsibleSection icon={<LayersIcon />} title="Hecho al mismo tiempo" count={related.length}>
+            <CollapsibleSection icon={<IconStack2 />} title="Hecho al mismo tiempo" count={related.length}>
               <p className="mb-3 text-sm text-muted-foreground">
                 Otros cambios que se guardaron junto con este. Por ejemplo, al pagar una solicitud también se
                 registra su movimiento.

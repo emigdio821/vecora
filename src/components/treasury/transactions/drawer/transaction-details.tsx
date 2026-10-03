@@ -1,4 +1,4 @@
-import { CalendarPlusIcon, HistoryIcon, NotebookPenIcon, ReceiptTextIcon, WalletIcon } from 'lucide-react'
+import { IconCalendarPlus, IconHistory, IconNotes, IconReceipt, IconWallet } from '@tabler/icons-react'
 import { CollapsibleSection, Detail, Timestamp } from '@/components/shared/details'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -41,7 +41,7 @@ export function TransactionDetailsDrawer({
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<ReceiptTextIcon />} title="Movimiento">
+          <CollapsibleSection icon={<IconReceipt />} title="Movimiento">
             <div className="grid grid-cols-2 gap-3">
               <Detail label="Tipo">{KIND_LABEL[kind]}</Detail>
               <Detail label="Monto">
@@ -66,7 +66,7 @@ export function TransactionDetailsDrawer({
             </div>
           </CollapsibleSection>
 
-          <CollapsibleSection icon={<WalletIcon />} title="Pago">
+          <CollapsibleSection icon={<IconWallet />} title="Pago">
             <div className="grid grid-cols-2 gap-3">
               <Detail label="Método de pago">{PAYMENT_METHOD_LABEL[transaction.payment_method]}</Detail>
               {reference && <Detail label="Referencia">{reference}</Detail>}
@@ -74,14 +74,14 @@ export function TransactionDetailsDrawer({
           </CollapsibleSection>
 
           {notes && (
-            <CollapsibleSection icon={<NotebookPenIcon />} title="Notas">
+            <CollapsibleSection icon={<IconNotes />} title="Notas">
               <p className="text-sm whitespace-pre-wrap">{notes}</p>
             </CollapsibleSection>
           )}
 
           <dl className="grid grid-cols-2 gap-3 px-1 pt-1">
-            <Timestamp icon={<CalendarPlusIcon />} label="Creado" value={transaction.created_at} />
-            <Timestamp icon={<HistoryIcon />} label="Actualizado" value={transaction.updated_at} />
+            <Timestamp icon={<IconCalendarPlus />} label="Creado" value={transaction.created_at} />
+            <Timestamp icon={<IconHistory />} label="Actualizado" value={transaction.updated_at} />
           </dl>
         </DrawerPanel>
 

@@ -1,9 +1,9 @@
-import { LoaderIcon, LucideProps } from 'lucide-react'
+import { IconLoader, type IconProps } from '@tabler/icons-react'
 import type React from 'react'
 import { cn } from '@/lib/utils'
 
-export function Spinner({ className, ...props }: LucideProps): React.ReactElement {
+export function Spinner({ className, ...props }: IconProps): React.ReactElement {
   return (
-    <LoaderIcon aria-label="Loading" className={cn('animate-spin', className)} role="status" {...props} />
+    <IconLoader aria-label="Loading" className={cn('animate-spin', className)} role="status" {...props} />
   )
 }

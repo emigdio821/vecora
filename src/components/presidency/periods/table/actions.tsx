@@ -1,4 +1,4 @@
-import { EllipsisIcon } from 'lucide-react'
+import { IconDots } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
@@ -30,7 +30,7 @@ export function PeriodsTableActions({ period }: ActionsProps) {
         <MenuTrigger
           render={
             <Button size="icon" variant="ghost" className="ml-auto" aria-label={`Acciones de ${period.name}`}>
-              <EllipsisIcon className="size-4" />
+              <IconDots className="size-4" />
             </Button>
           }
         />

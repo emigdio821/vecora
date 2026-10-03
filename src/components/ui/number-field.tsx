@@ -1,5 +1,5 @@
 import { NumberField as NumberFieldPrimitive } from '@base-ui/react/number-field'
-import { MinusIcon, PlusIcon } from 'lucide-react'
+import { IconMinus, IconPlus } from '@tabler/icons-react'
 import * as React from 'react'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
@@ -63,7 +63,7 @@ export function NumberFieldDecrement({
       data-slot="number-field-decrement"
       {...props}
     >
-      <MinusIcon />
+      <IconMinus />
     </NumberFieldPrimitive.Decrement>
   )
 }
@@ -81,7 +81,7 @@ export function NumberFieldIncrement({
       data-slot="number-field-increment"
       {...props}
     >
-      <PlusIcon />
+      <IconPlus />
     </NumberFieldPrimitive.Increment>
   )
 }

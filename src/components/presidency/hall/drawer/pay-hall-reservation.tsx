@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle, IconSelector } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
 import { addYears, format, parseISO, subYears } from 'date-fns'
-import { ChevronsUpDownIcon, CircleAlertIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { PAYMENT_METHOD_ITEMS } from '@/components/treasury/kind'
@@ -152,7 +152,7 @@ function PayHallReservationForm({ mutation }: { mutation: PayMutation }) {
                           className="w-full justify-between pr-2"
                         >
                           <span className="truncate font-normal">{formatDay(field.value)}</span>
-                          <ChevronsUpDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+                          <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                         </Button>
                       }
                     />
@@ -276,7 +276,7 @@ function PayHallReservationForm({ mutation }: { mutation: PayMutation }) {
 
           {form.formState.errors.root && (
             <Alert variant="error">
-              <CircleAlertIcon />
+              <IconAlertCircle />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>

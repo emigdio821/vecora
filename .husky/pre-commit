@@ -1,1 +1,3 @@
-lint-staged
+# Split the file list into chunks: a big commit otherwise passes every path in
+# one command and Windows rejects it ("The command line is too long").
+lint-staged --max-arg-length 6000

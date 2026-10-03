@@ -1,5 +1,5 @@
+import { IconFilter, IconInfoCircle, IconSearch, IconTrash, IconX } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { InfoIcon, ListFilterIcon, SearchIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
@@ -88,7 +88,7 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
             }}
           />
           <InputGroupAddon>
-            <SearchIcon />
+            <IconSearch />
           </InputGroupAddon>
 
           {searchQuery && (
@@ -102,7 +102,7 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
                   void setSearchQuery('')
                 }}
               >
-                <XIcon aria-hidden />
+                <IconX aria-hidden />
               </Button>
             </InputGroupAddon>
           )}
@@ -120,7 +120,7 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
                       setSearchTooltipOpen(true)
                     }}
                   >
-                    <InfoIcon className="size-4" />
+                    <IconInfoCircle className="size-4" />
                   </Button>
                 }
               />
@@ -143,7 +143,7 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
                         className="relative"
                         aria-label={isFiltered ? `Filtros: ${activeKindLabel}` : 'Filtros'}
                       >
-                        <ListFilterIcon className="size-4" />
+                        <IconFilter className="size-4" />
                         {/* The list is narrowed; don't let that go unnoticed. */}
                         {isFiltered && (
                           <span
@@ -192,7 +192,7 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
                           setDeleteSelectedOpen(true)
                         }}
                       >
-                        <Trash2Icon className="size-4" />
+                        <IconTrash className="size-4" />
                         <Badge variant="error" size="sm" aria-hidden>
                           {selectedRowsLength}
                         </Badge>

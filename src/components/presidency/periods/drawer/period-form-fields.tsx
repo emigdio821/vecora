@@ -1,5 +1,5 @@
+import { IconInfoCircle, IconSelector } from '@tabler/icons-react'
 import { addDays, addYears, format, parseISO, subYears } from 'date-fns'
-import { ChevronsUpDownIcon, InfoIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -81,7 +81,7 @@ export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProp
                         className="w-full justify-between pr-2"
                       >
                         <span className="truncate font-normal">{formatDay(field.value)}</span>
-                        <ChevronsUpDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+                        <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                       </Button>
                     }
                   />
@@ -224,7 +224,7 @@ export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProp
 
       {inUse && (
         <Alert variant="info">
-          <InfoIcon />
+          <IconInfoCircle />
           <AlertTitle>Este periodo ya tiene movimientos</AlertTitle>
           <AlertDescription>
             Los cambios en la cuota, el recargo o el día límite solo aplican a las cuotas que se registren a

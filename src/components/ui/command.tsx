@@ -1,5 +1,5 @@
 import { Dialog as CommandDialogPrimitive } from '@base-ui/react/dialog'
-import { SearchIcon } from 'lucide-react'
+import { IconSearch } from '@tabler/icons-react'
 import type * as React from 'react'
 import {
   Autocomplete,
@@ -107,7 +107,7 @@ export function CommandInput({
         )}
         placeholder={placeholder}
         size="lg"
-        startAddon={<SearchIcon />}
+        startAddon={<IconSearch />}
         {...props}
       />
     </div>

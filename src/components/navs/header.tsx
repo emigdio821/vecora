@@ -1,5 +1,5 @@
+import { IconChartLine } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
-import { ChartLineIcon } from 'lucide-react'
 import type { Settings } from '@/lib/supabase/settings'
 import { DEFAULT_RESIDENTIAL_LABEL } from '@/lib/validations/settings'
 import { VecoraIcon } from '../shared/icons'
@@ -47,7 +47,7 @@ export function HeaderNav({ settings, ...props }: HeaderNavProps) {
             isActive={pathname === '/'}
             render={
               <Link to="/">
-                <ChartLineIcon className="size-4" />
+                <IconChartLine className="size-4" />
                 <span>Inicio</span>
                 <LinkPendingIndicator to="/" />
               </Link>

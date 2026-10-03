@@ -1,11 +1,11 @@
 import {
-  CalendarPlusIcon,
-  HistoryIcon,
-  HouseIcon,
-  NotebookPenIcon,
-  PhoneIcon,
-  UserRoundIcon,
-} from 'lucide-react'
+  IconCalendarPlus,
+  IconHistory,
+  IconHome,
+  IconNotes,
+  IconPhone,
+  IconUserCircle,
+} from '@tabler/icons-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { CollapsibleSection, Detail, Muted, Timestamp } from '@/components/shared/details'
@@ -59,7 +59,7 @@ export function ResidentDetailsDrawer({
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<PhoneIcon />} title="Contacto">
+          <CollapsibleSection icon={<IconPhone />} title="Contacto">
             <Detail label="Teléfono">
               <a className="hover:underline" href={`tel:${resident.phone}`}>
                 {resident.phone}
@@ -76,7 +76,7 @@ export function ResidentDetailsDrawer({
             </Detail>
           </CollapsibleSection>
 
-          <CollapsibleSection icon={<HouseIcon />} title="Casas" count={resident.property_residents.length}>
+          <CollapsibleSection icon={<IconHome />} title="Casas" count={resident.property_residents.length}>
             {resident.property_residents.length ? (
               <ul className="grid gap-2">
                 {resident.property_residents.map(({ property, relationship }) => (
@@ -91,7 +91,7 @@ export function ResidentDetailsDrawer({
             )}
           </CollapsibleSection>
 
-          <CollapsibleSection icon={<UserRoundIcon />} title="Cuenta">
+          <CollapsibleSection icon={<IconUserCircle />} title="Cuenta">
             {resident.profile ? (
               <>
                 <Detail label="Nombre en la cuenta">
@@ -115,14 +115,14 @@ export function ResidentDetailsDrawer({
           </CollapsibleSection>
 
           {resident.notes && (
-            <CollapsibleSection icon={<NotebookPenIcon />} title="Notas">
+            <CollapsibleSection icon={<IconNotes />} title="Notas">
               <p className="text-sm whitespace-pre-wrap">{resident.notes}</p>
             </CollapsibleSection>
           )}
 
           <dl className="grid grid-cols-2 gap-3 px-1 pt-1">
-            <Timestamp icon={<CalendarPlusIcon />} label="Creado" value={resident.created_at} />
-            <Timestamp icon={<HistoryIcon />} label="Actualizado" value={resident.updated_at} />
+            <Timestamp icon={<IconCalendarPlus />} label="Creado" value={resident.created_at} />
+            <Timestamp icon={<IconHistory />} label="Actualizado" value={resident.updated_at} />
           </dl>
         </DrawerPanel>
 

@@ -1,21 +1,21 @@
+import {
+  IconBuildingCommunity,
+  IconEye,
+  IconFileText,
+  IconGavel,
+  IconHeartHandshake,
+  IconHistory,
+  IconHome,
+  IconPigMoney,
+  IconReceipt,
+  IconSettings,
+  IconTool,
+  IconUrgent,
+  IconUser,
+  type TablerIcon,
+} from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import {
-  EyeIcon,
-  FileTextIcon,
-  GavelIcon,
-  HeartHandshakeIcon,
-  HistoryIcon,
-  HouseIcon,
-  type LucideIcon,
-  MapPinHouseIcon,
-  PiggyBankIcon,
-  ReceiptTextIcon,
-  SettingsIcon,
-  SirenIcon,
-  UserIcon,
-  WrenchIcon,
-} from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { useCurrentUser } from '@/components/current-user-provider'
@@ -40,7 +40,7 @@ export function useWelcomeParam() {
 }
 
 interface Ability {
-  icon: LucideIcon
+  icon: TablerIcon
   title: string
   description: string
   roles: AppRole[]
@@ -49,49 +49,49 @@ interface Ability {
 /** What each role can change. Admin gets every entry, like `private.has_role`. */
 const ABILITIES: Ability[] = [
   {
-    icon: MapPinHouseIcon,
+    icon: IconBuildingCommunity,
     title: 'Residencial',
     description: 'Da de alta las casas y a sus residentes.',
     roles: ['president'],
   },
   {
-    icon: GavelIcon,
+    icon: IconGavel,
     title: 'Presidencia',
     description: 'Abre los periodos de cuotas y aparta la terraza.',
     roles: ['president', 'treasurer'],
   },
   {
-    icon: HeartHandshakeIcon,
+    icon: IconHeartHandshake,
     title: 'Mesa directiva',
     description: 'Agrega a los integrantes y compárteles su enlace de acceso.',
     roles: ['president'],
   },
   {
-    icon: PiggyBankIcon,
+    icon: IconPigMoney,
     title: 'Tesorería',
     description: 'Registra los ingresos, egresos y cuotas pagadas, y sus categorías.',
     roles: ['treasurer'],
   },
   {
-    icon: ReceiptTextIcon,
+    icon: IconReceipt,
     title: 'Solicitudes de pago',
     description: 'Marca como pagadas o rechazadas las de "Mantenimiento" y "Seguridad".',
     roles: ['treasurer'],
   },
   {
-    icon: WrenchIcon,
+    icon: IconTool,
     title: 'Mantenimiento',
     description: 'Registra trabajos y compras. Cada uno le llega a "Tesorería" como solicitud de pago.',
     roles: ['maintenance'],
   },
   {
-    icon: SirenIcon,
+    icon: IconUrgent,
     title: 'Seguridad',
     description: 'Registra los gastos de seguridad. Cada uno le llega a "Tesorería" como solicitud de pago.',
     roles: ['security'],
   },
   {
-    icon: HistoryIcon,
+    icon: IconHistory,
     title: 'Historial',
     description: 'Revisa cada cambio en la aplicación: qué se hizo, quién y cuándo.',
     roles: ['admin'],
@@ -194,22 +194,22 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
       description: 'Toda la mesa directiva trabaja con la misma información.',
       content: (
         <InfoList>
-          <InfoRow icon={EyeIcon} title="Puedes consultar todo">
+          <InfoRow icon={IconEye} title="Puedes consultar todo">
             Todas las secciones están abiertas para ti. Los botones para agregar o editar solo aparecen donde
             tienes permiso.
           </InfoRow>
-          <InfoRow icon={HouseIcon} title="Inicio">
+          <InfoRow icon={IconHome} title="Inicio">
             El resumen del periodo, las cuotas pendientes y las solicitudes de pago.
           </InfoRow>
-          <InfoRow icon={FileTextIcon} title="Reporte financiero">
+          <InfoRow icon={IconFileText} title="Reporte financiero">
             En "Reportes", en el menú lateral, descarga en PDF los ingresos, egresos y cuotas pendientes de
             las fechas que elijas.
           </InfoRow>
-          <InfoRow icon={HistoryIcon} title="Cada cambio queda registrado">
+          <InfoRow icon={IconHistory} title="Cada cambio queda registrado">
             Todo lo que se crea, edita o elimina queda registrado en la aplicación con la información de quién
             lo hizo y cuándo.
           </InfoRow>
-          <InfoRow icon={UserIcon} title="Vuelve a verla cuando quieras">
+          <InfoRow icon={IconUser} title="Vuelve a verla cuando quieras">
             Toca tu nombre en el menú lateral y elige "Ver introducción".
           </InfoRow>
         </InfoList>
@@ -224,11 +224,11 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
       content: (
         <div className="flex flex-col gap-4">
           <InfoList>
-            <InfoRow icon={HeartHandshakeIcon} title="Invita a la mesa directiva">
+            <InfoRow icon={IconHeartHandshake} title="Invita a la mesa directiva">
               Agrega a cada integrante en "Mesa directiva" y envíale el enlace de acceso que se genera, por
               WhatsApp o como prefieras. Al abrirlo, creará su contraseña para entrar.
             </InfoRow>
-            <InfoRow icon={SettingsIcon} title="Ajustes">
+            <InfoRow icon={IconSettings} title="Ajustes">
               Pon el nombre del residencial y su logo; se usan en el menú y en los reportes.
             </InfoRow>
           </InfoList>
@@ -238,7 +238,7 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
             render={<Link to="/hoa-board" />}
             onClick={onLeave}
           >
-            <HeartHandshakeIcon />
+            <IconHeartHandshake />
             Ir a "Mesa directiva"
           </Button>
         </div>
@@ -297,7 +297,7 @@ function InfoRow({
   title,
   children,
 }: {
-  icon: LucideIcon
+  icon: TablerIcon
   title: string
   children: React.ReactNode
 }) {

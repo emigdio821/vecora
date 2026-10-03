@@ -1,6 +1,6 @@
+import { IconReceipt } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, type LinkOptions, linkOptions } from '@tanstack/react-router'
-import { ReceiptTextIcon } from 'lucide-react'
 import { hallReservationStatus } from '@/components/presidency/hall/status'
 import { KIND_LABEL as SECURITY_KIND_LABEL } from '@/components/security/kind'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
@@ -87,7 +87,7 @@ export function PaymentRequestsCard() {
         <CardFrameTitle>Solicitudes de pago</CardFrameTitle>
         <CardFrameDescription>{pendingDescription(pending.length)}</CardFrameDescription>
         <CardFrameAction className="text-muted-foreground">
-          <ReceiptTextIcon />
+          <IconReceipt />
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
@@ -116,7 +116,7 @@ export function PaymentRequestsCard() {
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
-                  <ReceiptTextIcon />
+                  <IconReceipt />
                 </EmptyMedia>
                 <EmptyTitle>Todo al día</EmptyTitle>
                 <EmptyDescription>

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle, IconInfoCircle } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import { CircleAlertIcon, InfoIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -103,7 +103,7 @@ function EditCategoryForm({
         >
           {key !== null && (
             <Alert variant="info">
-              <InfoIcon />
+              <IconInfoCircle />
               <AlertTitle>Categoría del sistema</AlertTitle>
               <AlertDescription>
                 {systemCategorySource(key)} usa esta categoría. Puedes cambiarle el nombre, pero no
@@ -116,7 +116,7 @@ function EditCategoryForm({
 
           {form.formState.errors.root && (
             <Alert variant="error">
-              <CircleAlertIcon />
+              <IconAlertCircle />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IconAlertCircle, IconSelector } from '@tabler/icons-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   addMonths,
@@ -12,7 +13,6 @@ import {
   subMonths,
   subYears,
 } from 'date-fns'
-import { ChevronsUpDownIcon, CircleAlertIcon } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { HousesPicker, houseLabel } from '@/components/shared/pickers/houses-picker'
@@ -294,7 +294,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                             className="w-full justify-between pr-2"
                           >
                             <span className="truncate font-normal">{formatDay(field.value)}</span>
-                            <ChevronsUpDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+                            <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                           </Button>
                         }
                       />
@@ -472,7 +472,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
             ) : (
               periods && (
                 <Alert variant="warning">
-                  <CircleAlertIcon />
+                  <IconAlertCircle />
                   <AlertTitle>Sin periodo</AlertTitle>
                   <AlertDescription>
                     Ningún periodo cubre la fecha de pago. Crea el periodo antes de registrar cuotas.
@@ -483,7 +483,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
 
             {form.formState.errors.root && (
               <Alert variant="error">
-                <CircleAlertIcon />
+                <IconAlertCircle />
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>

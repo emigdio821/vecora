@@ -1,5 +1,5 @@
+import { IconUserMinus, IconUsers } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { UserMinusIcon, UsersIcon } from 'lucide-react'
 import { useState } from 'react'
 import { CollapsibleSection, Muted } from '@/components/shared/details'
 import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
@@ -34,7 +34,7 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
   const residents = sortByRelationship(house.property_residents)
 
   return (
-    <CollapsibleSection icon={<UsersIcon />} title="Residentes" count={residents.length}>
+    <CollapsibleSection icon={<IconUsers />} title="Residentes" count={residents.length}>
       {residents.length ? (
         <ul className="grid gap-3">
           {residents.map(({ resident, relationship }) => (
@@ -133,7 +133,7 @@ function UnassignResidentButton({
               }}
               aria-label={`Quitar a ${name} de la casa`}
             >
-              <UserMinusIcon />
+              <IconUserMinus />
             </Button>
           }
         />

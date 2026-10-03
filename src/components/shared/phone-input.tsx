@@ -1,4 +1,4 @@
-import { ChevronsUpDownIcon, SearchIcon } from 'lucide-react'
+import { IconSearch, IconSelector } from '@tabler/icons-react'
 import { useMemo, useState } from 'react'
 import RPNInput, {
   type Country,
@@ -79,7 +79,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
     >
       <ComboboxTrigger render={<Button className="w-20 justify-between font-normal" variant="outline" />}>
         <ComboboxValue>{getCountryCode}</ComboboxValue>
-        <ChevronsUpDownIcon className="-me-1!" />
+        <IconSelector className="-me-1!" />
       </ComboboxTrigger>
       <ComboboxPopup aria-label="Código" className="max-w-64 sm:max-w-72 sm:min-w-72">
         <div className="border-b p-2">
@@ -87,7 +87,7 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
             showTrigger={false}
             placeholder="Buscar"
             className="rounded-md before:rounded-[calc(var(--radius-md)-1px)]"
-            startAddon={<SearchIcon />}
+            startAddon={<IconSearch />}
           />
         </div>
         <ComboboxEmpty>Sin resultados.</ComboboxEmpty>

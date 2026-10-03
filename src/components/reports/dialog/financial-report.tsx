@@ -1,3 +1,4 @@
+import { IconDownload } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import {
   endOfMonth,
@@ -9,7 +10,6 @@ import {
   subMonths,
   subYears,
 } from 'date-fns'
-import { DownloadIcon } from 'lucide-react'
 import { useState } from 'react'
 import { type DayRange, RangePicker, type RangePreset, toRange } from '@/components/shared/range-picker'
 import { Button } from '@/components/ui/button'
@@ -178,7 +178,7 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
               mutation.mutate(tab === 'monthly' ? monthRange(parseISO(month)) : range)
             }}
           >
-            <DownloadIcon />
+            <IconDownload />
             Descargar PDF
           </Button>
         </DialogFooter>

@@ -1,6 +1,6 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { ChevronRight, MoreHorizontal } from 'lucide-react'
+import { IconChevronRight, IconDots } from '@tabler/icons-react'
 import type * as React from 'react'
 import { cn } from '@/lib/utils'
 
@@ -72,7 +72,7 @@ export function BreadcrumbSeparator({
       role="presentation"
       {...props}
     >
-      {children ?? <ChevronRight />}
+      {children ?? <IconChevronRight />}
     </li>
   )
 }
@@ -89,7 +89,7 @@ export function BreadcrumbEllipsis({
       role="presentation"
       {...props}
     >
-      <MoreHorizontal className="size-4" />
+      <IconDots className="size-4" />
       <span className="sr-only">More</span>
     </span>
   )

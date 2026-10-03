@@ -1,6 +1,6 @@
+import { IconCalendarMonth, IconConfetti } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { format, parseISO } from 'date-fns'
-import { CalendarDaysIcon, PartyPopperIcon } from 'lucide-react'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import {
   Card,
@@ -46,7 +46,7 @@ export function NoticesCard() {
         <CardFrameTitle>Terraza</CardFrameTitle>
         <CardFrameDescription>Próximos eventos</CardFrameDescription>
         <CardFrameAction>
-          <PartyPopperIcon className="text-muted-foreground" />
+          <IconConfetti className="text-muted-foreground" />
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
@@ -70,7 +70,7 @@ export function NoticesCard() {
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
-                  <CalendarDaysIcon />
+                  <IconCalendarMonth />
                 </EmptyMedia>
                 <EmptyTitle>Sin eventos próximos</EmptyTitle>
                 <EmptyDescription>Aquí aparecerán las reservaciones de la terraza.</EmptyDescription>

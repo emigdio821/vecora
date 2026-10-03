@@ -1,5 +1,5 @@
+import { IconSelector } from '@tabler/icons-react'
 import { addYears, format, parseISO, subYears } from 'date-fns'
-import { ChevronsUpDownIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
@@ -150,7 +150,7 @@ export function RequestFormFields({ form, disabled }: RequestFormFieldsProps) {
                       className="w-full justify-between pr-2"
                     >
                       <span className="truncate font-normal">{formatDay(field.value)}</span>
-                      <ChevronsUpDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+                      <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                     </Button>
                   }
                 />

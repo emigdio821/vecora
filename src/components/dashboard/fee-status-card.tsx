@@ -1,5 +1,5 @@
+import { IconCalendarOff, IconCoins } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
-import { CalendarOffIcon, CoinsIcon } from 'lucide-react'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -54,7 +54,7 @@ export function FeeStatusCard() {
         <CardFrameTitle>Cuotas de mantenimiento</CardFrameTitle>
         <CardFrameDescription>{feeStatusDescription(upToDate, total)}</CardFrameDescription>
         <CardFrameAction className="text-muted-foreground">
-          <CoinsIcon />
+          <IconCoins />
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
@@ -63,7 +63,7 @@ export function FeeStatusCard() {
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
-                  <CalendarOffIcon />
+                  <IconCalendarOff />
                 </EmptyMedia>
                 <EmptyTitle>Sin periodo actual</EmptyTitle>
                 <EmptyDescription>Ningún periodo cubre la fecha de hoy.</EmptyDescription>
@@ -73,7 +73,7 @@ export function FeeStatusCard() {
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
-                  <CoinsIcon />
+                  <IconCoins />
                 </EmptyMedia>
                 <EmptyTitle>Todas las casas están al corriente</EmptyTitle>
                 <EmptyDescription>Ninguna casa debe cuotas de este periodo.</EmptyDescription>
