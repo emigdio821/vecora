@@ -1,9 +1,28 @@
 import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url'
+import { IconAlertTriangle, IconCheck, IconCopy, IconWind } from '@tabler/icons-react'
 import type { QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, HeadContent, Link, Outlet, Scripts } from '@tanstack/react-router'
+import {
+  createRootRouteWithContext,
+  type ErrorComponentProps,
+  HeadContent,
+  Link,
+  Outlet,
+  Scripts,
+  useRouter,
+} from '@tanstack/react-router'
+import { useState } from 'react'
 import { AppProviders } from '@/components/providers'
 import { Button } from '@/components/ui/button'
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
+import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { siteConfig } from '@/lib/config/site'
 import { pageTitle } from '@/lib/metadata'
 import { currentUserQueryOptions } from '@/tanstack-queries/session'
@@ -49,6 +68,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   shellComponent: RootDocument,
   component: RootComponent,
   notFoundComponent: NotFound,
+  errorComponent: RouteError,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -79,6 +99,9 @@ function NotFound() {
     <main className="flex min-h-svh items-center justify-center p-4">
       <Empty>
         <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <IconWind />
+          </EmptyMedia>
           <EmptyTitle>Página no encontrada</EmptyTitle>
           <EmptyDescription>La dirección no existe o ya no está disponible.</EmptyDescription>
         </EmptyHeader>
@@ -86,6 +109,89 @@ function NotFound() {
           <Button variant="outline" render={<Link to="/" />}>
             Ir al inicio
           </Button>
+        </EmptyContent>
+      </Empty>
+    </main>
+  )
+}
+
+/**
+ * Any error a route throws (loader, beforeLoad or render) that no closer route
+ * handles. Shows the message so the user can send it to the admin.
+ */
+function RouteError({ error }: ErrorComponentProps) {
+  const router = useRouter()
+  const [copied, setCopied] = useState(false)
+  const message = (error instanceof Error ? error.message : String(error)) || 'Error desconocido'
+
+  async function copy() {
+    // The page tells the admin where it happened.
+    await navigator.clipboard.writeText(`${message}\nPágina: ${window.location.pathname}`)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <main className="flex min-h-svh items-center justify-center p-4">
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <IconAlertTriangle />
+          </EmptyMedia>
+          <EmptyTitle>Algo salió mal</EmptyTitle>
+          <EmptyDescription>Si sigue pasando, envía este error al administrador.</EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <InputGroup>
+            <InputGroupTextarea
+              readOnly
+              value={message}
+              aria-label="Error"
+              // The class lands on the wrapper; `*:` caps the textarea itself, which otherwise grows to fit.
+              className="text-xs *:max-h-40"
+              onFocus={(e) => {
+                e.currentTarget.select()
+              }}
+            />
+            <InputGroupAddon
+              align="block-start"
+              className="justify-between rounded-t-lg border-b bg-muted/72 p-2!"
+            >
+              <InputGroupText className="ps-1 text-xs">Error</InputGroupText>
+              <Tooltip>
+                <TooltipTrigger
+                  closeOnClick={false}
+                  render={
+                    <Button
+                      size="icon-sm"
+                      variant="ghost"
+                      aria-label="Copiar error"
+                      onClick={() => {
+                        void copy()
+                      }}
+                    >
+                      {copied ? <IconCheck className="text-success-foreground" /> : <IconCopy />}
+                    </Button>
+                  }
+                />
+                <TooltipContent>{copied ? 'Error copiado' : 'Copiar error'}</TooltipContent>
+              </Tooltip>
+            </InputGroupAddon>
+          </InputGroup>
+
+          <div className="flex gap-2">
+            {/* Reruns the loaders, which also clears this error. */}
+            <Button
+              onClick={() => {
+                void router.invalidate()
+              }}
+            >
+              Reintentar
+            </Button>
+            <Button variant="outline" render={<Link to="/" />}>
+              Ir al inicio
+            </Button>
+          </div>
         </EmptyContent>
       </Empty>
     </main>
