@@ -15,18 +15,24 @@ import {
 } from '@/components/ui/combobox'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
 
-type HousesPickerProps = Omit<ComboboxPrimitive.Root.Props<string, boolean | undefined>, 'items'>
+type HousesPickerProps = Omit<ComboboxPrimitive.Root.Props<string, boolean | undefined>, 'items'> & {
+  /** Hide these houses, e.g. the ones already linked to the resident being edited. */
+  excludeIds?: string[]
+}
 
 export function houseLabel(house: { number: string }) {
   return `Casa ${house.number}`
 }
 
 /** Pick one house (`string | null`) or, with `multiple`, several (`string[]`), by id. */
-export function HousesPicker(props: HousesPickerProps) {
+export function HousesPicker({ excludeIds, ...props }: HousesPickerProps) {
   const { data, isPending, isError } = useQuery(housesPickerQueryOptions())
 
   const byId = useMemo(() => new Map(data?.map((house) => [house.id, house])), [data])
-  const items = useMemo(() => data?.map((house) => house.id) ?? [], [data])
+  const items = useMemo(
+    () => (data ?? []).filter((house) => !excludeIds?.includes(house.id)).map((house) => house.id),
+    [data, excludeIds],
+  )
 
   function label(id: string) {
     const house = byId.get(id)

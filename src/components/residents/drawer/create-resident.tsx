@@ -4,7 +4,7 @@ import { CircleAlertIcon } from 'lucide-react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { RELATIONSHIP_ITEMS } from '@/components/houses/relationship'
 import { PhoneInput } from '@/components/shared/phone-input'
-import { HousesPicker, houseLabel } from '@/components/shared/pickers/houses-picker'
+import { HousesPicker } from '@/components/shared/pickers/houses-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -78,7 +78,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
         type: 'success',
         title: 'Residente creado',
         description: house
-          ? `${name} se agregó al directorio y a la ${houseLabel(house).toLowerCase()}.`
+          ? `${name} se agregó al directorio y a la casa ${house.number}.`
           : `${name} se agregó al directorio.`,
       })
       onOpenChange(false)
@@ -232,7 +232,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                     disabled={mutation.isPending}
                   />
                   <FieldDescription>
-                    Opcional. Si tiene más de una casa, podrás asignarle las demás desde la pestaña "Casas".
+                    Opcional. Si tiene más de una casa, podrás asignarle las demás al editar al residente.
                   </FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>

@@ -24,3 +24,11 @@ export const assignResidentsSchema = z.object({
 })
 
 export type AssignResidentsInput = z.infer<typeof assignResidentsSchema>
+
+/** The same link from the resident's side: one house for the resident being edited. */
+export const assignHouseSchema = z.object({
+  houseId: z.uuid('Selecciona una casa'),
+  relationship: z.enum(RELATIONSHIPS, 'Selecciona el tipo de relación'),
+})
+
+export type AssignHouseInput = z.infer<typeof assignHouseSchema>

@@ -24,6 +24,7 @@ import { toastManager } from '@/components/ui/toast'
 import { type UpdateResidentInput, updateResidentSchema } from '@/lib/validations/residents'
 import { updateResident } from '@/server-actions/residents'
 import { RESIDENTS_QUERY_KEY, type ResidentQueryData } from '@/tanstack-queries/residents'
+import { ResidentHouses } from './resident-houses'
 
 const FORM_ID = 'edit-resident-form'
 
@@ -105,7 +106,7 @@ function EditResidentForm({
 
   return (
     <>
-      <DrawerPanel>
+      <DrawerPanel className="grid gap-6">
         <Form
           id={FORM_ID}
           className="flex flex-col gap-4"
@@ -227,6 +228,9 @@ function EditResidentForm({
             </Alert>
           )}
         </Form>
+
+        {/* Links save on their own (assign/unassign), independent of the form's Guardar. */}
+        <ResidentHouses resident={resident} disabled={mutation.isPending} />
       </DrawerPanel>
 
       <DrawerFooter>
