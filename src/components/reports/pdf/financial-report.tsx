@@ -29,6 +29,8 @@ const COLOR = {
   panel: '#f9fafb',
   income: '#15803d',
   expense: '#b91c1c',
+  /** A balance below zero, like the app's "Saldo". */
+  destructive: '#b91c1c',
 }
 
 const styles = StyleSheet.create({
@@ -289,7 +291,11 @@ export function FinancialReportDocument({
             <SummaryBox label="Saldo inicial" value={report.opening_balance} />
             <SummaryBox label="Ingresos" value={report.total_income} color={COLOR.income} />
             <SummaryBox label="Egresos" value={report.total_expense} color={COLOR.expense} />
-            <SummaryBox label="Saldo final" value={report.closing_balance} />
+            <SummaryBox
+              label="Saldo final"
+              value={report.closing_balance}
+              color={report.closing_balance < 0 ? COLOR.destructive : undefined}
+            />
           </View>
           <Text style={styles.note}>
             Saldo inicial: todo lo registrado antes del {formatDay(report.from)}. Saldo final = saldo inicial
