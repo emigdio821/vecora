@@ -1,11 +1,10 @@
-import { IconFilter, IconInfoCircle, IconSearch, IconX } from '@tabler/icons-react'
+import { IconFilter } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 import { RangePicker } from '@/components/shared/range-picker'
+import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import {
   Menu,
   MenuGroup,
@@ -43,15 +42,11 @@ interface LogsDataTableHeaderProps {
 }
 
 export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
-  const searchInputRef = useRef<HTMLInputElement | null>(null)
-  const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-logs', parseAsString.withDefault(''))
   const [range, setRange] = useRangeFilter()
   const [section, setSection] = useSectionFilter()
   const [action, setAction] = useActionFilter()
   const [identity, setIdentity] = useIdentityFilter()
   const coreRows = table.getCoreRowModel().rows
-  const tableRowsLength = coreRows.length
 
   // Whoever shows up in the loaded range, so the list never offers an empty filter.
   const identityItems = useMemo(
@@ -70,68 +65,16 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
   const isFiltered = activeFilterLabels.length > 0
   const filtersLabel = isFiltered ? `Filtros: ${activeFilterLabels.join(', ')}` : 'Filtros'
 
-  useEffect(() => {
-    table.getColumn('summary')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
-
   return (
-    <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
-      <InputGroup className="w-full bg-background sm:w-2xs md:w-xs xl:w-sm">
-        <InputGroupInput
-          type="search"
-          value={searchQuery}
-          aria-label="Buscar"
-          placeholder="Buscar"
-          ref={searchInputRef}
-          name="search-logs"
-          disabled={tableRowsLength === 0}
-          onChange={(e) => {
-            void setSearchQuery(e.target.value)
-          }}
+    <div className="flex flex-col justify-between gap-2 sm:flex-row">
+      <div className="flex gap-2">
+        <DataTableSearch
+          table={table}
+          columnId="summary"
+          param="search-logs"
+          hint="Buscar por resumen, persona o sección"
         />
-        <InputGroupAddon>
-          <IconSearch />
-        </InputGroupAddon>
 
-        {searchQuery && (
-          <InputGroupAddon align="inline-end">
-            <Button
-              size="icon-xs"
-              variant="ghost"
-              aria-label="Limpiar búsqueda"
-              onClick={() => {
-                searchInputRef.current?.focus()
-                void setSearchQuery('')
-              }}
-            >
-              <IconX aria-hidden />
-            </Button>
-          </InputGroupAddon>
-        )}
-
-        <InputGroupAddon align="inline-end">
-          <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
-            <TooltipTrigger
-              closeOnClick={false}
-              render={
-                <Button
-                  size="icon-xs"
-                  variant="ghost"
-                  className="cursor-default"
-                  onClick={() => {
-                    setSearchTooltipOpen(true)
-                  }}
-                >
-                  <IconInfoCircle className="size-4" />
-                </Button>
-              }
-            />
-            <TooltipContent>Buscar por resumen, persona o sección</TooltipContent>
-          </Tooltip>
-        </InputGroupAddon>
-      </InputGroup>
-
-      <div className="flex flex-wrap justify-end gap-2">
         <Menu>
           <Tooltip>
             <TooltipTrigger
@@ -211,7 +154,9 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
             </MenuGroup>
           </MenuPopup>
         </Menu>
+      </div>
 
+      <div className="self-end">
         <RangePicker value={range} onChange={setRange} />
       </div>
     </div>

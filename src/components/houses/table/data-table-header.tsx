@@ -1,12 +1,11 @@
-import { IconInfoCircle, IconSearch, IconTrash, IconX } from '@tabler/icons-react'
+import { IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
+import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { HouseQueryData } from '@/tanstack-queries/houses'
 import { DeleteHousesAlertDialog } from '../dialog/delete-houses'
@@ -18,19 +17,11 @@ interface HousesDataTableHeaderProps {
 
 export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
   const canManage = useHasRole('president')
-  const searchInputRef = useRef<HTMLInputElement | null>(null)
-  const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [isDeleteSelectedOpen, setDeleteSelectedOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-houses', parseAsString.withDefault(''))
-  const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
   const selectedHouses = selectedRows.map((row) => row.original)
-
-  useEffect(() => {
-    table.getColumn('number')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
 
   return (
     <>
@@ -45,63 +36,17 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
       />
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
-        <InputGroup className="w-full bg-background sm:w-2xs md:w-xs xl:w-sm">
-          <InputGroupInput
-            type="search"
-            value={searchQuery}
-            aria-label="Buscar"
-            placeholder="Buscar"
-            ref={searchInputRef}
-            name="search-houses"
-            disabled={tableRowsLength === 0}
-            onChange={(e) => {
-              void setSearchQuery(e.target.value)
-            }}
+        <div className="flex gap-2">
+          <DataTableSearch
+            table={table}
+            columnId="number"
+            param="search-houses"
+            hint="Buscar por número de casa o nombre de residente"
           />
-          <InputGroupAddon>
-            <IconSearch />
-          </InputGroupAddon>
-
-          {searchQuery && (
-            <InputGroupAddon align="inline-end">
-              <Button
-                size="icon-xs"
-                variant="ghost"
-                aria-label="Limpiar búsqueda"
-                onClick={() => {
-                  searchInputRef.current?.focus()
-                  void setSearchQuery('')
-                }}
-              >
-                <IconX aria-hidden />
-              </Button>
-            </InputGroupAddon>
-          )}
-
-          <InputGroupAddon align="inline-end">
-            <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
-              <TooltipTrigger
-                closeOnClick={false}
-                render={
-                  <Button
-                    size="icon-xs"
-                    variant="ghost"
-                    className="cursor-default"
-                    onClick={() => {
-                      setSearchTooltipOpen(true)
-                    }}
-                  >
-                    <IconInfoCircle className="size-4" />
-                  </Button>
-                }
-              />
-              <TooltipContent>Buscar por número de casa o nombre de residente</TooltipContent>
-            </Tooltip>
-          </InputGroupAddon>
-        </InputGroup>
+        </div>
 
         {canManage && (
-          <div className="flex gap-2">
+          <div className="flex justify-end gap-2">
             {selectedRowsLength > 0 && (
               <Tooltip>
                 <TooltipTrigger

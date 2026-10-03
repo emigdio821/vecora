@@ -1,12 +1,12 @@
-import { IconFilter, IconInfoCircle, IconSearch, IconTrash, IconX } from '@tabler/icons-react'
+import { IconFilter, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
-import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
+import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import {
   Menu,
   MenuGroup,
@@ -42,23 +42,15 @@ interface TransactionsDataTableHeaderProps {
 
 export function TransactionsDataTableHeader({ table }: TransactionsDataTableHeaderProps) {
   const canManage = useHasRole('treasurer')
-  const searchInputRef = useRef<HTMLInputElement | null>(null)
-  const [isSearchTooltipOpen, setSearchTooltipOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useQueryState('search-transactions', parseAsString.withDefault(''))
   const [kind, setKind] = useKindFilter()
   const isFiltered = kind !== 'all'
   const activeKindLabel = KIND_FILTER_ITEMS.find((item) => item.value === kind)?.label
   const [isRecordFeeOpen, setRecordFeeOpen] = useState(false)
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [isDeleteSelectedOpen, setDeleteSelectedOpen] = useState(false)
-  const tableRowsLength = table.getCoreRowModel().rows.length
   const selectedRows = table.getFilteredSelectedRowModel().rows
   const selectedRowsLength = selectedRows.length
   const selectedTransactions = selectedRows.map((row) => row.original)
-
-  useEffect(() => {
-    table.getColumn('description')?.setFilterValue(searchQuery)
-  }, [searchQuery, table])
 
   return (
     <>
@@ -73,63 +65,15 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
         }}
       />
 
-      <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
-        <InputGroup className="w-full bg-background sm:w-2xs md:w-xs xl:w-sm">
-          <InputGroupInput
-            type="search"
-            value={searchQuery}
-            aria-label="Buscar"
-            placeholder="Buscar"
-            ref={searchInputRef}
-            name="search-transactions"
-            disabled={tableRowsLength === 0}
-            onChange={(e) => {
-              void setSearchQuery(e.target.value)
-            }}
+      <div className="flex flex-col justify-between gap-2 sm:flex-row">
+        <div className="flex gap-2">
+          <DataTableSearch
+            table={table}
+            columnId="description"
+            param="search-transactions"
+            hint="Buscar por concepto, folio, referencia, categoría o casa"
           />
-          <InputGroupAddon>
-            <IconSearch />
-          </InputGroupAddon>
 
-          {searchQuery && (
-            <InputGroupAddon align="inline-end">
-              <Button
-                size="icon-xs"
-                variant="ghost"
-                aria-label="Limpiar búsqueda"
-                onClick={() => {
-                  searchInputRef.current?.focus()
-                  void setSearchQuery('')
-                }}
-              >
-                <IconX aria-hidden />
-              </Button>
-            </InputGroupAddon>
-          )}
-
-          <InputGroupAddon align="inline-end">
-            <Tooltip open={isSearchTooltipOpen} onOpenChange={setSearchTooltipOpen}>
-              <TooltipTrigger
-                closeOnClick={false}
-                render={
-                  <Button
-                    size="icon-xs"
-                    variant="ghost"
-                    className="cursor-default"
-                    onClick={() => {
-                      setSearchTooltipOpen(true)
-                    }}
-                  >
-                    <IconInfoCircle className="size-4" />
-                  </Button>
-                }
-              />
-              <TooltipContent>Buscar por concepto, folio, referencia, categoría o casa</TooltipContent>
-            </Tooltip>
-          </InputGroupAddon>
-        </InputGroup>
-
-        <div className="flex flex-wrap justify-end gap-2">
           <Menu>
             <Tooltip>
               <TooltipTrigger
@@ -177,50 +121,50 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
               </MenuGroup>
             </MenuPopup>
           </Menu>
-
-          {canManage && (
-            <>
-              {selectedRowsLength > 0 && (
-                <Tooltip>
-                  <TooltipTrigger
-                    closeOnClick={false}
-                    render={
-                      <Button
-                        variant="destructive-outline"
-                        aria-label={`Eliminar ${selectedRowsLength} movimientos seleccionados`}
-                        onClick={() => {
-                          setDeleteSelectedOpen(true)
-                        }}
-                      >
-                        <IconTrash className="size-4" />
-                        <Badge variant="error" size="sm" aria-hidden>
-                          {selectedRowsLength}
-                        </Badge>
-                      </Button>
-                    }
-                  />
-                  <TooltipContent>Eliminar movimientos seleccionados</TooltipContent>
-                </Tooltip>
-              )}
-
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setCreateOpen(true)
-                }}
-              >
-                Registrar movimiento
-              </Button>
-              <Button
-                onClick={() => {
-                  setRecordFeeOpen(true)
-                }}
-              >
-                Registrar cuota
-              </Button>
-            </>
-          )}
         </div>
+
+        {canManage && (
+          <div className="flex flex-wrap justify-end gap-2">
+            {selectedRowsLength > 0 && (
+              <Tooltip>
+                <TooltipTrigger
+                  closeOnClick={false}
+                  render={
+                    <Button
+                      variant="destructive-outline"
+                      aria-label={`Eliminar ${selectedRowsLength} movimientos seleccionados`}
+                      onClick={() => {
+                        setDeleteSelectedOpen(true)
+                      }}
+                    >
+                      <IconTrash className="size-4" />
+                      <Badge variant="error" size="sm" aria-hidden>
+                        {selectedRowsLength}
+                      </Badge>
+                    </Button>
+                  }
+                />
+                <TooltipContent>Eliminar movimientos seleccionados</TooltipContent>
+              </Tooltip>
+            )}
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCreateOpen(true)
+              }}
+            >
+              Registrar movimiento
+            </Button>
+            <Button
+              onClick={() => {
+                setRecordFeeOpen(true)
+              }}
+            >
+              Registrar cuota
+            </Button>
+          </div>
+        )}
       </div>
     </>
   )
