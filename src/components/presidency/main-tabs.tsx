@@ -18,10 +18,10 @@ export function PresidencyMainTabs() {
         <TabsTab value="periods">Periodos</TabsTab>
         <TabsTab value="hall">Terraza</TabsTab>
       </TabsList>
-      <TabsPanel value="periods" keepMounted>
+      <TabsPanel value="periods">
         <PeriodsDataTable />
       </TabsPanel>
-      <TabsPanel value="hall" keepMounted>
+      <TabsPanel value="hall">
         <HallReservationsDataTable />
       </TabsPanel>
     </Tabs>

@@ -18,10 +18,10 @@ export function TreasuryMainTabs() {
         <TabsTab value="transactions">Movimientos</TabsTab>
         <TabsTab value="categories">Categorías</TabsTab>
       </TabsList>
-      <TabsPanel value="transactions" keepMounted>
+      <TabsPanel value="transactions">
         <TransactionsDataTable />
       </TabsPanel>
-      <TabsPanel value="categories" keepMounted>
+      <TabsPanel value="categories">
         <CategoriesDataTable />
       </TabsPanel>
     </Tabs>

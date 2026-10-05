@@ -18,10 +18,10 @@ export function ResidentialMainTabs() {
         <TabsTab value="houses">Casas</TabsTab>
         <TabsTab value="residents">Residentes</TabsTab>
       </TabsList>
-      <TabsPanel value="houses" keepMounted>
+      <TabsPanel value="houses">
         <HousesDataTable />
       </TabsPanel>
-      <TabsPanel value="residents" keepMounted>
+      <TabsPanel value="residents">
         <ResidentsDataTable />
       </TabsPanel>
     </Tabs>
