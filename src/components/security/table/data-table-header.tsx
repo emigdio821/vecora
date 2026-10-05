@@ -53,9 +53,10 @@ export function useKindFilter() {
 interface RequestsDataTableHeaderProps {
   table: Table<DataTableFeatures, SecurityRequestQueryData>
   viewer: SecurityViewer
+  isLoading: boolean
 }
 
-export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHeaderProps) {
+export function RequestsDataTableHeader({ table, viewer, isLoading }: RequestsDataTableHeaderProps) {
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [status, setStatus] = useStatusFilter()
   const [kind, setKind] = useKindFilter()
@@ -144,6 +145,7 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
         {viewer.canRequest && (
           <Button
             className="self-end"
+            disabled={isLoading}
             onClick={() => {
               setCreateOpen(true)
             }}

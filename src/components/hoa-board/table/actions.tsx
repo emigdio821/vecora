@@ -64,7 +64,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
             <Button
               size="icon"
               variant="ghost"
-              className="ml-auto"
+              className="ms-auto flex"
               aria-label={`Acciones de ${member.full_name}`}
               loading={resend.isPending}
             >

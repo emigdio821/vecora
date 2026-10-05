@@ -13,9 +13,10 @@ import { CreateResidentDrawer } from '../drawer/create-resident'
 
 interface ResidentsDataTableHeaderProps {
   table: Table<DataTableFeatures, ResidentQueryData>
+  isLoading: boolean
 }
 
-export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProps) {
+export function ResidentsDataTableHeader({ table, isLoading }: ResidentsDataTableHeaderProps) {
   const canManage = useHasRole('president')
   const [isCreateResidentDrawerOpen, setCreateResidentDrawerOpen] = useState(false)
   const [isDeleteSelectedOpen, setDeleteSelectedOpen] = useState(false)
@@ -78,6 +79,7 @@ export function ResidentsDataTableHeader({ table }: ResidentsDataTableHeaderProp
           )} */}
 
             <Button
+              disabled={isLoading}
               onClick={() => {
                 setCreateResidentDrawerOpen(true)
               }}

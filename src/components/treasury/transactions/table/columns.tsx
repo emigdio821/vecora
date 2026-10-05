@@ -14,7 +14,7 @@ const columnHelper = createColumnHelper<DataTableFeatures, TransactionQueryData>
 export const transactionsTableColumns = columnHelper.columns([
   columnHelper.display({
     id: 'select',
-    size: 28,
+    size: 34,
     enableSorting: false,
     header: ({ table }) => (
       <Checkbox

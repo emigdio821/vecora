@@ -38,9 +38,10 @@ export function useKindFilter() {
 
 interface TransactionsDataTableHeaderProps {
   table: Table<DataTableFeatures, TransactionQueryData>
+  isLoading: boolean
 }
 
-export function TransactionsDataTableHeader({ table }: TransactionsDataTableHeaderProps) {
+export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDataTableHeaderProps) {
   const canManage = useHasRole('treasurer')
   const [kind, setKind] = useKindFilter()
   const isFiltered = kind !== 'all'
@@ -150,6 +151,7 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
 
             <Button
               variant="outline"
+              disabled={isLoading}
               onClick={() => {
                 setCreateOpen(true)
               }}
@@ -157,6 +159,7 @@ export function TransactionsDataTableHeader({ table }: TransactionsDataTableHead
               Registrar movimiento
             </Button>
             <Button
+              disabled={isLoading}
               onClick={() => {
                 setRecordFeeOpen(true)
               }}

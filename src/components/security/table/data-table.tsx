@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
-import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/shared/table/data-table'
 import { securityRequestsQueryOptions } from '@/tanstack-queries/security'
 import { requestsTableColumns, type SecurityViewer } from './columns'
@@ -30,10 +29,6 @@ export function RequestsDataTable({ viewer }: RequestsDataTableProps) {
     return <TanstackQueryError refetch={refetch} />
   }
 
-  if (isLoading) {
-    return <TableGenericSkeleton />
-  }
-
   return (
     <DataTable
       data={visible}
@@ -41,8 +36,9 @@ export function RequestsDataTable({ viewer }: RequestsDataTableProps) {
       columns={columns}
       getRowId={(request) => request.id}
       initialSorting={[{ id: 'requested_on', desc: true }]}
-      header={(table) => <RequestsDataTableHeader table={table} viewer={viewer} />}
+      header={(table) => <RequestsDataTableHeader table={table} viewer={viewer} isLoading={isLoading} />}
       emptyMessage="Sin solicitudes."
+      isLoading={isLoading}
     />
   )
 }

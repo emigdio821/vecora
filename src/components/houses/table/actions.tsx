@@ -32,7 +32,7 @@ export function HousesTableActions({ house }: ActionsProps) {
       <Menu>
         <MenuTrigger
           render={
-            <Button size="icon" variant="ghost" className="ml-auto" aria-label={`Acciones de ${label}`}>
+            <Button size="icon" variant="ghost" className="ms-auto flex" aria-label={`Acciones de ${label}`}>
               <IconDots className="size-4" />
             </Button>
           }

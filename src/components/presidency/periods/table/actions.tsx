@@ -29,7 +29,12 @@ export function PeriodsTableActions({ period }: ActionsProps) {
       <Menu>
         <MenuTrigger
           render={
-            <Button size="icon" variant="ghost" className="ml-auto" aria-label={`Acciones de ${period.name}`}>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="ms-auto flex"
+              aria-label={`Acciones de ${period.name}`}
+            >
               <IconDots className="size-4" />
             </Button>
           }

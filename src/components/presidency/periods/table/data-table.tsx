@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
-import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/shared/table/data-table'
 import { periodSummariesQueryOptions, periodsQueryOptions } from '@/tanstack-queries/treasury'
 import { type PeriodRow, periodsTableColumns } from './columns'
@@ -22,10 +21,6 @@ export function PeriodsDataTable() {
     return <TanstackQueryError refetch={refetch} />
   }
 
-  if (isLoading) {
-    return <TableGenericSkeleton />
-  }
-
   return (
     <DataTable
       data={rows}
@@ -34,8 +29,9 @@ export function PeriodsDataTable() {
       getRowId={(period) => period.id}
       initialSorting={[{ id: 'starts_on', desc: true }]}
       // The query is ordered newest first, so periods[0] is the latest.
-      header={(table) => <PeriodsDataTableHeader table={table} latest={periods[0]} />}
+      header={(table) => <PeriodsDataTableHeader table={table} latest={periods[0]} isLoading={isLoading} />}
       emptyMessage="Sin periodos. Crea uno para poder registrar movimientos."
+      isLoading={isLoading}
     />
   )
 }

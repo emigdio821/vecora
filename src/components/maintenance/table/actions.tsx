@@ -62,7 +62,7 @@ export function RequestsTableActions({ request, viewer }: ActionsProps) {
             <Button
               size="icon"
               variant="ghost"
-              className="ml-auto"
+              className="ms-auto flex"
               aria-label={`Acciones de ${request.title}`}
             >
               <IconDots className="size-4" />

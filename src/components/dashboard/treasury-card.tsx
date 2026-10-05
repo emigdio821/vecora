@@ -2,7 +2,9 @@ import { IconCalendarOff, IconChartArea } from '@tabler/icons-react'
 import { areaY, d3Curve, defineChart, lineY } from '@tanstack/charts'
 import { crosshair } from '@tanstack/charts/crosshair'
 import { decorative } from '@tanstack/charts/mark/decorative'
-import { Chart } from '@tanstack/charts/react'
+import { motion } from '@tanstack/charts/motion'
+// The /core entry takes a renderer; the default one is static SVG.
+import { Chart } from '@tanstack/charts/react/core'
 import { scaleLinear } from '@tanstack/charts/scales/linear'
 import { scaleOrdinal } from '@tanstack/charts/scales/ordinal'
 import { scalePoint } from '@tanstack/charts/scales/point'
@@ -70,6 +72,14 @@ const SERIES_COLORS = scaleOrdinal<Series, string>(
 // Monotone, so the rounding never dips below $0 or overshoots a month's real total.
 const CURVE = d3Curve(curveMonotoneX)
 
+// Lines and areas grow from $0 on first paint and morph when the data changes; the
+// tooltip and crosshair follow the same spring. `initial: 'always'` replays the entrance
+// on the server-rendered chart too. Snaps under reduced motion.
+const RENDERER = motion({
+  initial: 'always',
+  transition: { type: 'spring', stiffness: 170, damping: 18, mass: 1 },
+})
+
 const compactCurrency = new Intl.NumberFormat('es-MX', {
   style: 'currency',
   currency: 'MXN',
@@ -110,7 +120,7 @@ export function TreasuryCard() {
   const summaries = useQuery(periodSummariesQueryOptions())
   const now = useToday()
 
-  if (periods.isPending || summaries.isPending) return <CardFrameSkeleton />
+  if (periods.isPending || summaries.isPending) return <TreasuryCardSkeleton />
   if (periods.isError || summaries.isError) return null
 
   const today = format(now, ISO_DAY)
@@ -149,6 +159,30 @@ export function TreasuryCard() {
   }
 
   return <PeriodTreasury period={period} summary={summary} today={today} />
+}
+
+/** Same layout as PeriodTreasury (totals, then the chart), so nothing moves when the data lands. */
+function TreasuryCardSkeleton() {
+  return (
+    <CardFrameSkeleton className="w-full">
+      <CardPanel className="grid min-w-0 gap-6">
+        <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
+          {Array.from({ length: 3 }, (_, i) => (
+            <div key={i} className="flex items-center justify-between gap-2 sm:grid sm:gap-1">
+              {/* Boxes as tall as the real lines: text-sm label, text-base / sm:text-2xl value. */}
+              <div className="flex h-5 items-center">
+                <Skeleton className="h-3.5 w-16" />
+              </div>
+              <div className="flex h-6 items-center sm:h-8">
+                <Skeleton className="h-4 w-24 sm:h-6 sm:w-32" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <Skeleton style={{ height: CHART_HEIGHT }} />
+      </CardPanel>
+    </CardFrameSkeleton>
+  )
 }
 
 function PeriodTreasury({
@@ -287,6 +321,7 @@ function MonthlyFlowChart({ period, today }: { period: PeriodQueryData; today: s
       <div className="text-muted-foreground">
         <Chart
           definition={definition}
+          renderer={RENDERER}
           height={CHART_HEIGHT}
           ariaLabel={`Ingresos y egresos por mes, periodo ${period.name}`}
           ariaDescription="Áreas por mes: ingresos en verde y egresos en rojo. La tabla que sigue tiene los montos exactos."

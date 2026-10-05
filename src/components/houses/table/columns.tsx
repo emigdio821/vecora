@@ -21,7 +21,7 @@ function owners(house: HouseQueryData) {
 export const housesTableColumns = columnHelper.columns([
   columnHelper.display({
     id: 'select',
-    size: 28,
+    size: 34,
     enableSorting: false,
     header: ({ table }) => (
       <Checkbox

@@ -9,9 +9,10 @@ import { CreateHallReservationDrawer } from '../drawer/create-hall-reservation'
 
 interface HallReservationsDataTableHeaderProps {
   table: Table<DataTableFeatures, HallReservationQueryData>
+  isLoading: boolean
 }
 
-export function HallReservationsDataTableHeader({ table }: HallReservationsDataTableHeaderProps) {
+export function HallReservationsDataTableHeader({ table, isLoading }: HallReservationsDataTableHeaderProps) {
   const canManage = useHasRole('president', 'treasurer')
   const [isCreateOpen, setCreateOpen] = useState(false)
 
@@ -32,6 +33,7 @@ export function HallReservationsDataTableHeader({ table }: HallReservationsDataT
         {canManage && (
           <Button
             className="self-end"
+            disabled={isLoading}
             onClick={() => {
               setCreateOpen(true)
             }}

@@ -31,7 +31,7 @@ function primaryRelationship(resident: ResidentQueryData): Relationship | null {
 export const residentsTableColumns = columnHelper.columns([
   columnHelper.display({
     id: 'select',
-    size: 28,
+    size: 34,
     enableSorting: false,
     header: ({ table }) => (
       <Checkbox

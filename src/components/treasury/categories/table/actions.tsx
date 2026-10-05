@@ -58,7 +58,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
             <Button
               size="icon"
               variant="ghost"
-              className="ml-auto"
+              className="ms-auto flex"
               aria-label={`Acciones de ${category.name}`}
             >
               <IconDots className="size-4" />

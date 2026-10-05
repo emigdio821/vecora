@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
-import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/shared/table/data-table'
 import { transactionsListQueryOptions } from '@/tanstack-queries/treasury'
 import { transactionsTableColumns } from './columns'
@@ -31,10 +30,6 @@ export function TransactionsDataTable() {
     return <TanstackQueryError refetch={refetch} />
   }
 
-  if (isLoading) {
-    return <TableGenericSkeleton />
-  }
-
   return (
     <DataTable
       data={visible}
@@ -42,8 +37,9 @@ export function TransactionsDataTable() {
       columns={columns}
       getRowId={(transaction) => transaction.id}
       initialSorting={[{ id: 'occurred_on', desc: true }]}
-      header={(table) => <TransactionsDataTableHeader table={table} />}
+      header={(table) => <TransactionsDataTableHeader table={table} isLoading={isLoading} />}
       emptyMessage="Sin movimientos."
+      isLoading={isLoading}
     />
   )
 }

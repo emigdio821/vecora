@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
-import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/shared/table/data-table'
 import { housesListQueryOptions } from '@/tanstack-queries/houses'
 import { housesTableColumns } from './columns'
@@ -21,10 +20,6 @@ export function HousesDataTable() {
     return <TanstackQueryError refetch={refetch} />
   }
 
-  if (isLoading) {
-    return <TableGenericSkeleton />
-  }
-
   return (
     <DataTable
       data={houses}
@@ -32,7 +27,8 @@ export function HousesDataTable() {
       columns={columns}
       getRowId={(house) => house.id}
       initialSorting={[{ id: 'number', desc: false }]}
-      header={(table) => <HousesDataTableHeader table={table} />}
+      header={(table) => <HousesDataTableHeader table={table} isLoading={isLoading} />}
+      isLoading={isLoading}
     />
   )
 }

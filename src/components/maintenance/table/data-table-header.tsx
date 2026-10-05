@@ -37,9 +37,10 @@ export function useStatusFilter() {
 interface RequestsDataTableHeaderProps {
   table: Table<DataTableFeatures, MaintenanceRequestQueryData>
   viewer: MaintenanceViewer
+  isLoading: boolean
 }
 
-export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHeaderProps) {
+export function RequestsDataTableHeader({ table, viewer, isLoading }: RequestsDataTableHeaderProps) {
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [status, setStatus] = useStatusFilter()
   const isFiltered = status !== 'all'
@@ -110,6 +111,7 @@ export function RequestsDataTableHeader({ table, viewer }: RequestsDataTableHead
         {viewer.canRequest && (
           <Button
             className="self-end"
+            disabled={isLoading}
             onClick={() => {
               setCreateOpen(true)
             }}

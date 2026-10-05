@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
-import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/shared/table/data-table'
 import { boardMembersQueryOptions } from '@/tanstack-queries/hoa-board'
 import { type BoardViewer, boardMembersTableColumns } from './columns'
@@ -19,10 +18,6 @@ export function BoardMembersDataTable({ viewer }: BoardMembersDataTableProps) {
     return <TanstackQueryError refetch={refetch} />
   }
 
-  if (isLoading) {
-    return <TableGenericSkeleton />
-  }
-
   return (
     <DataTable
       data={members}
@@ -30,8 +25,9 @@ export function BoardMembersDataTable({ viewer }: BoardMembersDataTableProps) {
       columns={columns}
       getRowId={(member) => member.id}
       initialSorting={[{ id: 'full_name', desc: false }]}
-      header={(table) => <BoardMembersDataTableHeader table={table} viewer={viewer} />}
+      header={(table) => <BoardMembersDataTableHeader table={table} viewer={viewer} isLoading={isLoading} />}
       emptyMessage="Sin integrantes."
+      isLoading={isLoading}
     />
   )
 }

@@ -12,15 +12,17 @@ interface PeriodsDataTableHeaderProps {
   table: Table<DataTableFeatures, PeriodRow>
   /** Newest period, if any; seeds the "Nuevo periodo" form. */
   latest: PeriodQueryData | undefined
+  isLoading: boolean
 }
 
-export function PeriodsDataTableHeader({ table, latest }: PeriodsDataTableHeaderProps) {
+export function PeriodsDataTableHeader({ table, latest, isLoading }: PeriodsDataTableHeaderProps) {
   const canManage = useHasRole('treasurer', 'president')
   const [isCreateOpen, setCreateOpen] = useState(false)
 
   return (
     <>
-      <CreatePeriodDrawer latest={latest} open={isCreateOpen} onOpenChange={setCreateOpen} />
+      {/* The form reads `latest` once, on mount; wait for it to load. */}
+      {!isLoading && <CreatePeriodDrawer latest={latest} open={isCreateOpen} onOpenChange={setCreateOpen} />}
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <div className="flex gap-2">
@@ -35,6 +37,7 @@ export function PeriodsDataTableHeader({ table, latest }: PeriodsDataTableHeader
         {canManage && (
           <Button
             className="self-end"
+            disabled={isLoading}
             onClick={() => {
               setCreateOpen(true)
             }}

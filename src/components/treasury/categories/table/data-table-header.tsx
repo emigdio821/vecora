@@ -9,9 +9,10 @@ import { CreateCategoryDrawer } from '../drawer/create-category'
 
 interface CategoriesDataTableHeaderProps {
   table: Table<DataTableFeatures, CategoryQueryData>
+  isLoading: boolean
 }
 
-export function CategoriesDataTableHeader({ table }: CategoriesDataTableHeaderProps) {
+export function CategoriesDataTableHeader({ table, isLoading }: CategoriesDataTableHeaderProps) {
   const canManage = useHasRole('treasurer')
   const [isCreateOpen, setCreateOpen] = useState(false)
 
@@ -32,6 +33,7 @@ export function CategoriesDataTableHeader({ table }: CategoriesDataTableHeaderPr
         {canManage && (
           <Button
             className="self-end"
+            disabled={isLoading}
             onClick={() => {
               setCreateOpen(true)
             }}

@@ -34,7 +34,7 @@ export function FeeStatusCard() {
   const houses = useQuery(housesPickerQueryOptions())
 
   if (status.isPending) {
-    return <CardFrameSkeleton rows={2} />
+    return <CardFrameSkeleton rows={3} />
   }
 
   if (status.isError) return null

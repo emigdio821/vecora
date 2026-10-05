@@ -39,7 +39,7 @@ export function ResidentsTableActions({ resident }: ActionsProps) {
             <Button
               size="icon"
               variant="ghost"
-              className="ml-auto"
+              className="ms-auto flex"
               aria-label={`Acciones de ${residentFullName}`}
             >
               <IconDots className="size-4" />

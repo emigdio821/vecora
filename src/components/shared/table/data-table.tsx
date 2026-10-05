@@ -54,7 +54,14 @@ interface DataTableProps<TData extends RowData> {
   className?: string
 }
 
-const LOADING_ROWS = 5
+const LOADING_ROWS = 10
+
+// Shaped like the real checkbox and actions button, so rows don't jump when the data lands.
+const LOADING_CELL_CLASS: Record<string, string> = {
+  // Inline like the checkbox, so it sits on the same line box (a block lands 1px lower).
+  select: 'inline-flex size-4.5 rounded-[.25rem] sm:size-4',
+  actions: 'ms-auto size-9 rounded-lg sm:size-8',
+}
 
 export function DataTable<TData extends RowData>({
   data,
@@ -164,8 +171,13 @@ export function DataTable<TData extends RowData>({
                 Array.from({ length: LOADING_ROWS }, (_, index) => (
                   <TableRow className="hover:bg-transparent" key={index}>
                     {table.getVisibleLeafColumns().map((column) => (
-                      <TableCell key={column.id}>
-                        <Skeleton className="h-4 w-full max-w-32" />
+                      <TableCell
+                        key={column.id}
+                        // A real checkbox cell narrows itself via `has-[[role=checkbox]]`; the skeleton
+                        // isn't one, so spell that out or the columns shift when the data lands.
+                        className={cn(column.id === 'select' && 'w-px first:pe-0 last:ps-0')}
+                      >
+                        <Skeleton className={LOADING_CELL_CLASS[column.id] ?? 'h-4.5 w-full max-w-32'} />
                       </TableCell>
                     ))}
                   </TableRow>

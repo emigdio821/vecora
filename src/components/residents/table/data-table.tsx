@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
-import { TableGenericSkeleton } from '@/components/shared/skeletons/table-generic'
 import { DataTable } from '@/components/shared/table/data-table'
 import type { Tables } from '@/lib/supabase/database.types'
 import { residentsListQueryOptions } from '@/tanstack-queries/residents'
@@ -25,17 +24,14 @@ export function ResidentsDataTable() {
     return <TanstackQueryError refetch={refetch} />
   }
 
-  if (isLoading) {
-    return <TableGenericSkeleton />
-  }
-
   return (
     <DataTable
       data={residents}
       tableId="residents"
       columns={columns}
       getRowId={(resident) => resident.id}
-      header={(table) => <ResidentsDataTableHeader table={table} />}
+      header={(table) => <ResidentsDataTableHeader table={table} isLoading={isLoading} />}
+      isLoading={isLoading}
     />
   )
 }

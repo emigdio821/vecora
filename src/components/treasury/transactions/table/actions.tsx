@@ -34,7 +34,7 @@ export function TransactionsTableActions({ transaction }: ActionsProps) {
             <Button
               size="icon"
               variant="ghost"
-              className="ml-auto"
+              className="ms-auto flex"
               aria-label={`Acciones de ${transaction.description}`}
             >
               <IconDots className="size-4" />

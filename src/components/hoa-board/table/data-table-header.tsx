@@ -12,9 +12,10 @@ import type { BoardViewer } from './columns'
 interface BoardMembersDataTableHeaderProps {
   table: Table<DataTableFeatures, BoardMemberQueryData>
   viewer: BoardViewer
+  isLoading: boolean
 }
 
-export function BoardMembersDataTableHeader({ table, viewer }: BoardMembersDataTableHeaderProps) {
+export function BoardMembersDataTableHeader({ table, viewer, isLoading }: BoardMembersDataTableHeaderProps) {
   const [isAddOpen, setAddOpen] = useState(false)
   const [invite, setInvite] = useState<InviteResult | null>(null)
   const [isInviteDialogOpen, setInviteDialogOpen] = useState(false)
@@ -55,6 +56,7 @@ export function BoardMembersDataTableHeader({ table, viewer }: BoardMembersDataT
         {viewer.isManager && (
           <Button
             className="self-end"
+            disabled={isLoading}
             onClick={() => {
               setAddOpen(true)
             }}

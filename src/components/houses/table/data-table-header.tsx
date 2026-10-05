@@ -13,9 +13,10 @@ import { CreateHouseDrawer } from '../drawer/create-house'
 
 interface HousesDataTableHeaderProps {
   table: Table<DataTableFeatures, HouseQueryData>
+  isLoading: boolean
 }
 
-export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
+export function HousesDataTableHeader({ table, isLoading }: HousesDataTableHeaderProps) {
   const canManage = useHasRole('president')
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [isDeleteSelectedOpen, setDeleteSelectedOpen] = useState(false)
@@ -71,6 +72,7 @@ export function HousesDataTableHeader({ table }: HousesDataTableHeaderProps) {
             )}
 
             <Button
+              disabled={isLoading}
               onClick={() => {
                 setCreateOpen(true)
               }}
