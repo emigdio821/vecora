@@ -9,6 +9,15 @@ export default defineConfig({
   server: { port: 3000 },
   // Native binary: dev's dependency optimizer can't bundle it.
   optimizeDeps: { exclude: ['@resvg/resvg-js'] },
+  build: {
+    rolldownOptions: {
+      // Libraries ship "use client" for RSC apps; this app doesn't use RSC, so dropping it is fine.
+      onLog(level, log, handler) {
+        if (log.code === 'MODULE_LEVEL_DIRECTIVE') return
+        handler(level, log)
+      },
+    },
+  },
   plugins: [
     tailwindcss(),
     tanstackStart(),
