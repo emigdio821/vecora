@@ -103,7 +103,12 @@ function EditPeriodForm({ period, mutation }: { period: PeriodQueryData; mutatio
             }),
           )}
         >
-          <PeriodFormFields form={form} disabled={mutation.isPending} inUse={transactionCount(period) > 0} />
+          <PeriodFormFields
+            form={form}
+            currency={period.currency}
+            disabled={mutation.isPending}
+            inUse={transactionCount(period) > 0}
+          />
 
           {form.formState.errors.root && (
             <Alert variant="error">

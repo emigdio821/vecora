@@ -13,7 +13,13 @@ export function PeriodsDataTable() {
 
   const rows = useMemo<PeriodRow[]>(
     () =>
-      periods.map((period) => ({ ...period, summary: summaries?.find((s) => s.period_id === period.id) })),
+      periods.map((period) => ({
+        ...period,
+        // The period's own currency first, then any other it has movements in.
+        summaries: summaries
+          ?.filter((s) => s.period_id === period.id)
+          .sort((a, b) => Number(b.currency === period.currency) - Number(a.currency === period.currency)),
+      })),
     [periods, summaries],
   )
 

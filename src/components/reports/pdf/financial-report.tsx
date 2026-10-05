@@ -1,7 +1,15 @@
 import { Document, Font, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns'
-import type { FinancialReport } from '@/lib/supabase/financial-report'
-import { capitalize, esLocale, formatCurrency, formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
+import type { CurrencyTotals, FinancialReport } from '@/lib/supabase/financial-report'
+import {
+  type CurrencyCode,
+  capitalize,
+  esLocale,
+  formatCurrency,
+  formatDay,
+  formatMonth,
+  ISO_DAY,
+} from '@/lib/utils'
 import geistRegularUrl from '../../../../assets/fonts/Geist-Regular.ttf?inline'
 import geistSemiBoldUrl from '../../../../assets/fonts/Geist-SemiBold.ttf?inline'
 
@@ -201,14 +209,16 @@ function byHouse(a: string, b: string): number {
   return a.localeCompare(b, 'es', { numeric: true })
 }
 
-type Category = FinancialReport['categories'][number]
+type Category = CurrencyTotals['categories'][number]
 type PendingHouse = FinancialReport['fee_status']['pending'][number]
 
-const CATEGORY_COLUMNS: Column<Category>[] = [
-  { label: 'Categoría', value: (c) => c.name },
-  { label: 'Movimientos', width: 64, align: 'right', value: (c) => String(c.movements) },
-  { label: 'Total', width: 72, align: 'right', value: (c) => formatCurrency(c.total) },
-]
+function categoryColumns(money: (value: number) => string): Column<Category>[] {
+  return [
+    { label: 'Categoría', value: (c) => c.name },
+    { label: 'Movimientos', width: 64, align: 'right', value: (c) => String(c.movements) },
+    { label: 'Total', width: 72, align: 'right', value: (c) => money(c.total) },
+  ]
+}
 
 /**
  * Sorted fee months as runs: "Enero – Julio 2026, Septiembre 2026" instead of
@@ -246,6 +256,8 @@ const PENDING_COLUMNS: Column<PendingHouse>[] = [
 interface FinancialReportDocumentProps {
   report: FinancialReport
   residentialName: string
+  /** The HOA's current one; amounts in any other carry their code. */
+  currency: CurrencyCode
   /** PNG bytes; without it the header shows only the name. */
   logo: Buffer | null
   generatedBy: string
@@ -255,13 +267,13 @@ interface FinancialReportDocumentProps {
 export function FinancialReportDocument({
   report,
   residentialName,
+  currency,
   logo,
   generatedBy,
   generatedAt,
 }: FinancialReportDocumentProps) {
   const range = rangeLabel(report.from, report.to)
-  const income = report.categories.filter((c) => c.kind === 'income')
-  const expense = report.categories.filter((c) => c.kind === 'expense')
+  const isMultiCurrency = report.currencies.length > 1
   const { fee_status: fees } = report
   const pending = [...fees.pending].sort((a, b) => byHouse(a.house, b.house))
 
@@ -285,44 +297,16 @@ export function FinancialReportDocument({
           <Text style={styles.headerRange}>{range}</Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Resumen</Text>
-          <View style={styles.summary}>
-            <SummaryBox label="Saldo inicial" value={report.opening_balance} />
-            <SummaryBox label="Ingresos" value={report.total_income} color={COLOR.income} />
-            <SummaryBox label="Egresos" value={report.total_expense} color={COLOR.expense} />
-            <SummaryBox
-              label="Saldo final"
-              value={report.closing_balance}
-              color={report.closing_balance < 0 ? COLOR.destructive : undefined}
-            />
-          </View>
-          <Text style={styles.note}>
-            Saldo inicial: todo lo registrado antes del {formatDay(report.from)}. Saldo final = saldo inicial
-            + ingresos - egresos.
-          </Text>
-        </View>
-
-        <View style={[styles.section, styles.columns]}>
-          <View style={styles.column}>
-            <Text style={styles.sectionTitle}>Ingresos por categoría</Text>
-            <Table
-              columns={CATEGORY_COLUMNS}
-              rows={income}
-              emptyText="Sin ingresos en este periodo."
-              total={{ label: 'Total', value: formatCurrency(report.total_income) }}
-            />
-          </View>
-          <View style={styles.column}>
-            <Text style={styles.sectionTitle}>Egresos por categoría</Text>
-            <Table
-              columns={CATEGORY_COLUMNS}
-              rows={expense}
-              emptyText="Sin egresos en este periodo."
-              total={{ label: 'Total', value: formatCurrency(report.total_expense) }}
-            />
-          </View>
-        </View>
+        {report.currencies.map((totals) => (
+          <CurrencySection
+            key={totals.currency}
+            totals={totals}
+            from={report.from}
+            // The headings name the currency (so the amounts don't have to) unless
+            // it's the only one and the HOA's current one.
+            suffix={isMultiCurrency || totals.currency !== currency ? ` (${totals.currency})` : ''}
+          />
+        ))}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Cuotas de mantenimiento</Text>
@@ -360,11 +344,68 @@ export function FinancialReportDocument({
   )
 }
 
-function SummaryBox({ label, value, color }: { label: string; value: number; color?: string }) {
+interface CurrencySectionProps {
+  totals: CurrencyTotals
+  from: string
+  suffix: string
+}
+
+/** Summary and per-category tables of one currency. */
+function CurrencySection({ totals, from, suffix }: CurrencySectionProps) {
+  const money = (value: number) => formatCurrency(value, totals.currency)
+  const columns = categoryColumns(money)
+  const income = totals.categories.filter((c) => c.kind === 'income')
+  const expense = totals.categories.filter((c) => c.kind === 'expense')
+
+  return (
+    <>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Resumen{suffix}</Text>
+        <View style={styles.summary}>
+          <SummaryBox label="Saldo inicial" value={money(totals.opening_balance)} />
+          <SummaryBox label="Ingresos" value={money(totals.total_income)} color={COLOR.income} />
+          <SummaryBox label="Egresos" value={money(totals.total_expense)} color={COLOR.expense} />
+          <SummaryBox
+            label="Saldo final"
+            value={money(totals.closing_balance)}
+            color={totals.closing_balance < 0 ? COLOR.destructive : undefined}
+          />
+        </View>
+        <Text style={styles.note}>
+          Saldo inicial: todo lo registrado antes del {formatDay(from)}. Saldo final = saldo inicial +
+          ingresos - egresos.
+        </Text>
+      </View>
+
+      <View style={[styles.section, styles.columns]}>
+        <View style={styles.column}>
+          <Text style={styles.sectionTitle}>Ingresos por categoría{suffix}</Text>
+          <Table
+            columns={columns}
+            rows={income}
+            emptyText="Sin ingresos en este periodo."
+            total={{ label: 'Total', value: money(totals.total_income) }}
+          />
+        </View>
+        <View style={styles.column}>
+          <Text style={styles.sectionTitle}>Egresos por categoría{suffix}</Text>
+          <Table
+            columns={columns}
+            rows={expense}
+            emptyText="Sin egresos en este periodo."
+            total={{ label: 'Total', value: money(totals.total_expense) }}
+          />
+        </View>
+      </View>
+    </>
+  )
+}
+
+function SummaryBox({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <View style={styles.summaryBox}>
       <Text style={styles.summaryLabel}>{label}</Text>
-      <Text style={[styles.summaryValue, color ? { color } : {}]}>{formatCurrency(value)}</Text>
+      <Text style={[styles.summaryValue, color ? { color } : {}]}>{value}</Text>
     </View>
   )
 }

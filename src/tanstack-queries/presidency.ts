@@ -42,7 +42,7 @@ function reservationsQuery() {
   return createClient()
     .from('amenity_reservations')
     .select(
-      `id, reserved_on, amount, notes, created_at, cancelled_at,
+      `id, reserved_on, amount, currency, notes, created_at, cancelled_at,
        amenity:amenities!inner ( id, name ),
        property:properties!inner ( id, number ),
        movements:transactions ( id, kind, amount, occurred_on, folio )`,

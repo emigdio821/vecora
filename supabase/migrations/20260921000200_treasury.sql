@@ -17,6 +17,10 @@
 --     folio; another receipt never reuses it (transactions_folio_one_receipt).
 --   * fee_month is distinct from occurred_on: a resident paying March on
 --     April 3rd has occurred_on = 2026-04-03 and fee_month = 2026-03-01.
+--   * Every amount carries its currency. A row takes settings.currency when
+--     it's created, or the currency of the row it comes from (a fee from its
+--     period), and keeps it: changing the HOA's currency later doesn't
+--     relabel history. Totals are therefore always per currency.
 --
 -- Access: every member reads; treasurer (and admin) writes. Periods (the
 -- board's fiscal year and its fee rules) are managed from the Presidency
@@ -33,6 +37,27 @@
 -- ---------------------------------------------------------------------------
 create type public.transaction_kind as enum ('income', 'expense');
 create type public.payment_method as enum ('cash', 'transfer');
+-- Add one with `alter type public.currency_code add value`.
+create type public.currency_code as enum ('MXN', 'USD');
+
+-- ---------------------------------------------------------------------------
+-- currency: set once, never changed
+-- ---------------------------------------------------------------------------
+-- The currency columns default to settings.currency; that default is attached
+-- in 20260921000500_settings_and_audit_log.sql, where the settings table is
+-- created. Every money table runs this trigger.
+create function private.keep_currency()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if new.currency is distinct from old.currency then
+    raise exception 'the currency of a recorded amount never changes' using errcode = '22023';
+  end if;
+  return new;
+end;
+$$;
 
 -- ---------------------------------------------------------------------------
 -- periods: the board's fiscal year and its fee rules
@@ -45,6 +70,7 @@ create table public.periods (
   monthly_fee numeric(12,2) not null,
   late_fee    numeric(12,2) not null default 100,
   due_day     smallint not null default 10,
+  currency    public.currency_code not null,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now(),
 
@@ -60,13 +86,18 @@ create table public.periods (
 create unique index periods_name_unique on public.periods (lower(name));
 
 comment on table public.periods is 'Fiscal year of the board ("2026-2027") with the fee rules in force during it.';
-comment on column public.periods.monthly_fee is 'What each house pays per month during this period, in MXN.';
+comment on column public.periods.monthly_fee is 'What each house pays per month during this period, in the period''s currency.';
 comment on column public.periods.late_fee is 'Fixed penalty added when a monthly fee is paid after due_day.';
 comment on column public.periods.due_day is 'Day of the month the fee is due (inclusive). Capped at 28 so it exists in every month.';
+comment on column public.periods.currency is 'Currency of the fee rules; the fees paid in this period are recorded in it.';
 
 create trigger periods_set_updated_at
   before update on public.periods
   for each row execute function private.set_updated_at();
+
+create trigger periods_keep_currency
+  before update of currency on public.periods
+  for each row execute function private.keep_currency();
 
 -- ---------------------------------------------------------------------------
 -- transaction_categories: treasurer-managed, per kind
@@ -130,6 +161,7 @@ create table public.transactions (
   period_id      uuid not null references public.periods (id) on delete restrict,
   property_id    uuid references public.properties (id) on delete restrict,
   amount         numeric(12,2) not null,
+  currency       public.currency_code not null,
   occurred_on    date not null default current_date,
   fee_month      date,
   payment_method public.payment_method not null default 'cash',
@@ -172,7 +204,8 @@ create table public.transactions (
 );
 
 comment on table public.transactions is 'Ledger of money in and out. One row per receipt line. Soft-deleted via deleted_at; never purged.';
-comment on column public.transactions.amount is 'Always positive, in MXN. kind tells whether it adds to or subtracts from the balance.';
+comment on column public.transactions.amount is 'Always positive, in currency. kind tells whether it adds to or subtracts from the balance.';
+comment on column public.transactions.currency is 'Currency of amount, fixed at creation: settings.currency, or the period / reservation / request it comes from.';
 comment on column public.transactions.occurred_on is 'Day the money actually moved (may differ from created_at when recorded later).';
 comment on column public.transactions.fee_month is 'For monthly fees and their late fees: first day of the month the payment covers.';
 comment on column public.transactions.folio is
@@ -204,23 +237,31 @@ create trigger transactions_set_deleted_by
   before update of deleted_at on public.transactions
   for each row execute function private.set_deleted_by();
 
+create trigger transactions_keep_currency
+  before update of currency on public.transactions
+  for each row execute function private.keep_currency();
+
 -- ---------------------------------------------------------------------------
 -- summary per period (balance is never stored)
 -- ---------------------------------------------------------------------------
 -- security_invoker so the caller's RLS applies (otherwise a view runs as its
 -- owner, postgres, and would bypass the policies).
+--
+-- One row per period and currency. A period without movements still gets one
+-- row, in its own currency, with zeros.
 create view public.treasury_period_summary
 with (security_invoker = true) as
   select
     p.id as period_id,
+    coalesce(t.currency, p.currency) as currency,
     coalesce(sum(t.amount) filter (where t.kind = 'income'), 0)::numeric(12,2)  as total_income,
     coalesce(sum(t.amount) filter (where t.kind = 'expense'), 0)::numeric(12,2) as total_expense,
     coalesce(sum(case t.kind when 'income' then t.amount else -t.amount end), 0)::numeric(12,2) as balance
   from public.periods p
   left join public.transactions t on t.period_id = p.id and t.deleted_at is null
-  group by p.id;
+  group by p.id, coalesce(t.currency, p.currency);
 
-comment on view public.treasury_period_summary is 'Income, expense and balance per period over live transactions.';
+comment on view public.treasury_period_summary is 'Income, expense and balance per period and currency over live transactions.';
 
 -- ---------------------------------------------------------------------------
 -- house_fee_status: who is behind on the fee (dashboard)
@@ -269,7 +310,7 @@ left join public.transactions t
 where pr.deleted_at is null
 group by pr.id, pr.number, dm.period_id;
 
-comment on view public.house_fee_status is 'Per live house, fee months due vs paid in the current period. unpaid_months empty = al corriente.';
+comment on view public.house_fee_status is 'Per live house, fee months due vs paid in the current period. unpaid_months empty = up to date.';
 
 -- ---------------------------------------------------------------------------
 -- record_fee_payment
@@ -280,7 +321,8 @@ comment on view public.house_fee_status is 'Per live house, fee months due vs pa
 -- half-recorded.
 --
 -- Descriptions read "Cuota Agosto 2026" (the app capitalizes month names);
--- the house is in property_id, and the lists show it in its own column.
+-- the house is in property_id, and the lists show it in its own column. The
+-- rows are in the period's currency, even if settings.currency changed since.
 --
 -- security invoker: inserts run as the caller, so the treasurer RLS applies.
 create function public.record_fee_payment(
@@ -346,10 +388,10 @@ begin
     v_label := v_months[extract(month from v_month)::int] || ' ' || extract(year from v_month)::int;
 
     insert into public.transactions
-      (kind, category_id, period_id, property_id, amount, occurred_on, fee_month,
+      (kind, category_id, period_id, property_id, amount, currency, occurred_on, fee_month,
        payment_method, folio, reference, description, notes)
     values
-      ('income', v_fee_cat, v_period.id, p_property_id, v_amount, p_occurred_on, v_month,
+      ('income', v_fee_cat, v_period.id, p_property_id, v_amount, v_period.currency, p_occurred_on, v_month,
        p_payment_method, p_folio, p_reference, 'Cuota ' || v_label, p_notes);
     fee_count := fee_count + 1;
     total := total + v_amount;
@@ -362,11 +404,11 @@ begin
 
     if v_is_late and v_period.late_fee > 0 then
       insert into public.transactions
-        (kind, category_id, period_id, property_id, amount, occurred_on, fee_month,
+        (kind, category_id, period_id, property_id, amount, currency, occurred_on, fee_month,
          payment_method, folio, reference, description)
       values
-        ('income', v_late_cat, v_period.id, p_property_id, v_period.late_fee, p_occurred_on, v_month,
-         p_payment_method, p_folio, p_reference, 'Recargo ' || v_label);
+        ('income', v_late_cat, v_period.id, p_property_id, v_period.late_fee, v_period.currency, p_occurred_on,
+         v_month, p_payment_method, p_folio, p_reference, 'Recargo ' || v_label);
       late_fee_count := late_fee_count + 1;
       total := total + v_period.late_fee;
     end if;
@@ -389,6 +431,10 @@ grant execute on function public.record_fee_payment to authenticated;
 --   * Money is counted by occurred_on (the day it moved). The opening balance
 --     is every live movement before the range, across all periods, so the
 --     closing balance matches the cash on hand.
+--   * Balances and category totals come per currency: one entry in
+--     `currencies` for each currency with movements up to the end of the
+--     range, the current one first. With no movements at all, a single entry
+--     in settings.currency with zeros.
 --   * Fee status is counted by fee_month (the month a fee covers), for the
 --     months of the range that fall inside a period and have already started.
 --     A month counts as paid only if the payment was recorded by the end of
@@ -409,29 +455,36 @@ begin
   return (
     with
     tx as (
-      select t.kind, t.amount, t.occurred_on, c.name as category
+      select t.kind, t.amount, t.currency, t.occurred_on, c.name as category
       from public.transactions t
       join public.transaction_categories c on c.id = t.category_id
-      where t.deleted_at is null
+      where t.deleted_at is null and t.occurred_on <= p_to
     ),
     in_range as (
-      select * from tx where occurred_on between p_from and p_to
+      select * from tx where occurred_on >= p_from
+    ),
+    currencies as (
+      select distinct currency from tx
+      union all
+      select s.currency from public.settings s where not exists (select 1 from tx)
     ),
     totals as (
       select
-        coalesce((
-          select sum(case o.kind when 'income' then o.amount else -o.amount end)
-          from tx o
-          where o.occurred_on < p_from
-        ), 0)::numeric(12,2)                                              as opening,
-        coalesce(sum(r.amount) filter (where r.kind = 'income'), 0)::numeric(12,2)  as income,
-        coalesce(sum(r.amount) filter (where r.kind = 'expense'), 0)::numeric(12,2) as expense
-      from in_range r
+        cur.currency,
+        coalesce(sum(case tx.kind when 'income' then tx.amount else -tx.amount end)
+                 filter (where tx.occurred_on < p_from), 0)::numeric(12,2) as opening,
+        coalesce(sum(tx.amount)
+                 filter (where tx.kind = 'income' and tx.occurred_on >= p_from), 0)::numeric(12,2) as income,
+        coalesce(sum(tx.amount)
+                 filter (where tx.kind = 'expense' and tx.occurred_on >= p_from), 0)::numeric(12,2) as expense
+      from currencies cur
+      left join tx on tx.currency = cur.currency
+      group by cur.currency
     ),
     categories as (
-      select kind, category, sum(amount)::numeric(12,2) as total, count(*)::int as movements
+      select currency, kind, category, sum(amount)::numeric(12,2) as total, count(*)::int as movements
       from in_range
-      group by kind, category
+      group by currency, kind, category
     ),
     -- fee months of the range that belong to a period and have started
     due as (
@@ -467,19 +520,26 @@ begin
       group by pr.id, pr.number
     )
     select jsonb_build_object(
-      'from',            p_from,
-      'to',              p_to,
-      'opening_balance', t.opening,
-      'total_income',    t.income,
-      'total_expense',   t.expense,
-      'closing_balance', (t.opening + t.income - t.expense)::numeric(12,2),
+      'from', p_from,
+      'to',   p_to,
 
-      'categories', coalesce((
+      'currencies', (
         select jsonb_agg(jsonb_build_object(
-          'kind', c.kind, 'name', c.category, 'total', c.total, 'movements', c.movements
-        ) order by c.kind, c.total desc, c.category)
-        from categories c
-      ), '[]'::jsonb),
+          'currency',        t.currency,
+          'opening_balance', t.opening,
+          'total_income',    t.income,
+          'total_expense',   t.expense,
+          'closing_balance', (t.opening + t.income - t.expense)::numeric(12,2),
+          'categories', coalesce((
+            select jsonb_agg(jsonb_build_object(
+              'kind', c.kind, 'name', c.category, 'total', c.total, 'movements', c.movements
+            ) order by c.kind, c.total desc, c.category)
+            from categories c
+            where c.currency = t.currency
+          ), '[]'::jsonb)
+        ) order by t.currency is distinct from (select s.currency from public.settings s), t.currency)
+        from totals t
+      ),
 
       'fee_status', jsonb_build_object(
         'months',     (select count(*) from due),
@@ -493,12 +553,11 @@ begin
         ), '[]'::jsonb)
       )
     )
-    from totals t
   );
 end;
 $$;
 
-comment on function public.financial_report is 'Report for a date range: balances, totals by category and fee status per house.';
+comment on function public.financial_report is 'Report for a date range: balances and totals by category per currency, and fee status per house.';
 
 revoke execute on function public.financial_report(date, date) from public, anon;
 grant execute on function public.financial_report(date, date) to authenticated;

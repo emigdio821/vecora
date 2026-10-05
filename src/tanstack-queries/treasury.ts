@@ -10,7 +10,7 @@ function transactionsListQuery() {
       .from('transactions')
       .select(
         `
-      id, kind, amount, occurred_on, fee_month, payment_method, folio, reference, description, notes,
+      id, kind, amount, currency, occurred_on, fee_month, payment_method, folio, reference, description, notes,
       created_at, updated_at,
       category:transaction_categories!inner ( id, name, key ),
       period:periods!inner ( id, name ),
@@ -44,7 +44,7 @@ export function transactionsListQueryOptions() {
 function periodsQuery() {
   return createClient()
     .from('periods')
-    .select('id, name, starts_on, ends_on, monthly_fee, late_fee, due_day, transactions(count)')
+    .select('id, name, starts_on, ends_on, monthly_fee, late_fee, due_day, currency, transactions(count)')
     .order('starts_on', { ascending: false })
 }
 
@@ -66,11 +66,15 @@ export function periodsQueryOptions() {
   })
 }
 
-/** Income / expense / balance per period, computed by the database over live rows. */
+/**
+ * Income / expense / balance per period and currency, computed by the
+ * database over live rows. A period has one row per currency it has
+ * movements in (at least one, in its own currency).
+ */
 function periodSummariesQuery() {
   return createClient()
     .from('treasury_period_summary')
-    .select('period_id, total_income, total_expense, balance')
+    .select('period_id, currency, total_income, total_expense, balance')
 }
 
 export type PeriodSummaryQueryData = QueryData<ReturnType<typeof periodSummariesQuery>>[number]
@@ -90,7 +94,7 @@ export function periodSummariesQueryOptions() {
 function periodMovementsQuery(periodId: string) {
   return createClient()
     .from('transactions')
-    .select('kind, amount, occurred_on')
+    .select('kind, amount, currency, occurred_on')
     .eq('period_id', periodId)
     .is('deleted_at', null)
 }

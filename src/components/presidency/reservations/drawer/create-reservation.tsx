@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
+import { useCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
 import { formatDay, ISO_DAY } from '@/lib/utils'
 import { type ReservationInput, reservationSchema } from '@/lib/validations/presidency'
@@ -94,6 +95,7 @@ export function CreateReservationDrawer({ open, onOpenChange, ...props }: Create
 
 function CreateReservationForm({ mutation }: { mutation: CreateMutation }) {
   const today = useToday()
+  const currency = useCurrency()
   const { data: amenities } = useQuery(amenitiesQueryOptions())
   // With a single area to book, there's nothing to choose.
   const active = (amenities ?? []).filter((a) => a.is_active)
@@ -123,7 +125,7 @@ function CreateReservationForm({ mutation }: { mutation: CreateMutation }) {
             }),
           )}
         >
-          <ReservationFormFields form={form} disabled={mutation.isPending} />
+          <ReservationFormFields form={form} currency={currency} disabled={mutation.isPending} />
 
           {form.formState.errors.root && (
             <Alert variant="error">

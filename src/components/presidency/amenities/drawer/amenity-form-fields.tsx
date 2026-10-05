@@ -3,7 +3,8 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
-import { MONEY_FORMAT } from '@/lib/utils'
+import { useCurrency } from '@/hooks/use-currency'
+import { currencySymbol, MONEY_FORMAT } from '@/lib/utils'
 import type { AmenityInput } from '@/lib/validations/presidency'
 
 interface AmenityFormFieldsProps {
@@ -13,6 +14,9 @@ interface AmenityFormFieldsProps {
 
 /** Shared by the create and edit drawers. */
 export function AmenityFormFields({ form, disabled }: AmenityFormFieldsProps) {
+  // The suggested fee has no currency of its own: it's always in the current one.
+  const currency = useCurrency()
+
   return (
     <>
       <Controller
@@ -60,10 +64,10 @@ export function AmenityFormFields({ form, disabled }: AmenityFormFieldsProps) {
                 <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
               </NumberField>
               <InputGroupAddon>
-                <InputGroupText>$</InputGroupText>
+                <InputGroupText>{currencySymbol(currency)}</InputGroupText>
               </InputGroupAddon>
               <InputGroupAddon align="inline-end">
-                <InputGroupText>MXN</InputGroupText>
+                <InputGroupText>{currency}</InputGroupText>
               </InputGroupAddon>
             </InputGroup>
             <FieldDescription>

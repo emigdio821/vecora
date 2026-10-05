@@ -103,9 +103,18 @@ begin
   update public.audit_log set occurred_at = t - interval '1 day', txid = -id where txid > 0;
 
   -- -------------------------------------------------------------------------
-  -- admin seats the board: one account per role (admin already exists)
+  -- admin completes the setup dialog
   -- -------------------------------------------------------------------------
   perform pg_temp.act_as(u_admin);
+
+  update public.settings
+  set residential_name = 'Loma Verde Coto 404', default_language = 'es', currency = 'MXN', configured_at = now();
+  perform pg_temp.mark(t);
+  t := t + interval '5 minutes';
+
+  -- -------------------------------------------------------------------------
+  -- admin seats the board: one account per role (admin already exists)
+  -- -------------------------------------------------------------------------
 
   insert into auth.users (
     instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -144,10 +153,6 @@ begin
   -- president sets up the residential
   -- -------------------------------------------------------------------------
   perform pg_temp.act_as(u_president);
-
-  update public.settings set residential_name = 'Loma Verde Coto 404';
-  t := t + interval '10 minutes';
-  perform pg_temp.mark(t);
 
   -- houses: A1–A5, B1–B5, C1–C5, D1–D5
   insert into public.properties (number)

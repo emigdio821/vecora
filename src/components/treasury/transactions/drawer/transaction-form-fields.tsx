@@ -16,7 +16,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
 import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
-import { formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { CreateTransactionInput } from '@/lib/validations/treasury'
 import { categoriesQueryOptions } from '@/tanstack-queries/treasury'
 import { KIND_ITEMS, PAYMENT_METHOD_ITEMS } from '../../kind'
@@ -25,6 +25,8 @@ const kindItemClassName = segmentedControlItemVariants({ className: 'grow', stat
 
 interface TransactionFormFieldsProps {
   form: UseFormReturn<CreateTransactionInput>
+  /** Of the amount: the HOA's current one for a new movement, the movement's own when editing. */
+  currency: CurrencyCode
   disabled?: boolean
   /** Editing: the kind is fixed once recorded. */
   lockKind?: boolean
@@ -38,6 +40,7 @@ interface TransactionFormFieldsProps {
 /** Shared by the create and edit drawers for non-fee movements. */
 export function TransactionFormFields({
   form,
+  currency,
   disabled,
   lockKind,
   lockFeeFields,
@@ -176,10 +179,10 @@ export function TransactionFormFields({
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
                 </NumberField>
                 <InputGroupAddon>
-                  <InputGroupText>$</InputGroupText>
+                  <InputGroupText>{currencySymbol(currency)}</InputGroupText>
                 </InputGroupAddon>
                 <InputGroupAddon align="inline-end">
-                  <InputGroupText>MXN</InputGroupText>
+                  <InputGroupText>{currency}</InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>

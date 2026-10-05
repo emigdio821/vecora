@@ -4,6 +4,8 @@
 -- Model
 --   * The maintenance person records a job (paint for the garden, 300 MXN,
 --     done on a date). Every row is a payment request and starts as pending.
+--     The amount keeps the currency it was requested in; paying it records
+--     the expense in that currency.
 --   * Only the treasurer (or admin) resolves it: "paid" records the expense in
 --     the ledger and links it (transaction_id); "rejected" keeps the row with
 --     the reason so the requester knows why.
@@ -34,6 +36,7 @@ create table public.maintenance_requests (
   title            text not null,
   details          text,
   amount           numeric(12,2) not null,
+  currency         public.currency_code not null,
   -- day the work was done or the purchase made
   requested_on     date not null default current_date,
   status           public.request_status not null default 'pending',
@@ -74,6 +77,10 @@ create trigger maintenance_requests_set_updated_at
   before update on public.maintenance_requests
   for each row execute function private.set_updated_at();
 
+create trigger maintenance_requests_keep_currency
+  before update of currency on public.maintenance_requests
+  for each row execute function private.keep_currency();
+
 -- ---------------------------------------------------------------------------
 -- security_requests
 -- ---------------------------------------------------------------------------
@@ -85,6 +92,7 @@ create table public.security_requests (
   title            text not null,
   details          text,
   amount           numeric(12,2) not null,
+  currency         public.currency_code not null,
   -- day the work was done, the service rendered or the purchase made
   requested_on     date not null default current_date,
   status           public.request_status not null default 'pending',
@@ -125,6 +133,10 @@ create index security_requests_created_by_idx on public.security_requests (creat
 create trigger security_requests_set_updated_at
   before update on public.security_requests
   for each row execute function private.set_updated_at();
+
+create trigger security_requests_keep_currency
+  before update of currency on public.security_requests
+  for each row execute function private.keep_currency();
 
 -- ---------------------------------------------------------------------------
 -- resolution RPCs (treasurer)
@@ -175,9 +187,9 @@ begin
 
   -- The composite FK rejects an income category here.
   insert into public.transactions
-    (kind, category_id, period_id, amount, occurred_on, payment_method, reference, description, notes)
+    (kind, category_id, period_id, amount, currency, occurred_on, payment_method, reference, description, notes)
   values
-    ('expense', p_category_id, v_period_id, v_request.amount, p_occurred_on,
+    ('expense', p_category_id, v_period_id, v_request.amount, v_request.currency, p_occurred_on,
      p_payment_method, nullif(btrim(p_reference), ''), v_request.title, nullif(btrim(p_notes), ''))
   returning id into v_transaction_id;
 
@@ -294,9 +306,9 @@ begin
 
   -- The composite FK rejects an income category here.
   insert into public.transactions
-    (kind, category_id, period_id, amount, occurred_on, payment_method, reference, description, notes)
+    (kind, category_id, period_id, amount, currency, occurred_on, payment_method, reference, description, notes)
   values
-    ('expense', p_category_id, v_period_id, v_request.amount, p_occurred_on,
+    ('expense', p_category_id, v_period_id, v_request.amount, v_request.currency, p_occurred_on,
      p_payment_method, nullif(btrim(p_reference), ''), v_request.title, nullif(btrim(p_notes), ''))
   returning id into v_transaction_id;
 

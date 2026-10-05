@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Money } from '@/components/shared/money'
 import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {
   AlertDialog,
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
-import { formatCurrency } from '@/lib/utils'
 import { deleteMaintenanceRequest } from '@/server-actions/maintenance'
 import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 
@@ -60,7 +60,8 @@ export function DeleteRequestAlertDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>¿Eliminar esta solicitud?</AlertDialogTitle>
           <AlertDialogDescription>
-            {request.title} - {formatCurrency(Number(request.amount))}. Esta acción no se puede deshacer.
+            {request.title} - <Money value={request.amount} currency={request.currency} />. Esta acción no se
+            puede deshacer.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

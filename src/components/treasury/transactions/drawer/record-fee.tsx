@@ -50,8 +50,9 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
+import { useCurrency, useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
-import { formatCurrency, formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
+import { formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
 import { type RecordFeePaymentInput, recordFeePaymentSchema } from '@/lib/validations/treasury'
 import { recordFeePayment } from '@/server-actions/treasury'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
@@ -90,6 +91,8 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
   const [isDateOpen, setDateOpen] = useState(false)
   const today = useToday()
   const { data: periods } = useQuery(periodsQueryOptions())
+  const home = useCurrency()
+  const formatCurrency = useFormatCurrency()
 
   const form = useForm<RecordFeePaymentInput>({
     resolver: zodResolver(recordFeePaymentSchema),
@@ -133,10 +136,12 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
 
       const months = summary.fee_count === 1 ? '1 mes' : `${summary.fee_count} meses`
       const recargo = summary.late_fee_count > 0 ? ' con recargo' : ''
+      // The RPC charges in the currency of the period the payment date falls in.
+      const total = formatCurrency(summary.total, preview?.period.currency ?? home)
       toastManager.add({
         type: 'success',
         title: 'Cuota registrada',
-        description: `${house ? houseLabel(house) : 'Casa'}: ${months}${recargo}, ${formatCurrency(summary.total)} - Folio ${values.folio}`,
+        description: `${house ? houseLabel(house) : 'Casa'}: ${months}${recargo}, ${total} - Folio ${values.folio}`,
       })
       onOpenChange(false)
     },
@@ -449,22 +454,24 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                   <dl className="grid grid-cols-[1fr_auto] gap-x-4 text-sm tabular-nums">
                     <dt className="text-muted-foreground">
                       {feeMonths.length === 1 ? '1 cuota' : `${feeMonths.length} cuotas`} de{' '}
-                      {formatCurrency(preview.period.monthly_fee)}
+                      {formatCurrency(preview.period.monthly_fee, preview.period.currency)}
                     </dt>
-                    <dd className="text-right">{formatCurrency(preview.fees)}</dd>
+                    <dd className="text-right">{formatCurrency(preview.fees, preview.period.currency)}</dd>
                     {preview.lateMonths > 0 && (
                       <>
                         <dt className="text-muted-foreground">
                           {preview.lateMonths === 1 ? '1 recargo' : `${preview.lateMonths} recargos`} de{' '}
-                          {formatCurrency(preview.period.late_fee)}
+                          {formatCurrency(preview.period.late_fee, preview.period.currency)}
                           {waiveLateFee && ' (condonado)'}
                         </dt>
-                        <dd className="text-right">{formatCurrency(preview.lateFees)}</dd>
+                        <dd className="text-right">
+                          {formatCurrency(preview.lateFees, preview.period.currency)}
+                        </dd>
                       </>
                     )}
                     <dt className="font-medium">Total a recibir</dt>
                     <dd className="text-right font-medium text-foreground">
-                      {formatCurrency(preview.total)}
+                      {formatCurrency(preview.total, preview.period.currency)}
                     </dd>
                   </dl>
                 </AlertDescription>

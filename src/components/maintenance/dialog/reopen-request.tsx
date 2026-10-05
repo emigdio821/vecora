@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Money } from '@/components/shared/money'
 import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {
   AlertDialog,
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
-import { formatCurrency } from '@/lib/utils'
 import { reopenMaintenanceRequest } from '@/server-actions/maintenance'
 import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 
@@ -60,8 +60,8 @@ export function ReopenRequestAlertDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>¿Reabrir esta solicitud?</AlertDialogTitle>
           <AlertDialogDescription>
-            {request.title} - {formatCurrency(Number(request.amount))}. Volverá a quedar pendiente: se podrá
-            editar, pagar o rechazar de nuevo, y se quitará el motivo del rechazo.
+            {request.title} - <Money value={request.amount} currency={request.currency} />. Volverá a quedar
+            pendiente: se podrá editar, pagar o rechazar de nuevo, y se quitará el motivo del rechazo.
           </AlertDialogDescription>
         </AlertDialogHeader>
 

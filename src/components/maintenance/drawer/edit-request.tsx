@@ -101,7 +101,7 @@ function EditRequestForm({
             }),
           )}
         >
-          <RequestFormFields form={form} disabled={mutation.isPending} />
+          <RequestFormFields form={form} currency={request.currency} disabled={mutation.isPending} />
 
           {form.formState.errors.root && (
             <Alert variant="error">

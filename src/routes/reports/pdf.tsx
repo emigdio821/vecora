@@ -59,6 +59,7 @@ async function GET(request: Request) {
     <FinancialReportDocument
       report={report}
       residentialName={residentialName}
+      currency={settings.currency}
       logo={logo}
       generatedBy={user.fullName}
       generatedAt={new Date()}

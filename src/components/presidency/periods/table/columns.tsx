@@ -1,14 +1,18 @@
 import { createColumnHelper } from '@tanstack/react-table'
 import { format } from 'date-fns'
+import { Money } from '@/components/shared/money'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
-import { cn, formatCurrency, formatDay, ISO_DAY, normalizeString } from '@/lib/utils'
+import { cn, formatDay, ISO_DAY, normalizeString } from '@/lib/utils'
 import type { PeriodQueryData, PeriodSummaryQueryData } from '@/tanstack-queries/treasury'
 import { PeriodsTableActions } from './actions'
 
-/** A period joined with its live totals (absent until the summary view loads). */
-export type PeriodRow = PeriodQueryData & { summary: PeriodSummaryQueryData | undefined }
+/**
+ * A period joined with its live totals, one per currency, its own first
+ * (absent until the summary view loads).
+ */
+export type PeriodRow = PeriodQueryData & { summaries: PeriodSummaryQueryData[] | undefined }
 
 /** "YYYY-MM-DD" strings compare correctly as text, so no parsing needed. */
 function isCurrentPeriod(period: PeriodQueryData) {
@@ -55,8 +59,10 @@ export const periodsTableColumns = columnHelper.columns([
     id: 'monthly_fee',
     size: 130,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Cuota" className="justify-end" />,
-    cell: ({ getValue }) => (
-      <span className="block text-right whitespace-nowrap tabular-nums">{formatCurrency(getValue())}</span>
+    cell: ({ getValue, row }) => (
+      <span className="block text-right whitespace-nowrap tabular-nums">
+        <Money value={getValue()} currency={row.original.currency} />
+      </span>
     ),
   }),
 
@@ -66,8 +72,10 @@ export const periodsTableColumns = columnHelper.columns([
     header: ({ column }) => (
       <DataTableSortableHeader column={column} title="Recargo" className="justify-end" />
     ),
-    cell: ({ getValue }) => (
-      <span className="block text-right whitespace-nowrap tabular-nums">{formatCurrency(getValue())}</span>
+    cell: ({ getValue, row }) => (
+      <span className="block text-right whitespace-nowrap tabular-nums">
+        <Money value={getValue()} currency={row.original.currency} />
+      </span>
     ),
   }),
 
@@ -78,24 +86,26 @@ export const periodsTableColumns = columnHelper.columns([
     cell: ({ getValue }) => <span className="tabular-nums">Día {getValue()}</span>,
   }),
 
-  columnHelper.accessor((row) => (row.summary ? Number(row.summary.balance) : 0), {
+  // Sorts by the balance in the period's own currency.
+  columnHelper.accessor((row) => Number(row.summaries?.[0]?.balance ?? 0), {
     id: 'balance',
     size: 140,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Saldo" className="justify-end" />,
-    cell: ({ row, getValue }) => {
-      if (!row.original.summary) return null
-      const balance = getValue()
-      return (
-        <span
-          className={cn(
-            'block text-right whitespace-nowrap tabular-nums',
-            balance < 0 && 'text-destructive-foreground',
-          )}
-        >
-          {formatCurrency(balance)}
-        </span>
-      )
-    },
+    cell: ({ row }) =>
+      row.original.summaries?.map((summary) => {
+        const balance = Number(summary.balance)
+        return (
+          <span
+            key={summary.currency}
+            className={cn(
+              'block text-right whitespace-nowrap tabular-nums',
+              balance < 0 && 'text-destructive-foreground',
+            )}
+          >
+            <Money value={balance} currency={summary.currency ?? row.original.currency} />
+          </span>
+        )
+      }),
   }),
 
   columnHelper.display({

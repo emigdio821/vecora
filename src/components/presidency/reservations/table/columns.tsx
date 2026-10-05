@@ -1,9 +1,10 @@
 import { createColumnHelper } from '@tanstack/react-table'
 import { format } from 'date-fns'
+import { Money } from '@/components/shared/money'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
-import { formatCurrency, formatDay, ISO_DAY, normalizeString } from '@/lib/utils'
+import { formatDay, ISO_DAY, normalizeString } from '@/lib/utils'
 import type { ReservationQueryData } from '@/tanstack-queries/presidency'
 import {
   RESERVATION_STATUS_BADGE_VARIANT,
@@ -70,7 +71,11 @@ export const reservationsTableColumns = columnHelper.columns([
     id: 'amount',
     size: 140,
     header: ({ column }) => <DataTableSortableHeader column={column} title="Monto" />,
-    cell: ({ getValue }) => <span className="tabular-nums">{formatCurrency(getValue())}</span>,
+    cell: ({ getValue, row }) => (
+      <span className="tabular-nums">
+        <Money value={getValue()} currency={row.original.currency} />
+      </span>
+    ),
   }),
 
   columnHelper.accessor((row) => reservationStatus(row), {
@@ -88,7 +93,7 @@ export const reservationsTableColumns = columnHelper.columns([
           <Badge variant={RESERVATION_STATUS_BADGE_VARIANT[status]}>{RESERVATION_STATUS_LABEL[status]}</Badge>
           {refund && (
             <span className="text-xs whitespace-nowrap text-muted-foreground tabular-nums">
-              Reembolso {formatCurrency(refund.amount)}
+              Reembolso <Money value={refund.amount} currency={row.original.currency} />
             </span>
           )}
         </div>

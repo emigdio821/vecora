@@ -26,8 +26,9 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
+import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
-import { formatCurrency, formatDay, ISO_DAY } from '@/lib/utils'
+import { formatDay, ISO_DAY } from '@/lib/utils'
 import { type PayReservationInput, payReservationSchema } from '@/lib/validations/presidency'
 import { payReservation } from '@/server-actions/presidency'
 import { PRESIDENCY_QUERY_KEY, type ReservationQueryData } from '@/tanstack-queries/presidency'
@@ -52,7 +53,9 @@ export function PayReservationDrawer({
   ...props
 }: PayReservationDrawerProps) {
   const queryClient = useQueryClient()
+  const formatCurrency = useFormatCurrency()
   const summary = reservationSummary(reservation)
+  const amount = formatCurrency(reservation.amount, reservation.currency)
 
   const mutation = useMutation({
     mutationFn: async (values: PayReservationInput) => {
@@ -67,7 +70,7 @@ export function PayReservationDrawer({
       toastManager.add({
         type: 'success',
         title: 'Pago registrado',
-        description: `${summary} - ${formatCurrency(reservation.amount)} ya está en "Tesorería"`,
+        description: `${summary} - ${amount} ya está en "Tesorería"`,
       })
       onOpenChange(false)
     },
@@ -88,8 +91,8 @@ export function PayReservationDrawer({
         <DrawerHeader>
           <DrawerTitle>Registrar pago</DrawerTitle>
           <DrawerDescription>
-            {summary} - {formatCurrency(reservation.amount)}. Se registrará como ingreso en "Tesorería" y la
-            reservación pasará a "Pagada".
+            {summary} - {amount}. Se registrará como ingreso en "Tesorería" y la reservación pasará a
+            "Pagada".
           </DrawerDescription>
         </DrawerHeader>
 

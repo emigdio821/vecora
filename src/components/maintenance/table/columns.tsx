@@ -1,9 +1,10 @@
 import { createColumnHelper } from '@tanstack/react-table'
+import { Money } from '@/components/shared/money'
 import { STATUS_BADGE_VARIANT, STATUS_LABEL } from '@/components/shared/request-status'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
-import { formatCurrency, formatDay, normalizeString } from '@/lib/utils'
+import { formatDay, normalizeString } from '@/lib/utils'
 import type { MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 import { RequestsTableActions } from './actions'
 import { RequestTitleCell } from './request-title-cell'
@@ -58,8 +59,10 @@ export function requestsTableColumns(viewer: MaintenanceViewer) {
       header: ({ column }) => (
         <DataTableSortableHeader column={column} title="Monto" className="justify-end" />
       ),
-      cell: ({ getValue }) => (
-        <span className="block text-right whitespace-nowrap tabular-nums">{formatCurrency(getValue())}</span>
+      cell: ({ getValue, row }) => (
+        <span className="block text-right whitespace-nowrap tabular-nums">
+          <Money value={getValue()} currency={row.original.currency} />
+        </span>
       ),
     }),
 

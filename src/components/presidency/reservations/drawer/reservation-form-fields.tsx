@@ -16,13 +16,15 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
-import { formatDay, formatMonth, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, formatMonth, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { ReservationInput } from '@/lib/validations/presidency'
 import { amenitiesQueryOptions, reservationsQueryOptions } from '@/tanstack-queries/presidency'
 import { houseFeeStatusQueryOptions } from '@/tanstack-queries/treasury'
 
 interface ReservationFormFieldsProps {
   form: UseFormReturn<ReservationInput>
+  /** Of the amount: the HOA's current one for a new booking, the booking's own when editing. */
+  currency: CurrencyCode
   disabled?: boolean
   /** Editing: this booking's own day must stay selectable. */
   currentId?: string
@@ -33,6 +35,7 @@ interface ReservationFormFieldsProps {
 /** Shared by the create and edit drawers. */
 export function ReservationFormFields({
   form,
+  currency,
   disabled,
   currentId,
   lockPaidFields,
@@ -262,10 +265,10 @@ export function ReservationFormFields({
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
                 </NumberField>
                 <InputGroupAddon>
-                  <InputGroupText>$</InputGroupText>
+                  <InputGroupText>{currencySymbol(currency)}</InputGroupText>
                 </InputGroupAddon>
                 <InputGroupAddon align="inline-end">
-                  <InputGroupText>MXN</InputGroupText>
+                  <InputGroupText>{currency}</InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
               <FieldDescription>

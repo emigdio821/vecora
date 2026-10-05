@@ -17,6 +17,8 @@ export interface CurrentUser {
   mustSetPassword: boolean
   /** Already closed the welcome dialog, on any device. */
   welcomed: boolean
+  /** admin@vecora.com, the app's own account: the one that completes the setup dialog. */
+  isMainAdmin: boolean
 }
 
 /**
@@ -43,7 +45,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, welcomed_at, user_roles!user_id ( role )')
+    .select('full_name, welcomed_at, is_main_admin, user_roles!user_id ( role )')
     .eq('id', id)
     .maybeSingle()
 
@@ -54,5 +56,6 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     roles: profile?.user_roles.map((r) => r.role) ?? [],
     mustSetPassword: cameFromAccessLink(amr),
     welcomed: !!profile?.welcomed_at,
+    isMainAdmin: !!profile?.is_main_admin,
   }
 }

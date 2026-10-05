@@ -17,8 +17,8 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
+import { useFormatCurrency } from '@/hooks/use-currency'
 import { systemCategorySource } from '@/lib/system-categories'
-import { formatCurrency } from '@/lib/utils'
 import { type UpdateTransactionInput, updateTransactionSchema } from '@/lib/validations/treasury'
 import { updateTransaction } from '@/server-actions/treasury'
 import { type TransactionQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
@@ -41,6 +41,7 @@ export function EditTransactionDrawer({
   ...props
 }: EditTransactionDrawerProps) {
   const queryClient = useQueryClient()
+  const formatCurrency = useFormatCurrency()
 
   const mutation = useMutation({
     mutationFn: async (values: UpdateTransactionInput) => {
@@ -52,7 +53,7 @@ export function EditTransactionDrawer({
       toastManager.add({
         type: 'success',
         title: 'Movimiento actualizado',
-        description: `${values.description} - ${formatCurrency(values.amount)}`,
+        description: `${values.description} - ${formatCurrency(values.amount, transaction.currency)}`,
       })
       onOpenChange(false)
     },
@@ -137,7 +138,13 @@ function EditTransactionForm({
             </Alert>
           )}
 
-          <TransactionFormFields form={form} disabled={mutation.isPending} lockKind lockFeeFields={isFee} />
+          <TransactionFormFields
+            form={form}
+            currency={transaction.currency}
+            disabled={mutation.isPending}
+            lockKind
+            lockFeeFields={isFee}
+          />
 
           {form.formState.errors.root && (
             <Alert variant="error">

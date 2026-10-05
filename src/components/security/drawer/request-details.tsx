@@ -7,6 +7,7 @@ import {
   IconUrgent,
 } from '@tabler/icons-react'
 import { CollapsibleSection, Detail, Timestamp } from '@/components/shared/details'
+import { Money } from '@/components/shared/money'
 import { STATUS_BADGE_VARIANT, STATUS_LABEL } from '@/components/shared/request-status'
 import { PAYMENT_METHOD_LABEL } from '@/components/treasury/kind'
 import { Badge } from '@/components/ui/badge'
@@ -21,7 +22,7 @@ import {
   DrawerPopup,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { formatCurrency, formatDay } from '@/lib/utils'
+import { formatDay } from '@/lib/utils'
 import type { SecurityRequestQueryData } from '@/tanstack-queries/security'
 import { KIND_LABEL } from '../kind'
 
@@ -53,7 +54,9 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
                 <Badge variant={STATUS_BADGE_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
               </Detail>
               <Detail label="Monto">
-                <span className="tabular-nums">{formatCurrency(Number(request.amount))}</span>
+                <span className="tabular-nums">
+                  <Money value={request.amount} currency={request.currency} />
+                </span>
               </Detail>
               <Detail label="Fecha">{formatDay(request.requested_on)}</Detail>
               <Detail label="Solicitó">{request.requester.full_name}</Detail>

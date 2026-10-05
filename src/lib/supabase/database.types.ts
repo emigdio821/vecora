@@ -38,6 +38,7 @@ export type Database = {
           cancelled_by: string | null
           created_at: string
           created_by: string
+          currency: Database['public']['Enums']['currency_code']
           id: string
           notes: string | null
           property_id: string
@@ -51,6 +52,7 @@ export type Database = {
           cancelled_by?: string | null
           created_at?: string
           created_by?: string
+          currency?: Database['public']['Enums']['currency_code']
           id?: string
           notes?: string | null
           property_id: string
@@ -64,6 +66,7 @@ export type Database = {
           cancelled_by?: string | null
           created_at?: string
           created_by?: string
+          currency?: Database['public']['Enums']['currency_code']
           id?: string
           notes?: string | null
           property_id?: string
@@ -166,6 +169,7 @@ export type Database = {
           amount: number
           created_at: string
           created_by: string
+          currency: Database['public']['Enums']['currency_code']
           details: string | null
           id: string
           rejection_reason: string | null
@@ -181,6 +185,7 @@ export type Database = {
           amount: number
           created_at?: string
           created_by?: string
+          currency?: Database['public']['Enums']['currency_code']
           details?: string | null
           id?: string
           rejection_reason?: string | null
@@ -196,6 +201,7 @@ export type Database = {
           amount?: number
           created_at?: string
           created_by?: string
+          currency?: Database['public']['Enums']['currency_code']
           details?: string | null
           id?: string
           rejection_reason?: string | null
@@ -234,6 +240,7 @@ export type Database = {
       periods: {
         Row: {
           created_at: string
+          currency: Database['public']['Enums']['currency_code']
           due_day: number
           ends_on: string
           id: string
@@ -245,6 +252,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          currency?: Database['public']['Enums']['currency_code']
           due_day?: number
           ends_on: string
           id?: string
@@ -256,6 +264,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          currency?: Database['public']['Enums']['currency_code']
           due_day?: number
           ends_on?: string
           id?: string
@@ -437,6 +446,7 @@ export type Database = {
           amount: number
           created_at: string
           created_by: string
+          currency: Database['public']['Enums']['currency_code']
           details: string | null
           id: string
           kind: Database['public']['Enums']['security_request_kind']
@@ -453,6 +463,7 @@ export type Database = {
           amount: number
           created_at?: string
           created_by?: string
+          currency?: Database['public']['Enums']['currency_code']
           details?: string | null
           id?: string
           kind?: Database['public']['Enums']['security_request_kind']
@@ -469,6 +480,7 @@ export type Database = {
           amount?: number
           created_at?: string
           created_by?: string
+          currency?: Database['public']['Enums']['currency_code']
           details?: string | null
           id?: string
           kind?: Database['public']['Enums']['security_request_kind']
@@ -507,6 +519,9 @@ export type Database = {
       }
       settings: {
         Row: {
+          configured_at: string | null
+          currency: Database['public']['Enums']['currency_code']
+          default_language: Database['public']['Enums']['app_language']
           id: string
           logo_path: string | null
           residential_name: string
@@ -514,6 +529,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          configured_at?: string | null
+          currency?: Database['public']['Enums']['currency_code']
+          default_language?: Database['public']['Enums']['app_language']
           id?: string
           logo_path?: string | null
           residential_name?: string
@@ -521,6 +539,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          configured_at?: string | null
+          currency?: Database['public']['Enums']['currency_code']
+          default_language?: Database['public']['Enums']['app_language']
           id?: string
           logo_path?: string | null
           residential_name?: string
@@ -566,6 +587,7 @@ export type Database = {
           category_id: string
           created_at: string
           created_by: string
+          currency: Database['public']['Enums']['currency_code']
           deleted_at: string | null
           deleted_by: string | null
           description: string
@@ -587,6 +609,7 @@ export type Database = {
           category_id: string
           created_at?: string
           created_by?: string
+          currency?: Database['public']['Enums']['currency_code']
           deleted_at?: string | null
           deleted_by?: string | null
           description: string
@@ -608,6 +631,7 @@ export type Database = {
           category_id?: string
           created_at?: string
           created_by?: string
+          currency?: Database['public']['Enums']['currency_code']
           deleted_at?: string | null
           deleted_by?: string | null
           description?: string
@@ -741,6 +765,7 @@ export type Database = {
       treasury_period_summary: {
         Row: {
           balance: number | null
+          currency: Database['public']['Enums']['currency_code'] | null
           period_id: string | null
           total_expense: number | null
           total_income: number | null
@@ -831,8 +856,10 @@ export type Database = {
       reopen_security_request: { Args: { p_request_id: string }; Returns: undefined }
     }
     Enums: {
+      app_language: 'es' | 'en'
       app_role: 'admin' | 'president' | 'treasurer' | 'security' | 'maintenance'
       audit_operation: 'insert' | 'update' | 'delete'
+      currency_code: 'MXN' | 'USD'
       payment_method: 'cash' | 'transfer'
       request_status: 'pending' | 'paid' | 'rejected'
       residency_relationship: 'owner' | 'tenant' | 'family'
@@ -953,8 +980,10 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_language: ['es', 'en'],
       app_role: ['admin', 'president', 'treasurer', 'security', 'maintenance'],
       audit_operation: ['insert', 'update', 'delete'],
+      currency_code: ['MXN', 'USD'],
       payment_method: ['cash', 'transfer'],
       request_status: ['pending', 'paid', 'rejected'],
       residency_relationship: ['owner', 'tenant', 'family'],

@@ -4,17 +4,34 @@
 -- ---------------------------------------------------------------------------
 -- settings: one row for the whole deployment
 -- ---------------------------------------------------------------------------
--- The name shown in the sidebar and in reports, and the logo; more fields
--- (address, defaults) can be added to the same row.
+-- The name shown in the sidebar and in reports, the logo, and the HOA's
+-- language and currency; more fields (address, defaults) can be added to the
+-- same row.
 --
 --   * Exactly one row, created here: the app only ever updates it.
 --   * Every board member reads it; only the president (or an admin) edits it.
+--     Language and currency are the admin's alone (trigger below): the main
+--     admin picks them in the setup dialog on the first sign-in, which sets
+--     configured_at.
+--   * default_language is the language of the HOA's data: generated
+--     descriptions, the names of the seeded categories and the report. Each
+--     person can still switch the app's screens to another language; that
+--     choice lives in their browser, not here.
+--   * currency applies to new amounts only. Every money table defaults to it
+--     (attached below) and keeps the currency a row was created with.
 --   * Audited like any other table, so a rename shows up in the activity log.
+
+-- Add one with `alter type public.app_language add value`.
+create type public.app_language as enum ('es', 'en');
+
 create table public.settings (
   id               uuid primary key default gen_random_uuid(),
   -- always true and unique: there can only be one row
   singleton        boolean not null default true unique,
   residential_name text not null default '',
+  default_language public.app_language not null default 'es',
+  currency         public.currency_code not null default 'MXN',
+  configured_at    timestamptz,
   updated_at       timestamptz not null default now(),
   logo_path        text,
 
@@ -22,8 +39,11 @@ create table public.settings (
   constraint settings_residential_name_trimmed check (residential_name = btrim(residential_name))
 );
 
-comment on table public.settings is 'Single row with the residential''s own details (name...). Read by everyone on the board, edited by the president.';
+comment on table public.settings is 'Single row with the residential''s own details (name, language, currency...). Read by everyone on the board, edited by the president; language and currency by an admin.';
 comment on column public.settings.residential_name is 'Shown in the sidebar and reports. Empty means the app falls back to its generic label.';
+comment on column public.settings.default_language is 'Language of the HOA''s data and reports, and of the app for anyone who hasn''t picked their own.';
+comment on column public.settings.currency is 'Currency of new amounts. Changing it never touches existing rows, which keep their own.';
+comment on column public.settings.configured_at is 'When the main admin completed the setup dialog. Null until then, which is what shows the dialog.';
 comment on column public.settings.logo_path is 'File in the "branding" bucket. Null means no logo.';
 
 insert into public.settings default values;
@@ -31,6 +51,54 @@ insert into public.settings default values;
 create trigger settings_set_updated_at
   before update on public.settings
   for each row execute function private.set_updated_at();
+
+-- Language and currency shape every record from then on, so they stay with the
+-- admin even though the president edits the rest of the row. Sessions with no
+-- signed-in user (SQL editor, migrations, seeds) are let through.
+create function private.guard_settings_admin_fields()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if (new.default_language, new.currency, new.configured_at)
+       is distinct from (old.default_language, old.currency, old.configured_at)
+     and auth.uid() is not null
+     and not private.is_admin() then
+    raise exception 'only an admin can change the language or the currency' using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+
+create trigger settings_guard_admin_fields
+  before update on public.settings
+  for each row execute function private.guard_settings_admin_fields();
+
+-- ---------------------------------------------------------------------------
+-- currency defaults for the money tables
+-- ---------------------------------------------------------------------------
+-- New rows take the HOA's current currency unless the insert names one (the
+-- RPCs pass the currency of the period, reservation or request a row comes
+-- from). security definer: reading settings needs no grant of its own.
+create function private.current_currency()
+returns public.currency_code
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select s.currency from public.settings s;
+$$;
+
+revoke execute on function private.current_currency() from public, anon;
+grant execute on function private.current_currency() to authenticated, service_role;
+
+alter table public.periods              alter column currency set default private.current_currency();
+alter table public.transactions         alter column currency set default private.current_currency();
+alter table public.amenity_reservations alter column currency set default private.current_currency();
+alter table public.maintenance_requests alter column currency set default private.current_currency();
+alter table public.security_requests    alter column currency set default private.current_currency();
 
 revoke all on table public.settings from anon;
 -- no insert/delete: the row is created above and never goes away

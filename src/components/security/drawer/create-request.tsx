@@ -18,7 +18,8 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
-import { formatCurrency, ISO_DAY } from '@/lib/utils'
+import { useCurrency, useFormatCurrency } from '@/hooks/use-currency'
+import { ISO_DAY } from '@/lib/utils'
 import { type SecurityRequestInput, securityRequestSchema } from '@/lib/validations/security'
 import { createSecurityRequest } from '@/server-actions/security'
 import { SECURITY_QUERY_KEY } from '@/tanstack-queries/security'
@@ -44,6 +45,8 @@ interface CreateRequestDrawerProps extends React.ComponentProps<typeof Drawer> {
 
 export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequestDrawerProps) {
   const queryClient = useQueryClient()
+  const currency = useCurrency()
+  const formatCurrency = useFormatCurrency()
 
   const form = useForm<SecurityRequestInput>({
     resolver: zodResolver(securityRequestSchema),
@@ -61,7 +64,7 @@ export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequ
       toastManager.add({
         type: 'success',
         title: 'Solicitud enviada a tesorería',
-        description: `${values.title} - ${formatCurrency(values.amount)}`,
+        description: `${values.title} - ${formatCurrency(values.amount, currency)}`,
       })
       onOpenChange(false)
     },
@@ -110,7 +113,7 @@ export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequ
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
           >
-            <RequestFormFields form={form} disabled={mutation.isPending} />
+            <RequestFormFields form={form} currency={currency} disabled={mutation.isPending} />
 
             {form.formState.errors.root && (
               <Alert variant="error">

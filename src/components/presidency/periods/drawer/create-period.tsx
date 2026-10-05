@@ -18,7 +18,8 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
-import { ISO_DAY } from '@/lib/utils'
+import { useCurrency } from '@/hooks/use-currency'
+import { type CurrencyCode, ISO_DAY } from '@/lib/utils'
 import { type PeriodInput, periodSchema } from '@/lib/validations/treasury'
 import { createPeriod } from '@/server-actions/treasury'
 import { type PeriodQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
@@ -29,17 +30,19 @@ const FORM_ID = 'create-period-form'
 /**
  * Pre-fills the next cycle: the day after the latest period ends, one year
  * long, same rates. Without a previous period, a year starting this month.
+ * Rates in another currency (it changed since) aren't carried over.
  */
-function defaultValues(latest: PeriodQueryData | undefined): PeriodInput {
+function defaultValues(latest: PeriodQueryData | undefined, currency: CurrencyCode): PeriodInput {
   const startsOn = latest ? addDays(parseISO(latest.ends_on), 1) : startOfMonth(new Date())
   const endsOn = addDays(addYears(startsOn, 1), -1)
+  const rates = latest?.currency === currency ? latest : undefined
 
   return {
     name: `${getYear(startsOn)}-${getYear(endsOn)}`,
     starts_on: format(startsOn, ISO_DAY),
     ends_on: format(endsOn, ISO_DAY),
-    monthly_fee: latest ? Number(latest.monthly_fee) : (null as unknown as number),
-    late_fee: latest ? Number(latest.late_fee) : 100,
+    monthly_fee: rates ? Number(rates.monthly_fee) : (null as unknown as number),
+    late_fee: rates ? Number(rates.late_fee) : 100,
     due_day: latest?.due_day ?? 10,
   }
 }
@@ -53,10 +56,11 @@ interface CreatePeriodDrawerProps extends React.ComponentProps<typeof Drawer> {
 
 export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: CreatePeriodDrawerProps) {
   const queryClient = useQueryClient()
+  const currency = useCurrency()
 
   const form = useForm<PeriodInput>({
     resolver: zodResolver(periodSchema),
-    defaultValues: defaultValues(latest),
+    defaultValues: defaultValues(latest, currency),
   })
 
   const mutation = useMutation({
@@ -88,7 +92,7 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
     props.onOpenChangeComplete?.(isOpen)
 
     if (!isOpen) {
-      form.reset(defaultValues(latest))
+      form.reset(defaultValues(latest, currency))
     }
   }
 
@@ -115,7 +119,7 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
           >
-            <PeriodFormFields form={form} disabled={mutation.isPending} />
+            <PeriodFormFields form={form} currency={currency} disabled={mutation.isPending} />
 
             {form.formState.errors.root && (
               <Alert variant="error">

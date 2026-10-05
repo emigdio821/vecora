@@ -11,16 +11,18 @@ import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
-import { formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { MaintenanceRequestInput } from '@/lib/validations/maintenance'
 
 interface RequestFormFieldsProps {
   form: UseFormReturn<MaintenanceRequestInput>
+  /** The amount's: the HOA's current one when creating, the request's own when editing. */
+  currency: CurrencyCode
   disabled?: boolean
 }
 
 /** Shared by the create and edit drawers. */
-export function RequestFormFields({ form, disabled }: RequestFormFieldsProps) {
+export function RequestFormFields({ form, currency, disabled }: RequestFormFieldsProps) {
   const [isDateOpen, setDateOpen] = useState(false)
   const today = useToday()
 
@@ -74,10 +76,10 @@ export function RequestFormFields({ form, disabled }: RequestFormFieldsProps) {
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
                 </NumberField>
                 <InputGroupAddon>
-                  <InputGroupText>$</InputGroupText>
+                  <InputGroupText>{currencySymbol(currency)}</InputGroupText>
                 </InputGroupAddon>
                 <InputGroupAddon align="inline-end">
-                  <InputGroupText>MXN</InputGroupText>
+                  <InputGroupText>{currency}</InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>

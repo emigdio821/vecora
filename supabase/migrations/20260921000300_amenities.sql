@@ -11,7 +11,8 @@
 --     every member can see them.
 --   * Most areas are free; a booking may carry a fee (e.g. electricity) in
 --     amount, paid in full when booking. 0 means free: there is nothing to
---     collect. The area's default_fee pre-fills it.
+--     collect. The area's default_fee pre-fills it. The booking keeps the
+--     currency it was made in, and its fee and refund are recorded in it.
 --   * Collecting it is an income row in the amenity_fee category linked back
 --     via transactions.amenity_reservation_id. The status is derived, never
 --     stored: paid while that row is live. Deleting the income in Transactions
@@ -48,7 +49,7 @@ create table public.amenities (
 create unique index amenities_name_unique on public.amenities (lower(name));
 
 comment on table public.amenities is 'Bookable common areas (terrace, pool...). Retire with is_active = false; areas with reservations cannot be deleted.';
-comment on column public.amenities.default_fee is 'Fee proposed when booking, in MXN; each reservation can change it. 0 = free.';
+comment on column public.amenities.default_fee is 'Fee proposed when booking, in the current settings.currency (no currency of its own); each reservation can change it. 0 = free.';
 
 create trigger amenities_set_updated_at
   before update on public.amenities
@@ -63,6 +64,7 @@ create table public.amenity_reservations (
   property_id  uuid not null references public.properties (id) on delete cascade,
   reserved_on  date not null,
   amount       numeric(12,2) not null,
+  currency     public.currency_code not null,
   notes        text,
   cancelled_at timestamptz,
   cancelled_by uuid references public.profiles (id) on delete restrict,
@@ -76,7 +78,8 @@ create table public.amenity_reservations (
 );
 
 comment on table public.amenity_reservations is 'Bookings of a common area, one house per area per day.';
-comment on column public.amenity_reservations.amount is 'Price of the booking in MXN, paid in full. 0 = free.';
+comment on column public.amenity_reservations.amount is 'Price of the booking, paid in full. 0 = free.';
+comment on column public.amenity_reservations.currency is 'Currency of amount, fixed at creation. Its fee and refund are recorded in it.';
 comment on column public.amenity_reservations.cancelled_at is 'Set by cancel_amenity_reservation. A cancelled booking frees its day and never changes again.';
 
 -- One booking per area per day, the whole point of the table; a cancelled
@@ -89,6 +92,10 @@ create index amenity_reservations_property_id_idx on public.amenity_reservations
 create trigger amenity_reservations_set_updated_at
   before update on public.amenity_reservations
   for each row execute function private.set_updated_at();
+
+create trigger amenity_reservations_keep_currency
+  before update of currency on public.amenity_reservations
+  for each row execute function private.keep_currency();
 
 -- ---------------------------------------------------------------------------
 -- transactions: link to the reservation
@@ -236,11 +243,11 @@ begin
   end if;
 
   insert into public.transactions
-    (kind, category_id, period_id, property_id, amenity_reservation_id, amount, occurred_on,
+    (kind, category_id, period_id, property_id, amenity_reservation_id, amount, currency, occurred_on,
      payment_method, folio, reference, description, notes)
   values
     ('income', v_category_id, v_period_id, v_reservation.property_id, v_reservation.id,
-     v_reservation.amount, p_occurred_on, p_payment_method, nullif(btrim(p_folio), ''),
+     v_reservation.amount, v_reservation.currency, p_occurred_on, p_payment_method, nullif(btrim(p_folio), ''),
      nullif(btrim(p_reference), ''),
      'Tarifa ' || private.amenity_reservation_day(v_reservation.amenity_id, v_reservation.reserved_on),
      nullif(btrim(p_notes), ''))
@@ -306,12 +313,12 @@ begin
     end if;
 
     insert into public.transactions
-      (kind, category_id, period_id, property_id, amenity_reservation_id, amount, occurred_on,
+      (kind, category_id, period_id, property_id, amenity_reservation_id, amount, currency, occurred_on,
        payment_method, reference, description, notes)
     values
       ('expense', (select id from public.transaction_categories where key = 'amenity_refund'), v_period_id,
-       v_reservation.property_id, v_reservation.id, p_refund_amount, p_occurred_on, p_payment_method,
-       nullif(btrim(p_reference), ''),
+       v_reservation.property_id, v_reservation.id, p_refund_amount, v_reservation.currency, p_occurred_on,
+       p_payment_method, nullif(btrim(p_reference), ''),
        'Reembolso ' || private.amenity_reservation_day(v_reservation.amenity_id, v_reservation.reserved_on),
        nullif(btrim(p_notes), ''));
   end if;

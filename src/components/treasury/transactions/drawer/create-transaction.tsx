@@ -18,7 +18,8 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
-import { formatCurrency, ISO_DAY } from '@/lib/utils'
+import { useCurrency, useFormatCurrency } from '@/hooks/use-currency'
+import { ISO_DAY } from '@/lib/utils'
 import {
   type CreateTransactionInput,
   createTransactionSchema,
@@ -61,6 +62,8 @@ export function CreateTransactionDrawer({
   ...props
 }: CreateTransactionDrawerProps) {
   const queryClient = useQueryClient()
+  const currency = useCurrency()
+  const formatCurrency = useFormatCurrency()
 
   const form = useForm<CreateTransactionInput>({
     resolver: zodResolver(createTransactionSchema),
@@ -78,7 +81,7 @@ export function CreateTransactionDrawer({
       toastManager.add({
         type: 'success',
         title: `${KIND_LABEL[values.kind]} registrado`,
-        description: `${values.description} - ${formatCurrency(values.amount)}`,
+        description: `${values.description} - ${formatCurrency(values.amount, currency)}`,
       })
       onOpenChange(false)
     },
@@ -127,7 +130,7 @@ export function CreateTransactionDrawer({
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
           >
-            <TransactionFormFields form={form} disabled={mutation.isPending} />
+            <TransactionFormFields form={form} currency={currency} disabled={mutation.isPending} />
 
             {form.formState.errors.root && (
               <Alert variant="error">

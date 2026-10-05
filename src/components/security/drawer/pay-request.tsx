@@ -26,8 +26,9 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
+import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
-import { formatCurrency, formatDay, ISO_DAY } from '@/lib/utils'
+import { formatDay, ISO_DAY } from '@/lib/utils'
 import { type PayRequestInput, payRequestSchema } from '@/lib/validations/requests'
 import { paySecurityRequest } from '@/server-actions/security'
 import { SECURITY_QUERY_KEY, type SecurityRequestQueryData } from '@/tanstack-queries/security'
@@ -49,6 +50,8 @@ type PayMutation = UseMutationResult<{ transaction_id: string }, Error, PayReque
 /** Treasurer: records the expense in the ledger and marks the request paid. */
 export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayRequestDrawerProps) {
   const queryClient = useQueryClient()
+  const formatCurrency = useFormatCurrency()
+  const amount = formatCurrency(request.amount, request.currency)
 
   const mutation = useMutation({
     mutationFn: async (values: PayRequestInput) => {
@@ -63,7 +66,7 @@ export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayR
       toastManager.add({
         type: 'success',
         title: 'Pago registrado',
-        description: `${request.title} - ${formatCurrency(Number(request.amount))} ya está en "Tesorería"`,
+        description: `${request.title} - ${amount} ya está en "Tesorería"`,
       })
       onOpenChange(false)
     },
@@ -84,8 +87,8 @@ export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayR
         <DrawerHeader>
           <DrawerTitle>Registrar pago</DrawerTitle>
           <DrawerDescription>
-            {request.title} - {formatCurrency(Number(request.amount))}. Se registrará como egreso en
-            "Tesorería" y la solicitud pasará a "Pagada".
+            {request.title} - {amount}. Se registrará como egreso en "Tesorería" y la solicitud pasará a
+            "Pagada".
           </DrawerDescription>
         </DrawerHeader>
 

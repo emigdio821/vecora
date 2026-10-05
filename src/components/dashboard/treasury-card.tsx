@@ -14,6 +14,7 @@ import { Link } from '@tanstack/react-router'
 import { curveMonotoneX } from 'd3-shape'
 import { eachMonthOfInterval, format, parseISO } from 'date-fns'
 import { useMemo } from 'react'
+import { Money } from '@/components/shared/money'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import { Button } from '@/components/ui/button'
 import {
@@ -34,8 +35,9 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
-import { cn, esLocale, formatCurrency, ISO_DAY } from '@/lib/utils'
+import { type CurrencyCode, cn, esLocale, ISO_DAY } from '@/lib/utils'
 import {
   type PeriodMovementQueryData,
   type PeriodQueryData,
@@ -80,13 +82,6 @@ const RENDERER = motion({
   transition: { type: 'spring', stiffness: 170, damping: 18, mass: 1 },
 })
 
-const compactCurrency = new Intl.NumberFormat('es-MX', {
-  style: 'currency',
-  currency: 'MXN',
-  notation: 'compact',
-  maximumFractionDigits: 1,
-})
-
 function monthDate(month: string) {
   return parseISO(`${month}-01`)
 }
@@ -125,9 +120,12 @@ export function TreasuryCard() {
 
   const today = format(now, ISO_DAY)
   const period = periods.data.find((p) => p.starts_on <= today && today <= p.ends_on)
-  const summary = period && summaries.data.find((s) => s.period_id === period.id)
+  // The period's own currency first, then any other it has movements in.
+  const periodSummaries = summaries.data
+    .filter((s) => s.period_id === period?.id)
+    .sort((a, b) => Number(b.currency === period?.currency) - Number(a.currency === period?.currency))
 
-  if (!period || !summary) {
+  if (!period || periodSummaries.length === 0) {
     return (
       <CardFrame className="w-full">
         <CardFrameHeader>
@@ -158,7 +156,7 @@ export function TreasuryCard() {
     )
   }
 
-  return <PeriodTreasury period={period} summary={summary} today={today} />
+  return <PeriodTreasury period={period} summaries={periodSummaries} today={today} />
 }
 
 /** Same layout as PeriodTreasury (totals, then the chart), so nothing moves when the data lands. */
@@ -185,15 +183,18 @@ function TreasuryCardSkeleton() {
   )
 }
 
+/** Totals and chart in the leading currency; other currencies get a line each underneath. */
 function PeriodTreasury({
   period,
-  summary,
+  summaries,
   today,
 }: {
   period: PeriodQueryData
-  summary: PeriodSummaryQueryData
+  summaries: PeriodSummaryQueryData[]
   today: string
 }) {
+  const [summary, ...others] = summaries
+  const currency = summary.currency ?? period.currency
   const balance = Number(summary.balance ?? 0)
 
   return (
@@ -208,15 +209,40 @@ function PeriodTreasury({
       <Card>
         <CardPanel className="grid min-w-0 gap-6">
           <dl className="grid gap-2 sm:grid-cols-3 sm:gap-4">
-            <Total label="Ingresos" swatch="bg-(--chart-income)" value={summary.total_income ?? 0} />
-            <Total label="Egresos" swatch="bg-(--chart-expense)" value={summary.total_expense ?? 0} />
+            <Total
+              label="Ingresos"
+              swatch="bg-(--chart-income)"
+              value={summary.total_income ?? 0}
+              currency={currency}
+            />
+            <Total
+              label="Egresos"
+              swatch="bg-(--chart-expense)"
+              value={summary.total_expense ?? 0}
+              currency={currency}
+            />
             <Total
               label="Saldo"
               value={balance}
+              currency={currency}
               className={balance < 0 ? 'text-destructive-foreground' : undefined}
             />
           </dl>
-          <MonthlyFlowChart period={period} today={today} />
+          {others.length > 0 && (
+            <ul className="grid gap-1 text-sm text-muted-foreground tabular-nums">
+              {others.map((other) => {
+                const code = other.currency ?? period.currency
+                return (
+                  <li key={code}>
+                    En {code}: ingresos <Money value={other.total_income ?? 0} currency={code} />, egresos{' '}
+                    <Money value={other.total_expense ?? 0} currency={code} />, saldo{' '}
+                    <Money value={other.balance ?? 0} currency={code} />
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+          <MonthlyFlowChart period={period} currency={currency} today={today} />
         </CardPanel>
       </Card>
     </CardFrame>
@@ -227,11 +253,13 @@ function Total({
   label,
   swatch,
   value,
+  currency,
   className,
 }: {
   label: string
   swatch?: string
   value: number | string
+  currency: CurrencyCode
   className?: string
 }) {
   return (
@@ -241,18 +269,35 @@ function Total({
         {label}
       </dt>
       <dd className={cn('text-base font-semibold tabular-nums sm:text-2xl', className)}>
-        {formatCurrency(value)}
+        <Money value={value} currency={currency} />
       </dd>
     </div>
   )
 }
 
-function MonthlyFlowChart({ period, today }: { period: PeriodQueryData; today: string }) {
+function MonthlyFlowChart({
+  period,
+  currency,
+  today,
+}: {
+  period: PeriodQueryData
+  currency: CurrencyCode
+  today: string
+}) {
   const movements = useQuery(periodMovementsQueryOptions(period.id))
+  const formatCurrency = useFormatCurrency()
 
+  // Amounts in different currencies don't add up, so the chart sticks to one.
   const months = useMemo(
-    () => (movements.data ? monthlyTotals(period, movements.data, today) : []),
-    [period, movements.data, today],
+    () =>
+      movements.data
+        ? monthlyTotals(
+            period,
+            movements.data.filter((m) => m.currency === currency),
+            today,
+          )
+        : [],
+    [period, currency, movements.data, today],
   )
   const rows = useMemo(
     () =>
@@ -263,54 +308,60 @@ function MonthlyFlowChart({ period, today }: { period: PeriodQueryData; today: s
     [months],
   )
 
-  const definition = useMemo(
-    () =>
-      defineChart({
-        marks: [
-          // Explicit baseline so the two areas overlap instead of stacking.
-          // Visual only: the lines own focus, so each series appears once in the tooltip.
-          decorative(
-            areaY(rows, { x: 'month', y1: 0, y2: 'amount', z: 'series', fillOpacity: 0.1, curve: CURVE }),
-          ),
-          lineY(rows, { x: 'month', y: 'amount', z: 'series', strokeWidth: 2, curve: CURVE }),
-          crosshair({ y: false }),
-        ],
-        scales: {
-          x: {
-            scale: () => scalePoint<string>().padding(0.25),
-            axis: {
-              line: false,
-              ticks: { size: 0, format: (month) => format(monthDate(month), 'MMM', { locale: esLocale }) },
-            },
-          },
-          y: {
-            scale: scaleLinear,
-            nice: true,
-            grid: true,
-            axis: { line: false, ticks: { size: 0, format: (value) => compactCurrency.format(value) } },
+  const definition = useMemo(() => {
+    const compactCurrency = new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    })
+
+    return defineChart({
+      marks: [
+        // Explicit baseline so the two areas overlap instead of stacking.
+        // Visual only: the lines own focus, so each series appears once in the tooltip.
+        decorative(
+          areaY(rows, { x: 'month', y1: 0, y2: 'amount', z: 'series', fillOpacity: 0.1, curve: CURVE }),
+        ),
+        lineY(rows, { x: 'month', y: 'amount', z: 'series', strokeWidth: 2, curve: CURVE }),
+        crosshair({ y: false }),
+      ],
+      scales: {
+        x: {
+          scale: () => scalePoint<string>().padding(0.25),
+          axis: {
+            line: false,
+            ticks: { size: 0, format: (month) => format(monthDate(month), 'MMM', { locale: esLocale }) },
           },
         },
-        color: { scale: SERIES_COLORS },
-        focus: 'group-x',
-        // Anywhere over the plot snaps to the nearest month.
-        maxFocusDistance: Number.POSITIVE_INFINITY,
-        tooltip: {
-          use: tooltip,
-          anchor: 'group-center',
-          placement: ['right', 'left', 'top'],
-          sort: 'color-domain',
-          content: (points) => ({
-            title: format(monthDate(String(points[0]?.xValue ?? '')), 'MMMM yyyy', { locale: esLocale }),
-            rows: points.map((point) => ({
-              label: String(point.groupLabel),
-              value: formatCurrency(point.datum.amount),
-              color: point.color,
-            })),
-          }),
+        y: {
+          scale: scaleLinear,
+          nice: true,
+          grid: true,
+          axis: { line: false, ticks: { size: 0, format: (value) => compactCurrency.format(value) } },
         },
-      }),
-    [rows],
-  )
+      },
+      color: { scale: SERIES_COLORS },
+      focus: 'group-x',
+      // Anywhere over the plot snaps to the nearest month.
+      maxFocusDistance: Number.POSITIVE_INFINITY,
+      tooltip: {
+        use: tooltip,
+        anchor: 'group-center',
+        placement: ['right', 'left', 'top'],
+        sort: 'color-domain',
+        content: (points) => ({
+          title: format(monthDate(String(points[0]?.xValue ?? '')), 'MMMM yyyy', { locale: esLocale }),
+          rows: points.map((point) => ({
+            label: String(point.groupLabel),
+            value: formatCurrency(point.datum.amount, currency),
+            color: point.color,
+          })),
+        }),
+      },
+    })
+  }, [rows, currency, formatCurrency])
 
   if (movements.isPending) return <Skeleton style={{ height: CHART_HEIGHT }} />
   if (movements.isError) return null
@@ -343,8 +394,8 @@ function MonthlyFlowChart({ period, today }: { period: PeriodQueryData; today: s
             {months.map((t) => (
               <tr key={t.month}>
                 <th scope="row">{format(monthDate(t.month), 'MMMM yyyy', { locale: esLocale })}</th>
-                <td>{formatCurrency(t.income)}</td>
-                <td>{formatCurrency(t.expense)}</td>
+                <td>{formatCurrency(t.income, currency)}</td>
+                <td>{formatCurrency(t.expense, currency)}</td>
               </tr>
             ))}
           </tbody>

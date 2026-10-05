@@ -3,12 +3,23 @@ import sharp from 'sharp'
 import { type ActionResult, postgrestErrorMessage } from '@/lib/action-result'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { createClient } from '@/lib/supabase/server'
-import { LOGO_BUCKET, logoFileSchema, type SettingsInput, settingsSchema } from '@/lib/validations/settings'
+import {
+  LOGO_BUCKET,
+  logoFileSchema,
+  type SettingsInput,
+  settingsSchema,
+  type SetupInput,
+  setupSchema,
+} from '@/lib/validations/settings'
 
 /** Largest side of the stored logo, in pixels: plenty for the report header. */
 const LOGO_SIZE = 512
 
-/** President (or admin) edits the residential's details. RLS enforces the role. */
+/**
+ * President (or admin) edits the residential's details. RLS enforces the
+ * role; language and currency only reach here from an admin, and a trigger
+ * refuses them from anyone else.
+ */
 const updateSettingsFn = createServerFn({ method: 'POST' })
   .validator((input: SettingsInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult> => {
@@ -41,6 +52,39 @@ const updateSettingsFn = createServerFn({ method: 'POST' })
   })
 
 export const updateSettings = (input: SettingsInput) => updateSettingsFn({ data: input })
+
+/** The main admin's setup dialog: name, language and currency, then it never opens again. */
+const completeSetupFn = createServerFn({ method: 'POST' })
+  .validator((input: SetupInput) => input)
+  .handler(async ({ data: input }): Promise<ActionResult> => {
+    const parsed = setupSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
+
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('settings')
+      .update({ ...parsed.data, configured_at: new Date().toISOString() })
+      .eq('singleton', true)
+      .select('id')
+      .maybeSingle()
+
+    if (error) {
+      return {
+        error: postgrestErrorMessage(error, {
+          fallback: 'No se pudo guardar la configuración, intenta nuevamente',
+        }),
+      }
+    }
+    if (!data) {
+      return { error: 'No tienes permisos para realizar esta acción' }
+    }
+
+    return { data: undefined }
+  })
+
+export const completeSetup = (input: SetupInput) => completeSetupFn({ data: input })
 
 /**
  * Whatever the president uploads ends up as a light PNG: turned upright,

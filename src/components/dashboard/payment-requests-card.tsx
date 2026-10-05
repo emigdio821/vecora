@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, type LinkOptions, linkOptions } from '@tanstack/react-router'
 import { reservationStatus } from '@/components/presidency/reservations/status'
 import { KIND_LABEL as SECURITY_KIND_LABEL } from '@/components/security/kind'
+import { Money } from '@/components/shared/money'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import {
   Card,
@@ -14,7 +15,7 @@ import {
   CardPanel,
 } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { formatCurrency, formatDay } from '@/lib/utils'
+import { type CurrencyCode, formatDay } from '@/lib/utils'
 import { maintenanceRequestsQueryOptions } from '@/tanstack-queries/maintenance'
 import { reservationsQueryOptions } from '@/tanstack-queries/presidency'
 import { securityRequestsQueryOptions } from '@/tanstack-queries/security'
@@ -25,6 +26,7 @@ interface PaymentRequest {
   section: string
   title: string
   amount: number
+  currency: CurrencyCode
   requested_on: string
 }
 
@@ -57,6 +59,7 @@ export function PaymentRequestsCard() {
         section: 'Mantenimiento',
         title: r.title,
         amount: r.amount,
+        currency: r.currency,
         requested_on: r.requested_on,
       })),
     ...security.data
@@ -67,6 +70,7 @@ export function PaymentRequestsCard() {
         section: `Seguridad - ${SECURITY_KIND_LABEL[r.kind]}`,
         title: r.title,
         amount: r.amount,
+        currency: r.currency,
         requested_on: r.requested_on,
       })),
     ...reservations.data
@@ -77,6 +81,7 @@ export function PaymentRequestsCard() {
         section: 'Reservaciones',
         title: `Tarifa ${r.amenity.name} - Casa ${r.property.number}`,
         amount: Number(r.amount),
+        currency: r.currency,
         requested_on: r.reserved_on,
       })),
   ].sort((a, b) => a.requested_on.localeCompare(b.requested_on))
@@ -106,7 +111,7 @@ export function PaymentRequestsCard() {
                       </span>
                     </span>
                     <span className="shrink-0 font-medium tabular-nums">
-                      {formatCurrency(request.amount)}
+                      <Money value={request.amount} currency={request.currency} />
                     </span>
                   </div>
                 </li>

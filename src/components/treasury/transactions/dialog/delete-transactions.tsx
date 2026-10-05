@@ -11,7 +11,8 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
-import { formatCurrency } from '@/lib/utils'
+import { useFormatCurrency } from '@/hooks/use-currency'
+import type { CurrencyCode } from '@/lib/utils'
 import { deleteTransactions, restoreTransactions } from '@/server-actions/treasury'
 import { type TransactionQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 
@@ -57,14 +58,24 @@ export function DeleteTransactionsAlertDialog({
   const queryClient = useQueryClient()
   const count = transactions.length
   const isSingle = count === 1
-  const total = transactions.reduce((sum, t) => sum + Number(t.amount) * (t.kind === 'income' ? 1 : -1), 0)
+  const formatCurrency = useFormatCurrency()
+  // Net effect on the balance, one per currency in the selection.
+  const totals = new Map<CurrencyCode, number>()
+  for (const t of transactions) {
+    totals.set(t.currency, (totals.get(t.currency) ?? 0) + Number(t.amount) * (t.kind === 'income' ? 1 : -1))
+  }
+  const impact = [...totals]
+    .map(
+      ([currency, total]) => `${formatCurrency(Math.abs(total), currency)} ${total >= 0 ? 'menos' : 'más'}`,
+    )
+    .join(', ')
   const hasFee = transactions.some((t) => t.category.key === 'fee')
   const feeClause = hasFee
     ? ` ${isSingle ? 'Es una cuota, así que ese mes volverá a aparecer como pendiente para la casa.' : 'Incluye cuotas, así que esos meses volverán a aparecer como pendientes para sus casas.'}`
     : ''
   const hasAmenityFee = transactions.some((t) => t.category.key === 'amenity_fee')
   const amenityClause = hasAmenityFee ? ' La reservación volverá a aparecer como pendiente de pago.' : ''
-  const description = `${isSingle ? 'Dejará' : 'Dejarán'} de contar en el saldo (${formatCurrency(Math.abs(total))} ${total >= 0 ? 'menos' : 'más'}).${feeClause}${amenityClause} Solo podrás deshacerlo durante unos segundos.`
+  const description = `${isSingle ? 'Dejará' : 'Dejarán'} de contar en el saldo (${impact}).${feeClause}${amenityClause} Solo podrás deshacerlo durante unos segundos.`
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -132,7 +143,7 @@ export function DeleteTransactionsAlertDialog({
               <span className="truncate">{transaction.description}</span>
               <span className="shrink-0 tabular-nums">
                 {transaction.kind === 'income' ? '+' : '−'}
-                {formatCurrency(transaction.amount)}
+                {formatCurrency(transaction.amount, transaction.currency)}
               </span>
             </li>
           ))}

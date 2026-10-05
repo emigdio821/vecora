@@ -1,8 +1,9 @@
 import { createColumnHelper } from '@tanstack/react-table'
+import { Money } from '@/components/shared/money'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
-import { formatCurrency, normalizeString } from '@/lib/utils'
+import { normalizeString } from '@/lib/utils'
 import { type AmenityQueryData, reservationCount } from '@/tanstack-queries/presidency'
 import { AmenitiesTableActions } from './actions'
 
@@ -30,7 +31,9 @@ export const amenitiesTableColumns = columnHelper.columns([
       return fee === 0 ? (
         <span className="text-muted-foreground">Sin costo</span>
       ) : (
-        <span className="tabular-nums">{formatCurrency(fee)}</span>
+        <span className="tabular-nums">
+          <Money value={fee} />
+        </span>
       )
     },
   }),

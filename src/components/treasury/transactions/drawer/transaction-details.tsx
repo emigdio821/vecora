@@ -1,5 +1,6 @@
 import { IconCalendarPlus, IconHistory, IconNotes, IconReceipt, IconWallet } from '@tabler/icons-react'
 import { CollapsibleSection, Detail, Timestamp } from '@/components/shared/details'
+import { Money } from '@/components/shared/money'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,7 +13,7 @@ import {
   DrawerPopup,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { cn, formatCurrency, formatDay, formatMonth } from '@/lib/utils'
+import { cn, formatDay, formatMonth } from '@/lib/utils'
 import type { TransactionQueryData } from '@/tanstack-queries/treasury'
 import { KIND_LABEL, PAYMENT_METHOD_LABEL } from '../../kind'
 
@@ -52,7 +53,7 @@ export function TransactionDetailsDrawer({
                   )}
                 >
                   {isIncome ? '+' : '−'}
-                  {formatCurrency(Number(transaction.amount))}
+                  <Money value={transaction.amount} currency={transaction.currency} />
                 </span>
               </Detail>
               <Detail label="Fecha">{formatDay(transaction.occurred_on)}</Detail>

@@ -1,9 +1,10 @@
 import { createColumnHelper } from '@tanstack/react-table'
+import { Money } from '@/components/shared/money'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { cn, formatCurrency, formatDay, normalizeString } from '@/lib/utils'
+import { cn, formatDay, normalizeString } from '@/lib/utils'
 import type { TransactionQueryData } from '@/tanstack-queries/treasury'
 import { PAYMENT_METHOD_LABEL } from '../../kind'
 import { TransactionsTableActions } from './actions'
@@ -102,7 +103,7 @@ export const transactionsTableColumns = columnHelper.columns([
           )}
         >
           {isIncome ? '+' : '−'}
-          {formatCurrency(getValue())}
+          <Money value={getValue()} currency={row.original.currency} />
         </span>
       )
     },

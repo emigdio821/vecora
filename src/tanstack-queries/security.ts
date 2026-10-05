@@ -9,7 +9,7 @@ function requestsQuery() {
     .from('security_requests')
     .select(
       `
-      id, kind, title, details, amount, requested_on, status, rejection_reason, resolved_at, created_at,
+      id, kind, title, details, amount, currency, requested_on, status, rejection_reason, resolved_at, created_at,
       requester:profiles!created_by ( full_name ),
       resolver:profiles!resolved_by ( full_name ),
       transaction:transactions!transaction_id ( id, occurred_on, payment_method, reference )

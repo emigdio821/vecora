@@ -128,6 +128,7 @@ function EditReservationForm({
 
           <ReservationFormFields
             form={form}
+            currency={reservation.currency}
             disabled={mutation.isPending}
             currentId={reservation.id}
             lockPaidFields={isPaid}

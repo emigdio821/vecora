@@ -11,18 +11,20 @@ import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/inp
 import { NumberField, NumberFieldGroup, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { useToday } from '@/hooks/use-today'
-import { formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { PeriodInput } from '@/lib/validations/treasury'
 
 interface PeriodFormFieldsProps {
   form: UseFormReturn<PeriodInput>
+  /** Of the fees: the HOA's current one for a new period, the period's own when editing. */
+  currency: CurrencyCode
   disabled?: boolean
   /** Editing a period that already has movements: rates only apply going forward. */
   inUse?: boolean
 }
 
 /** Shared by the create and edit drawers. */
-export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProps) {
+export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodFormFieldsProps) {
   const [openDate, setOpenDate] = useState<'starts_on' | 'ends_on' | null>(null)
   const startsOn = useWatch({ control: form.control, name: 'starts_on' })
   const today = useToday()
@@ -137,10 +139,10 @@ export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProp
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
                 </NumberField>
                 <InputGroupAddon>
-                  <InputGroupText>$</InputGroupText>
+                  <InputGroupText>{currencySymbol(currency)}</InputGroupText>
                 </InputGroupAddon>
                 <InputGroupAddon align="inline-end">
-                  <InputGroupText>MXN</InputGroupText>
+                  <InputGroupText>{currency}</InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -175,10 +177,10 @@ export function PeriodFormFields({ form, disabled, inUse }: PeriodFormFieldsProp
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
                 </NumberField>
                 <InputGroupAddon>
-                  <InputGroupText>$</InputGroupText>
+                  <InputGroupText>{currencySymbol(currency)}</InputGroupText>
                 </InputGroupAddon>
                 <InputGroupAddon align="inline-end">
-                  <InputGroupText>MXN</InputGroupText>
+                  <InputGroupText>{currency}</InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>

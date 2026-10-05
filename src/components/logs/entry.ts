@@ -1,5 +1,14 @@
 import type { Badge } from '@/components/ui/badge'
-import { formatCurrency, formatDate, formatDay, formatMonth, getRoleLabel } from '@/lib/utils'
+import {
+  CURRENCIES,
+  formatCurrency,
+  formatDate,
+  formatDay,
+  formatMonth,
+  getRoleLabel,
+  MONEY_FORMAT,
+} from '@/lib/utils'
+import { LANGUAGE_LABEL } from '@/lib/validations/settings'
 import type { LogEntryQueryData } from '@/tanstack-queries/logs'
 
 /*
@@ -118,6 +127,18 @@ function asText(value: unknown): string {
   return typeof value === 'string' || typeof value === 'number' ? String(value) : ''
 }
 
+const numberFormatter = new Intl.NumberFormat('es-MX', MONEY_FORMAT)
+
+/**
+ * The log mixes rows from any point in time, so amounts always carry their
+ * code. Amenity fees have no currency of their own: just the number.
+ */
+function formatAmount(row: RowData, value: unknown): string {
+  const currency = CURRENCIES.find((c) => c === row.currency)
+  const text = asText(value)
+  return currency ? `${formatCurrency(text, currency)} ${currency}` : numberFormatter.format(Number(text))
+}
+
 /** One line for the "what" column: the label plus whatever makes it unambiguous. */
 export function entrySummary(entry: LogEntryQueryData): string {
   const row = entryRow(entry)
@@ -128,15 +149,15 @@ export function entrySummary(entry: LogEntryQueryData): string {
       // Descriptions don't name the house; the movement's property does.
       const house = refName(entry, row.property_id)
       const summary = house ? `${label} - Casa ${house}` : label
-      return row.amount == null ? summary : `${summary} - ${formatCurrency(asText(row.amount))}`
+      return row.amount == null ? summary : `${summary} - ${formatAmount(row, row.amount)}`
     }
     case 'maintenance_requests':
     case 'security_requests':
-      return row.amount == null ? label : `${label} - ${formatCurrency(asText(row.amount))}`
+      return row.amount == null ? label : `${label} - ${formatAmount(row, row.amount)}`
     case 'amenity_reservations': {
       const amenity = refName(entry, row.amenity_id)
       const summary = `${amenity ? `${amenity} - ` : ''}Casa ${label} - ${formatDay(asText(row.reserved_on))}`
-      return row.amount == null ? summary : `${summary} - ${formatCurrency(asText(row.amount))}`
+      return row.amount == null ? summary : `${summary} - ${formatAmount(row, row.amount)}`
     }
     case 'property_residents': {
       const resident = refName(entry, row.resident_id) ?? 'Residente'
@@ -184,6 +205,9 @@ const FIELD_LABEL: Record<string, string> = {
   relationship: 'Relación',
   residential_name: 'Nombre del residencial',
   logo_path: 'Logo',
+  default_language: 'Idioma predeterminado',
+  configured_at: 'Configuración inicial',
+  currency: 'Moneda',
   amount: 'Monto',
   occurred_on: 'Fecha',
   requested_on: 'Fecha',
@@ -223,7 +247,14 @@ const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton', 'key'])
 
 const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee', 'default_fee'])
 const DAY_FIELDS = new Set(['occurred_on', 'requested_on', 'reserved_on', 'starts_on', 'ends_on'])
-const TIMESTAMP_FIELDS = new Set(['created_at', 'resolved_at', 'cancelled_at', 'deleted_at', 'welcomed_at'])
+const TIMESTAMP_FIELDS = new Set([
+  'created_at',
+  'resolved_at',
+  'cancelled_at',
+  'deleted_at',
+  'welcomed_at',
+  'configured_at',
+])
 
 /** Enum values don't collide across tables, so one flat map is enough. */
 const ENUM_LABEL: Record<string, string> = {
@@ -242,6 +273,7 @@ const ENUM_LABEL: Record<string, string> = {
   access: 'Accesos',
   equipment: 'Equipo',
   other: 'Otro',
+  ...LANGUAGE_LABEL,
 }
 
 function enumLabel(value: unknown): string | undefined {
@@ -254,7 +286,7 @@ export function formatFieldValue(entry: LogEntryQueryData, field: string, value:
   if (value == null || value === '') return ''
   if (typeof value === 'boolean') return value ? 'Sí' : 'No'
   const text = asText(value)
-  if (CURRENCY_FIELDS.has(field)) return formatCurrency(text)
+  if (CURRENCY_FIELDS.has(field)) return formatAmount(entryRow(entry), value)
   if (field === 'fee_month') return formatMonth(text)
   if (DAY_FIELDS.has(field)) return formatDay(text)
   if (TIMESTAMP_FIELDS.has(field)) return formatDate(text)

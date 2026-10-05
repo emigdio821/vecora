@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from 'clsx'
 import { format, isValid, type Locale, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { twMerge } from 'tailwind-merge'
+import { Constants, type Database } from '@/lib/supabase/database.types'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -65,7 +66,25 @@ export function getAvatarFallback(name: string) {
   return fallabck
 }
 
-const currencyFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })
+export type CurrencyCode = Database['public']['Enums']['currency_code']
+
+export const CURRENCIES = Constants.public.Enums.currency_code
+
+const currencyFormatters = new Map<CurrencyCode, Intl.NumberFormat>()
+
+function currencyFormatter(currency: CurrencyCode): Intl.NumberFormat {
+  let formatter = currencyFormatters.get(currency)
+  if (!formatter) {
+    // narrowSymbol: "$1,250.00" for MXN and USD alike, not "USD 1,250.00".
+    formatter = new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
+    })
+    currencyFormatters.set(currency, formatter)
+  }
+  return formatter
+}
 
 /**
  * NumberField `format` for money inputs: "1,250.00" without the currency
@@ -73,9 +92,24 @@ const currencyFormatter = new Intl.NumberFormat('es-MX', { style: 'currency', cu
  */
 export const MONEY_FORMAT: Intl.NumberFormatOptions = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
 
-/** "$1,250.00" from a number or the numeric string PostgREST returns. */
-export function formatCurrency(value: number | string): string {
-  return currencyFormatter.format(typeof value === 'string' ? Number(value) : value)
+/**
+ * "$1,250.00" from a number or the numeric string PostgREST returns. With
+ * `home` (the HOA's current currency), an amount in any other currency gets
+ * its code, "$1,250.00 MXN", so records from before a switch stand out.
+ * Components use useFormatCurrency(), which passes it.
+ */
+export function formatCurrency(value: number | string, currency: CurrencyCode, home?: CurrencyCode): string {
+  const text = currencyFormatter(currency).format(typeof value === 'string' ? Number(value) : value)
+  return home && currency !== home ? `${text} ${currency}` : text
+}
+
+/** "$": the addon in front of a money input. */
+export function currencySymbol(currency: CurrencyCode): string {
+  return (
+    currencyFormatter(currency)
+      .formatToParts(0)
+      .find((part) => part.type === 'currency')?.value ?? ''
+  )
 }
 
 // `date` columns arrive as "YYYY-MM-DD"; parseISO reads them as *local* midnight

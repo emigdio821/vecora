@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconAlertCircle, IconPhoto, IconTrash, IconUpload } from '@tabler/icons-react'
+import { IconAlertCircle, IconAlertTriangle, IconPhoto, IconTrash, IconUpload } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
+import { useCurrentUser } from '@/components/current-user-provider'
 import { RemoveLogoAlertDialog } from '@/components/settings/dialog/remove-logo'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -20,10 +21,13 @@ import {
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toastManager } from '@/components/ui/toast'
 import type { Settings } from '@/lib/supabase/settings'
 import {
+  CURRENCY_ITEMS,
   DEFAULT_RESIDENTIAL_LABEL,
+  LANGUAGE_ITEMS,
   logoFileSchema,
   type SettingsInput,
   settingsSchema,
@@ -82,10 +86,20 @@ export function EditSettingsDialog({ settings, open, onOpenChange, ...props }: E
 }
 
 function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation: UpdateSettingsMutation }) {
+  const user = useCurrentUser()
+  // Language and currency shape the whole HOA's records, so they're admin only.
+  const isAdmin = user.roles.includes('admin')
   const form = useForm<SettingsInput>({
     resolver: zodResolver(settingsSchema),
-    defaultValues: { residential_name: settings.residentialName },
+    defaultValues: isAdmin
+      ? {
+          residential_name: settings.residentialName,
+          default_language: settings.defaultLanguage,
+          currency: settings.currency,
+        }
+      : { residential_name: settings.residentialName },
   })
+  const currency = useWatch({ control: form.control, name: 'currency' })
 
   return (
     <>
@@ -120,6 +134,94 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
               </Field>
             )}
           />
+
+          {isAdmin && (
+            <>
+              <Controller
+                name="default_language"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    name={field.name}
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
+                  >
+                    <FieldLabel>Idioma</FieldLabel>
+                    <Select
+                      items={LANGUAGE_ITEMS}
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                      }}
+                      disabled={mutation.isPending}
+                    >
+                      <SelectTrigger ref={field.ref} className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectPopup>
+                        {LANGUAGE_ITEMS.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectPopup>
+                    </Select>
+                    <FieldDescription>
+                      El de los reportes y los textos que genera la aplicación.
+                    </FieldDescription>
+                    <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="currency"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    name={field.name}
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
+                  >
+                    <FieldLabel>Moneda</FieldLabel>
+                    <Select
+                      items={CURRENCY_ITEMS}
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                      }}
+                      disabled={mutation.isPending}
+                    >
+                      <SelectTrigger ref={field.ref} className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectPopup>
+                        {CURRENCY_ITEMS.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectPopup>
+                    </Select>
+                    <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
+
+              {currency && currency !== settings.currency && (
+                <Alert variant="warning">
+                  <IconAlertTriangle />
+                  <AlertTitle>Cambiar la moneda a {currency}</AlertTitle>
+                  <AlertDescription>
+                    Lo ya registrado conserva su moneda, incluidos los periodos existentes y sus cuotas.
+                    Revisa las tarifas sugeridas de las áreas comunes: se usarán tal cual en {currency}.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </>
+          )}
 
           {form.formState.errors.root && (
             <Alert variant="error">

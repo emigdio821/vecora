@@ -1,8 +1,19 @@
 import type { Database } from '@/lib/supabase/database.types'
 import { createClient } from '@/lib/supabase/server'
+import type { CurrencyCode } from '@/lib/utils'
 import type { ReportRange } from '@/lib/validations/reports'
 
 type TransactionKind = Database['public']['Enums']['transaction_kind']
+
+/** Totals of one currency; amounts in different currencies never add up. */
+export interface CurrencyTotals {
+  currency: CurrencyCode
+  opening_balance: number
+  total_income: number
+  total_expense: number
+  closing_balance: number
+  categories: { kind: TransactionKind; name: string; total: number; movements: number }[]
+}
 
 /**
  * Shape of the jsonb built by public.financial_report(). Dates are
@@ -11,11 +22,8 @@ type TransactionKind = Database['public']['Enums']['transaction_kind']
 export interface FinancialReport {
   from: string
   to: string
-  opening_balance: number
-  total_income: number
-  total_expense: number
-  closing_balance: number
-  categories: { kind: TransactionKind; name: string; total: number; movements: number }[]
+  /** At least one; the HOA's current currency first. */
+  currencies: CurrencyTotals[]
   fee_status: {
     /** Fee months of the range that were due; 0 when no period covers it. */
     months: number

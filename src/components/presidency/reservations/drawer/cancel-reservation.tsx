@@ -28,8 +28,9 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
+import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
-import { formatCurrency, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import { type CancelReservationInput, cancelReservationSchema } from '@/lib/validations/presidency'
 import { cancelReservation } from '@/server-actions/presidency'
 import { PRESIDENCY_QUERY_KEY, type ReservationQueryData } from '@/tanstack-queries/presidency'
@@ -57,8 +58,10 @@ export function CancelReservationDrawer({
   ...props
 }: CancelReservationDrawerProps) {
   const queryClient = useQueryClient()
+  const formatCurrency = useFormatCurrency()
   const summary = reservationSummary(reservation)
   const paid = Number(reservationPayment(reservation)?.amount ?? 0)
+  const { currency } = reservation
 
   const mutation = useMutation({
     mutationFn: async (values: CancelReservationInput) => {
@@ -73,7 +76,7 @@ export function CancelReservationDrawer({
         title: 'Reservación cancelada',
         description:
           values.refund_amount > 0
-            ? `${summary}. Reembolso de ${formatCurrency(values.refund_amount)} registrado en "Tesorería"`
+            ? `${summary}. Reembolso de ${formatCurrency(values.refund_amount, currency)} registrado en "Tesorería"`
             : `${summary}. Sin reembolso`,
       })
       onOpenChange(false)
@@ -95,27 +98,34 @@ export function CancelReservationDrawer({
         <DrawerHeader>
           <DrawerTitle>Cancelar reservación</DrawerTitle>
           <DrawerDescription>
-            {summary}, pagada con {formatCurrency(paid)}. El día quedará libre para otra casa. El ingreso se
-            queda en "Tesorería" y lo que se devuelva se registra como egreso.
+            {summary}, pagada con {formatCurrency(paid, currency)}. El día quedará libre para otra casa. El
+            ingreso se queda en "Tesorería" y lo que se devuelva se registra como egreso.
           </DrawerDescription>
         </DrawerHeader>
 
         {/* Mounted only while open so the defaults (today, full refund) are fresh. */}
-        <CancelReservationForm paid={paid} mutation={mutation} />
+        <CancelReservationForm paid={paid} currency={currency} mutation={mutation} />
       </DrawerPopup>
     </Drawer>
   )
 }
 
-function CancelReservationForm({ paid, mutation }: { paid: number; mutation: CancelMutation }) {
+interface CancelReservationFormProps {
+  paid: number
+  currency: CurrencyCode
+  mutation: CancelMutation
+}
+
+function CancelReservationForm({ paid, currency, mutation }: CancelReservationFormProps) {
   const [isDateOpen, setDateOpen] = useState(false)
   const today = useToday()
+  const formatCurrency = useFormatCurrency()
 
   const form = useForm<CancelReservationInput>({
     resolver: zodResolver(
       cancelReservationSchema.refine((data) => data.refund_amount <= paid, {
         path: ['refund_amount'],
-        message: `El reembolso no puede ser mayor a ${formatCurrency(paid)}`,
+        message: `El reembolso no puede ser mayor a ${formatCurrency(paid, currency)}`,
       }),
     ),
     defaultValues: {
@@ -170,10 +180,10 @@ function CancelReservationForm({ paid, mutation }: { paid: number; mutation: Can
                     <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
                   </NumberField>
                   <InputGroupAddon>
-                    <InputGroupText>$</InputGroupText>
+                    <InputGroupText>{currencySymbol(currency)}</InputGroupText>
                   </InputGroupAddon>
                   <InputGroupAddon align="inline-end">
-                    <InputGroupText>MXN</InputGroupText>
+                    <InputGroupText>{currency}</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
                 <FieldDescription>Lo que se le devuelve a la casa. 0 si no hay reembolso.</FieldDescription>
