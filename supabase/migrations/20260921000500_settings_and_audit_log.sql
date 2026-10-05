@@ -9,7 +9,7 @@
 --
 --   * Exactly one row, created here: the app only ever updates it.
 --   * Every board member reads it; only the president (or an admin) edits it.
---   * Audited like any other table, so a rename shows up in "Historial".
+--   * Audited like any other table, so a rename shows up in the activity log.
 create table public.settings (
   id               uuid primary key default gen_random_uuid(),
   -- always true and unique: there can only be one row
@@ -48,7 +48,7 @@ create policy "settings: president can update"
   with check ((select private.has_role('president')));
 
 -- ---------------------------------------------------------------------------
--- logo: shown in "Ajustes" and in the report header
+-- logo: shown in Settings and in the report header
 -- ---------------------------------------------------------------------------
 --   * The upload is resized and converted to PNG on the server before it gets
 --     here, so the bucket only ever holds small PNGs.
@@ -92,7 +92,7 @@ create policy "branding: president can delete"
 --     request = one transaction insert + one request update).
 --   * No-op updates are not recorded: only updated_at changed, or only
 --     welcomed_at (closing the welcome dialog is bookkeeping, not something
---     "Historial" should list).
+--     the activity log should list).
 --
 -- Access: admins read; nobody writes through the API. The trigger function is
 -- security definer and owned by postgres, so its inserts bypass RLS. There are

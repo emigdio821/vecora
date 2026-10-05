@@ -2,9 +2,9 @@
 
 > _Vecora_: from _vecino_ (Spanish for "neighbor") and _ágora_, the square where citizens of ancient Greece met to talk and settle the city's affairs. This is the neighbors' agora, where the HOA board runs the residential.
 
-Residential management for the HOA board (the _mesa directiva_): houses and residents, treasury (fees, transactions and periods), terrace bookings, maintenance and security payment requests, and a change history for the admin.
+Residential management for the HOA board: houses and residents, treasury (fees, transactions and periods), common area bookings, maintenance and security payment requests, and an activity log for the admin.
 
-The app itself is in Spanish (es-MX); code, comments and docs are in English.
+The app itself is in Spanish (es-MX); code, comments and docs are in English and call each section by its English name (see [Sections](#sections)).
 
 TanStack Start (Vite + Nitro) · React · Supabase (Postgres, Auth, RLS) · Tailwind CSS · [coss ui](https://coss.com/ui) (Base UI) · TanStack Query / Table · React Hook Form + zod.
 
@@ -55,15 +55,40 @@ You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
 
 All local accounts use the password **`admin`**. They come from `supabase/seed.sql` (admin) and `supabase/seeds/dev.sql` (everyone else) and only exist in the local database.
 
-| Email                    | Role                           | Can write in                                                                     |
-| ------------------------ | ------------------------------ | -------------------------------------------------------------------------------- |
-| `admin@vecora.com`       | Administrador                  | Everything, plus "Mesa directiva" and "Historial"                                |
-| `president@vecora.com`   | Presidente (Ana López)         | "Residencial", "Presidencia", "Mesa directiva"                                   |
-| `treasurer@vecora.com`   | Tesorero (Luis Fernández)      | "Tesorería", periods and reservations in "Presidencia"; pays or rejects requests |
-| `security@vecora.com`    | Seguridad (María García)       | Requests in "Seguridad"                                                          |
-| `maintenance@vecora.com` | Mantenimiento (Diego Martínez) | Requests in "Mantenimiento"                                                      |
+| Email                    | Role                         | Can write in                                                               |
+| ------------------------ | ---------------------------- | -------------------------------------------------------------------------- |
+| `admin@vecora.com`       | Admin                        | Everything, plus the HOA board and the activity log                        |
+| `president@vecora.com`   | President (Ana López)        | Residential, Presidency, HOA board                                         |
+| `treasurer@vecora.com`   | Treasurer (Luis Fernández)   | Treasury, periods and reservations in Presidency; pays or rejects requests |
+| `security@vecora.com`    | Security (María García)      | Requests in Security                                                       |
+| `maintenance@vecora.com` | Maintenance (Diego Martínez) | Requests in Maintenance                                                    |
 
-Every role can read every section. The seed also creates 20 houses (A1–D5), 10 residents, the current year's period with a few payments, requests in every status, and 45 days of activity in "Historial".
+Every role can read every section. The seed also creates 20 houses (A1–D5), 10 residents, the current year's period with a few payments, two common areas with bookings, requests in every status, and 45 days of activity in the activity log.
+
+## Sections
+
+What each section is called on screen. Docs and comments use the English name.
+
+| Name             | On screen            | Route / tab                               |
+| ---------------- | -------------------- | ----------------------------------------- |
+| Home             | "Inicio"             | `/`                                       |
+| Treasury         | "Tesorería"          | `/treasury`                               |
+| - Transactions   | "Movimientos"        | `?tab=transactions`                       |
+| - Categories     | "Categorías"         | `?tab=categories`                         |
+| Presidency       | "Presidencia"        | `/presidency`                             |
+| - Periods        | "Periodos"           | `?tab=periods`                            |
+| - Reservations   | "Reservaciones"      | `?tab=reservations`                       |
+| - Common areas   | "Áreas comunes"      | `?tab=amenities`                          |
+| Maintenance      | "Mantenimiento"      | `/maintenance`                            |
+| Security         | "Seguridad"          | `/security`                               |
+| HOA board        | "Mesa directiva"     | `/hoa-board`                              |
+| Residential      | "Residencial"        | `/residential`                            |
+| - Houses         | "Casas"              | `?tab=houses`                             |
+| - Residents      | "Residentes"         | `?tab=residents`                          |
+| Activity log     | "Historial"          | `/logs` (admin only)                      |
+| Financial report | "Reporte financiero" | sidebar dialog; the PDF is `/reports/pdf` |
+| Appearance       | "Apariencia"         | sidebar, per device                       |
+| Settings         | "Ajustes"            | sidebar (president or admin)              |
 
 ## Useful commands
 
@@ -106,11 +131,11 @@ The app runs on Vercel against a hosted Supabase project.
 
 4. **Create the main admin.** Nobody can sign in until an account has a role. In Authentication → Users → **Add user** → **Create new user**, enter `admin@vecora.com` and a strong password, and check **Auto Confirm User**. The database names the account "Vecora Admin" and grants it the admin role on its own.
 
-5. **Deploy**, sign in as the admin, set the residential's name and logo in "Ajustes", and add the board members in "Mesa directiva".
+5. **Deploy**, sign in as the admin, set the residential's name and logo in Settings, and add the board members in HOA board.
 
 ### The main admin
 
-`admin@vecora.com` is the app's own account, not a resident's. It can't be deleted, lose the admin role, change its email or its name ("Vecora Admin"); the database refuses all four, including from the dashboard. Other admins are residents and are removed in "Mesa directiva" like anyone else.
+`admin@vecora.com` is the app's own account, not a resident's. It can't be deleted, lose the admin role, change its email or its name ("Vecora Admin"); the database refuses all four, including from the dashboard. Other admins are residents and are removed in HOA board like anyone else.
 
 Nobody receives mail at `vecora.com`, so the dashboard's password reset email won't arrive. Change the password in the SQL Editor instead:
 
@@ -140,6 +165,6 @@ src/lib/validations/   zod schemas shared by forms and server actions
 
 ## Notes
 
-- Access is invite-only: there is no sign-up page. The admin or president adds a board member in "Mesa directiva" and shares the access link; the same link is how someone resets a forgotten password.
+- Access is invite-only: there is no sign-up page. The admin or president adds a board member in HOA board and shares the access link; the same link is how someone resets a forgotten password.
 - Permissions are enforced by Postgres RLS; the UI hides what a role can't do, but the database is the source of truth.
-- Every insert, update and delete is recorded in `audit_log` and shown to admins in "Historial".
+- Every insert, update and delete is recorded in `audit_log` and shown to admins in the activity log.

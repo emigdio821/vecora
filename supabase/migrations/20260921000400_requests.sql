@@ -2,7 +2,7 @@
 -- the treasurer to pay.
 --
 -- Model
---   * The maintenance person records a job ("Pintura para el jardín", 300 MXN,
+--   * The maintenance person records a job (paint for the garden, 300 MXN,
 --     done on a date). Every row is a payment request and starts as pending.
 --   * Only the treasurer (or admin) resolves it: "paid" records the expense in
 --     the ledger and links it (transaction_id); "rejected" keeps the row with

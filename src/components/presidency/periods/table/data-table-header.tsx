@@ -10,7 +10,7 @@ import type { PeriodRow } from './columns'
 
 interface PeriodsDataTableHeaderProps {
   table: Table<DataTableFeatures, PeriodRow>
-  /** Newest period, if any; seeds the "Nuevo periodo" form. */
+  /** Newest period, if any; seeds the new period form. */
   latest: PeriodQueryData | undefined
   isLoading: boolean
 }

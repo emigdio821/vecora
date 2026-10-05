@@ -18,7 +18,7 @@ interface NavSettingsProps extends React.ComponentProps<typeof SidebarGroup> {
 }
 
 /**
- * "Apariencia" is per device and open to everyone. "Ajustes" writes the shared
+ * Appearance is per device and open to everyone. Settings writes the shared
  * settings row, so only president (or admin) sees it; RLS re-checks the role.
  */
 export function NavSettings({ settings, ...props }: NavSettingsProps) {

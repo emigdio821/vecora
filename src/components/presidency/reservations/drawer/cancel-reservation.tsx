@@ -48,7 +48,7 @@ type CancelMutation = UseMutationResult<void, Error, CancelReservationInput>
 
 /**
  * Treasurer: cancels a paid booking and frees its day. The income stays in the
- * ledger; whatever is given back is recorded as a "Reembolso de área común" expense.
+ * ledger; whatever is given back is recorded as an amenity_refund expense.
  */
 export function CancelReservationDrawer({
   reservation,

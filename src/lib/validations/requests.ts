@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { PAYMENT_METHODS } from './treasury'
 
-// Shared by the "Mantenimiento" and "Seguridad" payment requests.
+// Shared by the Maintenance and Security payment requests.
 
 // Mirrors the `request_status` enum in the database.
 export const REQUEST_STATUSES = ['pending', 'paid', 'rejected'] as const

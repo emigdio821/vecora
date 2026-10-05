@@ -10,7 +10,7 @@
 --   select  -> to authenticated using (true)
 --   write   -> to authenticated using/with check ((select private.has_role('treasurer')))
 --
--- Mesa directiva: the board manages its own membership.
+-- HOA board: the board manages its own membership.
 --
 -- A board member is a resident with an app account (profiles) holding at least
 -- one role (user_roles). Only board members may sign in; the app enforces it

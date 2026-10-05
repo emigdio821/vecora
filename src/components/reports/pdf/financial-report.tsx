@@ -29,7 +29,7 @@ const COLOR = {
   panel: '#f9fafb',
   income: '#15803d',
   expense: '#b91c1c',
-  /** A balance below zero, like the app's "Saldo". */
+  /** A balance below zero, like the app's balance. */
   destructive: '#b91c1c',
 }
 

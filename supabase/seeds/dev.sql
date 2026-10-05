@@ -17,7 +17,7 @@
 -- since January, and a few maintenance / security requests in every status.
 --
 -- Every step runs *as* the board member who would do it in the app
--- (pg_temp.act_as), so created_by and the "Historial" identity are right, and
+-- (pg_temp.act_as), so created_by and the activity log identity are right, and
 -- goes through the real RPCs where the app would. After each step the log rows
 -- are stamped with a spread-out time and their own group (pg_temp.mark), so the
 -- history reads like 45 days of activity instead of one seed run.
@@ -78,7 +78,7 @@ declare
   v_maintenance_id uuid;
   v_cameras_id     uuid;
 
-  -- for the "Recibo CFE <mes>" notes of the back-filled months
+  -- for the "Recibo CFE <month>" notes of the back-filled months
   months  constant text[] := array['Enero','Febrero','Marzo','Abril','Mayo','Junio',
                                    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   v_month date;

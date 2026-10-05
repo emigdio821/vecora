@@ -12,7 +12,7 @@ export const RESERVATION_STATUS_LABEL: Record<ReservationStatus, string> = {
   cancelled: 'Cancelada',
 }
 
-/** Sort order for the "Estado" column: what's left to collect comes first. */
+/** Sort order for the status column: what's left to collect comes first. */
 export const RESERVATION_STATUS_ORDER: Record<ReservationStatus, number> = {
   pending: 0,
   paid: 1,

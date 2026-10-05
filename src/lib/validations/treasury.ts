@@ -18,8 +18,8 @@ export const recordFeePaymentSchema = z
     folio: requiredText('Folio'),
     reference: z.string().trim(),
     notes: z.string().trim(),
-    // The DB applies the recargo by the due-day rule; this only lets the
-    // treasurer waive it ("condonado por la mesa").
+    // The DB applies the late fee by the due-day rule; this only lets the
+    // treasurer waive it (when the board forgives it).
     waive_late_fee: z.boolean(),
   })
   .refine((data) => data.payment_method !== 'transfer' || data.reference.length > 0, {

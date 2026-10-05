@@ -7,19 +7,19 @@
 --   * A transaction is one line of money moving in or out: kind income|expense,
 --     a category, an amount (always positive; kind gives the sign), the day it
 --     happened and the period it belongs to. Balance is derived, never stored.
---   * The monthly fee ("cuota") is income linked to a house via property_id and
---     to the month it covers via fee_month. Paying after the period's due_day
---     adds a late fee ("recargo"), recorded as its *own* row in the late-fee
---     category so sums per category stay trivial and a waived penalty is a row
---     delete, not an amount edit.
+--   * The monthly fee is income linked to a house via property_id and to the
+--     month it covers via fee_month. Paying after the period's due_day adds a
+--     late fee, recorded as its *own* row in the late-fee category so sums per
+--     category stay trivial and a waived penalty is a row delete, not an
+--     amount edit.
 --   * folio is the number of the pre-printed paper receipt handed to the
---     resident. Fee + recargo, or several months paid on one ticket, share a
+--     resident. Fee + late fee, or several months paid on one ticket, share a
 --     folio; another receipt never reuses it (transactions_folio_one_receipt).
 --   * fee_month is distinct from occurred_on: a resident paying March on
 --     April 3rd has occurred_on = 2026-04-03 and fee_month = 2026-03-01.
 --
 -- Access: every member reads; treasurer (and admin) writes. Periods (the
--- board's fiscal year and its fee rules) are managed from the Presidencia
+-- board's fiscal year and its fee rules) are managed from the Presidency
 -- section, so the president writes them too. The treasurer keeps write access:
 -- creating the next cycle is part of closing the books.
 --
@@ -101,7 +101,7 @@ create trigger transaction_categories_set_updated_at
   for each row execute function private.set_updated_at();
 
 -- Common areas are mostly free; a booking only carries an optional fee (e.g.
--- electricity), hence "Tarifa". One pair for every area (see amenities).
+-- electricity). One pair for every area (see amenities).
 insert into public.transaction_categories (kind, name, key) values
   ('income',  'Cuota de mantenimiento',  'fee'),
   ('income',  'Recargo',                 'late_fee'),
@@ -158,7 +158,7 @@ create table public.transactions (
     foreign key (category_id, kind) references public.transaction_categories (id, kind) on delete restrict,
   -- A folio is the number printed on one paper receipt, and the receipt book
   -- never repeats it. Every line of that receipt shares it (a fee and its
-  -- recargo, several months paid together), so it can't be a plain unique.
+  -- late fee, several months paid together), so it can't be a plain unique.
   --
   -- Lines of one receipt are always written together in a single database
   -- transaction (record_fee_payment, or one insert), and now() is fixed per
@@ -190,7 +190,7 @@ create index transactions_folio_idx on public.transactions (folio) where folio i
 create index transactions_fee_month_property_idx
   on public.transactions (fee_month, property_id) where fee_month is not null and deleted_at is null;
 
--- One live fee row (and one live recargo row) per house and month. Waiving a
+-- One live fee row (and one live late-fee row) per house and month. Waiving a
 -- penalty by mistake is fixed by deleting + re-recording, which this allows.
 create unique index transactions_one_per_house_month_category
   on public.transactions (property_id, fee_month, category_id)
@@ -227,7 +227,7 @@ comment on view public.treasury_period_summary is 'Income, expense and balance p
 -- ---------------------------------------------------------------------------
 -- One row per live house for the *current* period: how many months are due
 -- so far (period start through this month), how many have a fee row, and
--- which months are missing. A house is "pendiente" when unpaid_months is not
+-- which months are missing. A house is behind when unpaid_months is not
 -- empty. Empty result when no period covers today.
 create view public.house_fee_status
 with (security_invoker = true) as

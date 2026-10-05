@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { requiredText } from './requests'
 import { PAYMENT_METHODS } from './treasury'
 
-/** A bookable common area: terraza, alberca, gimnasio... */
+/** A bookable common area: terrace, pool, gym... */
 export const amenitySchema = z.object({
   // Unique in the DB (case-insensitive).
   name: requiredText('Nombre'),
@@ -30,7 +30,7 @@ const transferNeedsReference = {
   message: 'La referencia es requerida para transferencias',
 }
 
-/** Treasurer collecting the fee: the income it becomes in "Tesorería". */
+/** Treasurer collecting the fee: the income it becomes in Treasury. */
 export const payReservationSchema = z
   .object({
     occurred_on: z.iso.date('Fecha inválida'),

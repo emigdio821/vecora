@@ -1,6 +1,6 @@
 /**
  * Where the rows of each system category (transaction_categories.key) come
- * from. Those rows are never typed into "Movimientos" by hand.
+ * from. Those rows are never typed into Transactions by hand.
  */
 const SYSTEM_CATEGORY_SOURCE: Record<string, string> = {
   fee: '"Registrar cuota"',

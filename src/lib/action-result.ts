@@ -50,7 +50,7 @@ export function postgrestErrorMessage(
   }
 }
 
-// Raised by the pay/reject/reopen request RPCs ("Mantenimiento" and "Seguridad").
+// Raised by the pay/reject/reopen request RPCs (Maintenance and Security).
 const NOT_FOUND = 'P0002'
 const ALREADY_RESOLVED = 'P0003'
 export const FK_VIOLATION = '23503'

@@ -41,7 +41,7 @@ export const login = (input: LoginInput) => loginFn({ data: input })
  * Spends the one-time access link from server-actions/hoa-board.ts, turning it
  * into a cookie session; the caller then sends the person to choose a
  * password, or back to /login?error=invite on an error. Only runs from the
- * "Continuar" button on /auth/confirm: link previews (WhatsApp) and email
+ * Continue button on /auth/confirm: link previews (WhatsApp) and email
  * scanners open the URL with a GET, which must never use the token.
  */
 const confirmAccessLinkFn = createServerFn({ method: 'POST' })

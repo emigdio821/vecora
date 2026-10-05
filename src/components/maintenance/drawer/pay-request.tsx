@@ -122,7 +122,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
   })
   const paymentMethod = useWatch({ control: form.control, name: 'payment_method' })
 
-  // Preselect "Mantenimiento" once categories arrive, unless the treasurer already chose.
+  // Preselect DEFAULT_CATEGORY_NAME once categories arrive, unless the treasurer already chose.
   const defaultCategoryId = categoryItems.find((c) => c.label === DEFAULT_CATEGORY_NAME)?.value
   useEffect(() => {
     if (defaultCategoryId && !form.getValues('category_id')) {

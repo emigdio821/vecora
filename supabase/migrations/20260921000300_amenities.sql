@@ -1,5 +1,5 @@
--- Common areas ("áreas comunes": terraza, alberca, gimnasio...) and their
--- reservations, with the payments those carry.
+-- Common areas (terrace, pool, gym...) and their reservations, with the
+-- payments those carry.
 --
 -- Model
 --   * Each residential lists its own areas; the president adds them in the
@@ -10,25 +10,25 @@
 --     impossible. The board records reservations (residents ask in person);
 --     every member can see them.
 --   * Most areas are free; a booking may carry a fee (e.g. electricity) in
---     amount, paid in full when booking. 0 means "sin costo": there is nothing
---     to collect. The area's default_fee pre-fills it.
---   * Collecting it is an income row in "Tarifa de área común" linked back via
---     transactions.amenity_reservation_id. The status is derived, never stored:
---     paid while that row is live. Deleting the income in "Movimientos" puts
---     the reservation back to pending; restoring it marks it paid again.
+--     amount, paid in full when booking. 0 means free: there is nothing to
+--     collect. The area's default_fee pre-fills it.
+--   * Collecting it is an income row in the amenity_fee category linked back
+--     via transactions.amenity_reservation_id. The status is derived, never
+--     stored: paid while that row is live. Deleting the income in Transactions
+--     puts the reservation back to pending; restoring it marks it paid again.
 --   * A paid reservation is not deleted but cancelled (treasurer only): the
 --     row stays as history, the day is freed, and an optional refund (up to
---     what was paid) is an expense in "Reembolso de área común". The income
+--     what was paid) is an expense in the amenity_refund category. The income
 --     stays where it was, so a refund in a later month doesn't rewrite a past
 --     report.
 --   * An unpaid reservation is still simply deleted by the board.
 --   * Both categories are system categories (key, seeded with the treasury):
---     "Movimientos" can't create them by hand and only lets their receipt
+--     Transactions can't create them by hand and only lets their receipt
 --     details change. One pair serves every area; the description names it.
 --
--- Booking by the day fits a terraza or a salón. Hourly slots (gym, pool) would
--- swap reserved_on for a time range and the unique index for an exclusion
--- constraint (btree_gist is already installed).
+-- Booking by the day fits a terrace or a party hall. Hourly slots (gym, pool)
+-- would swap reserved_on for a time range and the unique index for an
+-- exclusion constraint (btree_gist is already installed).
 
 -- ---------------------------------------------------------------------------
 -- amenities: the bookable areas of the residential
@@ -47,8 +47,8 @@ create table public.amenities (
 
 create unique index amenities_name_unique on public.amenities (lower(name));
 
-comment on table public.amenities is 'Bookable common areas (terraza, alberca...). Retire with is_active = false; areas with reservations cannot be deleted.';
-comment on column public.amenities.default_fee is 'Fee proposed when booking, in MXN; each reservation can change it. 0 = sin costo.';
+comment on table public.amenities is 'Bookable common areas (terrace, pool...). Retire with is_active = false; areas with reservations cannot be deleted.';
+comment on column public.amenities.default_fee is 'Fee proposed when booking, in MXN; each reservation can change it. 0 = free.';
 
 create trigger amenities_set_updated_at
   before update on public.amenities
@@ -76,7 +76,7 @@ create table public.amenity_reservations (
 );
 
 comment on table public.amenity_reservations is 'Bookings of a common area, one house per area per day.';
-comment on column public.amenity_reservations.amount is 'Price of the booking in MXN, paid in full. 0 = sin costo.';
+comment on column public.amenity_reservations.amount is 'Price of the booking in MXN, paid in full. 0 = free.';
 comment on column public.amenity_reservations.cancelled_at is 'Set by cancel_amenity_reservation. A cancelled booking frees its day and never changes again.';
 
 -- One booking per area per day, the whole point of the table; a cancelled
@@ -343,7 +343,7 @@ grant select, insert, update, delete on table public.amenity_reservations to aut
 alter table public.amenities enable row level security;
 alter table public.amenity_reservations enable row level security;
 
--- amenities: the president's, like the rest of Presidencia
+-- amenities: the president's, like the rest of Presidency
 create policy "amenities: members can read"
   on public.amenities for select to authenticated
   using (true);

@@ -4,7 +4,7 @@ import type { LogEntryQueryData } from '@/tanstack-queries/logs'
 
 /*
  * Turns raw audit rows (table names, column names, enum values, jsonb) into
- * the Spanish the admin reads in the "Historial" table and drawer.
+ * the Spanish the admin reads in the activity log table and drawer.
  */
 
 export type RowData = Record<string, unknown>
@@ -118,7 +118,7 @@ function asText(value: unknown): string {
   return typeof value === 'string' || typeof value === 'number' ? String(value) : ''
 }
 
-/** One line for the "Qué" column: the label plus whatever makes it unambiguous. */
+/** One line for the "what" column: the label plus whatever makes it unambiguous. */
 export function entrySummary(entry: LogEntryQueryData): string {
   const row = entryRow(entry)
   const { label } = entry

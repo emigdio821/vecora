@@ -19,7 +19,7 @@ interface RemoveLogoAlertDialogProps extends React.ComponentProps<typeof AlertDi
   onOpenChange: (open: boolean) => void
 }
 
-/** Opened from "Ajustes"; the file is deleted, so it has to be uploaded again to get it back. */
+/** Opened from Settings; the file is deleted, so it has to be uploaded again to get it back. */
 export function RemoveLogoAlertDialog({ open, onOpenChange, ...props }: RemoveLogoAlertDialogProps) {
   const queryClient = useQueryClient()
 

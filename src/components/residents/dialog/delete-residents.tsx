@@ -15,12 +15,12 @@ import { deleteResidents, restoreResidents } from '@/server-actions/residents'
 import { HOUSES_QUERY_KEY } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY, type ResidentQueryData } from '@/tanstack-queries/residents'
 
-/** How long the "Deshacer" toast stays up. Rows are recoverable for 6 months
+/** How long the undo toast stays up. Rows are recoverable for 6 months
  *  either way; this only bounds the one-click shortcut. */
 const UNDO_TOAST_TIMEOUT_MS = 8000
 
 /**
- * Standalone (not a hook): by the time the user clicks "Deshacer" the row —
+ * Standalone (not a hook): by the time the user clicks Undo the row —
  * and the menu/dialog that started the delete — is usually unmounted.
  */
 async function undoDelete(queryClient: QueryClient, ids: string[]) {

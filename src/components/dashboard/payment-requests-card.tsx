@@ -34,8 +34,8 @@ function pendingDescription(pending: number): string {
 }
 
 /**
- * What the treasurer still has to pay or collect across "Mantenimiento",
- * "Seguridad" and "Reservaciones", oldest first. Resolved ones live in each section.
+ * What the treasurer still has to pay or collect across Maintenance,
+ * Security and Reservations, oldest first. Resolved ones live in each section.
  */
 export function PaymentRequestsCard() {
   const maintenance = useQuery(maintenanceRequestsQueryOptions())

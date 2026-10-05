@@ -73,7 +73,7 @@ const recordFeePaymentFn = createServerFn({ method: 'POST' })
         p_payment_method: payment_method,
         p_reference: reference || undefined,
         p_notes: notes || undefined,
-        // null = let the due-day rule decide per month; false = waive every recargo
+        // null = let the due-day rule decide per month; false = waive every late fee
         p_apply_late_fee: waive_late_fee ? false : undefined,
       })
       .single()

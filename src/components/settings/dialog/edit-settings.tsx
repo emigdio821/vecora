@@ -144,7 +144,7 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
 }
 
 /**
- * Saved as soon as it's picked, apart from "Guardar". The server shrinks it,
+ * Saved as soon as it's picked, apart from Save. The server shrinks it,
  * so the size check here only spares uploading something it would refuse.
  */
 function LogoField({ logoPath }: { logoPath: string | null }) {

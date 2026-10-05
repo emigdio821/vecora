@@ -85,7 +85,7 @@ function EditCategoryForm({
     resolver: zodResolver(categorySchema),
     defaultValues: { kind: category.kind, name: category.name },
   })
-  // "Cuota de mantenimiento", "Recargo" and the common area ones: the RPCs look them up by key.
+  // The fee, late fee and common area categories: the RPCs look them up by key.
   const { key } = category
 
   return (

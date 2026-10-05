@@ -15,12 +15,12 @@ import { formatCurrency } from '@/lib/utils'
 import { deleteTransactions, restoreTransactions } from '@/server-actions/treasury'
 import { type TransactionQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 
-/** How long the "Deshacer" toast stays up. Ledger rows are never purged;
+/** How long the undo toast stays up. Ledger rows are never purged;
  *  this only bounds the one-click shortcut. */
 const UNDO_TOAST_TIMEOUT_MS = 8000
 
 /**
- * Standalone (not a hook): by the time the user clicks "Deshacer" the row —
+ * Standalone (not a hook): by the time the user clicks Undo the row —
  * and the menu/dialog that started the delete — is usually unmounted.
  */
 async function undoDelete(queryClient: QueryClient, ids: string[]) {
