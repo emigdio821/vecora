@@ -55,13 +55,13 @@ You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
 
 All local accounts use the password **`admin`**. They come from `supabase/seed.sql` (admin) and `supabase/seeds/dev.sql` (everyone else) and only exist in the local database.
 
-| Email                    | Role                           | Can write in                                                                |
-| ------------------------ | ------------------------------ | --------------------------------------------------------------------------- |
-| `admin@vecora.com`       | Administrador                  | Everything, plus "Mesa directiva" and "Historial"                           |
-| `president@vecora.com`   | Presidente (Ana López)         | "Residencial", "Presidencia", "Mesa directiva"                              |
-| `treasurer@vecora.com`   | Tesorero (Luis Fernández)      | "Tesorería", periods and terraza in "Presidencia"; pays or rejects requests |
-| `security@vecora.com`    | Seguridad (María García)       | Requests in "Seguridad"                                                     |
-| `maintenance@vecora.com` | Mantenimiento (Diego Martínez) | Requests in "Mantenimiento"                                                 |
+| Email                    | Role                           | Can write in                                                                     |
+| ------------------------ | ------------------------------ | -------------------------------------------------------------------------------- |
+| `admin@vecora.com`       | Administrador                  | Everything, plus "Mesa directiva" and "Historial"                                |
+| `president@vecora.com`   | Presidente (Ana López)         | "Residencial", "Presidencia", "Mesa directiva"                                   |
+| `treasurer@vecora.com`   | Tesorero (Luis Fernández)      | "Tesorería", periods and reservations in "Presidencia"; pays or rejects requests |
+| `security@vecora.com`    | Seguridad (María García)       | Requests in "Seguridad"                                                          |
+| `maintenance@vecora.com` | Mantenimiento (Diego Martínez) | Requests in "Mantenimiento"                                                      |
 
 Every role can read every section. The seed also creates 20 houses (A1–D5), 10 residents, the current year's period with a few payments, requests in every status, and 45 days of activity in "Historial".
 
@@ -127,7 +127,7 @@ To wipe the hosted database and re-apply every migration, run `npx supabase db r
 ## Project layout
 
 ```
-supabase/migrations/   schema, RLS policies and RPCs (one file per feature)
+supabase/migrations/   schema, RLS policies and RPCs (one file per area)
 supabase/seed.sql      local admin account
 supabase/seeds/dev.sql local-only test data
 src/routes/_authed/    one route per section (TanStack Router file routes)

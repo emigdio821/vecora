@@ -5,7 +5,9 @@ import { pageTitle } from '@/lib/metadata'
 
 export const Route = createFileRoute('/_authed/presidency')({
   // Only types the links into a tab; PresidencyMainTabs reads it through nuqs.
-  validateSearch: z.object({ tab: z.enum(['periods', 'hall']).optional().catch(undefined) }),
+  validateSearch: z.object({
+    tab: z.enum(['periods', 'reservations', 'amenities']).optional().catch(undefined),
+  }),
   head: () => ({ meta: [{ title: pageTitle('Presidencia') }] }),
   component: PresidencyPage,
 })

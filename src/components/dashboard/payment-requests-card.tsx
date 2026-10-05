@@ -1,7 +1,7 @@
 import { IconReceipt } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, type LinkOptions, linkOptions } from '@tanstack/react-router'
-import { hallReservationStatus } from '@/components/presidency/hall/status'
+import { reservationStatus } from '@/components/presidency/reservations/status'
 import { KIND_LABEL as SECURITY_KIND_LABEL } from '@/components/security/kind'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import {
@@ -16,7 +16,7 @@ import {
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { formatCurrency, formatDay } from '@/lib/utils'
 import { maintenanceRequestsQueryOptions } from '@/tanstack-queries/maintenance'
-import { hallReservationsQueryOptions } from '@/tanstack-queries/presidency'
+import { reservationsQueryOptions } from '@/tanstack-queries/presidency'
 import { securityRequestsQueryOptions } from '@/tanstack-queries/security'
 
 interface PaymentRequest {
@@ -35,18 +35,18 @@ function pendingDescription(pending: number): string {
 
 /**
  * What the treasurer still has to pay or collect across "Mantenimiento",
- * "Seguridad" and "Terraza", oldest first. Resolved ones live in each section.
+ * "Seguridad" and "Reservaciones", oldest first. Resolved ones live in each section.
  */
 export function PaymentRequestsCard() {
   const maintenance = useQuery(maintenanceRequestsQueryOptions())
   const security = useQuery(securityRequestsQueryOptions())
-  const hall = useQuery(hallReservationsQueryOptions())
+  const reservations = useQuery(reservationsQueryOptions())
 
-  if (maintenance.isPending || security.isPending || hall.isPending) {
+  if (maintenance.isPending || security.isPending || reservations.isPending) {
     return <CardFrameSkeleton rows={3} />
   }
 
-  if (maintenance.isError || security.isError || hall.isError) return null
+  if (maintenance.isError || security.isError || reservations.isError) return null
 
   const pending: PaymentRequest[] = [
     ...maintenance.data
@@ -69,13 +69,13 @@ export function PaymentRequestsCard() {
         amount: r.amount,
         requested_on: r.requested_on,
       })),
-    ...hall.data
-      .filter((r) => hallReservationStatus(r) === 'pending')
+    ...reservations.data
+      .filter((r) => reservationStatus(r) === 'pending')
       .map((r) => ({
-        key: `hall-${r.id}`,
-        link: linkOptions({ to: '/presidency', search: { tab: 'hall' } }),
-        section: 'Terraza',
-        title: `Tarifa de terraza - Casa ${r.property.number}`,
+        key: `reservation-${r.id}`,
+        link: linkOptions({ to: '/presidency', search: { tab: 'reservations' } }),
+        section: 'Reservaciones',
+        title: `Tarifa ${r.amenity.name} - Casa ${r.property.number}`,
         amount: Number(r.amount),
         requested_on: r.reserved_on,
       })),
@@ -120,7 +120,8 @@ export function PaymentRequestsCard() {
                 </EmptyMedia>
                 <EmptyTitle>Todo al día</EmptyTitle>
                 <EmptyDescription>
-                  Aquí aparecerán las solicitudes pendientes de "Mantenimiento", "Seguridad" y "Terraza".
+                  Aquí aparecerán las solicitudes pendientes de "Mantenimiento", "Seguridad" y
+                  "Reservaciones".
                 </EmptyDescription>
               </EmptyHeader>
             </Empty>

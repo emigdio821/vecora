@@ -57,7 +57,7 @@ const ABILITIES: Ability[] = [
   {
     icon: IconGavel,
     title: 'Presidencia',
-    description: 'Abre los periodos de cuotas y aparta la terraza.',
+    description: 'Abre los periodos de cuotas y aparta las áreas comunes.',
     roles: ['president', 'treasurer'],
   },
   {

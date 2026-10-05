@@ -17,42 +17,42 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
-import { systemCategorySource } from '@/lib/system-categories'
-import { formatCurrency } from '@/lib/utils'
-import { type UpdateTransactionInput, updateTransactionSchema } from '@/lib/validations/treasury'
-import { updateTransaction } from '@/server-actions/treasury'
-import { type TransactionQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
-import { TransactionFormFields } from './transaction-form-fields'
+import { formatDay } from '@/lib/utils'
+import { type ReservationInput, reservationSchema } from '@/lib/validations/presidency'
+import { updateReservation } from '@/server-actions/presidency'
+import { PRESIDENCY_QUERY_KEY, type ReservationQueryData } from '@/tanstack-queries/presidency'
+import { reservationPayment, reservationSummary } from '../status'
+import { ReservationFormFields } from './reservation-form-fields'
 
-const FORM_ID = 'edit-transaction-form'
+const FORM_ID = 'edit-reservation-form'
 
-interface EditTransactionDrawerProps extends React.ComponentProps<typeof Drawer> {
-  transaction: TransactionQueryData
+interface EditReservationDrawerProps extends React.ComponentProps<typeof Drawer> {
+  reservation: ReservationQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-type UpdateTransactionMutation = UseMutationResult<void, Error, UpdateTransactionInput>
+type UpdateMutation = UseMutationResult<void, Error, ReservationInput>
 
-export function EditTransactionDrawer({
-  transaction,
+export function EditReservationDrawer({
+  reservation,
   open,
   onOpenChange,
   ...props
-}: EditTransactionDrawerProps) {
+}: EditReservationDrawerProps) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: async (values: UpdateTransactionInput) => {
-      const result = await updateTransaction(transaction.id, values)
+    mutationFn: async (values: ReservationInput) => {
+      const result = await updateReservation(reservation.id, values)
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: (_data, values) => {
-      void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Movimiento actualizado',
-        description: `${values.description} - ${formatCurrency(values.amount)}`,
+        title: 'Reservación actualizada',
+        description: formatDay(values.reserved_on),
       })
       onOpenChange(false)
     },
@@ -71,47 +71,36 @@ export function EditTransactionDrawer({
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar movimiento</DrawerTitle>
-          <DrawerDescription>{transaction.description}</DrawerDescription>
+          <DrawerTitle>Editar reservación</DrawerTitle>
+          <DrawerDescription>{reservationSummary(reservation)}</DrawerDescription>
         </DrawerHeader>
 
         {/* Mounted only while the drawer is open, so the form always starts
             from the current row and a refetch mid-edit can't reset it. */}
-        <EditTransactionForm transaction={transaction} mutation={mutation} />
+        <EditReservationForm reservation={reservation} mutation={mutation} />
       </DrawerPopup>
     </Drawer>
   )
 }
 
-function toFormValues(transaction: TransactionQueryData): UpdateTransactionInput {
-  return {
-    kind: transaction.kind,
-    category_id: transaction.category.id,
-    amount: Number(transaction.amount),
-    occurred_on: transaction.occurred_on,
-    payment_method: transaction.payment_method,
-    folio: transaction.folio ?? '',
-    reference: transaction.reference ?? '',
-    property_id: transaction.property?.id ?? null,
-    description: transaction.description,
-    notes: transaction.notes ?? '',
-  }
-}
-
-function EditTransactionForm({
-  transaction,
+function EditReservationForm({
+  reservation,
   mutation,
 }: {
-  transaction: TransactionQueryData
-  mutation: UpdateTransactionMutation
+  reservation: ReservationQueryData
+  mutation: UpdateMutation
 }) {
-  const form = useForm<UpdateTransactionInput>({
-    resolver: zodResolver(updateTransactionSchema),
-    defaultValues: toFormValues(transaction),
+  const form = useForm<ReservationInput>({
+    resolver: zodResolver(reservationSchema),
+    defaultValues: {
+      amenity_id: reservation.amenity.id,
+      property_id: reservation.property.id,
+      reserved_on: reservation.reserved_on,
+      amount: Number(reservation.amount),
+      notes: reservation.notes ?? '',
+    },
   })
-  // Fee, late-fee and reservation rows come from their RPCs (category key is set).
-  const { key } = transaction.category
-  const isFee = key !== null
+  const isPaid = reservationPayment(reservation) !== undefined
 
   return (
     <>
@@ -126,18 +115,23 @@ function EditTransactionForm({
             }),
           )}
         >
-          {key !== null && (
+          {isPaid && (
             <Alert variant="info">
               <IconInfoCircle />
-              <AlertTitle>Registrado desde {systemCategorySource(key)}</AlertTitle>
+              <AlertTitle>Reservación pagada</AlertTitle>
               <AlertDescription>
-                Aquí solo puedes corregir el folio, el método de pago, la referencia y las notas. Para cambiar
-                lo demás, elimina el movimiento y regístralo de nuevo desde {systemCategorySource(key)}.
+                El pago ya está en "Tesorería", así que el área, la casa y el monto no se pueden cambiar.
+                Puedes mover la fecha.
               </AlertDescription>
             </Alert>
           )}
 
-          <TransactionFormFields form={form} disabled={mutation.isPending} lockKind lockFeeFields={isFee} />
+          <ReservationFormFields
+            form={form}
+            disabled={mutation.isPending}
+            currentId={reservation.id}
+            lockPaidFields={isPaid}
+          />
 
           {form.formState.errors.root && (
             <Alert variant="error">

@@ -45,7 +45,7 @@ export const createTransactionSchema = z
     // Paper receipt number, only handed out for income
     folio: z.string().trim(),
     reference: z.string().trim(),
-    // Which house the money came from, when it did (fines, hall fees…)
+    // Which house the money came from, when it did (fines, reservation fees…)
     property_id: z.uuid().nullable(),
     description: requiredText('Concepto'),
     notes: z.string().trim(),

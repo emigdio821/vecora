@@ -1,7 +1,8 @@
 import { useQueryState } from 'nuqs'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '../ui/tabs'
-import { HallReservationsDataTable } from './hall/table/data-table'
+import { AmenitiesDataTable } from './amenities/table/data-table'
 import { PeriodsDataTable } from './periods/table/data-table'
+import { ReservationsDataTable } from './reservations/table/data-table'
 
 export function PresidencyMainTabs() {
   const [tab, setTab] = useQueryState('tab', { defaultValue: 'periods' })
@@ -16,13 +17,17 @@ export function PresidencyMainTabs() {
     >
       <TabsList>
         <TabsTab value="periods">Periodos</TabsTab>
-        <TabsTab value="hall">Terraza</TabsTab>
+        <TabsTab value="reservations">Reservaciones</TabsTab>
+        <TabsTab value="amenities">Áreas comunes</TabsTab>
       </TabsList>
       <TabsPanel value="periods">
         <PeriodsDataTable />
       </TabsPanel>
-      <TabsPanel value="hall">
-        <HallReservationsDataTable />
+      <TabsPanel value="reservations">
+        <ReservationsDataTable />
+      </TabsPanel>
+      <TabsPanel value="amenities">
+        <AmenitiesDataTable />
       </TabsPanel>
     </Tabs>
   )

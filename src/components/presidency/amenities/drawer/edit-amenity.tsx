@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconAlertCircle, IconInfoCircle } from '@tabler/icons-react'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -17,34 +17,33 @@ import {
 } from '@/components/ui/drawer'
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
-import { systemCategorySource } from '@/lib/system-categories'
-import { type CategoryInput, categorySchema } from '@/lib/validations/treasury'
-import { updateCategory } from '@/server-actions/treasury'
-import { type CategoryQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
-import { CategoryFormFields } from './category-form-fields'
+import { type AmenityInput, amenitySchema } from '@/lib/validations/presidency'
+import { updateAmenity } from '@/server-actions/presidency'
+import { type AmenityQueryData, PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
+import { AmenityFormFields } from './amenity-form-fields'
 
-const FORM_ID = 'edit-category-form'
+const FORM_ID = 'edit-amenity-form'
 
-interface EditCategoryDrawerProps extends React.ComponentProps<typeof Drawer> {
-  category: CategoryQueryData
+interface EditAmenityDrawerProps extends React.ComponentProps<typeof Drawer> {
+  amenity: AmenityQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-type UpdateCategoryMutation = UseMutationResult<void, Error, CategoryInput>
+type UpdateAmenityMutation = UseMutationResult<void, Error, AmenityInput>
 
-export function EditCategoryDrawer({ category, open, onOpenChange, ...props }: EditCategoryDrawerProps) {
+export function EditAmenityDrawer({ amenity, open, onOpenChange, ...props }: EditAmenityDrawerProps) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: async (values: CategoryInput) => {
-      const result = await updateCategory(category.id, { name: values.name })
+    mutationFn: async (values: AmenityInput) => {
+      const result = await updateAmenity(amenity.id, values)
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: (_data, values) => {
-      // Movements embed the category name, so their list needs a refresh too.
-      void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Categoría actualizada', description: values.name })
+      // Reservations embed the area name, so their list needs a refresh too.
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })
+      toastManager.add({ type: 'success', title: 'Área actualizada', description: values.name })
       onOpenChange(false)
     },
   })
@@ -62,31 +61,31 @@ export function EditCategoryDrawer({ category, open, onOpenChange, ...props }: E
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar categoría</DrawerTitle>
-          <DrawerDescription>{category.name}</DrawerDescription>
+          <DrawerTitle>Editar área</DrawerTitle>
+          <DrawerDescription>
+            {amenity.name}. Las reservaciones ya registradas conservan su monto.
+          </DrawerDescription>
         </DrawerHeader>
 
         {/* Mounted only while the drawer is open, so the form always starts
             from the current row and a refetch mid-edit can't reset it. */}
-        <EditCategoryForm category={category} mutation={mutation} />
+        <EditAmenityForm amenity={amenity} mutation={mutation} />
       </DrawerPopup>
     </Drawer>
   )
 }
 
-function EditCategoryForm({
-  category,
+function EditAmenityForm({
+  amenity,
   mutation,
 }: {
-  category: CategoryQueryData
-  mutation: UpdateCategoryMutation
+  amenity: AmenityQueryData
+  mutation: UpdateAmenityMutation
 }) {
-  const form = useForm<CategoryInput>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: { kind: category.kind, name: category.name },
+  const form = useForm<AmenityInput>({
+    resolver: zodResolver(amenitySchema),
+    defaultValues: { name: amenity.name, default_fee: Number(amenity.default_fee) },
   })
-  // "Cuota de mantenimiento", "Recargo" and the common area ones: the RPCs look them up by key.
-  const { key } = category
 
   return (
     <>
@@ -101,18 +100,7 @@ function EditCategoryForm({
             }),
           )}
         >
-          {key !== null && (
-            <Alert variant="info">
-              <IconInfoCircle />
-              <AlertTitle>Categoría del sistema</AlertTitle>
-              <AlertDescription>
-                {systemCategorySource(key)} usa esta categoría. Puedes cambiarle el nombre, pero no
-                desactivarla ni eliminarla.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <CategoryFormFields form={form} disabled={mutation.isPending} lockKind />
+          <AmenityFormFields form={form} disabled={mutation.isPending} />
 
           {form.formState.errors.root && (
             <Alert variant="error">

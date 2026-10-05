@@ -62,11 +62,9 @@ export function DeleteTransactionsAlertDialog({
   const feeClause = hasFee
     ? ` ${isSingle ? 'Es una cuota, así que ese mes volverá a aparecer como pendiente para la casa.' : 'Incluye cuotas, así que esos meses volverán a aparecer como pendientes para sus casas.'}`
     : ''
-  const hasHallRent = transactions.some((t) => t.category.key === 'hall_rent')
-  const hallClause = hasHallRent
-    ? ' La reservación de terraza volverá a aparecer como pendiente de pago.'
-    : ''
-  const description = `${isSingle ? 'Dejará' : 'Dejarán'} de contar en el saldo (${formatCurrency(Math.abs(total))} ${total >= 0 ? 'menos' : 'más'}).${feeClause}${hallClause} Solo podrás deshacerlo durante unos segundos.`
+  const hasAmenityFee = transactions.some((t) => t.category.key === 'amenity_fee')
+  const amenityClause = hasAmenityFee ? ' La reservación volverá a aparecer como pendiente de pago.' : ''
+  const description = `${isSingle ? 'Dejará' : 'Dejarán'} de contar en el saldo (${formatCurrency(Math.abs(total))} ${total >= 0 ? 'menos' : 'más'}).${feeClause}${amenityClause} Solo podrás deshacerlo durante unos segundos.`
 
   const mutation = useMutation({
     mutationFn: async () => {

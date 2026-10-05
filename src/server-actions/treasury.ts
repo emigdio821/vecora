@@ -35,8 +35,7 @@ function toMessage(error: PostgrestError, fallback: string) {
     unique: {
       transactions_one_per_house_month_category:
         'Esa casa ya tiene registrada la cuota de uno de los meses seleccionados',
-      transactions_one_per_hall_reservation_category:
-        'Esa reservación de terraza ya tiene su pago registrado',
+      transactions_one_per_amenity_reservation_category: 'Esa reservación ya tiene su pago registrado',
       transaction_categories_name_unique: 'Ya existe una categoría con ese nombre',
       periods_name_unique: 'Ya existe un periodo con ese nombre',
     },
@@ -134,7 +133,7 @@ const createTransactionFn = createServerFn({ method: 'POST' })
     } = parsed.data
     const supabase = await createClient()
 
-    // Fees need a fee_month and the period's rates, terraza rows their booking;
+    // Fees need a fee_month and the period's rates, reservation rows their booking;
     // only the RPCs know how.
     const { data: category } = await supabase
       .from('transaction_categories')
@@ -218,7 +217,7 @@ const updateTransactionFn = createServerFn({ method: 'POST' })
     }
 
     // Fee and late-fee rows are produced by record_fee_payment from the period's
-    // rates and due day, terraza rows from their booking. Editing their amount,
+    // rates and due day, reservation rows from their booking. Editing their amount,
     // date, month or house here would silently break that; only the receipt
     // details can change. Anything else is fixed by deleting the receipt and
     // recording it again.

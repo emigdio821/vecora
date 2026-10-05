@@ -46,7 +46,7 @@ begin
   );
 
   -- The on_auth_user_created trigger has already created the profile, named it
-  -- "Vecora Admin" and granted the admin role (see 20260928080000_main_admin.sql).
+  -- "Vecora Admin" and granted the admin role (see 20260921000000_profiles_and_roles.sql).
 
   raise notice 'seed: created admin %', admin_email;
 end $$;

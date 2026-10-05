@@ -361,13 +361,25 @@ begin
   perform pg_temp.mark(t);
 
   -- -------------------------------------------------------------------------
-  -- president: a booking, an edit, a delete that gets undone
+  -- president: the common areas, two bookings, an edit, a delete that gets undone
   -- -------------------------------------------------------------------------
   perform pg_temp.act_as(u_president);
 
-  insert into public.hall_reservations (property_id, reserved_on, amount, notes)
-  values ((select id from public.properties where number = 'B1'), current_date + 10, 0, 'Cumpleaños, 40 personas');
+  insert into public.amenities (name, default_fee) values ('Terraza', 0), ('Alberca', 250);
+  t := now() - interval '4 days 2 hours';
+  perform pg_temp.mark(t);
+
+  insert into public.amenity_reservations (amenity_id, property_id, reserved_on, amount, notes)
+  values ((select id from public.amenities where name = 'Terraza'),
+          (select id from public.properties where number = 'B1'), current_date + 10, 0, 'Cumpleaños, 40 personas');
   t := now() - interval '3 days 4 hours';
+  perform pg_temp.mark(t);
+
+  -- Same day, another area: pending for the treasurer to collect.
+  insert into public.amenity_reservations (amenity_id, property_id, reserved_on, amount, notes)
+  values ((select id from public.amenities where name = 'Alberca'),
+          (select id from public.properties where number = 'C2'), current_date + 10, 250, null);
+  t := t + interval '2 hours';
   perform pg_temp.mark(t);
 
   update public.residents set phone = '+523139612299', notes = 'Cambió de número' where id = r_lucia;

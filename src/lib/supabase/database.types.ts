@@ -3,6 +3,111 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      amenities: {
+        Row: {
+          created_at: string
+          default_fee: number
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_fee?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_fee?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      amenity_reservations: {
+        Row: {
+          amenity_id: string
+          amount: number
+          cancelled_at: string | null
+          cancelled_by: string | null
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          property_id: string
+          reserved_on: string
+          updated_at: string
+        }
+        Insert: {
+          amenity_id: string
+          amount: number
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          property_id: string
+          reserved_on: string
+          updated_at?: string
+        }
+        Update: {
+          amenity_id?: string
+          amount?: number
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          property_id?: string
+          reserved_on?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'amenity_reservations_amenity_id_fkey'
+            columns: ['amenity_id']
+            isOneToOne: false
+            referencedRelation: 'amenities'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'amenity_reservations_cancelled_by_fkey'
+            columns: ['cancelled_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'amenity_reservations_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'amenity_reservations_property_id_fkey'
+            columns: ['property_id']
+            isOneToOne: false
+            referencedRelation: 'house_fee_status'
+            referencedColumns: ['property_id']
+          },
+          {
+            foreignKeyName: 'amenity_reservations_property_id_fkey'
+            columns: ['property_id']
+            isOneToOne: false
+            referencedRelation: 'properties'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       audit_log: {
         Row: {
           changed_fields: string[] | null
@@ -52,74 +157,6 @@ export type Database = {
             columns: ['identity_id']
             isOneToOne: false
             referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          },
-        ]
-      }
-      hall_reservations: {
-        Row: {
-          amount: number
-          cancelled_at: string | null
-          cancelled_by: string | null
-          created_at: string
-          created_by: string
-          id: string
-          notes: string | null
-          property_id: string
-          reserved_on: string
-          updated_at: string
-        }
-        Insert: {
-          amount: number
-          cancelled_at?: string | null
-          cancelled_by?: string | null
-          created_at?: string
-          created_by?: string
-          id?: string
-          notes?: string | null
-          property_id: string
-          reserved_on: string
-          updated_at?: string
-        }
-        Update: {
-          amount?: number
-          cancelled_at?: string | null
-          cancelled_by?: string | null
-          created_at?: string
-          created_by?: string
-          id?: string
-          notes?: string | null
-          property_id?: string
-          reserved_on?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'hall_reservations_cancelled_by_fkey'
-            columns: ['cancelled_by']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'hall_reservations_created_by_fkey'
-            columns: ['created_by']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'hall_reservations_property_id_fkey'
-            columns: ['property_id']
-            isOneToOne: false
-            referencedRelation: 'house_fee_status'
-            referencedColumns: ['property_id']
-          },
-          {
-            foreignKeyName: 'hall_reservations_property_id_fkey'
-            columns: ['property_id']
-            isOneToOne: false
-            referencedRelation: 'properties'
             referencedColumns: ['id']
           },
         ]
@@ -524,6 +561,7 @@ export type Database = {
       }
       transactions: {
         Row: {
+          amenity_reservation_id: string | null
           amount: number
           category_id: string
           created_at: string
@@ -533,7 +571,6 @@ export type Database = {
           description: string
           fee_month: string | null
           folio: string | null
-          hall_reservation_id: string | null
           id: string
           kind: Database['public']['Enums']['transaction_kind']
           notes: string | null
@@ -545,6 +582,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          amenity_reservation_id?: string | null
           amount: number
           category_id: string
           created_at?: string
@@ -554,7 +592,6 @@ export type Database = {
           description: string
           fee_month?: string | null
           folio?: string | null
-          hall_reservation_id?: string | null
           id?: string
           kind: Database['public']['Enums']['transaction_kind']
           notes?: string | null
@@ -566,6 +603,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          amenity_reservation_id?: string | null
           amount?: number
           category_id?: string
           created_at?: string
@@ -575,7 +613,6 @@ export type Database = {
           description?: string
           fee_month?: string | null
           folio?: string | null
-          hall_reservation_id?: string | null
           id?: string
           kind?: Database['public']['Enums']['transaction_kind']
           notes?: string | null
@@ -587,6 +624,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: 'transactions_amenity_reservation_id_fkey'
+            columns: ['amenity_reservation_id']
+            isOneToOne: false
+            referencedRelation: 'amenity_reservations'
+            referencedColumns: ['id']
+          },
           {
             foreignKeyName: 'transactions_category_fkey'
             columns: ['category_id', 'kind']
@@ -606,13 +650,6 @@ export type Database = {
             columns: ['deleted_by']
             isOneToOne: false
             referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'transactions_hall_reservation_id_fkey'
-            columns: ['hall_reservation_id']
-            isOneToOne: false
-            referencedRelation: 'hall_reservations'
             referencedColumns: ['id']
           },
           {
@@ -712,7 +749,7 @@ export type Database = {
       }
     }
     Functions: {
-      cancel_hall_reservation: {
+      cancel_amenity_reservation: {
         Args: {
           p_notes?: string
           p_occurred_on?: string
@@ -736,7 +773,7 @@ export type Database = {
         Returns: string
       }
       financial_report: { Args: { p_from: string; p_to: string }; Returns: Json }
-      pay_hall_reservation: {
+      pay_amenity_reservation: {
         Args: {
           p_folio?: string
           p_notes?: string

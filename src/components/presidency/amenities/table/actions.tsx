@@ -5,38 +5,36 @@ import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
-import { setCategoryActive } from '@/server-actions/treasury'
-import { type CategoryQueryData, transactionCount, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
-import { DeleteCategoryAlertDialog } from '../dialog/delete-category'
-import { EditCategoryDrawer } from '../drawer/edit-category'
+import { setAmenityActive } from '@/server-actions/presidency'
+import { type AmenityQueryData, PRESIDENCY_QUERY_KEY, reservationCount } from '@/tanstack-queries/presidency'
+import { DeleteAmenityAlertDialog } from '../dialog/delete-amenity'
+import { EditAmenityDrawer } from '../drawer/edit-amenity'
 
 interface ActionsProps {
-  category: CategoryQueryData
+  amenity: AmenityQueryData
 }
 
-export function CategoriesTableActions({ category }: ActionsProps) {
-  const canManage = useHasRole('treasurer')
+export function AmenitiesTableActions({ amenity }: ActionsProps) {
+  const canManage = useHasRole('president')
   const queryClient = useQueryClient()
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
-  // System categories (fee, late fee, common areas) can only be renamed.
-  const isSystem = category.key !== null
-  // Soft-deleted movements count too: the ledger is never purged.
-  const canDelete = !isSystem && transactionCount(category) === 0
+  // Cancelled bookings count too: they stay as history.
+  const canDelete = reservationCount(amenity) === 0
 
   const toggleActive = useMutation({
     mutationFn: async () => {
-      const result = await setCategoryActive(category.id, !category.is_active)
+      const result = await setAmenityActive(amenity.id, !amenity.is_active)
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY, 'categories'] })
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'amenities'] })
       toastManager.add({
         type: 'success',
-        title: category.is_active ? 'Categoría desactivada' : 'Categoría activada',
-        description: category.is_active
-          ? `${category.name} ya no aparecerá al registrar movimientos`
-          : `${category.name} vuelve a estar disponible al registrar movimientos`,
+        title: amenity.is_active ? 'Área desactivada' : 'Área activada',
+        description: amenity.is_active
+          ? `${amenity.name} ya no aparecerá al reservar`
+          : `${amenity.name} vuelve a estar disponible al reservar`,
       })
     },
     onError: (error) => {
@@ -49,8 +47,8 @@ export function CategoriesTableActions({ category }: ActionsProps) {
 
   return (
     <>
-      <EditCategoryDrawer category={category} open={isEditOpen} onOpenChange={setEditOpen} />
-      <DeleteCategoryAlertDialog category={category} open={isDeleteOpen} onOpenChange={setDeleteOpen} />
+      <EditAmenityDrawer amenity={amenity} open={isEditOpen} onOpenChange={setEditOpen} />
+      <DeleteAmenityAlertDialog amenity={amenity} open={isDeleteOpen} onOpenChange={setDeleteOpen} />
 
       <Menu>
         <MenuTrigger
@@ -59,7 +57,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={`Acciones de ${category.name}`}
+              aria-label={`Acciones de ${amenity.name}`}
             >
               <IconDots className="size-4" />
             </Button>
@@ -68,7 +66,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
         <MenuPopup align="end" className="max-w-42">
           <MenuGroup>
             <MenuGroupLabel className="my-1.5 line-clamp-2 py-0 wrap-break-word">
-              {category.name}
+              {amenity.name}
             </MenuGroupLabel>
 
             <MenuItem
@@ -79,16 +77,14 @@ export function CategoriesTableActions({ category }: ActionsProps) {
               Editar
             </MenuItem>
 
-            {!isSystem && (
-              <MenuItem
-                disabled={toggleActive.isPending}
-                onClick={() => {
-                  toggleActive.mutate()
-                }}
-              >
-                {category.is_active ? 'Desactivar' : 'Activar'}
-              </MenuItem>
-            )}
+            <MenuItem
+              disabled={toggleActive.isPending}
+              onClick={() => {
+                toggleActive.mutate()
+              }}
+            >
+              {amenity.is_active ? 'Desactivar' : 'Activar'}
+            </MenuItem>
 
             {canDelete && (
               <MenuItem

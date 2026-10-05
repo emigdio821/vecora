@@ -2,6 +2,7 @@ import type { PostgrestError } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
 import {
   type ActionResult,
+  FK_VIOLATION,
   FOLIO_TAKEN_MESSAGE,
   isFolioTaken,
   postgrestErrorMessage,
@@ -9,13 +10,126 @@ import {
 } from '@/lib/action-result'
 import { createClient } from '@/lib/supabase/server'
 import {
-  type CancelHallReservationInput,
-  cancelHallReservationSchema,
-  type HallReservationInput,
-  hallReservationSchema,
-  type PayHallReservationInput,
-  payHallReservationSchema,
+  type AmenityInput,
+  amenitySchema,
+  type CancelReservationInput,
+  cancelReservationSchema,
+  type PayReservationInput,
+  payReservationSchema,
+  type ReservationInput,
+  reservationSchema,
 } from '@/lib/validations/presidency'
+
+// ---------------------------------------------------------------------------
+// amenities
+// ---------------------------------------------------------------------------
+
+function toAmenityMessage(error: PostgrestError, fallback: string) {
+  return postgrestErrorMessage(error, {
+    fallback,
+    unique: { amenities_name_unique: 'Ya existe un área con ese nombre' },
+  })
+}
+
+const createAmenityFn = createServerFn({ method: 'POST' })
+  .validator((input: AmenityInput) => input)
+  .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
+    const parsed = amenitySchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
+
+    const supabase = await createClient()
+    const { data, error } = await supabase.from('amenities').insert(parsed.data).select('id').single()
+
+    if (error) {
+      return { error: toAmenityMessage(error, 'No se pudo crear el área, intenta nuevamente') }
+    }
+
+    return { data }
+  })
+
+export const createAmenity = (input: AmenityInput) => createAmenityFn({ data: input })
+
+/** Past bookings keep their amount; the new fee applies from the next one. */
+const updateAmenityFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: AmenityInput }) => data)
+  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+    const parsed = amenitySchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: 'Revisa los campos del formulario' }
+    }
+
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('amenities')
+      .update(parsed.data)
+      .eq('id', id)
+      .select('id')
+      .single()
+
+    if (error) {
+      return { error: toAmenityMessage(error, 'No se pudo actualizar el área, intenta nuevamente') }
+    }
+    if (!data) {
+      return { error: 'No tienes permisos para realizar esta acción' }
+    }
+
+    return { data: undefined }
+  })
+
+export const updateAmenity = (id: string, input: AmenityInput) => updateAmenityFn({ data: { id, input } })
+
+/** Retire / reinstate. Retired areas keep their bookings but leave the booking form. */
+const setAmenityActiveFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; isActive: boolean }) => data)
+  .handler(async ({ data: { id, isActive } }): Promise<ActionResult> => {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('amenities')
+      .update({ is_active: isActive })
+      .eq('id', id)
+      .select('id')
+      .single()
+
+    if (error) {
+      return { error: toAmenityMessage(error, 'No se pudo actualizar el área, intenta nuevamente') }
+    }
+    if (!data) {
+      return { error: 'No tienes permisos para realizar esta acción' }
+    }
+
+    return { data: undefined }
+  })
+
+export const setAmenityActive = (id: string, isActive: boolean) =>
+  setAmenityActiveFn({ data: { id, isActive } })
+
+/** Hard delete; only possible while the area has no bookings. */
+const deleteAmenityFn = createServerFn({ method: 'POST' })
+  .validator((id: string) => id)
+  .handler(async ({ data: id }): Promise<ActionResult> => {
+    const supabase = await createClient()
+    const { data, error } = await supabase.from('amenities').delete().eq('id', id).select('id')
+
+    if (error) {
+      if (error.code === FK_VIOLATION) {
+        return { error: 'No se puede eliminar: el área tiene reservaciones. Desactívala en su lugar.' }
+      }
+      return { error: toAmenityMessage(error, 'No se pudo eliminar el área, intenta nuevamente') }
+    }
+    if (data.length === 0) {
+      return { error: 'No tienes permisos para realizar esta acción' }
+    }
+
+    return { data: undefined }
+  })
+
+export const deleteAmenity = (id: string) => deleteAmenityFn({ data: id })
+
+// ---------------------------------------------------------------------------
+// reservations
+// ---------------------------------------------------------------------------
 
 // Raised by the guard trigger once a booking has money recorded against it.
 const PAID = 'P0003'
@@ -25,15 +139,15 @@ function toMessage(error: PostgrestError, fallback: string) {
     return 'La reservación ya está pagada. El tesorero puede cancelarla y registrar el reembolso.'
   }
   if (error.code === PAID) {
-    return 'La reservación ya está pagada: no se puede cambiar la casa ni el monto'
+    return 'La reservación ya está pagada: no se puede cambiar el área, la casa ni el monto'
   }
   return postgrestErrorMessage(error, {
     fallback,
-    unique: { hall_reservations_one_per_day: 'La terraza ya está reservada ese día' },
+    unique: { amenity_reservations_one_per_day: 'El área ya está reservada ese día' },
   })
 }
 
-/** Errors from pay_hall_reservation / cancel_hall_reservation. */
+/** Errors from pay_amenity_reservation / cancel_amenity_reservation. */
 function toResolutionMessage(error: PostgrestError, fallback: string) {
   if (isFolioTaken(error)) return FOLIO_TAKEN_MESSAGE
   if (error.message.includes('already paid')) return 'Esta reservación ya tiene su pago registrado'
@@ -44,19 +158,19 @@ function toResolutionMessage(error: PostgrestError, fallback: string) {
   return requestResolutionErrorMessage(error, fallback)
 }
 
-const createHallReservationFn = createServerFn({ method: 'POST' })
-  .validator((input: HallReservationInput) => input)
+const createReservationFn = createServerFn({ method: 'POST' })
+  .validator((input: ReservationInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
-    const parsed = hallReservationSchema.safeParse(input)
+    const parsed = reservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: 'Revisa los campos del formulario' }
     }
 
-    const { property_id, reserved_on, amount, notes } = parsed.data
+    const { amenity_id, property_id, reserved_on, amount, notes } = parsed.data
     const supabase = await createClient()
     const { data, error } = await supabase
-      .from('hall_reservations')
-      .insert({ property_id, reserved_on, amount, notes: notes || null })
+      .from('amenity_reservations')
+      .insert({ amenity_id, property_id, reserved_on, amount, notes: notes || null })
       .select('id')
       .single()
 
@@ -67,22 +181,22 @@ const createHallReservationFn = createServerFn({ method: 'POST' })
     return { data }
   })
 
-export const createHallReservation = (input: HallReservationInput) => createHallReservationFn({ data: input })
+export const createReservation = (input: ReservationInput) => createReservationFn({ data: input })
 
-/** Not once cancelled (RLS). Once paid, the guard trigger keeps the house and amount. */
-const updateHallReservationFn = createServerFn({ method: 'POST' })
-  .validator((data: { id: string; input: HallReservationInput }) => data)
+/** Not once cancelled (RLS). Once paid, the guard trigger keeps the area, house and amount. */
+const updateReservationFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: ReservationInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
-    const parsed = hallReservationSchema.safeParse(input)
+    const parsed = reservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: 'Revisa los campos del formulario' }
     }
 
-    const { property_id, reserved_on, amount, notes } = parsed.data
+    const { amenity_id, property_id, reserved_on, amount, notes } = parsed.data
     const supabase = await createClient()
     const { data, error } = await supabase
-      .from('hall_reservations')
-      .update({ property_id, reserved_on, amount, notes: notes || null })
+      .from('amenity_reservations')
+      .update({ amenity_id, property_id, reserved_on, amount, notes: notes || null })
       .eq('id', id)
       .select('id')
       .single()
@@ -97,15 +211,15 @@ const updateHallReservationFn = createServerFn({ method: 'POST' })
     return { data: undefined }
   })
 
-export const updateHallReservation = (id: string, input: HallReservationInput) =>
-  updateHallReservationFn({ data: { id, input } })
+export const updateReservation = (id: string, input: ReservationInput) =>
+  updateReservationFn({ data: { id, input } })
 
-/** Unpaid bookings only; a paid one is cancelled with cancelHallReservation. */
-const deleteHallReservationFn = createServerFn({ method: 'POST' })
+/** Unpaid bookings only; a paid one is cancelled with cancelReservation. */
+const deleteReservationFn = createServerFn({ method: 'POST' })
   .validator((id: string) => id)
   .handler(async ({ data: id }): Promise<ActionResult> => {
     const supabase = await createClient()
-    const { data, error } = await supabase.from('hall_reservations').delete().eq('id', id).select('id')
+    const { data, error } = await supabase.from('amenity_reservations').delete().eq('id', id).select('id')
 
     if (error) {
       return { error: toMessage(error, 'No se pudo cancelar la reservación, intenta nuevamente') }
@@ -117,19 +231,19 @@ const deleteHallReservationFn = createServerFn({ method: 'POST' })
     return { data: undefined }
   })
 
-export const deleteHallReservation = (id: string) => deleteHallReservationFn({ data: id })
+export const deleteReservation = (id: string) => deleteReservationFn({ data: id })
 
-const payHallReservationFn = createServerFn({ method: 'POST' })
-  .validator((data: { id: string; input: PayHallReservationInput }) => data)
+const payReservationFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: PayReservationInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ transaction_id: string }>> => {
-    const parsed = payHallReservationSchema.safeParse(input)
+    const parsed = payReservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: 'Revisa los campos del formulario' }
     }
 
     const { occurred_on, folio, payment_method, reference, notes } = parsed.data
     const supabase = await createClient()
-    const { data, error } = await supabase.rpc('pay_hall_reservation', {
+    const { data, error } = await supabase.rpc('pay_amenity_reservation', {
       p_reservation_id: id,
       p_occurred_on: occurred_on,
       p_folio: folio,
@@ -145,20 +259,20 @@ const payHallReservationFn = createServerFn({ method: 'POST' })
     return { data: { transaction_id: data } }
   })
 
-export const payHallReservation = (id: string, input: PayHallReservationInput) =>
-  payHallReservationFn({ data: { id, input } })
+export const payReservation = (id: string, input: PayReservationInput) =>
+  payReservationFn({ data: { id, input } })
 
-const cancelHallReservationFn = createServerFn({ method: 'POST' })
-  .validator((data: { id: string; input: CancelHallReservationInput }) => data)
+const cancelReservationFn = createServerFn({ method: 'POST' })
+  .validator((data: { id: string; input: CancelReservationInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
-    const parsed = cancelHallReservationSchema.safeParse(input)
+    const parsed = cancelReservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: 'Revisa los campos del formulario' }
     }
 
     const { refund_amount, occurred_on, payment_method, reference, notes } = parsed.data
     const supabase = await createClient()
-    const { error } = await supabase.rpc('cancel_hall_reservation', {
+    const { error } = await supabase.rpc('cancel_amenity_reservation', {
       p_reservation_id: id,
       p_refund_amount: refund_amount,
       p_occurred_on: occurred_on,
@@ -174,5 +288,5 @@ const cancelHallReservationFn = createServerFn({ method: 'POST' })
     return { data: undefined }
   })
 
-export const cancelHallReservation = (id: string, input: CancelHallReservationInput) =>
-  cancelHallReservationFn({ data: { id, input } })
+export const cancelReservation = (id: string, input: CancelReservationInput) =>
+  cancelReservationFn({ data: { id, input } })

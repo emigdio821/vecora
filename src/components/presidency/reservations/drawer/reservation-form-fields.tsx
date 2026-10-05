@@ -1,0 +1,299 @@
+import { IconAlertTriangle, IconSelector } from '@tabler/icons-react'
+import { useQuery } from '@tanstack/react-query'
+import { addYears, format, parseISO, startOfToday } from 'date-fns'
+import { useId, useMemo, useState } from 'react'
+import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
+import { HousesPicker } from '@/components/shared/pickers/houses-picker'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
+import { Label } from '@/components/ui/label'
+import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
+import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/textarea'
+import { useToday } from '@/hooks/use-today'
+import { formatDay, formatMonth, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import type { ReservationInput } from '@/lib/validations/presidency'
+import { amenitiesQueryOptions, reservationsQueryOptions } from '@/tanstack-queries/presidency'
+import { houseFeeStatusQueryOptions } from '@/tanstack-queries/treasury'
+
+interface ReservationFormFieldsProps {
+  form: UseFormReturn<ReservationInput>
+  disabled?: boolean
+  /** Editing: this booking's own day must stay selectable. */
+  currentId?: string
+  /** Editing a paid booking: the ledger already has its area, house and amount. */
+  lockPaidFields?: boolean
+}
+
+/** Shared by the create and edit drawers. */
+export function ReservationFormFields({
+  form,
+  disabled,
+  currentId,
+  lockPaidFields,
+}: ReservationFormFieldsProps) {
+  const [isDateOpen, setDateOpen] = useState(false)
+  const today = useToday()
+  const { data: amenities } = useQuery(amenitiesQueryOptions())
+  const { data: reservations } = useQuery(reservationsQueryOptions())
+  const { data: feeStatus } = useQuery(houseFeeStatusQueryOptions())
+  const amenityId = useWatch({ control: form.control, name: 'amenity_id' })
+  const propertyId = useWatch({ control: form.control, name: 'property_id' })
+  const amount = useWatch({ control: form.control, name: 'amount' })
+  const feeSwitchId = useId()
+
+  // Retired areas leave the list, except the one this booking already has.
+  const initialAmenityId = form.formState.defaultValues?.amenity_id
+  const amenityItems = useMemo(
+    () =>
+      (amenities ?? [])
+        .filter((a) => a.is_active || a.id === initialAmenityId)
+        .map((a) => ({ value: a.id, label: a.name })),
+    [amenities, initialAmenityId],
+  )
+  const amenity = amenities?.find((a) => a.id === amenityId)
+
+  // Most areas are free; some bookings carry a charge (e.g. electricity for
+  // brincolines). Empty while switched on still counts as on, so the fee
+  // field stays visible.
+  const hasFee = amount !== 0
+
+  // Days this area is already booked by someone else are greyed out; the DB
+  // enforces it too (unique area + day), this just saves a failed submit.
+  // Cancelled bookings no longer hold their day.
+  const takenDays = useMemo(
+    () =>
+      (reservations ?? [])
+        .filter((r) => r.id !== currentId && r.amenity.id === amenityId && !r.cancelled_at)
+        .map((r) => parseISO(r.reserved_on)),
+    [reservations, currentId, amenityId],
+  )
+
+  // A warning only: the board doesn't block a booking over missing fees. Once
+  // paid the house is settled, so there's nothing left to warn about.
+  const unpaidMonths = lockPaidFields
+    ? []
+    : (feeStatus?.find((h) => h.property_id === propertyId)?.unpaid_months ?? [])
+
+  return (
+    <>
+      <Controller
+        name="amenity_id"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field
+            name={field.name}
+            invalid={fieldState.invalid}
+            touched={fieldState.isTouched}
+            dirty={fieldState.isDirty}
+          >
+            <FieldLabel>
+              Área <span className="text-destructive">*</span>
+            </FieldLabel>
+            <Select
+              items={amenityItems}
+              value={field.value || null}
+              onValueChange={(value) => {
+                field.onChange(value ?? '')
+                // Each area proposes its own fee.
+                const next = amenities?.find((a) => a.id === value)
+                if (next) form.setValue('amount', Number(next.default_fee), { shouldDirty: true })
+              }}
+              disabled={disabled || lockPaidFields}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecciona un área" />
+              </SelectTrigger>
+              <SelectPopup>
+                {amenityItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectPopup>
+            </Select>
+            <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+          </Field>
+        )}
+      />
+
+      <Controller
+        name="property_id"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field
+            name={field.name}
+            invalid={fieldState.invalid}
+            touched={fieldState.isTouched}
+            dirty={fieldState.isDirty}
+          >
+            <FieldLabel>
+              Casa <span className="text-destructive">*</span>
+            </FieldLabel>
+            <HousesPicker
+              value={field.value || null}
+              onValueChange={(value) => {
+                field.onChange(value ?? '')
+              }}
+              inputRef={field.ref}
+              disabled={disabled || lockPaidFields}
+            />
+            <FieldDescription>La casa que aparta el área.</FieldDescription>
+            <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+          </Field>
+        )}
+      />
+
+      {unpaidMonths.length > 0 && (
+        <Alert variant="warning">
+          <IconAlertTriangle />
+          <AlertTitle>Casa con cuotas pendientes</AlertTitle>
+          <AlertDescription>
+            Debe {unpaidMonths.length === 1 ? '1 mes' : `${unpaidMonths.length} meses`}:{' '}
+            {unpaidMonths.map((month) => formatMonth(month)).join(', ')}. Puedes reservar de todos modos.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <Controller
+        name="reserved_on"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field
+            name={field.name}
+            invalid={fieldState.invalid}
+            touched={fieldState.isTouched}
+            dirty={fieldState.isDirty}
+          >
+            <FieldLabel>
+              Fecha <span className="text-destructive">*</span>
+            </FieldLabel>
+            <Popover open={isDateOpen} onOpenChange={setDateOpen}>
+              <PopoverTrigger
+                ref={field.ref}
+                render={
+                  <Button
+                    variant="outline"
+                    aria-invalid={fieldState.invalid}
+                    disabled={disabled}
+                    className="w-full justify-between pr-2"
+                  >
+                    <span className="truncate font-normal">{formatDay(field.value)}</span>
+                    <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
+                  </Button>
+                }
+              />
+              <PopoverPopup className="w-auto p-1">
+                <Calendar
+                  mode="single"
+                  captionLayout="dropdown"
+                  startMonth={startOfToday()}
+                  endMonth={addYears(today, 1)}
+                  selected={parseISO(field.value)}
+                  defaultMonth={parseISO(field.value)}
+                  disabled={[{ before: startOfToday() }, ...takenDays]}
+                  onSelect={(date) => {
+                    field.onChange(format(date ?? new Date(), ISO_DAY))
+                    setDateOpen(false)
+                  }}
+                />
+              </PopoverPopup>
+            </Popover>
+            <FieldDescription>
+              Los días en que el área ya está apartada aparecen deshabilitados.
+            </FieldDescription>
+            <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+          </Field>
+        )}
+      />
+
+      <div className="flex items-start gap-2">
+        <Switch
+          id={feeSwitchId}
+          checked={hasFee}
+          onCheckedChange={(checked) => {
+            // Off means free; on starts from the area's fee, or empty to force one.
+            const defaultFee = Number(amenity?.default_fee ?? 0)
+            form.setValue('amount', checked ? defaultFee || (null as unknown as number) : 0, {
+              shouldDirty: true,
+            })
+          }}
+          disabled={disabled || lockPaidFields}
+        />
+        <div className="flex flex-col gap-1">
+          <Label htmlFor={feeSwitchId}>Agregar tarifa</Label>
+          <p className="text-xs text-muted-foreground">
+            Actívalo si la reservación tiene un cobro, como la tarifa del área o el uso de electricidad para
+            brincolines o inflables.
+          </p>
+        </div>
+      </div>
+
+      {hasFee && (
+        <Controller
+          name="amount"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field
+              name={field.name}
+              invalid={fieldState.invalid}
+              touched={fieldState.isTouched}
+              dirty={fieldState.isDirty}
+            >
+              <FieldLabel>
+                Tarifa <span className="text-destructive">*</span>
+              </FieldLabel>
+              <InputGroup>
+                <NumberField
+                  value={field.value ?? null}
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                  }}
+                  min={0}
+                  locale="es-MX"
+                  format={MONEY_FORMAT}
+                  disabled={disabled || lockPaidFields}
+                >
+                  <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
+                </NumberField>
+                <InputGroupAddon>
+                  <InputGroupText>$</InputGroupText>
+                </InputGroupAddon>
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>MXN</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+              <FieldDescription>
+                Se paga completo al reservar. Puedes anotar el motivo del cobro en "Notas".
+              </FieldDescription>
+              <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+            </Field>
+          )}
+        />
+      )}
+
+      <Controller
+        name="notes"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field
+            name={field.name}
+            invalid={fieldState.invalid}
+            touched={fieldState.isTouched}
+            dirty={fieldState.isDirty}
+          >
+            <FieldLabel>Notas</FieldLabel>
+            <Textarea {...field} rows={3} className="max-h-40" disabled={disabled} />
+            <FieldDescription>Opcional. Motivo, horario, o cualquier acuerdo con la casa.</FieldDescription>
+            <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+          </Field>
+        )}
+      />
+    </>
+  )
+}

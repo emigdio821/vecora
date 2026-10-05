@@ -2,25 +2,36 @@ import { z } from 'zod'
 import { requiredText } from './requests'
 import { PAYMENT_METHODS } from './treasury'
 
-/** One booking of the terraza (event terrace): a house, a day, its price, optional notes. */
-export const hallReservationSchema = z.object({
+/** A bookable common area: terraza, alberca, gimnasio... */
+export const amenitySchema = z.object({
+  // Unique in the DB (case-insensitive).
+  name: requiredText('Nombre'),
+  // Proposed when booking; each reservation can change it. 0 = free.
+  default_fee: z.number('Tarifa es requerida').nonnegative('La tarifa no puede ser negativa'),
+})
+
+export type AmenityInput = z.infer<typeof amenitySchema>
+
+/** One booking of a common area: the area, a house, a day, its price, optional notes. */
+export const reservationSchema = z.object({
+  amenity_id: z.uuid('Selecciona un área'),
   property_id: z.uuid('Selecciona una casa'),
-  // Unique in the DB: one live booking per day.
+  // Unique in the DB per area: one live booking per area and day.
   reserved_on: z.iso.date('Fecha inválida'),
-  // Optional extra fee (e.g. electricity), paid in full when booking; 0 = free.
+  // Optional fee (e.g. electricity), paid in full when booking; 0 = free.
   amount: z.number('Monto es requerido').nonnegative('El monto no puede ser negativo'),
   notes: z.string().trim(),
 })
 
-export type HallReservationInput = z.infer<typeof hallReservationSchema>
+export type ReservationInput = z.infer<typeof reservationSchema>
 
 const transferNeedsReference = {
   path: ['reference'],
   message: 'La referencia es requerida para transferencias',
 }
 
-/** Treasurer collecting the rent: the income it becomes in "Tesorería". */
-export const payHallReservationSchema = z
+/** Treasurer collecting the fee: the income it becomes in "Tesorería". */
+export const payReservationSchema = z
   .object({
     occurred_on: z.iso.date('Fecha inválida'),
     // Like every income: the paper receipt handed to the resident.
@@ -31,10 +42,10 @@ export const payHallReservationSchema = z
   })
   .refine((data) => data.payment_method !== 'transfer' || data.reference.length > 0, transferNeedsReference)
 
-export type PayHallReservationInput = z.infer<typeof payHallReservationSchema>
+export type PayReservationInput = z.infer<typeof payReservationSchema>
 
 /** Treasurer cancelling a paid booking; refund 0 = the house keeps nothing back. */
-export const cancelHallReservationSchema = z
+export const cancelReservationSchema = z
   .object({
     refund_amount: z.number('Monto es requerido').nonnegative('El monto no puede ser negativo'),
     occurred_on: z.iso.date('Fecha inválida'),
@@ -47,4 +58,4 @@ export const cancelHallReservationSchema = z
     transferNeedsReference,
   )
 
-export type CancelHallReservationInput = z.infer<typeof cancelHallReservationSchema>
+export type CancelReservationInput = z.infer<typeof cancelReservationSchema>

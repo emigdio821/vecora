@@ -14,7 +14,8 @@ export const SECTION_LABEL: Record<string, string> = {
   transactions: 'Movimientos',
   transaction_categories: 'Categorías de movimientos',
   periods: 'Periodos',
-  hall_reservations: 'Terraza',
+  amenity_reservations: 'Reservaciones',
+  amenities: 'Áreas comunes',
   maintenance_requests: 'Mantenimiento',
   security_requests: 'Seguridad',
   user_roles: 'Mesa directiva',
@@ -90,7 +91,7 @@ export function entryAction(entry: LogEntryQueryData): LogAction {
     if (after.status === 'rejected') return 'rejected'
     if (after.status === 'pending') return 'reopened'
   }
-  // Paid terraza bookings are cancelled, not deleted, by the treasurer's RPC.
+  // Paid bookings are cancelled, not deleted, by the treasurer's RPC.
   if (changed.includes('cancelled_at')) return 'cancelled'
   return 'updated'
 }
@@ -132,8 +133,9 @@ export function entrySummary(entry: LogEntryQueryData): string {
     case 'maintenance_requests':
     case 'security_requests':
       return row.amount == null ? label : `${label} - ${formatCurrency(asText(row.amount))}`
-    case 'hall_reservations': {
-      const summary = `Casa ${label} - ${formatDay(asText(row.reserved_on))}`
+    case 'amenity_reservations': {
+      const amenity = refName(entry, row.amenity_id)
+      const summary = `${amenity ? `${amenity} - ` : ''}Casa ${label} - ${formatDay(asText(row.reserved_on))}`
       return row.amount == null ? summary : `${summary} - ${formatCurrency(asText(row.amount))}`
     }
     case 'property_residents': {
@@ -196,7 +198,9 @@ const FIELD_LABEL: Record<string, string> = {
   status: 'Estado',
   rejection_reason: 'Motivo del rechazo',
   transaction_id: 'Movimiento',
-  hall_reservation_id: 'Reservación de terraza',
+  amenity_id: 'Área',
+  amenity_reservation_id: 'Reservación',
+  default_fee: 'Tarifa sugerida',
   created_by: 'Registrado por',
   granted_by: 'Otorgado por',
   resolved_by: 'Resuelto por',
@@ -217,7 +221,7 @@ export function fieldLabel(field: string) {
 /** Bookkeeping columns nobody needs to see; `key` is a category's internal code. */
 const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton', 'key'])
 
-const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee'])
+const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee', 'default_fee'])
 const DAY_FIELDS = new Set(['occurred_on', 'requested_on', 'reserved_on', 'starts_on', 'ends_on'])
 const TIMESTAMP_FIELDS = new Set(['created_at', 'resolved_at', 'cancelled_at', 'deleted_at', 'welcomed_at'])
 

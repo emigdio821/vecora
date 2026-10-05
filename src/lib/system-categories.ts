@@ -5,8 +5,8 @@
 const SYSTEM_CATEGORY_SOURCE: Record<string, string> = {
   fee: '"Registrar cuota"',
   late_fee: '"Registrar cuota"',
-  hall_rent: '"Presidencia" - "Terraza"',
-  hall_refund: '"Presidencia" - "Terraza"',
+  amenity_fee: '"Presidencia" - "Reservaciones"',
+  amenity_refund: '"Presidencia" - "Reservaciones"',
 }
 
 export function systemCategorySource(key: string): string {

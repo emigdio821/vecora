@@ -14,16 +14,16 @@ import {
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { useToday } from '@/hooks/use-today'
 import { esLocale, ISO_DAY } from '@/lib/utils'
-import { hallReservationsQueryOptions } from '@/tanstack-queries/presidency'
+import { reservationsQueryOptions } from '@/tanstack-queries/presidency'
 
 const MAX_NOTICES = 5
 
 /**
- * What's coming up in the residential. For now that's only the terraza bookings;
- * announcements, if they ever land, join this same list.
+ * What's coming up in the residential. For now that's only the common area
+ * bookings; announcements, if they ever land, join this same list.
  */
 export function NoticesCard() {
-  const reservations = useQuery(hallReservationsQueryOptions())
+  const reservations = useQuery(reservationsQueryOptions())
   const now = useToday()
 
   if (reservations.isPending) {
@@ -43,7 +43,7 @@ export function NoticesCard() {
   return (
     <CardFrame className="w-full">
       <CardFrameHeader>
-        <CardFrameTitle>Terraza</CardFrameTitle>
+        <CardFrameTitle>Reservaciones</CardFrameTitle>
         <CardFrameDescription>Próximos eventos</CardFrameDescription>
         <CardFrameAction>
           <IconConfetti className="text-muted-foreground" />
@@ -60,7 +60,7 @@ export function NoticesCard() {
                     {reservation.reserved_on === today && ' - Hoy'}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    Casa {reservation.property.number}
+                    {reservation.amenity.name} - Casa {reservation.property.number}
                     {reservation.notes && ` - ${reservation.notes}`}
                   </span>
                 </li>
@@ -73,7 +73,7 @@ export function NoticesCard() {
                   <IconCalendarMonth />
                 </EmptyMedia>
                 <EmptyTitle>Sin eventos próximos</EmptyTitle>
-                <EmptyDescription>Aquí aparecerán las reservaciones de la terraza.</EmptyDescription>
+                <EmptyDescription>Aquí aparecerán las reservaciones de las áreas comunes.</EmptyDescription>
               </EmptyHeader>
             </Empty>
           )}
