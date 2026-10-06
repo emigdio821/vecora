@@ -8,15 +8,21 @@ import { IconChevronRight, IconX } from '@tabler/icons-react'
 import type React from 'react'
 import { createContext, useContext } from 'react'
 import { Button } from '@/components/ui/button'
+import { useIsMobile } from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 
 export type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'
 
-const DrawerContext: React.Context<{ position: DrawerPosition }> = createContext<{
+interface DrawerContextValue {
   position: DrawerPosition
-}>({
+  /** A side drawer shown as a bottom sheet on mobile. */
+  isMobileSheet: boolean
+}
+
+const DrawerContext: React.Context<DrawerContextValue> = createContext<DrawerContextValue>({
   position: 'bottom',
+  isMobileSheet: false,
 })
 
 const directionMap: Record<DrawerPosition, DrawerPrimitive.Root.Props['swipeDirection']> = {
@@ -28,15 +34,24 @@ const directionMap: Record<DrawerPosition, DrawerPrimitive.Root.Props['swipeDire
 
 export const DrawerCreateHandle: typeof DrawerPrimitive.createHandle = DrawerPrimitive.createHandle
 
+/**
+ * On mobile (the sidebar's breakpoint) a left or right drawer opens from the
+ * bottom with a drag bar instead, like the menu and the responsive dialogs: a
+ * side panel is too narrow there, and bottom sheets stack on each other.
+ */
 export function Drawer({
   swipeDirection,
-  position = 'bottom',
+  position: positionProp = 'bottom',
   ...props
 }: DrawerPrimitive.Root.Props & {
   position?: DrawerPosition
 }): React.ReactElement {
+  const isMobile = useIsMobile()
+  const isMobileSheet = isMobile && (positionProp === 'left' || positionProp === 'right')
+  const position = isMobileSheet ? 'bottom' : positionProp
+
   return (
-    <DrawerContext.Provider value={{ position }}>
+    <DrawerContext.Provider value={{ position, isMobileSheet }}>
       <DrawerPrimitive.Root swipeDirection={swipeDirection ?? directionMap[position]} {...props} />
     </DrawerContext.Provider>
   )
@@ -125,8 +140,8 @@ export function DrawerPopup({
   children,
   showCloseButton = false,
   position: positionProp,
-  variant = 'default',
-  showBar = false,
+  variant: variantProp = 'default',
+  showBar: showBarProp = false,
   portalProps,
   ...props
 }: DrawerPrimitive.Popup.Props & {
@@ -136,8 +151,11 @@ export function DrawerPopup({
   showBar?: boolean
   portalProps?: DrawerPrimitive.Portal.Props
 }): React.ReactElement {
-  const { position: contextPosition } = useContext(DrawerContext)
+  const { position: contextPosition, isMobileSheet } = useContext(DrawerContext)
   const position = positionProp ?? contextPosition
+  // A side drawer turned bottom sheet looks like the other sheets: edge to edge, with the bar.
+  const variant = isMobileSheet ? 'default' : variantProp
+  const showBar = showBarProp || isMobileSheet
 
   return (
     <DrawerPortal {...portalProps}>
