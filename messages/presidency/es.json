@@ -44,7 +44,7 @@
   "presidency_amenity_deleted": "Área eliminada",
   "presidency_amenity_name_description": "Como aparecerá en las reservaciones y en \"Tesorería\".",
   "presidency_amenity_default_fee": "Tarifa sugerida",
-  "presidency_amenity_default_fee_description": "Se propone al reservar y se puede cambiar en cada reservación. 0 si el área es gratuita.",
+  "presidency_amenity_default_fee_description": "Si el área es gratuita, déjalo en 0. Se puede ajustar en cada reservación.",
   "presidency_activate": "Activar",
   "presidency_deactivate": "Desactivar",
   "presidency_amenity_activated": "Área activada",
