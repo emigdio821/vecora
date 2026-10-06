@@ -1,4 +1,4 @@
-import { IconFilter } from '@tabler/icons-react'
+import { IconFilter2 } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { useMemo } from 'react'
 import { RangePicker } from '@/components/shared/range-picker'
@@ -101,7 +101,7 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
                 <MenuTrigger
                   render={
                     <Button size="icon" variant="outline" className="relative" aria-label={filtersLabel}>
-                      <IconFilter className="size-4" />
+                      <IconFilter2 className="size-4" />
                       {/* The list is narrowed; don't let that go unnoticed. */}
                       {isFiltered && (
                         <span

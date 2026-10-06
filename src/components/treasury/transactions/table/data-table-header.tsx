@@ -1,4 +1,4 @@
-import { IconFilter, IconTrash } from '@tabler/icons-react'
+import { IconFilter2, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -102,7 +102,7 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
                   <MenuTrigger
                     render={
                       <Button size="icon" variant="outline" className="relative" aria-label={filtersLabel}>
-                        <IconFilter className="size-4" />
+                        <IconFilter2 className="size-4" />
                         {/* The list is narrowed; don't let that go unnoticed. */}
                         {isFiltered && (
                           <span
