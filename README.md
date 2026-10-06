@@ -4,9 +4,9 @@
 
 Residential management for the HOA board: houses and residents, treasury (fees, transactions and periods), common area bookings, maintenance and security payment requests, and an activity log for the admin.
 
-The app itself is in Spanish (es-MX); code, comments and docs are in English and call each section by its English name (see [Sections](#sections)).
+The app itself is in Spanish (es-MX); code, comments and docs are in English and call each section by its English name (see [Sections](#sections)). Every on-screen text is also translated to English, switched off for now (see [Languages](#languages)).
 
-TanStack Start (Vite + Nitro) · React · Supabase (Postgres, Auth, RLS) · Tailwind CSS · [coss ui](https://coss.com/ui) (Base UI) · TanStack Query / Table · React Hook Form + zod.
+TanStack Start (Vite + Nitro) · React · Supabase (Postgres, Auth, RLS) · Tailwind CSS · [coss ui](https://coss.com/ui) (Base UI) · TanStack Query / Table · React Hook Form + zod · [Paraglide](https://inlang.com/m/gerre34r/library-inlang-paraglideJs) (i18n).
 
 ## Run it locally
 
@@ -69,26 +69,27 @@ Every role can read every section. The seed also creates 20 houses (A1–D5), 10
 
 What each section is called on screen. Docs and comments use the English name.
 
-| Name             | On screen            | Route / tab                               |
-| ---------------- | -------------------- | ----------------------------------------- |
-| Home             | "Inicio"             | `/`                                       |
-| Treasury         | "Tesorería"          | `/treasury`                               |
-| - Transactions   | "Movimientos"        | `?tab=transactions`                       |
-| - Categories     | "Categorías"         | `?tab=categories`                         |
-| Presidency       | "Presidencia"        | `/presidency`                             |
-| - Periods        | "Periodos"           | `?tab=periods`                            |
-| - Reservations   | "Reservaciones"      | `?tab=reservations`                       |
-| - Common areas   | "Áreas comunes"      | `?tab=amenities`                          |
-| Maintenance      | "Mantenimiento"      | `/maintenance`                            |
-| Security         | "Seguridad"          | `/security`                               |
-| HOA board        | "Mesa directiva"     | `/hoa-board`                              |
-| Residential      | "Residencial"        | `/residential`                            |
-| - Houses         | "Casas"              | `?tab=houses`                             |
-| - Residents      | "Residentes"         | `?tab=residents`                          |
-| Activity log     | "Historial"          | `/logs` (admin only)                      |
-| Financial report | "Reporte financiero" | sidebar dialog; the PDF is `/reports/pdf` |
-| Appearance       | "Apariencia"         | sidebar, per device                       |
-| Settings         | "Ajustes"            | sidebar (president or admin)              |
+| Name             | On screen            | Route / tab                                    |
+| ---------------- | -------------------- | ---------------------------------------------- |
+| Home             | "Inicio"             | `/`                                            |
+| Treasury         | "Tesorería"          | `/treasury`                                    |
+| - Transactions   | "Movimientos"        | `?tab=transactions`                            |
+| - Categories     | "Categorías"         | `?tab=categories`                              |
+| Presidency       | "Presidencia"        | `/presidency`                                  |
+| - Periods        | "Periodos"           | `?tab=periods`                                 |
+| - Reservations   | "Reservaciones"      | `?tab=reservations`                            |
+| - Common areas   | "Áreas comunes"      | `?tab=amenities`                               |
+| Maintenance      | "Mantenimiento"      | `/maintenance`                                 |
+| Security         | "Seguridad"          | `/security`                                    |
+| HOA board        | "Mesa directiva"     | `/hoa-board`                                   |
+| Residential      | "Residencial"        | `/residential`                                 |
+| - Houses         | "Casas"              | `?tab=houses`                                  |
+| - Residents      | "Residentes"         | `?tab=residents`                               |
+| Activity log     | "Historial"          | `/logs` (admin only)                           |
+| Financial report | "Reporte financiero" | sidebar dialog; the PDF is `/reports/pdf`      |
+| Settings         | "Ajustes"            | sidebar dialog                                 |
+| - App            | "Aplicación"         | tab: theme (and language), per device          |
+| - HOA            | "Residencial"        | tab: name, logo, currency (president or admin) |
 
 ## Useful commands
 
@@ -97,7 +98,8 @@ What each section is called on screen. Docs and comments use the English name.
 | `npm run dev`                     | Development server                                                                                     |
 | `npm run db:reset`                | Recreate the local database from migrations + seeds (destroys local data)                              |
 | `npm run db:types`                | Regenerate `src/lib/supabase/database.types.ts` from the local schema — run after changing a migration |
-| `npm run typecheck`               | `tsc --noEmit`                                                                                         |
+| `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                             |
+| `npm run i18n`                    | Compile `messages/` into `src/paraglide/` (the dev server also does it on its own)                     |
 | `npm run lint` / `npm run format` | oxlint / oxfmt                                                                                         |
 | `npx supabase status`             | Local URLs and keys; Studio is at <http://127.0.0.1:54323>                                             |
 | `npx supabase stop`               | Stop the local stack (data is kept)                                                                    |
@@ -131,7 +133,7 @@ The app runs on Vercel against a hosted Supabase project.
 
 4. **Create the main admin.** Nobody can sign in until an account has a role. In Authentication → Users → **Add user** → **Create new user**, enter `admin@vecora.com` and a strong password, and check **Auto Confirm User**. The database names the account "Vecora Admin" and grants it the admin role on its own.
 
-5. **Deploy**, sign in as the admin, set the residential's name and logo in Settings, and add the board members in HOA board.
+5. **Deploy** and sign in as the admin. The first sign-in asks for the residential's name and currency (it can't be skipped); then upload the logo in Ajustes → Residencial and add the board members in HOA board.
 
 ### The main admin
 
@@ -161,10 +163,25 @@ src/components/        UI per section (table/, drawer/, dialog/) + shared/ and u
 src/server-actions/    mutations (server functions), called from the client with the user's session
 src/tanstack-queries/  read queries and query keys
 src/lib/validations/   zod schemas shared by forms and server actions
+messages/              on-screen text, one folder per section with es.json and en.json
+project.inlang/        Paraglide project: languages, message files, detection strategy
+src/paraglide/         compiled messages (generated, gitignored)
 ```
+
+## Languages
+
+On-screen text lives in `messages/<section>/{es,en}.json` and is used as `m.key()` from `@/paraglide/messages`, so a missing key or variable fails the typecheck. Add a key to both files.
+
+Multi-language is off: `MULTI_LANGUAGE` in `src/lib/config/i18n.ts` is `false`, so everyone gets Spanish and the language pickers are hidden. Setting it to `true` (then restarting the dev server) brings back:
+
+- a language picker on the sign-in pages and in Ajustes → Aplicación, per device;
+- the HOA's default language in setup and in Ajustes → Residencial (admin only). Reports are written in it, and so is the screen of anyone who hasn't picked a language.
+
+Records keep the language they were written in: category names and generated descriptions (e.g. "Cuota Septiembre 2026") are data, not translated text.
 
 ## Notes
 
 - Access is invite-only: there is no sign-up page. The admin or president adds a board member in HOA board and shares the access link; the same link is how someone resets a forgotten password.
 - Permissions are enforced by Postgres RLS; the UI hides what a role can't do, but the database is the source of truth.
 - Every insert, update and delete is recorded in `audit_log` and shown to admins in the activity log.
+- Every amount keeps the currency it was recorded in. Changing the HOA's currency (admin only) applies to new records; existing transactions, periods and their fees keep theirs, and totals are shown per currency.
