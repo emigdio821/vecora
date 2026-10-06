@@ -1,6 +1,6 @@
 import { IconInfoCircle, IconSelector } from '@tabler/icons-react'
 import { addDays, addYears, format, parseISO, subYears } from 'date-fns'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -27,6 +27,9 @@ interface PeriodFormFieldsProps {
 /** Shared by the create and edit drawers. */
 export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodFormFieldsProps) {
   const [openDate, setOpenDate] = useState<'starts_on' | 'ends_on' | null>(null)
+  // The triggers are plain buttons, so Field can't link the labels to them on its own.
+  // Each name is its label plus the picked date, which would otherwise go unread.
+  const dateTriggerId = useId()
   const startsOn = useWatch({ control: form.control, name: 'starts_on' })
   const today = useToday()
 
@@ -65,7 +68,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
                 touched={fieldState.isTouched}
                 dirty={fieldState.isDirty}
               >
-                <FieldLabel>
+                <FieldLabel id={`${dateTriggerId}-${name}-label`} htmlFor={`${dateTriggerId}-${name}`}>
                   {name === 'starts_on' ? m.presidency_period_starts_on() : m.presidency_period_ends_on()}{' '}
                   <span className="text-destructive">*</span>
                 </FieldLabel>
@@ -76,6 +79,8 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
                   }}
                 >
                   <PopoverTrigger
+                    id={`${dateTriggerId}-${name}`}
+                    aria-labelledby={`${dateTriggerId}-${name}-label ${dateTriggerId}-${name}-value`}
                     ref={field.ref}
                     render={
                       <Button
@@ -84,7 +89,9 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
                         disabled={disabled}
                         className="w-full justify-between pr-2"
                       >
-                        <span className="truncate font-normal">{formatDay(field.value)}</span>
+                        <span id={`${dateTriggerId}-${name}-value`} className="truncate font-normal">
+                          {formatDay(field.value)}
+                        </span>
                         <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                       </Button>
                     }

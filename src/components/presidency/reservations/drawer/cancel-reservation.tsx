@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IconAlertCircle, IconSelector } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
 import { addYears, format, parseISO, subYears } from 'date-fns'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { PAYMENT_METHOD_ITEMS } from '@/components/treasury/kind'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -121,6 +121,7 @@ interface CancelReservationFormProps {
 
 function CancelReservationForm({ paid, currency, mutation }: CancelReservationFormProps) {
   const [isDateOpen, setDateOpen] = useState(false)
+  const dateTriggerId = useId()
   const today = useToday()
   const formatCurrency = useFormatCurrency()
 
@@ -208,11 +209,13 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                       touched={fieldState.isTouched}
                       dirty={fieldState.isDirty}
                     >
-                      <FieldLabel>
+                      <FieldLabel id={`${dateTriggerId}-label`} htmlFor={dateTriggerId}>
                         {m.presidency_refund_date()} <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                         <PopoverTrigger
+                          id={dateTriggerId}
+                          aria-labelledby={`${dateTriggerId}-label ${dateTriggerId}-value`}
                           ref={field.ref}
                           render={
                             <Button
@@ -221,7 +224,9 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                               disabled={mutation.isPending}
                               className="w-full justify-between pr-2"
                             >
-                              <span className="truncate font-normal">{formatDay(field.value)}</span>
+                              <span id={`${dateTriggerId}-value`} className="truncate font-normal">
+                                {formatDay(field.value)}
+                              </span>
                               <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                             </Button>
                           }

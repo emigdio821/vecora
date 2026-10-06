@@ -1,6 +1,6 @@
 import { IconSelector } from '@tabler/icons-react'
 import { addYears, format, parseISO, subYears } from 'date-fns'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -27,6 +27,7 @@ interface RequestFormFieldsProps {
 /** Shared by the create and edit drawers. */
 export function RequestFormFields({ form, currency, disabled }: RequestFormFieldsProps) {
   const [isDateOpen, setDateOpen] = useState(false)
+  const dateTriggerId = useId()
   const today = useToday()
   const kind = useWatch({ control: form.control, name: 'kind' })
 
@@ -139,11 +140,13 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
               touched={fieldState.isTouched}
               dirty={fieldState.isDirty}
             >
-              <FieldLabel>
+              <FieldLabel id={`${dateTriggerId}-label`} htmlFor={dateTriggerId}>
                 {m.common_field_date()} <span className="text-destructive">*</span>
               </FieldLabel>
               <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                 <PopoverTrigger
+                  id={dateTriggerId}
+                  aria-labelledby={`${dateTriggerId}-label ${dateTriggerId}-value`}
                   ref={field.ref}
                   render={
                     <Button
@@ -152,7 +155,9 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
                       disabled={disabled}
                       className="w-full justify-between pr-2"
                     >
-                      <span className="truncate font-normal">{formatDay(field.value)}</span>
+                      <span id={`${dateTriggerId}-value`} className="truncate font-normal">
+                        {formatDay(field.value)}
+                      </span>
                       <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                     </Button>
                   }

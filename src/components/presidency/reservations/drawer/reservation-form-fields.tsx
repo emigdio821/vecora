@@ -50,6 +50,7 @@ export function ReservationFormFields({
   lockPaidFields,
 }: ReservationFormFieldsProps) {
   const [isDateOpen, setDateOpen] = useState(false)
+  const dateTriggerId = useId()
   const today = useToday()
   const { data: amenities } = useQuery(amenitiesQueryOptions())
   const { data: reservations } = useQuery(reservationsQueryOptions())
@@ -184,11 +185,13 @@ export function ReservationFormFields({
             touched={fieldState.isTouched}
             dirty={fieldState.isDirty}
           >
-            <FieldLabel>
+            <FieldLabel id={`${dateTriggerId}-label`} htmlFor={dateTriggerId}>
               {m.common_field_date()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Popover open={isDateOpen} onOpenChange={setDateOpen}>
               <PopoverTrigger
+                id={dateTriggerId}
+                aria-labelledby={`${dateTriggerId}-label ${dateTriggerId}-value`}
                 ref={field.ref}
                 render={
                   <Button
@@ -197,7 +200,9 @@ export function ReservationFormFields({
                     disabled={disabled}
                     className="w-full justify-between pr-2"
                   >
-                    <span className="truncate font-normal">{formatDay(field.value)}</span>
+                    <span id={`${dateTriggerId}-value`} className="truncate font-normal">
+                      {formatDay(field.value)}
+                    </span>
                     <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                   </Button>
                 }

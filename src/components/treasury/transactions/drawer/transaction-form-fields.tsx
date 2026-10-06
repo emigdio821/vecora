@@ -1,7 +1,7 @@
 import { IconSelector } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { addYears, format, parseISO, subYears } from 'date-fns'
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
 import { HousesPicker } from '@/components/shared/pickers/houses-picker'
 import { Button } from '@/components/ui/button'
@@ -47,6 +47,7 @@ export function TransactionFormFields({
   lockFeeFields,
 }: TransactionFormFieldsProps) {
   const [isDateOpen, setDateOpen] = useState(false)
+  const dateTriggerId = useId()
   const today = useToday()
   const { data: categories } = useQuery(categoriesQueryOptions())
   const [kind, paymentMethod, categoryId] = useWatch({
@@ -201,11 +202,13 @@ export function TransactionFormFields({
               touched={fieldState.isTouched}
               dirty={fieldState.isDirty}
             >
-              <FieldLabel>
+              <FieldLabel id={`${dateTriggerId}-label`} htmlFor={dateTriggerId}>
                 {m.common_field_date()} <span className="text-destructive">*</span>
               </FieldLabel>
               <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                 <PopoverTrigger
+                  id={dateTriggerId}
+                  aria-labelledby={`${dateTriggerId}-label ${dateTriggerId}-value`}
                   ref={field.ref}
                   render={
                     <Button
@@ -214,7 +217,9 @@ export function TransactionFormFields({
                       disabled={lockedForFee}
                       className="w-full justify-between pr-2"
                     >
-                      <span className="truncate font-normal">{formatDay(field.value)}</span>
+                      <span id={`${dateTriggerId}-value`} className="truncate font-normal">
+                        {formatDay(field.value)}
+                      </span>
                       <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
                     </Button>
                   }
