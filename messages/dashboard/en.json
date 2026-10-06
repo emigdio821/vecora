@@ -37,7 +37,7 @@
   ],
   "dashboard_requests_reservation_fee": "{amenity} fee - House {number}",
   "dashboard_requests_empty_title": "All caught up",
-  "dashboard_requests_empty_description": "Pending requests from \"Maintenance\", \"Security\" and \"Reservations\" will show up here.",
+  "dashboard_requests_empty_description": "Pending payment requests will show up here.",
 
   "dashboard_notices_upcoming": "Upcoming events",
   "dashboard_notices_date_pattern": "EEEE, MMMM d",

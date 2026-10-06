@@ -40,7 +40,7 @@
   ],
   "dashboard_requests_reservation_fee": "Tarifa {amenity} - Casa {number}",
   "dashboard_requests_empty_title": "Todo al día",
-  "dashboard_requests_empty_description": "Aquí aparecerán las solicitudes pendientes de \"Mantenimiento\", \"Seguridad\" y \"Reservaciones\".",
+  "dashboard_requests_empty_description": "Aquí aparecerán las solicitudes pendientes de pago.",
 
   "dashboard_notices_upcoming": "Próximos eventos",
   "dashboard_notices_date_pattern": "EEEE d 'de' MMMM",
