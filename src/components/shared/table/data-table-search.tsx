@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { DataTableFeatures } from './features'
 
 interface DataTableSearchProps<TData extends RowData> {
@@ -47,8 +48,8 @@ export function DataTableSearch<TData extends RowData>({
       <InputGroupInput
         type="search"
         value={query}
-        aria-label="Buscar"
-        placeholder="Buscar"
+        aria-label={m.common_search()}
+        placeholder={m.common_search()}
         ref={inputRef}
         name={param}
         disabled={isEmpty}
@@ -65,7 +66,7 @@ export function DataTableSearch<TData extends RowData>({
           <Button
             size="icon-xs"
             variant="ghost"
-            aria-label="Limpiar búsqueda"
+            aria-label={m.common_clear_search()}
             onClick={() => {
               inputRef.current?.focus()
               void setQuery('')

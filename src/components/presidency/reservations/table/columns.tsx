@@ -5,6 +5,7 @@ import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { formatDay, ISO_DAY, normalizeString } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { ReservationQueryData } from '@/tanstack-queries/presidency'
 import {
   RESERVATION_STATUS_BADGE_VARIANT,
@@ -21,7 +22,7 @@ export const reservationsTableColumns = columnHelper.columns([
   columnHelper.accessor('reserved_on', {
     id: 'reserved_on',
     size: 200,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_date()} />,
     cell: ({ getValue }) => {
       const value = getValue()
       const today = format(new Date(), ISO_DAY)
@@ -29,9 +30,9 @@ export const reservationsTableColumns = columnHelper.columns([
         <div className="flex items-center gap-2">
           <span className="whitespace-nowrap tabular-nums">{formatDay(value)}</span>
           {value === today ? (
-            <Badge variant="info">Hoy</Badge>
+            <Badge variant="info">{m.common_today()}</Badge>
           ) : value < today ? (
-            <Badge variant="secondary">Pasada</Badge>
+            <Badge variant="secondary">{m.presidency_reservation_past()}</Badge>
           ) : null}
         </div>
       )
@@ -42,7 +43,7 @@ export const reservationsTableColumns = columnHelper.columns([
       if (!filterValue) return true
 
       const { property, notes } = row.original
-      return [`casa ${property.number}`, notes].some(
+      return [m.common_house_label({ number: property.number }), notes].some(
         (field) => field && normalizeString(field).includes(filterValue),
       )
     },
@@ -51,14 +52,14 @@ export const reservationsTableColumns = columnHelper.columns([
   columnHelper.accessor((row) => row.amenity.name, {
     id: 'amenity',
     size: 160,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Área" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.presidency_amenity()} />,
     cell: ({ getValue }) => <span className="truncate">{getValue()}</span>,
   }),
 
   columnHelper.accessor((row) => row.property.number, {
     id: 'property',
     size: 120,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Casa" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_house()} />,
     cell: ({ getValue }) => getValue(),
     sortFn: (rowA, rowB) =>
       rowA.original.property.number.localeCompare(rowB.original.property.number, 'es', {
@@ -70,7 +71,7 @@ export const reservationsTableColumns = columnHelper.columns([
   columnHelper.accessor((row) => Number(row.amount), {
     id: 'amount',
     size: 140,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Monto" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_amount()} />,
     cell: ({ getValue, row }) => (
       <span className="tabular-nums">
         <Money value={getValue()} currency={row.original.currency} />
@@ -81,7 +82,7 @@ export const reservationsTableColumns = columnHelper.columns([
   columnHelper.accessor((row) => reservationStatus(row), {
     id: 'status',
     size: 200,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_status()} />,
     sortFn: (rowA, rowB) =>
       RESERVATION_STATUS_ORDER[reservationStatus(rowA.original)] -
       RESERVATION_STATUS_ORDER[reservationStatus(rowB.original)],
@@ -93,7 +94,7 @@ export const reservationsTableColumns = columnHelper.columns([
           <Badge variant={RESERVATION_STATUS_BADGE_VARIANT[status]}>{RESERVATION_STATUS_LABEL[status]}</Badge>
           {refund && (
             <span className="text-xs whitespace-nowrap text-muted-foreground tabular-nums">
-              Reembolso <Money value={refund.amount} currency={row.original.currency} />
+              {m.presidency_refund()} <Money value={refund.amount} currency={row.original.currency} />
             </span>
           )}
         </div>
@@ -104,7 +105,7 @@ export const reservationsTableColumns = columnHelper.columns([
   columnHelper.accessor('notes', {
     id: 'notes',
     size: 360,
-    header: 'Notas',
+    header: () => m.common_field_notes(),
     cell: ({ getValue }) => <span className="truncate">{getValue()}</span>,
   }),
 

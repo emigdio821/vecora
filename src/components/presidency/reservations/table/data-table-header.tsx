@@ -16,6 +16,7 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { m } from '@/paraglide/messages'
 import type { AmenityQueryData, ReservationQueryData } from '@/tanstack-queries/presidency'
 import { CreateReservationDrawer } from '../drawer/create-reservation'
 
@@ -39,7 +40,9 @@ export function ReservationsDataTableHeader({
   const [amenityId, setAmenityId] = useAmenityFilter()
   const [isCreateOpen, setCreateOpen] = useState(false)
   const activeAmenity = amenities.find((a) => a.id === amenityId)
-  const filterLabel = activeAmenity ? `Filtros: ${activeAmenity.name}` : 'Filtros'
+  const filterLabel = activeAmenity
+    ? m.presidency_filters_with_amenity({ name: activeAmenity.name })
+    : m.common_filters()
   const hasActiveAmenity = amenities.some((a) => a.is_active)
 
   return (
@@ -52,7 +55,7 @@ export function ReservationsDataTableHeader({
             table={table}
             columnId="reserved_on"
             param="search-reservations"
-            hint="Buscar por número de casa o notas"
+            hint={m.presidency_reservation_search_hint()}
           />
 
           {/* With a single area there's nothing to narrow down. */}
@@ -83,14 +86,14 @@ export function ReservationsDataTableHeader({
 
               <MenuPopup align="end">
                 <MenuGroup>
-                  <MenuGroupLabel>Área</MenuGroupLabel>
+                  <MenuGroupLabel>{m.presidency_amenity()}</MenuGroupLabel>
                   <MenuRadioGroup
                     value={activeAmenity ? amenityId : 'all'}
                     onValueChange={(value: string) => {
                       void setAmenityId(value)
                     }}
                   >
-                    <MenuRadioItem value="all">Todas</MenuRadioItem>
+                    <MenuRadioItem value="all">{m.common_all_feminine()}</MenuRadioItem>
                     {amenities.map((amenity) => (
                       <MenuRadioItem key={amenity.id} value={amenity.id}>
                         {amenity.name}
@@ -111,7 +114,7 @@ export function ReservationsDataTableHeader({
               setCreateOpen(true)
             }}
           >
-            Nueva reservación
+            {m.presidency_new_reservation()}
           </Button>
         )}
       </div>

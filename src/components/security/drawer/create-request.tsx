@@ -21,6 +21,7 @@ import { toastManager } from '@/components/ui/toast'
 import { useCurrency, useFormatCurrency } from '@/hooks/use-currency'
 import { ISO_DAY } from '@/lib/utils'
 import { type SecurityRequestInput, securityRequestSchema } from '@/lib/validations/security'
+import { m } from '@/paraglide/messages'
 import { createSecurityRequest } from '@/server-actions/security'
 import { SECURITY_QUERY_KEY } from '@/tanstack-queries/security'
 import { RequestFormFields } from './request-form-fields'
@@ -63,7 +64,7 @@ export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequ
       void queryClient.invalidateQueries({ queryKey: [SECURITY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Solicitud enviada a tesorería',
+        title: m.requests_create_success(),
         description: `${values.title} - ${formatCurrency(values.amount, currency)}`,
       })
       onOpenChange(false)
@@ -100,11 +101,8 @@ export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequ
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Nueva solicitud</DrawerTitle>
-          <DrawerDescription>
-            Registra el gasto de seguridad y cuánto costó. Quedará pendiente hasta que la tesorería lo pague o
-            lo rechace.
-          </DrawerDescription>
+          <DrawerTitle>{m.requests_new()}</DrawerTitle>
+          <DrawerDescription>{m.requests_security_create_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -118,7 +116,7 @@ export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequ
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -127,10 +125,10 @@ export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequ
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Enviar solicitud
+            {m.requests_submit()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

@@ -4,11 +4,12 @@ import { IconChevronLeft, IconChevronRight, IconDots } from '@tabler/icons-react
 import type * as React from 'react'
 import { type Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 
 export function Pagination({ className, ...props }: React.ComponentProps<'nav'>): React.ReactElement {
   return (
     <nav
-      aria-label="pagination"
+      aria-label={m.common_pagination()}
       className={cn('mx-auto flex w-full justify-center', className)}
       data-slot="pagination"
       {...props}
@@ -70,13 +71,13 @@ export function PaginationPrevious({
 }: React.ComponentProps<typeof PaginationLink>): React.ReactElement {
   return (
     <PaginationLink
-      aria-label="Ir a la página anterior"
+      aria-label={m.common_pagination_previous_label()}
       className={cn('max-sm:aspect-square max-sm:p-0', className)}
       size="default"
       {...props}
     >
       <IconChevronLeft className="sm:-ms-1" />
-      <span className="max-sm:hidden">Anterior</span>
+      <span className="max-sm:hidden">{m.common_pagination_previous()}</span>
     </PaginationLink>
   )
 }
@@ -87,12 +88,12 @@ export function PaginationNext({
 }: React.ComponentProps<typeof PaginationLink>): React.ReactElement {
   return (
     <PaginationLink
-      aria-label="Ir a la página siguiente"
+      aria-label={m.common_pagination_next_label()}
       className={cn('max-sm:aspect-square max-sm:p-0', className)}
       size="default"
       {...props}
     >
-      <span className="max-sm:hidden">Siguiente</span>
+      <span className="max-sm:hidden">{m.common_action_next()}</span>
       <IconChevronRight className="sm:-me-1" />
     </PaginationLink>
   )
@@ -110,7 +111,7 @@ export function PaginationEllipsis({
       {...props}
     >
       <IconDots className="size-5 sm:size-4" />
-      <span className="sr-only">Más páginas</span>
+      <span className="sr-only">{m.common_pagination_more()}</span>
     </span>
   )
 }

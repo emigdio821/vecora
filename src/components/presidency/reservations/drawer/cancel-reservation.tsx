@@ -30,8 +30,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
-import { type CurrencyCode, currencySymbol, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import { type CancelReservationInput, cancelReservationSchema } from '@/lib/validations/presidency'
+import { m } from '@/paraglide/messages'
 import { cancelReservation } from '@/server-actions/presidency'
 import { PRESIDENCY_QUERY_KEY, type ReservationQueryData } from '@/tanstack-queries/presidency'
 import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
@@ -73,11 +74,14 @@ export function CancelReservationDrawer({
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Reservación cancelada',
+        title: m.presidency_reservation_cancelled(),
         description:
           values.refund_amount > 0
-            ? `${summary}. Reembolso de ${formatCurrency(values.refund_amount, currency)} registrado en "Tesorería"`
-            : `${summary}. Sin reembolso`,
+            ? m.presidency_reservation_cancelled_refund_description({
+                summary,
+                amount: formatCurrency(values.refund_amount, currency),
+              })
+            : m.presidency_reservation_cancelled_no_refund_description({ summary }),
       })
       onOpenChange(false)
     },
@@ -96,10 +100,9 @@ export function CancelReservationDrawer({
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Cancelar reservación</DrawerTitle>
+          <DrawerTitle>{m.presidency_cancel_reservation()}</DrawerTitle>
           <DrawerDescription>
-            {summary}, pagada con {formatCurrency(paid, currency)}. El día quedará libre para otra casa. El
-            ingreso se queda en "Tesorería" y lo que se devuelva se registra como egreso.
+            {m.presidency_cancel_reservation_description({ summary, amount: formatCurrency(paid, currency) })}
           </DrawerDescription>
         </DrawerHeader>
 
@@ -125,7 +128,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
     resolver: zodResolver(
       cancelReservationSchema.refine((data) => data.refund_amount <= paid, {
         path: ['refund_amount'],
-        message: `El reembolso no puede ser mayor a ${formatCurrency(paid, currency)}`,
+        error: () => m.presidency_refund_max({ amount: formatCurrency(paid, currency) }),
       }),
     ),
     defaultValues: {
@@ -163,7 +166,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>
-                  Reembolso <span className="text-destructive">*</span>
+                  {m.presidency_refund()} <span className="text-destructive">*</span>
                 </FieldLabel>
                 <InputGroup>
                   <NumberField
@@ -173,7 +176,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                     }}
                     min={0}
                     max={paid}
-                    locale="es-MX"
+                    locale={intlLocale()}
                     format={MONEY_FORMAT}
                     disabled={mutation.isPending}
                   >
@@ -186,7 +189,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                     <InputGroupText>{currency}</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
-                <FieldDescription>Lo que se le devuelve a la casa. 0 si no hay reembolso.</FieldDescription>
+                <FieldDescription>{m.presidency_refund_description()}</FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
             )}
@@ -206,7 +209,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                       dirty={fieldState.isDirty}
                     >
                       <FieldLabel>
-                        Fecha del reembolso <span className="text-destructive">*</span>
+                        {m.presidency_refund_date()} <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                         <PopoverTrigger
@@ -254,7 +257,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                       dirty={fieldState.isDirty}
                     >
                       <FieldLabel>
-                        Método <span className="text-destructive">*</span>
+                        {m.presidency_method()} <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Select
                         items={PAYMENT_METHOD_ITEMS}
@@ -293,10 +296,10 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                       dirty={fieldState.isDirty}
                     >
                       <FieldLabel>
-                        Referencia de la transferencia <span className="text-destructive">*</span>
+                        {m.presidency_transfer_reference()} <span className="text-destructive">*</span>
                       </FieldLabel>
                       <Input {...field} autoComplete="off" disabled={mutation.isPending} />
-                      <FieldDescription>Clave de rastreo o número de referencia del banco.</FieldDescription>
+                      <FieldDescription>{m.presidency_transfer_reference_description()}</FieldDescription>
                       <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                     </Field>
                   )}
@@ -313,9 +316,9 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                     touched={fieldState.isTouched}
                     dirty={fieldState.isDirty}
                   >
-                    <FieldLabel>Notas</FieldLabel>
+                    <FieldLabel>{m.common_field_notes()}</FieldLabel>
                     <Textarea {...field} rows={3} className="max-h-40" disabled={mutation.isPending} />
-                    <FieldDescription>Opcional. Se guardan en el egreso de "Tesorería".</FieldDescription>
+                    <FieldDescription>{m.presidency_refund_notes_description()}</FieldDescription>
                     <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                   </Field>
                 )}
@@ -326,7 +329,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -335,7 +338,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Volver
+          {m.presidency_go_back()}
         </DrawerClose>
         <Button
           type="submit"
@@ -344,7 +347,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
           disabled={mutation.isPending}
           loading={mutation.isPending}
         >
-          Cancelar reservación
+          {m.presidency_cancel_reservation()}
         </Button>
       </DrawerFooter>
     </>

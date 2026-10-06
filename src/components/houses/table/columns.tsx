@@ -4,6 +4,7 @@ import { DataTableSortableHeader } from '@/components/shared/table/sortable-head
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { normalizeString } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { HouseQueryData } from '@/tanstack-queries/houses'
 import { HousesTableActions } from './actions'
 import { HouseNumberCell } from './house-number-cell'
@@ -25,7 +26,7 @@ export const housesTableColumns = columnHelper.columns([
     enableSorting: false,
     header: ({ table }) => (
       <Checkbox
-        aria-label="Seleccionar todo"
+        aria-label={m.common_select_all()}
         checked={table.getIsAllPageRowsSelected()}
         indeterminate={table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()}
         disabled={table.getFilteredRowModel().rows.length === 0}
@@ -36,7 +37,7 @@ export const housesTableColumns = columnHelper.columns([
     ),
     cell: ({ row }) => (
       <Checkbox
-        aria-label="Seleccionar elemento"
+        aria-label={m.common_select_row()}
         checked={row.getIsSelected()}
         onCheckedChange={(value) => {
           row.toggleSelected(!!value)
@@ -48,7 +49,7 @@ export const housesTableColumns = columnHelper.columns([
   columnHelper.accessor('number', {
     id: 'number',
     size: 140,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Casa" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_house()} />,
     cell: ({ row }) => <HouseNumberCell house={row.original} />,
     // "2A" < "10B": compare numerically where possible.
     sortFn: (rowA, rowB) =>
@@ -72,7 +73,7 @@ export const housesTableColumns = columnHelper.columns([
     id: 'owners',
     size: 220,
     enableSorting: false,
-    header: 'Propietarios',
+    header: () => m.residential_column_owners(),
     cell: ({ row }) => {
       const houseOwners = owners(row.original)
 
@@ -85,7 +86,7 @@ export const housesTableColumns = columnHelper.columns([
           ))}
         </div>
       ) : (
-        <Badge variant="warning">Sin propietario</Badge>
+        <Badge variant="warning">{m.residential_no_owner()}</Badge>
       )
     },
   }),
@@ -94,7 +95,7 @@ export const housesTableColumns = columnHelper.columns([
     id: 'residents',
     size: 220,
     enableSorting: false,
-    header: 'Residentes',
+    header: () => m.common_section_residents(),
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
         {row.original.property_residents.map(({ resident }) => (
@@ -109,7 +110,7 @@ export const housesTableColumns = columnHelper.columns([
   columnHelper.accessor((row) => row.property_residents.length, {
     id: 'residents_count',
     size: 100,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Personas" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.residential_column_people()} />,
     cell: ({ getValue }) => <span className="tabular-nums">{getValue()}</span>,
   }),
 

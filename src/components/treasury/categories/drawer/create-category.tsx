@@ -18,6 +18,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { type CategoryInput, categorySchema } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 import { createCategory } from '@/server-actions/treasury'
 import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { KIND_LABEL } from '../../kind'
@@ -50,7 +51,7 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY, 'categories'] })
       toastManager.add({
         type: 'success',
-        title: 'Categoría creada',
+        title: m.treasury_category_created(),
         description: `${values.name} - ${KIND_LABEL[values.kind]}`,
       })
       onOpenChange(false)
@@ -87,10 +88,8 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Nueva categoría</DrawerTitle>
-          <DrawerDescription>
-            Las categorías agrupan los movimientos, por ejemplo "Jardinería" o "Donativos".
-          </DrawerDescription>
+          <DrawerTitle>{m.treasury_new_category()}</DrawerTitle>
+          <DrawerDescription>{m.treasury_new_category_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -104,7 +103,7 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -113,10 +112,10 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Crear
+            {m.common_action_create()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

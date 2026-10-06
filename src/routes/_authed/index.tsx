@@ -4,16 +4,17 @@ import { NoticesCard } from '@/components/dashboard/notices-card'
 import { PaymentRequestsCard } from '@/components/dashboard/payment-requests-card'
 import { TreasuryCard } from '@/components/dashboard/treasury-card'
 import { pageTitle } from '@/lib/metadata'
+import { m } from '@/paraglide/messages'
 
 export const Route = createFileRoute('/_authed/')({
-  head: () => ({ meta: [{ title: pageTitle('Inicio') }] }),
+  head: () => ({ meta: [{ title: pageTitle(m.common_section_home()) }] }),
   component: HomePage,
 })
 
 function HomePage() {
   return (
     <>
-      <h1 className="font-heading text-base font-semibold">Inicio</h1>
+      <h1 className="font-heading text-base font-semibold">{m.common_section_home()}</h1>
 
       <TreasuryCard />
 

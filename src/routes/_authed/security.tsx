@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { RequestsDataTable } from '@/components/security/table/data-table'
 import { pageTitle } from '@/lib/metadata'
+import { m } from '@/paraglide/messages'
 
 export const Route = createFileRoute('/_authed/security')({
-  head: () => ({ meta: [{ title: pageTitle('Seguridad') }] }),
+  head: () => ({ meta: [{ title: pageTitle(m.common_section_security()) }] }),
   component: SecurityPage,
 })
 
@@ -19,11 +20,8 @@ function SecurityPage() {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <h1 className="font-heading text-base font-semibold">Seguridad</h1>
-        <p className="text-sm text-muted-foreground">
-          Gastos de seguridad: cámaras, guardias, accesos y equipo. Cada registro es una solicitud de pago que
-          "Tesorería" marca como pagada o rechazada.
-        </p>
+        <h1 className="font-heading text-base font-semibold">{m.common_section_security()}</h1>
+        <p className="text-sm text-muted-foreground">{m.requests_security_page_description()}</p>
       </div>
 
       <RequestsDataTable viewer={viewer} />

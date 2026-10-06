@@ -1,4 +1,5 @@
 import type { PostgrestError } from '@supabase/supabase-js'
+import { m } from '@/paraglide/messages'
 
 /**
  * Return shape for server actions. Check with `result.error !== undefined`
@@ -13,12 +14,13 @@ const NO_ROWS = 'PGRST116'
 export const UNIQUE_VIOLATION = '23505'
 export const EXCLUSION_VIOLATION = '23P01'
 
-/** transactions_folio_one_receipt: the receipt book never repeats a folio. */
+/**
+ * transactions_folio_one_receipt: the receipt book never repeats a folio.
+ * Answer it with `m.common_folio_taken()`.
+ */
 export function isFolioTaken(error: PostgrestError) {
   return error.code === EXCLUSION_VIOLATION && error.message.includes('transactions_folio_one_receipt')
 }
-
-export const FOLIO_TAKEN_MESSAGE = 'Ese folio ya se usó en otro recibo'
 
 interface PostgrestMessageOptions {
   /** Shown for anything not recognised below. */
@@ -32,15 +34,15 @@ interface PostgrestMessageOptions {
   uniqueFallback?: string
 }
 
-/** Maps a PostgREST error to a user-facing (Spanish) message. */
+/** Maps a PostgREST error to a user-facing message. */
 export function postgrestErrorMessage(
   error: PostgrestError,
-  { fallback, unique = {}, uniqueFallback = 'Ya existe un registro con esos datos' }: PostgrestMessageOptions,
+  { fallback, unique = {}, uniqueFallback = m.common_unique_fallback() }: PostgrestMessageOptions,
 ): string {
   switch (error.code) {
     case RLS_VIOLATION:
     case NO_ROWS:
-      return 'No tienes permisos para realizar esta acción'
+      return m.common_no_permission()
     case UNIQUE_VIOLATION: {
       const constraint = Object.keys(unique).find((name) => error.message.includes(name))
       return constraint ? unique[constraint] : uniqueFallback
@@ -58,12 +60,12 @@ export const FK_VIOLATION = '23503'
 /** Maps an error from `pay_*_request` / `reject_*_request` / `reopen_*_request` to a user-facing message. */
 export function requestResolutionErrorMessage(error: PostgrestError, fallback: string): string {
   if (error.code === ALREADY_RESOLVED && error.message.includes('not rejected')) {
-    return 'Esta solicitud ya fue reabierta por alguien más'
+    return m.common_request_already_reopened()
   }
-  if (error.code === ALREADY_RESOLVED) return 'Esta solicitud ya fue resuelta por alguien más'
+  if (error.code === ALREADY_RESOLVED) return m.common_request_already_resolved()
   if (error.code === NOT_FOUND && error.message.includes('no period')) {
-    return 'Ningún periodo cubre esa fecha. Crea el periodo primero.'
+    return m.common_request_no_period()
   }
-  if (error.code === NOT_FOUND) return 'La solicitud ya no existe'
+  if (error.code === NOT_FOUND) return m.common_request_not_found()
   return postgrestErrorMessage(error, { fallback })
 }

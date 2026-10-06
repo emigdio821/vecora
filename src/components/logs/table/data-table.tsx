@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
+import { m } from '@/paraglide/messages'
 import { logEntriesQueryOptions } from '@/tanstack-queries/logs'
 import { entryAction, identityName } from '../entry'
 import { logsTableColumns } from './columns'
@@ -39,7 +40,7 @@ export function LogsDataTable() {
       getRowId={(entry) => String(entry.id)}
       initialSorting={[{ id: 'occurred_at', desc: true }]}
       header={(table) => <LogsDataTableHeader table={table} />}
-      emptyMessage="Sin cambios en estas fechas."
+      emptyMessage={m.logs_empty()}
       isLoading={isLoading}
     />
   )

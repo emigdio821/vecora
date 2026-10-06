@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
+import { m } from '@/paraglide/messages'
 import { periodSummariesQueryOptions, periodsQueryOptions } from '@/tanstack-queries/treasury'
 import { type PeriodRow, periodsTableColumns } from './columns'
 import { PeriodsDataTableHeader } from './data-table-header'
@@ -36,7 +37,7 @@ export function PeriodsDataTable() {
       initialSorting={[{ id: 'starts_on', desc: true }]}
       // The query is ordered newest first, so periods[0] is the latest.
       header={(table) => <PeriodsDataTableHeader table={table} latest={periods[0]} isLoading={isLoading} />}
-      emptyMessage="Sin periodos. Crea uno para poder registrar movimientos."
+      emptyMessage={m.presidency_periods_empty()}
       isLoading={isLoading}
     />
   )

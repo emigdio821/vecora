@@ -25,6 +25,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { type CreateResidentInput, createResidentSchema } from '@/lib/validations/residents'
+import { m } from '@/paraglide/messages'
 import { createResident } from '@/server-actions/residents'
 import { HOUSES_QUERY_KEY, housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
@@ -76,10 +77,10 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
       const name = `${values.first_name} ${values.last_name}`
       toastManager.add({
         type: 'success',
-        title: 'Residente creado',
+        title: m.residential_resident_created(),
         description: house
-          ? `${name} se agregó al directorio y a la casa ${house.number}.`
-          : `${name} se agregó al directorio.`,
+          ? m.residential_resident_created_with_house({ name, number: house.number })
+          : m.residential_resident_created_description({ name }),
       })
       onOpenChange(false)
     },
@@ -117,10 +118,8 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Nuevo residente</DrawerTitle>
-          <DrawerDescription>
-            Agrega una persona al directorio y, si ya sabes dónde vive, asígnale su casa.
-          </DrawerDescription>
+          <DrawerTitle>{m.residential_new_resident()}</DrawerTitle>
+          <DrawerDescription>{m.residential_new_resident_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -141,7 +140,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                     dirty={fieldState.isDirty}
                   >
                     <FieldLabel>
-                      Nombre <span className="text-destructive">*</span>
+                      {m.residential_field_first_name()} <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Input {...field} autoComplete="given-name" />
                     <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -160,7 +159,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                     dirty={fieldState.isDirty}
                   >
                     <FieldLabel>
-                      Apellido <span className="text-destructive">*</span>
+                      {m.residential_field_last_name()} <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Input {...field} autoComplete="family-name" />
                     <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -180,7 +179,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Teléfono <span className="text-destructive">*</span>
+                    {m.common_field_phone()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <PhoneInput
                     {...field}
@@ -204,11 +203,9 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                   touched={fieldState.isTouched}
                   dirty={fieldState.isDirty}
                 >
-                  <FieldLabel>Correo</FieldLabel>
+                  <FieldLabel>{m.common_field_email()}</FieldLabel>
                   <Input {...field} inputMode="email" autoComplete="email" />
-                  <FieldDescription>
-                    Opcional. Necesario si se le crea una cuenta para iniciar sesión.
-                  </FieldDescription>
+                  <FieldDescription>{m.residential_email_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -224,16 +221,14 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                   touched={fieldState.isTouched}
                   dirty={fieldState.isDirty}
                 >
-                  <FieldLabel>Casa</FieldLabel>
+                  <FieldLabel>{m.common_field_house()}</FieldLabel>
                   <HousesPicker
                     value={field.value}
                     onValueChange={field.onChange}
                     inputRef={field.ref}
                     disabled={mutation.isPending}
                   />
-                  <FieldDescription>
-                    Opcional. Si tiene más de una casa, podrás asignarle las demás al editar al residente.
-                  </FieldDescription>
+                  <FieldDescription>{m.residential_house_field_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -251,7 +246,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                     dirty={fieldState.isDirty}
                   >
                     <FieldLabel>
-                      Relación <span className="text-destructive">*</span>
+                      {m.residential_field_relationship()} <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Select
                       items={RELATIONSHIP_ITEMS}
@@ -262,7 +257,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                       disabled={mutation.isPending}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona una relación" />
+                        <SelectValue placeholder={m.residential_relationship_placeholder()} />
                       </SelectTrigger>
                       <SelectPopup>
                         {RELATIONSHIP_ITEMS.map((item) => (
@@ -288,9 +283,9 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
                   touched={fieldState.isTouched}
                   dirty={fieldState.isDirty}
                 >
-                  <FieldLabel>Notas</FieldLabel>
+                  <FieldLabel>{m.common_field_notes()}</FieldLabel>
                   <Textarea {...field} rows={3} className="max-h-40" />
-                  <FieldDescription>Visible para todos los miembros.</FieldDescription>
+                  <FieldDescription>{m.residential_notes_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -299,7 +294,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -308,10 +303,10 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Crear
+            {m.common_action_create()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

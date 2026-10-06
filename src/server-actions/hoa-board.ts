@@ -14,14 +14,14 @@ import {
   type UpdateBoardMemberRolesInput,
   updateBoardMemberRolesSchema,
 } from '@/lib/validations/hoa-board'
+import { m } from '@/paraglide/messages'
 
-const NO_PERMISSION = 'No tienes permisos para realizar esta acción'
 // Raised by the guards on the main admin (admin@vecora.com).
 const MAIN_ADMIN_PROTECTED = 'P0004'
 
 function toMessage(error: PostgrestError, fallback: string) {
   if (error.code === MAIN_ADMIN_PROTECTED) {
-    return 'La cuenta principal de administración no se puede quitar ni perder su rol'
+    return m.board_main_admin_protected()
   }
   return postgrestErrorMessage(error, { fallback })
 }
@@ -32,10 +32,10 @@ function toMessage(error: PostgrestError, fallback: string) {
  */
 async function requireBoardManager(): Promise<{ user: CurrentUser; isAdmin: boolean } | { error: string }> {
   const user = await getCurrentUser()
-  if (!user) return { error: NO_PERMISSION }
+  if (!user) return { error: m.common_no_permission() }
 
   const isAdmin = user.roles.includes('admin')
-  if (!isAdmin && !user.roles.includes('president')) return { error: NO_PERMISSION }
+  if (!isAdmin && !user.roles.includes('president')) return { error: m.common_no_permission() }
 
   return { user, isAdmin }
 }
@@ -89,7 +89,7 @@ const addBoardMemberFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<InviteResult>> => {
     const parsed = addBoardMemberSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const manager = await requireBoardManager()
@@ -97,7 +97,7 @@ const addBoardMemberFn = createServerFn({ method: 'POST' })
 
     const { resident_id, roles } = parsed.data
     if (roles.includes('admin') && !manager.isAdmin) {
-      return { error: 'Solo un administrador puede otorgar el rol de administrador' }
+      return { error: m.board_only_admin_grant_admin() }
     }
 
     const supabase = await createClient()
@@ -110,14 +110,12 @@ const addBoardMemberFn = createServerFn({ method: 'POST' })
       .is('deleted_at', null)
       .maybeSingle()
 
-    if (!resident) return { error: 'El residente ya no existe' }
+    if (!resident) return { error: m.board_resident_not_found() }
     if (!resident.email) {
-      return {
-        error: 'El residente no tiene correo registrado. Agrégalo en la sección "Residencial" primero.',
-      }
+      return { error: m.board_resident_no_email() }
     }
     if (resident.profile?.user_roles.length) {
-      return { error: 'Este residente ya es integrante de la mesa directiva' }
+      return { error: m.board_resident_already_member() }
     }
 
     const fullName = `${resident.first_name} ${resident.last_name}`
@@ -125,10 +123,7 @@ const addBoardMemberFn = createServerFn({ method: 'POST' })
     const invite = await createInviteLink(resident.email, fullName, !isNewAccount)
     if ('error' in invite) {
       return {
-        error:
-          invite.error.code === 'email_exists'
-            ? 'Ya existe una cuenta con ese correo que no está ligada a este residente'
-            : 'No se pudo crear la cuenta, intenta nuevamente',
+        error: invite.error.code === 'email_exists' ? m.board_email_taken() : m.board_account_create_failed(),
       }
     }
 
@@ -143,7 +138,7 @@ const addBoardMemberFn = createServerFn({ method: 'POST' })
       const { error } = await supabase.from('residents').update({ profile_id: userId }).eq('id', resident_id)
       if (error) {
         await rollback()
-        return { error: toMessage(error, 'No se pudo ligar la cuenta al residente, intenta nuevamente') }
+        return { error: toMessage(error, m.board_link_account_failed()) }
       }
     }
 
@@ -155,7 +150,7 @@ const addBoardMemberFn = createServerFn({ method: 'POST' })
         await supabase.from('residents').update({ profile_id: null }).eq('id', resident_id)
       }
       await rollback()
-      return { error: toMessage(rolesError, 'No se pudieron asignar los roles, intenta nuevamente') }
+      return { error: toMessage(rolesError, m.board_assign_roles_failed()) }
     }
 
     return { data: { link: invite.link, full_name: fullName, phone: resident.phone } }
@@ -179,15 +174,15 @@ const resendInviteFn = createServerFn({ method: 'POST' })
 
     // The link signs in as that person, so it's as good as their account.
     if (profile?.user_roles.some((r) => r.role === 'admin') && !manager.isAdmin) {
-      return { error: 'Solo un administrador puede generar un enlace para otro administrador' }
+      return { error: m.board_only_admin_link_admin() }
     }
     if (!profile?.resident?.email) {
-      return { error: 'El integrante no tiene correo registrado' }
+      return { error: m.board_member_no_email() }
     }
 
     const invite = await createInviteLink(profile.resident.email, profile.full_name, true)
     if ('error' in invite) {
-      return { error: 'No se pudo generar el enlace, intenta nuevamente' }
+      return { error: m.board_link_create_failed() }
     }
 
     return { data: { link: invite.link, full_name: profile.full_name, phone: profile.resident.phone } }
@@ -200,13 +195,13 @@ const updateBoardMemberRolesFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { userId, input } }): Promise<ActionResult> => {
     const parsed = updateBoardMemberRolesSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const manager = await requireBoardManager()
     if ('error' in manager) return manager
     if (userId === manager.user.id) {
-      return { error: 'No puedes cambiar tus propios roles. Pídele a otro integrante que lo haga.' }
+      return { error: m.board_cannot_change_own_roles() }
     }
 
     const supabase = await createClient()
@@ -215,7 +210,7 @@ const updateBoardMemberRolesFn = createServerFn({ method: 'POST' })
       .select('role')
       .eq('user_id', userId)
     if (readError) {
-      return { error: toMessage(readError, 'No se pudieron leer los roles actuales') }
+      return { error: toMessage(readError, m.board_read_roles_failed()) }
     }
 
     const current = new Set<AppRole>(currentRows.map((r) => r.role))
@@ -224,18 +219,18 @@ const updateBoardMemberRolesFn = createServerFn({ method: 'POST' })
     const toRemove = [...current].filter((role) => !next.has(role))
 
     if ([...toAdd, ...toRemove].includes('admin') && !manager.isAdmin) {
-      return { error: 'Solo un administrador puede otorgar o quitar el rol de administrador' }
+      return { error: m.board_only_admin_change_admin() }
     }
 
     if (toRemove.length > 0) {
       const { error } = await supabase.from('user_roles').delete().eq('user_id', userId).in('role', toRemove)
-      if (error) return { error: toMessage(error, 'No se pudieron actualizar los roles, intenta nuevamente') }
+      if (error) return { error: toMessage(error, m.board_update_roles_failed()) }
     }
     if (toAdd.length > 0) {
       const { error } = await supabase
         .from('user_roles')
         .insert(toAdd.map((role) => ({ user_id: userId, role })))
-      if (error) return { error: toMessage(error, 'No se pudieron actualizar los roles, intenta nuevamente') }
+      if (error) return { error: toMessage(error, m.board_update_roles_failed()) }
     }
 
     return { data: undefined }
@@ -254,7 +249,7 @@ const removeBoardMemberFn = createServerFn({ method: 'POST' })
     const manager = await requireBoardManager()
     if ('error' in manager) return manager
     if (userId === manager.user.id) {
-      return { error: 'No puedes quitarte a ti mismo de la mesa directiva' }
+      return { error: m.board_cannot_remove_self() }
     }
 
     const supabase = await createClient()
@@ -263,18 +258,18 @@ const removeBoardMemberFn = createServerFn({ method: 'POST' })
       .select('role')
       .eq('user_id', userId)
     if (readError) {
-      return { error: toMessage(readError, 'No se pudo quitar al integrante, intenta nuevamente') }
+      return { error: toMessage(readError, m.board_remove_member_failed()) }
     }
     if (rows.some((r) => r.role === 'admin') && !manager.isAdmin) {
-      return { error: 'Solo un administrador puede quitar a otro administrador' }
+      return { error: m.board_only_admin_remove_admin() }
     }
 
     const { data, error } = await supabase.from('user_roles').delete().eq('user_id', userId).select('role')
     if (error) {
-      return { error: toMessage(error, 'No se pudo quitar al integrante, intenta nuevamente') }
+      return { error: toMessage(error, m.board_remove_member_failed()) }
     }
     if (data.length === 0) {
-      return { error: NO_PERMISSION }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -288,18 +283,18 @@ const setPasswordFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult> => {
     const parsed = setPasswordSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
     const { data: claims } = await supabase.auth.getClaims()
     const email = claims?.claims.email
-    if (!email) return { error: NO_PERMISSION }
+    if (!email) return { error: m.common_no_permission() }
 
     const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
     // Someone resetting who typed the password they already had: it's still theirs, let them in.
     if (error && error.code !== 'same_password') {
-      return { error: 'No se pudo guardar la contraseña, intenta nuevamente' }
+      return { error: m.board_password_save_failed() }
     }
 
     // The link session stays marked as such (see CurrentUser.mustSetPassword), so
@@ -309,10 +304,7 @@ const setPasswordFn = createServerFn({ method: 'POST' })
       password: parsed.data.password,
     })
     if (signInError) {
-      return {
-        error:
-          'Se guardó la contraseña, pero no se pudo iniciar sesión. Entra con ella desde la pantalla de inicio.',
-      }
+      return { error: m.board_password_saved_sign_in_failed() }
     }
 
     // Sign out every other device. Auth already ends the other sessions on a

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
+import { m } from '@/paraglide/messages'
 import type { TransactionQueryData } from '@/tanstack-queries/treasury'
 import { DeleteTransactionsAlertDialog } from '../dialog/delete-transactions'
 import { EditTransactionDrawer } from '../drawer/edit-transaction'
@@ -35,7 +36,7 @@ export function TransactionsTableActions({ transaction }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={`Acciones de ${transaction.description}`}
+              aria-label={m.treasury_actions_for({ name: transaction.description })}
             >
               <IconDots className="size-4" />
             </Button>
@@ -52,7 +53,7 @@ export function TransactionsTableActions({ transaction }: ActionsProps) {
                 setEditOpen(true)
               }}
             >
-              Editar
+              {m.common_action_edit()}
             </MenuItem>
 
             <MenuItem
@@ -61,7 +62,7 @@ export function TransactionsTableActions({ transaction }: ActionsProps) {
                 setDeleteOpen(true)
               }}
             >
-              Eliminar
+              {m.common_action_delete()}
             </MenuItem>
           </MenuGroup>
         </MenuPopup>

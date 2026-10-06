@@ -1,5 +1,6 @@
 import { IconHistory } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
+import { m } from '@/paraglide/messages'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -18,7 +19,7 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
 
   return (
     <SidebarGroup {...props}>
-      <SidebarGroupLabel>Administración</SidebarGroupLabel>
+      <SidebarGroupLabel>{m.common_nav_administration()}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -30,7 +31,7 @@ export function NavAdmin({ ...props }: React.ComponentProps<typeof SidebarGroup>
               render={
                 <Link to="/logs">
                   <IconHistory className="size-4" />
-                  <span>Historial</span>
+                  <span>{m.common_section_logs()}</span>
                   <LinkPendingIndicator to="/logs" />
                 </Link>
               }

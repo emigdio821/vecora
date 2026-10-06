@@ -5,9 +5,12 @@ import RPNInput, {
   getCountryCallingCode,
   type Props as RPNInputProps,
 } from 'react-phone-number-input'
-import defaultLabels from 'react-phone-number-input/locale/es'
+import enLabels from 'react-phone-number-input/locale/en'
+import esLabels from 'react-phone-number-input/locale/es'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
+import { getLocale } from '@/paraglide/runtime'
 import { Button } from '../ui/button'
 import {
   Combobox,
@@ -48,7 +51,7 @@ export function PhoneInput({ className, ...props }: PhoneInputProps) {
     <RPNInput
       defaultCountry="MX"
       international={false}
-      labels={defaultLabels}
+      labels={getLocale() === 'en' ? enLabels : esLabels}
       inputComponent={InputComponent}
       countrySelectComponent={CountrySelect}
       className={cn('flex w-full gap-2 rounded-md', className)}
@@ -81,16 +84,16 @@ function CountrySelect({ disabled, value: selectedCountry, onChange, options }: 
         <ComboboxValue>{getCountryCode}</ComboboxValue>
         <IconSelector className="-me-1!" />
       </ComboboxTrigger>
-      <ComboboxPopup aria-label="Código" className="max-w-64 sm:max-w-72 sm:min-w-72">
+      <ComboboxPopup aria-label={m.common_phone_country_code()} className="max-w-64 sm:max-w-72 sm:min-w-72">
         <div className="border-b p-2">
           <ComboboxInput
             showTrigger={false}
-            placeholder="Buscar"
+            placeholder={m.common_search()}
             className="rounded-md before:rounded-[calc(var(--radius-md)-1px)]"
             startAddon={<IconSearch />}
           />
         </div>
-        <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
+        <ComboboxEmpty>{m.common_no_results()}</ComboboxEmpty>
         <ComboboxList>
           {(country: CountrySelectOption) => (
             <ComboboxItem key={country.value} value={country}>

@@ -20,6 +20,7 @@ import { Form } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { type RejectRequestInput, rejectRequestSchema } from '@/lib/validations/requests'
+import { m } from '@/paraglide/messages'
 import { rejectMaintenanceRequest } from '@/server-actions/maintenance'
 import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 
@@ -44,7 +45,7 @@ export function RejectRequestDialog({ request, open, onOpenChange, ...props }: R
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [MAINTENANCE_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Solicitud rechazada', description: request.title })
+      toastManager.add({ type: 'success', title: m.requests_reject_success(), description: request.title })
       onOpenChange(false)
     },
   })
@@ -62,10 +63,8 @@ export function RejectRequestDialog({ request, open, onOpenChange, ...props }: R
     <Dialog open={open} onOpenChange={handleOpenChange} {...props}>
       <DialogPopup>
         <DialogHeader>
-          <DialogTitle>Rechazar solicitud</DialogTitle>
-          <DialogDescription>
-            {request.title}. No se registrará ningún pago y quien la envió verá el motivo.
-          </DialogDescription>
+          <DialogTitle>{m.requests_reject_title()}</DialogTitle>
+          <DialogDescription>{m.requests_reject_description({ title: request.title })}</DialogDescription>
         </DialogHeader>
 
         {/* Mounted only while open so each rejection starts with an empty reason. */}
@@ -104,12 +103,10 @@ function RejectRequestForm({ mutation }: { mutation: RejectMutation }) {
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>
-                  Motivo <span className="text-destructive">*</span>
+                  {m.requests_reason()} <span className="text-destructive">*</span>
                 </FieldLabel>
                 <Textarea {...field} rows={3} className="max-h-40" disabled={mutation.isPending} />
-                <FieldDescription>
-                  Explica por qué no se pagará, por ejemplo: falta comprobante.
-                </FieldDescription>
+                <FieldDescription>{m.requests_reason_description()}</FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
             )}
@@ -118,7 +115,7 @@ function RejectRequestForm({ mutation }: { mutation: RejectMutation }) {
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -127,7 +124,7 @@ function RejectRequestForm({ mutation }: { mutation: RejectMutation }) {
 
       <DialogFooter>
         <DialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DialogClose>
         <Button
           type="submit"
@@ -136,7 +133,7 @@ function RejectRequestForm({ mutation }: { mutation: RejectMutation }) {
           disabled={mutation.isPending}
           loading={mutation.isPending}
         >
-          Rechazar
+          {m.requests_action_reject()}
         </Button>
       </DialogFooter>
     </>

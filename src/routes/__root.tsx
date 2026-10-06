@@ -25,6 +25,9 @@ import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { siteConfig } from '@/lib/config/site'
 import { pageTitle } from '@/lib/metadata'
+import { intlLocale } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
+import { getLocale } from '@/paraglide/runtime'
 import { currentUserQueryOptions } from '@/tanstack-queries/session'
 import globalsCss from '@/styles/globals.css?url'
 
@@ -48,7 +51,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: 'og:description', content: siteConfig.description },
       { property: 'og:url', content: siteConfig.url },
       { property: 'og:site_name', content: siteConfig.name },
-      { property: 'og:locale', content: 'es_MX' },
+      { property: 'og:locale', content: intlLocale().replace('-', '_') },
       { property: 'og:type', content: 'website' },
       { property: 'og:image', content: siteConfig.ogUrl },
       { name: 'twitter:card', content: 'summary_large_image' },
@@ -74,7 +77,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     // The theme script sets the class before React hydrates.
-    <html suppressHydrationWarning lang="en" className="font-sans">
+    <html suppressHydrationWarning lang={getLocale()} className="font-sans">
       <head>
         <HeadContent />
       </head>
@@ -102,12 +105,12 @@ function NotFound() {
           <EmptyMedia variant="icon">
             <IconWind />
           </EmptyMedia>
-          <EmptyTitle>Página no encontrada</EmptyTitle>
-          <EmptyDescription>La dirección no existe o ya no está disponible.</EmptyDescription>
+          <EmptyTitle>{m.common_not_found_title()}</EmptyTitle>
+          <EmptyDescription>{m.common_not_found_description()}</EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
           <Button variant="outline" render={<Link to="/" />}>
-            Ir al inicio
+            {m.common_go_home()}
           </Button>
         </EmptyContent>
       </Empty>
@@ -122,11 +125,13 @@ function NotFound() {
 function RouteError({ error }: ErrorComponentProps) {
   const router = useRouter()
   const [copied, setCopied] = useState(false)
-  const message = (error instanceof Error ? error.message : String(error)) || 'Error desconocido'
+  const message = (error instanceof Error ? error.message : String(error)) || m.common_error_unknown()
 
   async function copy() {
     // The page tells the admin where it happened.
-    await navigator.clipboard.writeText(`${message}\nPágina: ${window.location.pathname}`)
+    await navigator.clipboard.writeText(
+      `${message}\n${m.common_error_page({ path: window.location.pathname })}`,
+    )
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -138,15 +143,15 @@ function RouteError({ error }: ErrorComponentProps) {
           <EmptyMedia variant="icon">
             <IconAlertTriangle />
           </EmptyMedia>
-          <EmptyTitle>Algo salió mal</EmptyTitle>
-          <EmptyDescription>Si sigue pasando, envía este error al administrador.</EmptyDescription>
+          <EmptyTitle>{m.common_error_title()}</EmptyTitle>
+          <EmptyDescription>{m.common_error_description()}</EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
           <InputGroup>
             <InputGroupTextarea
               readOnly
               value={message}
-              aria-label="Error"
+              aria-label={m.common_error()}
               // The class lands on the wrapper; `*:` caps the textarea itself, which otherwise grows to fit.
               className="text-xs *:max-h-40"
               onFocus={(e) => {
@@ -157,7 +162,7 @@ function RouteError({ error }: ErrorComponentProps) {
               align="block-start"
               className="justify-between rounded-t-lg border-b bg-muted/72 p-2!"
             >
-              <InputGroupText className="ps-1 text-xs">Error</InputGroupText>
+              <InputGroupText className="ps-1 text-xs">{m.common_error()}</InputGroupText>
               <Tooltip>
                 <TooltipTrigger
                   closeOnClick={false}
@@ -165,7 +170,7 @@ function RouteError({ error }: ErrorComponentProps) {
                     <Button
                       size="icon-sm"
                       variant="ghost"
-                      aria-label="Copiar error"
+                      aria-label={m.common_error_copy()}
                       onClick={() => {
                         void copy()
                       }}
@@ -174,7 +179,7 @@ function RouteError({ error }: ErrorComponentProps) {
                     </Button>
                   }
                 />
-                <TooltipContent>{copied ? 'Error copiado' : 'Copiar error'}</TooltipContent>
+                <TooltipContent>{copied ? m.common_error_copied() : m.common_error_copy()}</TooltipContent>
               </Tooltip>
             </InputGroupAddon>
           </InputGroup>
@@ -186,10 +191,10 @@ function RouteError({ error }: ErrorComponentProps) {
                 void router.invalidate()
               }}
             >
-              Reintentar
+              {m.common_action_retry()}
             </Button>
             <Button variant="outline" render={<Link to="/" />}>
-              Ir al inicio
+              {m.common_go_home()}
             </Button>
           </div>
         </EmptyContent>

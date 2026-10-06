@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { useCurrency } from '@/hooks/use-currency'
-import { currencySymbol, MONEY_FORMAT } from '@/lib/utils'
+import { currencySymbol, intlLocale, MONEY_FORMAT } from '@/lib/utils'
 import type { AmenityInput } from '@/lib/validations/presidency'
+import { m } from '@/paraglide/messages'
 
 interface AmenityFormFieldsProps {
   form: UseFormReturn<AmenityInput>
@@ -30,10 +31,10 @@ export function AmenityFormFields({ form, disabled }: AmenityFormFieldsProps) {
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Nombre <span className="text-destructive">*</span>
+              {m.common_field_name()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Input {...field} autoComplete="off" disabled={disabled} />
-            <FieldDescription>Como aparecerá en las reservaciones y en "Tesorería".</FieldDescription>
+            <FieldDescription>{m.presidency_amenity_name_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
@@ -49,7 +50,7 @@ export function AmenityFormFields({ form, disabled }: AmenityFormFieldsProps) {
             touched={fieldState.isTouched}
             dirty={fieldState.isDirty}
           >
-            <FieldLabel>Tarifa sugerida</FieldLabel>
+            <FieldLabel>{m.presidency_amenity_default_fee()}</FieldLabel>
             <InputGroup>
               <NumberField
                 value={field.value ?? null}
@@ -57,7 +58,7 @@ export function AmenityFormFields({ form, disabled }: AmenityFormFieldsProps) {
                   field.onChange(value ?? 0)
                 }}
                 min={0}
-                locale="es-MX"
+                locale={intlLocale()}
                 format={MONEY_FORMAT}
                 disabled={disabled}
               >
@@ -70,9 +71,7 @@ export function AmenityFormFields({ form, disabled }: AmenityFormFieldsProps) {
                 <InputGroupText>{currency}</InputGroupText>
               </InputGroupAddon>
             </InputGroup>
-            <FieldDescription>
-              Se propone al reservar y se puede cambiar en cada reservación. 0 si el área es gratuita.
-            </FieldDescription>
+            <FieldDescription>{m.presidency_amenity_default_fee_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}

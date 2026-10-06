@@ -16,8 +16,17 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
-import { type CurrencyCode, currencySymbol, formatDay, formatMonth, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import {
+  type CurrencyCode,
+  currencySymbol,
+  formatDay,
+  formatMonth,
+  intlLocale,
+  ISO_DAY,
+  MONEY_FORMAT,
+} from '@/lib/utils'
 import type { ReservationInput } from '@/lib/validations/presidency'
+import { m } from '@/paraglide/messages'
 import { amenitiesQueryOptions, reservationsQueryOptions } from '@/tanstack-queries/presidency'
 import { houseFeeStatusQueryOptions } from '@/tanstack-queries/treasury'
 
@@ -96,7 +105,7 @@ export function ReservationFormFields({
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Área <span className="text-destructive">*</span>
+              {m.presidency_amenity()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Select
               items={amenityItems}
@@ -110,7 +119,7 @@ export function ReservationFormFields({
               disabled={disabled || lockPaidFields}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecciona un área" />
+                <SelectValue placeholder={m.presidency_select_amenity()} />
               </SelectTrigger>
               <SelectPopup>
                 {amenityItems.map((item) => (
@@ -136,7 +145,7 @@ export function ReservationFormFields({
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Casa <span className="text-destructive">*</span>
+              {m.common_field_house()} <span className="text-destructive">*</span>
             </FieldLabel>
             <HousesPicker
               value={field.value || null}
@@ -146,7 +155,7 @@ export function ReservationFormFields({
               inputRef={field.ref}
               disabled={disabled || lockPaidFields}
             />
-            <FieldDescription>La casa que aparta el área.</FieldDescription>
+            <FieldDescription>{m.presidency_reservation_house_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
@@ -155,10 +164,12 @@ export function ReservationFormFields({
       {unpaidMonths.length > 0 && (
         <Alert variant="warning">
           <IconAlertTriangle />
-          <AlertTitle>Casa con cuotas pendientes</AlertTitle>
+          <AlertTitle>{m.presidency_unpaid_fees_title()}</AlertTitle>
           <AlertDescription>
-            Debe {unpaidMonths.length === 1 ? '1 mes' : `${unpaidMonths.length} meses`}:{' '}
-            {unpaidMonths.map((month) => formatMonth(month)).join(', ')}. Puedes reservar de todos modos.
+            {m.presidency_unpaid_fees_description({
+              count: unpaidMonths.length,
+              months: unpaidMonths.map((month) => formatMonth(month)).join(', '),
+            })}
           </AlertDescription>
         </Alert>
       )}
@@ -174,7 +185,7 @@ export function ReservationFormFields({
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Fecha <span className="text-destructive">*</span>
+              {m.common_field_date()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Popover open={isDateOpen} onOpenChange={setDateOpen}>
               <PopoverTrigger
@@ -207,9 +218,7 @@ export function ReservationFormFields({
                 />
               </PopoverPopup>
             </Popover>
-            <FieldDescription>
-              Los días en que el área ya está apartada aparecen deshabilitados.
-            </FieldDescription>
+            <FieldDescription>{m.presidency_reservation_date_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
@@ -229,11 +238,8 @@ export function ReservationFormFields({
           disabled={disabled || lockPaidFields}
         />
         <div className="flex flex-col gap-1">
-          <Label htmlFor={feeSwitchId}>Agregar tarifa</Label>
-          <p className="text-xs text-muted-foreground">
-            Actívalo si la reservación tiene un cobro, como la tarifa del área o el uso de electricidad para
-            brincolines o inflables.
-          </p>
+          <Label htmlFor={feeSwitchId}>{m.presidency_add_fee()}</Label>
+          <p className="text-xs text-muted-foreground">{m.presidency_add_fee_description()}</p>
         </div>
       </div>
 
@@ -249,7 +255,7 @@ export function ReservationFormFields({
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Tarifa <span className="text-destructive">*</span>
+                {m.presidency_fee()} <span className="text-destructive">*</span>
               </FieldLabel>
               <InputGroup>
                 <NumberField
@@ -258,7 +264,7 @@ export function ReservationFormFields({
                     field.onChange(value)
                   }}
                   min={0}
-                  locale="es-MX"
+                  locale={intlLocale()}
                   format={MONEY_FORMAT}
                   disabled={disabled || lockPaidFields}
                 >
@@ -271,9 +277,7 @@ export function ReservationFormFields({
                   <InputGroupText>{currency}</InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
-              <FieldDescription>
-                Se paga completo al reservar. Puedes anotar el motivo del cobro en "Notas".
-              </FieldDescription>
+              <FieldDescription>{m.presidency_fee_description()}</FieldDescription>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
             </Field>
           )}
@@ -290,9 +294,9 @@ export function ReservationFormFields({
             touched={fieldState.isTouched}
             dirty={fieldState.isDirty}
           >
-            <FieldLabel>Notas</FieldLabel>
+            <FieldLabel>{m.common_field_notes()}</FieldLabel>
             <Textarea {...field} rows={3} className="max-h-40" disabled={disabled} />
-            <FieldDescription>Opcional. Motivo, horario, o cualquier acuerdo con la casa.</FieldDescription>
+            <FieldDescription>{m.presidency_reservation_notes_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}

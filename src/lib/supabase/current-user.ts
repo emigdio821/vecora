@@ -1,6 +1,7 @@
 import '@tanstack/react-start/server-only'
 import type { Database } from '@/lib/supabase/database.types'
 import { createClient } from '@/lib/supabase/server'
+import { m } from '@/paraglide/messages'
 
 export type AppRole = Database['public']['Enums']['app_role']
 
@@ -52,7 +53,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   return {
     id,
     email: email ?? '',
-    fullName: profile?.full_name || email?.split('@')[0] || 'Usuario',
+    fullName: profile?.full_name || email?.split('@')[0] || m.common_user_fallback_name(),
     roles: profile?.user_roles.map((r) => r.role) ?? [],
     mustSetPassword: cameFromAccessLink(amr),
     welcomed: !!profile?.welcomed_at,

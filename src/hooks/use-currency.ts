@@ -10,5 +10,5 @@ export function useCurrency(): CurrencyCode {
 /** formatCurrency against the current currency: an amount in another one shows its code ("$500.00 MXN"). */
 export function useFormatCurrency(): (value: number | string, currency: CurrencyCode) => string {
   const home = useCurrency()
-  return (value, currency) => formatCurrency(value, currency, home)
+  return (value, currency) => formatCurrency(value, currency, { home })
 }

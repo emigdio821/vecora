@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { type CurrencyCode, formatDay } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import { maintenanceRequestsQueryOptions } from '@/tanstack-queries/maintenance'
 import { reservationsQueryOptions } from '@/tanstack-queries/presidency'
 import { securityRequestsQueryOptions } from '@/tanstack-queries/security'
@@ -31,8 +32,8 @@ interface PaymentRequest {
 }
 
 function pendingDescription(pending: number): string {
-  if (pending === 0) return 'Sin solicitudes pendientes'
-  return pending === 1 ? '1 solicitud pendiente' : `${pending} solicitudes pendientes`
+  if (pending === 0) return m.dashboard_requests_none_pending()
+  return m.dashboard_requests_pending_count({ count: pending })
 }
 
 /**
@@ -56,7 +57,7 @@ export function PaymentRequestsCard() {
       .map((r) => ({
         key: `maintenance-${r.id}`,
         link: linkOptions({ to: '/maintenance' }),
-        section: 'Mantenimiento',
+        section: m.common_section_maintenance(),
         title: r.title,
         amount: r.amount,
         currency: r.currency,
@@ -67,7 +68,7 @@ export function PaymentRequestsCard() {
       .map((r) => ({
         key: `security-${r.id}`,
         link: linkOptions({ to: '/security' }),
-        section: `Seguridad - ${SECURITY_KIND_LABEL[r.kind]}`,
+        section: `${m.common_section_security()} - ${SECURITY_KIND_LABEL[r.kind]}`,
         title: r.title,
         amount: r.amount,
         currency: r.currency,
@@ -78,8 +79,8 @@ export function PaymentRequestsCard() {
       .map((r) => ({
         key: `reservation-${r.id}`,
         link: linkOptions({ to: '/presidency', search: { tab: 'reservations' } }),
-        section: 'Reservaciones',
-        title: `Tarifa ${r.amenity.name} - Casa ${r.property.number}`,
+        section: m.common_section_reservations(),
+        title: m.dashboard_requests_reservation_fee({ amenity: r.amenity.name, number: r.property.number }),
         amount: Number(r.amount),
         currency: r.currency,
         requested_on: r.reserved_on,
@@ -89,7 +90,7 @@ export function PaymentRequestsCard() {
   return (
     <CardFrame className="w-full">
       <CardFrameHeader>
-        <CardFrameTitle>Solicitudes de pago</CardFrameTitle>
+        <CardFrameTitle>{m.dashboard_requests_title()}</CardFrameTitle>
         <CardFrameDescription>{pendingDescription(pending.length)}</CardFrameDescription>
         <CardFrameAction className="text-muted-foreground">
           <IconReceipt />
@@ -123,11 +124,8 @@ export function PaymentRequestsCard() {
                 <EmptyMedia variant="icon">
                   <IconReceipt />
                 </EmptyMedia>
-                <EmptyTitle>Todo al día</EmptyTitle>
-                <EmptyDescription>
-                  Aquí aparecerán las solicitudes pendientes de "Mantenimiento", "Seguridad" y
-                  "Reservaciones".
-                </EmptyDescription>
+                <EmptyTitle>{m.dashboard_requests_empty_title()}</EmptyTitle>
+                <EmptyDescription>{m.dashboard_requests_empty_description()}</EmptyDescription>
               </EmptyHeader>
             </Empty>
           )}

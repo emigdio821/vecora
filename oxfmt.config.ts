@@ -1,7 +1,7 @@
 import { defineConfig } from 'oxfmt'
 
 export default defineConfig({
-  ignorePatterns: ['.claude', '.agents', '**/src/routeTree.gen.ts'],
+  ignorePatterns: ['.claude', '.agents', '**/src/routeTree.gen.ts', '**/src/paraglide/**'],
   tabWidth: 2,
   semi: false,
   useTabs: false,

@@ -23,6 +23,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { formatDay } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 
 interface RequestDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
@@ -40,61 +41,73 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
       <DrawerPopup variant="inset">
         <DrawerHeader>
           <DrawerTitle>{request.title}</DrawerTitle>
-          <DrawerDescription>Información de la solicitud</DrawerDescription>
+          <DrawerDescription>{m.requests_details_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<IconTool />} title="Solicitud">
+          <CollapsibleSection icon={<IconTool />} title={m.requests_section_request()}>
             <div className="grid grid-cols-2 gap-3">
-              <Detail label="Monto">
+              <Detail label={m.common_field_amount()}>
                 <span className="tabular-nums">
                   <Money value={request.amount} currency={request.currency} />
                 </span>
               </Detail>
-              <Detail label="Fecha del trabajo">{formatDay(request.requested_on)}</Detail>
-              <Detail label="Solicitó">{request.requester.full_name}</Detail>
-              <Detail label="Estado">
+              <Detail label={m.requests_maintenance_work_date()}>{formatDay(request.requested_on)}</Detail>
+              <Detail label={m.requests_requester()}>{request.requester.full_name}</Detail>
+              <Detail label={m.common_field_status()}>
                 <Badge variant={STATUS_BADGE_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
               </Detail>
             </div>
           </CollapsibleSection>
 
           {request.details && (
-            <CollapsibleSection icon={<IconNotes />} title="Detalles">
+            <CollapsibleSection icon={<IconNotes />} title={m.common_field_details()}>
               <p className="text-sm whitespace-pre-wrap">{request.details}</p>
             </CollapsibleSection>
           )}
 
           {status === 'paid' && transaction && (
-            <CollapsibleSection icon={<IconCash />} title="Pago">
+            <CollapsibleSection icon={<IconCash />} title={m.requests_section_payment()}>
               <div className="grid grid-cols-2 gap-3">
-                <Detail label="Fecha del pago">{formatDay(transaction.occurred_on)}</Detail>
-                <Detail label="Método de pago">{PAYMENT_METHOD_LABEL[transaction.payment_method]}</Detail>
-                {transaction.reference && <Detail label="Referencia">{transaction.reference}</Detail>}
-                {resolver && <Detail label="Registró">{resolver.full_name}</Detail>}
+                <Detail label={m.requests_payment_date()}>{formatDay(transaction.occurred_on)}</Detail>
+                <Detail label={m.common_field_payment_method()}>
+                  {PAYMENT_METHOD_LABEL[transaction.payment_method]}
+                </Detail>
+                {transaction.reference && (
+                  <Detail label={m.common_field_reference()}>{transaction.reference}</Detail>
+                )}
+                {resolver && <Detail label={m.requests_recorded_by()}>{resolver.full_name}</Detail>}
               </div>
             </CollapsibleSection>
           )}
 
           {status === 'rejected' && (
-            <CollapsibleSection icon={<IconCircleX />} title="Rechazo">
-              <Detail label="Motivo">
+            <CollapsibleSection icon={<IconCircleX />} title={m.requests_section_rejection()}>
+              <Detail label={m.requests_reason()}>
                 <p className="font-normal whitespace-pre-wrap">{request.rejection_reason}</p>
               </Detail>
-              {resolver && <Detail label="Rechazó">{resolver.full_name}</Detail>}
+              {resolver && <Detail label={m.requests_rejected_by()}>{resolver.full_name}</Detail>}
             </CollapsibleSection>
           )}
 
           <dl className="grid grid-cols-2 gap-3 px-1 pt-1">
-            <Timestamp icon={<IconCalendarPlus />} label="Enviada" value={request.created_at} />
+            <Timestamp
+              icon={<IconCalendarPlus />}
+              label={m.requests_submitted()}
+              value={request.created_at}
+            />
             {request.resolved_at && (
-              <Timestamp icon={<IconCircleCheck />} label="Resuelta" value={request.resolved_at} />
+              <Timestamp
+                icon={<IconCircleCheck />}
+                label={m.requests_resolved()}
+                value={request.resolved_at}
+              />
             )}
           </dl>
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />}>Cerrar</DrawerClose>
+          <DrawerClose render={<Button variant="ghost" />}>{m.common_action_close()}</DrawerClose>
         </DrawerFooter>
       </DrawerPopup>
     </Drawer>

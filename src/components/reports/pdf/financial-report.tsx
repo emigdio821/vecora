@@ -4,12 +4,15 @@ import type { CurrencyTotals, FinancialReport } from '@/lib/supabase/financial-r
 import {
   type CurrencyCode,
   capitalize,
-  esLocale,
+  dateLocale,
   formatCurrency,
   formatDay,
   formatMonth,
   ISO_DAY,
+  intlLocale,
 } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
+import type { Locale } from '@/paraglide/runtime'
 import geistRegularUrl from '../../../../assets/fonts/Geist-Regular.ttf?inline'
 import geistSemiBoldUrl from '../../../../assets/fonts/Geist-SemiBold.ttf?inline'
 
@@ -179,26 +182,24 @@ export function isWholeMonth(from: string, to: string): boolean {
 }
 
 /** "Agosto 2026" for a whole month, "1 ago 2026 – 15 ago 2026" otherwise. */
-export function rangeLabel(from: string, to: string): string {
-  if (isWholeMonth(from, to)) return formatMonth(from)
-  if (from === to) return formatDay(from)
-  return `${formatDay(from)} – ${formatDay(to)}`
+export function rangeLabel(from: string, to: string, language?: Locale): string {
+  if (isWholeMonth(from, to)) return formatMonth(from, language)
+  if (from === to) return formatDay(from, language)
+  return `${formatDay(from, language)} – ${formatDay(to, language)}`
 }
-
-// The server may run in UTC; the report is read in the residential's time.
-const generatedAtFormatter = new Intl.DateTimeFormat('es-MX', {
-  dateStyle: 'long',
-  timeStyle: 'short',
-  timeZone: 'America/Mexico_City',
-})
 
 /**
  * "2 de Octubre de 2026 a las 3:15 p.m.", months capitalized like the rest of
  * the app. Intl puts a narrow no-break space (U+202F) before "p.m.", which the
  * PDF font has no glyph for, so every space becomes a plain one.
  */
-function formatGeneratedAt(date: Date): string {
-  return generatedAtFormatter
+function formatGeneratedAt(date: Date, language: Locale): string {
+  // The server may run in UTC; the report is read in the residential's time.
+  return new Intl.DateTimeFormat(intlLocale(language), {
+    dateStyle: 'long',
+    timeStyle: 'short',
+    timeZone: 'America/Mexico_City',
+  })
     .formatToParts(date)
     .map((part) => (part.type === 'month' ? capitalize(part.value) : part.value))
     .join('')
@@ -212,11 +213,17 @@ function byHouse(a: string, b: string): number {
 type Category = CurrencyTotals['categories'][number]
 type PendingHouse = FinancialReport['fee_status']['pending'][number]
 
-function categoryColumns(money: (value: number) => string): Column<Category>[] {
+function categoryColumns(money: (value: number) => string, language: Locale): Column<Category>[] {
+  const locale = { locale: language }
   return [
-    { label: 'Categoría', value: (c) => c.name },
-    { label: 'Movimientos', width: 64, align: 'right', value: (c) => String(c.movements) },
-    { label: 'Total', width: 72, align: 'right', value: (c) => money(c.total) },
+    { label: m.common_field_category({}, locale), value: (c) => c.name },
+    {
+      label: m.common_section_transactions({}, locale),
+      width: 64,
+      align: 'right',
+      value: (c) => String(c.movements),
+    },
+    { label: m.common_field_total({}, locale), width: 72, align: 'right', value: (c) => money(c.total) },
   ]
 }
 
@@ -224,7 +231,7 @@ function categoryColumns(money: (value: number) => string): Column<Category>[] {
  * Sorted fee months as runs: "Enero – Julio 2026, Septiembre 2026" instead of
  * nine month names in a row.
  */
-function monthRuns(months: string[]): string {
+function monthRuns(months: string[], language: Locale): string {
   const runs: { first: string; last: string }[] = []
   for (const month of months) {
     const run = runs.at(-1)
@@ -237,27 +244,37 @@ function monthRuns(months: string[]): string {
 
   return runs
     .map(({ first, last }) => {
-      if (first === last) return formatMonth(first)
+      if (first === last) return formatMonth(first, language)
       const firstLabel =
         first.slice(0, 4) === last.slice(0, 4)
-          ? format(parseISO(first), 'MMMM', { locale: esLocale })
-          : formatMonth(first)
-      return `${firstLabel} – ${formatMonth(last)}`
+          ? format(parseISO(first), 'MMMM', { locale: dateLocale(language) })
+          : formatMonth(first, language)
+      return `${firstLabel} – ${formatMonth(last, language)}`
     })
     .join(', ')
 }
 
-const PENDING_COLUMNS: Column<PendingHouse>[] = [
-  { label: 'Casa', width: 56, value: (p) => p.house },
-  { label: 'Meses', width: 44, align: 'right', value: (p) => String(p.months.length) },
-  { label: 'Sin pagar', value: (p) => monthRuns(p.months) },
-]
+function pendingColumns(language: Locale): Column<PendingHouse>[] {
+  const locale = { locale: language }
+  return [
+    { label: m.common_field_house({}, locale), width: 56, value: (p) => p.house },
+    {
+      label: m.reports_pdf_column_months({}, locale),
+      width: 44,
+      align: 'right',
+      value: (p) => String(p.months.length),
+    },
+    { label: m.reports_pdf_column_unpaid({}, locale), value: (p) => monthRuns(p.months, language) },
+  ]
+}
 
 interface FinancialReportDocumentProps {
   report: FinancialReport
   residentialName: string
   /** The HOA's current one; amounts in any other carry their code. */
   currency: CurrencyCode
+  /** The HOA's default language, whoever downloads the report. */
+  language: Locale
   /** PNG bytes; without it the header shows only the name. */
   logo: Buffer | null
   generatedBy: string
@@ -268,22 +285,24 @@ export function FinancialReportDocument({
   report,
   residentialName,
   currency,
+  language,
   logo,
   generatedBy,
   generatedAt,
 }: FinancialReportDocumentProps) {
-  const range = rangeLabel(report.from, report.to)
+  const locale = { locale: language }
+  const range = rangeLabel(report.from, report.to, language)
   const isMultiCurrency = report.currencies.length > 1
   const { fee_status: fees } = report
   const pending = [...fees.pending].sort((a, b) => byHouse(a.house, b.house))
 
   return (
     <Document
-      title={`Reporte financiero - ${range}`}
+      title={m.reports_pdf_document_title({ range }, locale)}
       author={residentialName}
       creator="Vecora"
       producer="Vecora"
-      language="es-MX"
+      language={intlLocale(language)}
     >
       <Page size="A4" style={styles.page}>
         <View style={styles.header} fixed>
@@ -291,7 +310,7 @@ export function FinancialReportDocument({
             {logo && <Image style={styles.logo} src={{ data: logo, format: 'png' }} />}
             <View>
               <Text style={styles.residential}>{residentialName}</Text>
-              <Text style={styles.headerSubtitle}>Reporte financiero</Text>
+              <Text style={styles.headerSubtitle}>{m.common_section_financial_report({}, locale)}</Text>
             </View>
           </View>
           <Text style={styles.headerRange}>{range}</Text>
@@ -302,6 +321,7 @@ export function FinancialReportDocument({
             key={totals.currency}
             totals={totals}
             from={report.from}
+            language={language}
             // The headings name the currency (so the amounts don't have to) unless
             // it's the only one and the HOA's current one.
             suffix={isMultiCurrency || totals.currency !== currency ? ` (${totals.currency})` : ''}
@@ -309,35 +329,47 @@ export function FinancialReportDocument({
         ))}
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cuotas de mantenimiento</Text>
+          <Text style={styles.sectionTitle}>{m.reports_pdf_fees_title({}, locale)}</Text>
           {fees.months ? (
             <>
               <Text style={styles.sectionHint}>
-                {fees.up_to_date} de {fees.houses} casas al corriente -{' '}
-                {fees.months === 1 ? '1 mes considerado' : `${fees.months} meses considerados`}
+                {m.reports_pdf_fees_up_to_date(
+                  {
+                    upToDate: fees.up_to_date,
+                    houses: fees.houses,
+                    months: m.reports_pdf_months_considered({ count: fees.months }, locale),
+                  },
+                  locale,
+                )}
               </Text>
               <Table
-                columns={PENDING_COLUMNS}
+                columns={pendingColumns(language)}
                 rows={pending}
-                emptyText="Todas las casas están al corriente."
+                emptyText={m.reports_pdf_all_up_to_date({}, locale)}
                 repeatHeader
               />
             </>
           ) : (
-            <Text style={styles.empty}>No hay cuotas por cobrar en estas fechas.</Text>
+            <Text style={styles.empty}>{m.reports_pdf_no_fees({}, locale)}</Text>
           )}
         </View>
 
         <Text style={styles.note}>
-          Ingresos y egresos se cuentan por la fecha en que ocurrieron. Una cuota cuenta como pagada si su
-          pago se registró a más tardar el {formatDay(report.to)}.
+          {m.reports_pdf_dates_note({ date: formatDay(report.to, language) }, locale)}
         </Text>
 
         <View style={styles.footer} fixed>
           <Text>
-            Generado el {formatGeneratedAt(generatedAt)} por {generatedBy}
+            {m.reports_pdf_generated(
+              { date: formatGeneratedAt(generatedAt, language), name: generatedBy },
+              locale,
+            )}
           </Text>
-          <Text render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`} />
+          <Text
+            render={({ pageNumber, totalPages }) =>
+              m.reports_pdf_page({ page: pageNumber, total: totalPages }, locale)
+            }
+          />
         </View>
       </Page>
     </Document>
@@ -347,53 +379,65 @@ export function FinancialReportDocument({
 interface CurrencySectionProps {
   totals: CurrencyTotals
   from: string
+  language: Locale
   suffix: string
 }
 
 /** Summary and per-category tables of one currency. */
-function CurrencySection({ totals, from, suffix }: CurrencySectionProps) {
-  const money = (value: number) => formatCurrency(value, totals.currency)
-  const columns = categoryColumns(money)
+function CurrencySection({ totals, from, language, suffix }: CurrencySectionProps) {
+  const locale = { locale: language }
+  const money = (value: number) => formatCurrency(value, totals.currency, locale)
+  const columns = categoryColumns(money, language)
   const income = totals.categories.filter((c) => c.kind === 'income')
   const expense = totals.categories.filter((c) => c.kind === 'expense')
 
   return (
     <>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Resumen{suffix}</Text>
+        <Text style={styles.sectionTitle}>{m.reports_pdf_summary({ suffix }, locale)}</Text>
         <View style={styles.summary}>
-          <SummaryBox label="Saldo inicial" value={money(totals.opening_balance)} />
-          <SummaryBox label="Ingresos" value={money(totals.total_income)} color={COLOR.income} />
-          <SummaryBox label="Egresos" value={money(totals.total_expense)} color={COLOR.expense} />
           <SummaryBox
-            label="Saldo final"
+            label={m.reports_pdf_opening_balance({}, locale)}
+            value={money(totals.opening_balance)}
+          />
+          <SummaryBox
+            label={m.common_income({}, locale)}
+            value={money(totals.total_income)}
+            color={COLOR.income}
+          />
+          <SummaryBox
+            label={m.common_expense({}, locale)}
+            value={money(totals.total_expense)}
+            color={COLOR.expense}
+          />
+          <SummaryBox
+            label={m.reports_pdf_closing_balance({}, locale)}
             value={money(totals.closing_balance)}
             color={totals.closing_balance < 0 ? COLOR.destructive : undefined}
           />
         </View>
         <Text style={styles.note}>
-          Saldo inicial: todo lo registrado antes del {formatDay(from)}. Saldo final = saldo inicial +
-          ingresos - egresos.
+          {m.reports_pdf_balance_note({ date: formatDay(from, language) }, locale)}
         </Text>
       </View>
 
       <View style={[styles.section, styles.columns]}>
         <View style={styles.column}>
-          <Text style={styles.sectionTitle}>Ingresos por categoría{suffix}</Text>
+          <Text style={styles.sectionTitle}>{m.reports_pdf_income_by_category({ suffix }, locale)}</Text>
           <Table
             columns={columns}
             rows={income}
-            emptyText="Sin ingresos en este periodo."
-            total={{ label: 'Total', value: money(totals.total_income) }}
+            emptyText={m.reports_pdf_no_income({}, locale)}
+            total={{ label: m.common_field_total({}, locale), value: money(totals.total_income) }}
           />
         </View>
         <View style={styles.column}>
-          <Text style={styles.sectionTitle}>Egresos por categoría{suffix}</Text>
+          <Text style={styles.sectionTitle}>{m.reports_pdf_expense_by_category({ suffix }, locale)}</Text>
           <Table
             columns={columns}
             rows={expense}
-            emptyText="Sin egresos en este periodo."
-            total={{ label: 'Total', value: money(totals.total_expense) }}
+            emptyText={m.reports_pdf_no_expense({}, locale)}
+            total={{ label: m.common_field_total({}, locale), value: money(totals.total_expense) }}
           />
         </View>
       </View>

@@ -18,6 +18,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { type AmenityInput, amenitySchema } from '@/lib/validations/presidency'
+import { m } from '@/paraglide/messages'
 import { updateAmenity } from '@/server-actions/presidency'
 import { type AmenityQueryData, PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
 import { AmenityFormFields } from './amenity-form-fields'
@@ -43,7 +44,7 @@ export function EditAmenityDrawer({ amenity, open, onOpenChange, ...props }: Edi
     onSuccess: (_data, values) => {
       // Reservations embed the area name, so their list needs a refresh too.
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Área actualizada', description: values.name })
+      toastManager.add({ type: 'success', title: m.presidency_amenity_updated(), description: values.name })
       onOpenChange(false)
     },
   })
@@ -61,9 +62,9 @@ export function EditAmenityDrawer({ amenity, open, onOpenChange, ...props }: Edi
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar área</DrawerTitle>
+          <DrawerTitle>{m.presidency_edit_amenity_title()}</DrawerTitle>
           <DrawerDescription>
-            {amenity.name}. Las reservaciones ya registradas conservan su monto.
+            {m.presidency_edit_amenity_description({ name: amenity.name })}
           </DrawerDescription>
         </DrawerHeader>
 
@@ -105,7 +106,7 @@ function EditAmenityForm({
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -114,10 +115,10 @@ function EditAmenityForm({
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DrawerFooter>
     </>

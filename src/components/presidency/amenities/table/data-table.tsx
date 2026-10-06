@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
+import { m } from '@/paraglide/messages'
 import { amenitiesQueryOptions } from '@/tanstack-queries/presidency'
 import { amenitiesTableColumns } from './columns'
 import { AmenitiesDataTableHeader } from './data-table-header'
@@ -20,7 +21,7 @@ export function AmenitiesDataTable() {
       getRowId={(amenity) => amenity.id}
       // No initial sort: the query already orders by name.
       header={(table) => <AmenitiesDataTableHeader table={table} isLoading={isLoading} />}
-      emptyMessage="Sin áreas comunes. Agrega la terraza, la alberca o cualquier área que se pueda reservar."
+      emptyMessage={m.presidency_amenities_empty()}
       isLoading={isLoading}
     />
   )

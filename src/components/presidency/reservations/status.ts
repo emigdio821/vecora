@@ -1,15 +1,24 @@
 import type { Badge } from '@/components/ui/badge'
 import { formatDay } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { ReservationQueryData } from '@/tanstack-queries/presidency'
 
 /** Derived, never stored: see supabase/migrations/20260921000300_amenities.sql. */
 export type ReservationStatus = 'pending' | 'paid' | 'free' | 'cancelled'
 
 export const RESERVATION_STATUS_LABEL: Record<ReservationStatus, string> = {
-  pending: 'Pendiente',
-  paid: 'Pagada',
-  free: 'Sin costo',
-  cancelled: 'Cancelada',
+  get pending() {
+    return m.presidency_reservation_status_pending()
+  },
+  get paid() {
+    return m.presidency_reservation_status_paid()
+  },
+  get free() {
+    return m.presidency_no_cost()
+  },
+  get cancelled() {
+    return m.presidency_reservation_status_cancelled()
+  },
 }
 
 /** Sort order for the status column: what's left to collect comes first. */
@@ -49,5 +58,5 @@ export function reservationStatus(reservation: ReservationQueryData): Reservatio
 
 /** Area, day and house: how menus, drawers and toasts name a booking. */
 export function reservationSummary(reservation: ReservationQueryData) {
-  return `${reservation.amenity.name} - ${formatDay(reservation.reserved_on)} - Casa ${reservation.property.number}`
+  return `${reservation.amenity.name} - ${formatDay(reservation.reserved_on)} - ${m.common_house_label({ number: reservation.property.number })}`
 }

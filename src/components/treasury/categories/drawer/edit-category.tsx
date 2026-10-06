@@ -19,6 +19,7 @@ import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { systemCategorySource } from '@/lib/system-categories'
 import { type CategoryInput, categorySchema } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 import { updateCategory } from '@/server-actions/treasury'
 import { type CategoryQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { CategoryFormFields } from './category-form-fields'
@@ -44,7 +45,7 @@ export function EditCategoryDrawer({ category, open, onOpenChange, ...props }: E
     onSuccess: (_data, values) => {
       // Movements embed the category name, so their list needs a refresh too.
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Categoría actualizada', description: values.name })
+      toastManager.add({ type: 'success', title: m.treasury_category_updated(), description: values.name })
       onOpenChange(false)
     },
   })
@@ -62,7 +63,7 @@ export function EditCategoryDrawer({ category, open, onOpenChange, ...props }: E
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar categoría</DrawerTitle>
+          <DrawerTitle>{m.treasury_edit_category()}</DrawerTitle>
           <DrawerDescription>{category.name}</DrawerDescription>
         </DrawerHeader>
 
@@ -104,10 +105,9 @@ function EditCategoryForm({
           {key !== null && (
             <Alert variant="info">
               <IconInfoCircle />
-              <AlertTitle>Categoría del sistema</AlertTitle>
+              <AlertTitle>{m.treasury_system_category()}</AlertTitle>
               <AlertDescription>
-                {systemCategorySource(key)} usa esta categoría. Puedes cambiarle el nombre, pero no
-                desactivarla ni eliminarla.
+                {m.treasury_system_category_description({ source: systemCategorySource(key) })}
               </AlertDescription>
             </Alert>
           )}
@@ -117,7 +117,7 @@ function EditCategoryForm({
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -126,10 +126,10 @@ function EditCategoryForm({
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DrawerFooter>
     </>

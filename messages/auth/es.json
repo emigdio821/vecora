@@ -1,0 +1,49 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "auth_login_title": "Iniciar sesión",
+  "auth_login_head_description": "Entra a {appName} con tu correo y contraseña.",
+  "auth_login_description": "Ingresa tus credenciales para acceder a tu cuenta.",
+  "auth_login_submit": "Inicia sesión",
+  "auth_invite_invalid_title": "El enlace de invitación ya no es válido",
+  "auth_invite_invalid_description": "Puede haber caducado o ya se usó. Pide un enlace nuevo a quien te lo envió.",
+
+  "auth_field_password": "Contraseña",
+  "auth_password_toggle_label": "Contraseña con alternar visibilidad",
+  "auth_hide_password": "Ocultar contraseña",
+  "auth_show_password": "Mostrar contraseña",
+
+  "auth_email_invalid": "Correo inválido",
+  "auth_password_required": "Contraseña es requerida",
+  "auth_credentials_required": "Correo y contraseña son requeridos",
+  "auth_credentials_invalid": "Correo o contraseña inválidos",
+  "auth_no_access_message": "Tu cuenta aún no tiene acceso a la aplicación. Si deberías tenerlo, pide a un administrador que te lo dé.",
+
+  "auth_logout": "Cerrar sesión",
+  "auth_logout_failed": "No se pudo cerrar la sesión, intenta nuevamente",
+
+  "auth_no_access_title": "Sin acceso",
+  "auth_no_access_head_description": "Tu cuenta aún no tiene acceso a {appName}.",
+  "auth_no_access_signed_in_as": "Iniciaste sesión como {email}.",
+
+  "auth_set_password_head_title": "Crear contraseña",
+  "auth_set_password_head_description": "Crea la contraseña con la que entrarás a {appName}.",
+  "auth_set_password_title": "Crea tu contraseña",
+  "auth_set_password_for_before": "Para",
+  "auth_set_password_for_after": ". Con ella entrarás a Vecora las próximas veces, junto con tu correo.",
+  "auth_new_password": "Nueva contraseña",
+  "auth_password_min_hint": "Mínimo 8 caracteres.",
+  "auth_repeat_password": "Repite la contraseña",
+  "auth_save_password": "Guardar contraseña",
+  "auth_password_saved": "Contraseña guardada",
+
+  "auth_confirm_head_title": "Confirmar acceso",
+  "auth_confirm_head_description": "Recibiste un enlace de acceso a {appName}. Ábrelo para crear tu contraseña.",
+  "auth_confirm_session_title": "Ya hay una sesión iniciada",
+  "auth_confirm_session_before": "Este navegador tiene la sesión de",
+  "auth_confirm_session_after": "({email}). Si continúas con el enlace de acceso, esa sesión se cerrará aquí.",
+  "auth_confirm_access_title": "Tu acceso a Vecora",
+  "auth_confirm_access_description": "Este es tu enlace de acceso a Vecora. Continúa para crear tu contraseña.",
+  "auth_confirm_sign_out_and_continue": "Cerrar sesión y continuar",
+  "auth_confirm_continue": "Continuar"
+}

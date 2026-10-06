@@ -12,8 +12,9 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
-import { type CurrencyCode, currencySymbol, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { SecurityRequestInput } from '@/lib/validations/security'
+import { m } from '@/paraglide/messages'
 import { KIND_DESCRIPTION, KIND_ITEMS } from '../kind'
 
 interface RequestFormFieldsProps {
@@ -42,7 +43,7 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Tipo <span className="text-destructive">*</span>
+              {m.common_field_type()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Select
               items={KIND_ITEMS}
@@ -80,10 +81,10 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Concepto <span className="text-destructive">*</span>
+              {m.common_field_description()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Input {...field} autoComplete="off" disabled={disabled} />
-            <FieldDescription>Qué se hizo o qué se compró. Es lo que verá la tesorería.</FieldDescription>
+            <FieldDescription>{m.requests_title_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
@@ -101,7 +102,7 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Monto <span className="text-destructive">*</span>
+                {m.common_field_amount()} <span className="text-destructive">*</span>
               </FieldLabel>
               <InputGroup>
                 <NumberField
@@ -110,7 +111,7 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
                     field.onChange(value)
                   }}
                   min={0}
-                  locale="es-MX"
+                  locale={intlLocale()}
                   format={MONEY_FORMAT}
                   disabled={disabled}
                 >
@@ -139,7 +140,7 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Fecha <span className="text-destructive">*</span>
+                {m.common_field_date()} <span className="text-destructive">*</span>
               </FieldLabel>
               <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                 <PopoverTrigger
@@ -171,7 +172,7 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
                   />
                 </PopoverPopup>
               </Popover>
-              <FieldDescription>Día del servicio, trabajo o compra.</FieldDescription>
+              <FieldDescription>{m.requests_security_date_description()}</FieldDescription>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
             </Field>
           )}
@@ -188,11 +189,9 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
             touched={fieldState.isTouched}
             dirty={fieldState.isDirty}
           >
-            <FieldLabel>Detalles</FieldLabel>
+            <FieldLabel>{m.common_field_details()}</FieldLabel>
             <Textarea {...field} rows={3} className="max-h-40" disabled={disabled} />
-            <FieldDescription>
-              Opcional. Proveedor, turnos cubiertos, dónde se instaló, número de cámara.
-            </FieldDescription>
+            <FieldDescription>{m.requests_security_details_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}

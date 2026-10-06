@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import type { CurrentUser } from '@/lib/supabase/current-user'
 import { getAvatarFallback } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import { logout } from '@/server-actions/auth'
 import { RoleNameBadge } from '../shared/role-name-badge'
 import { Avatar, AvatarFallback } from '../ui/avatar'
@@ -31,7 +32,7 @@ export function NavUser({ user }: NavUserProps) {
       await navigate({ to: '/login', replace: true })
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'Error', description: error.message })
+      toastManager.add({ type: 'error', title: m.common_error(), description: error.message })
     },
   })
 
@@ -43,7 +44,7 @@ export function NavUser({ user }: NavUserProps) {
             render={
               <SidebarMenuButton
                 size="lg"
-                aria-label="Menú de usuario"
+                aria-label={m.common_user_menu()}
                 className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
               >
                 <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -57,7 +58,7 @@ export function NavUser({ user }: NavUserProps) {
                         user.roles.map((role) => <RoleNameBadge key={role} size="sm" roleName={role} />)
                       ) : (
                         <Badge variant="outline" size="sm">
-                          Miembro
+                          {m.common_member()}
                         </Badge>
                       )}
                     </div>
@@ -83,7 +84,7 @@ export function NavUser({ user }: NavUserProps) {
                 void setWelcome(true)
               }}
             >
-              Ver introducción
+              {m.common_view_intro()}
             </MenuItem>
 
             <MenuItem
@@ -92,7 +93,7 @@ export function NavUser({ user }: NavUserProps) {
                 logoutMutation.mutate()
               }}
             >
-              Cerrar sesión
+              {m.common_sign_out()}
             </MenuItem>
           </MenuPopup>
         </Menu>

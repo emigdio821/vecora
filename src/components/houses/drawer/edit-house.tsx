@@ -18,6 +18,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { type UpdateHouseInput, updateHouseSchema } from '@/lib/validations/houses'
+import { m } from '@/paraglide/messages'
 import { updateHouse } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/tanstack-queries/houses'
 import { HouseFormFields } from './house-form-fields'
@@ -45,8 +46,8 @@ export function EditHouseDrawer({ house, open, onOpenChange, ...props }: EditHou
       void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Casa actualizada',
-        description: `Los datos de la casa ${values.number} fueron guardados`,
+        title: m.residential_house_updated(),
+        description: m.residential_house_updated_description({ number: values.number }),
       })
       // Not handleOpenChange: the mutation is still `pending` while onSuccess runs.
       onOpenChange(false)
@@ -66,8 +67,8 @@ export function EditHouseDrawer({ house, open, onOpenChange, ...props }: EditHou
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar casa</DrawerTitle>
-          <DrawerDescription>Casa {house.number}</DrawerDescription>
+          <DrawerTitle>{m.residential_edit_house()}</DrawerTitle>
+          <DrawerDescription>{m.common_house_label({ number: house.number })}</DrawerDescription>
         </DrawerHeader>
 
         {/* Mounted only while the drawer is open, so the form always starts
@@ -109,7 +110,7 @@ function EditHouseForm({ house, mutation }: { house: HouseQueryData; mutation: U
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -121,7 +122,7 @@ function EditHouseForm({ house, mutation }: { house: HouseQueryData; mutation: U
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button
           type="submit"
@@ -129,7 +130,7 @@ function EditHouseForm({ house, mutation }: { house: HouseQueryData; mutation: U
           disabled={mutation.isPending || !form.formState.isDirty}
           loading={mutation.isPending}
         >
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DrawerFooter>
     </>

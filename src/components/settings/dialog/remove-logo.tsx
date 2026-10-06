@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
+import { m } from '@/paraglide/messages'
 import { removeLogo } from '@/server-actions/settings'
 import { SETTINGS_QUERY_KEY } from '@/tanstack-queries/settings'
 
@@ -30,11 +31,11 @@ export function RemoveLogoAlertDialog({ open, onOpenChange, ...props }: RemoveLo
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [SETTINGS_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Logo eliminado' })
+      toastManager.add({ type: 'success', title: m.settings_logo_removed() })
       onOpenChange(false)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo quitar', description: error.message })
+      toastManager.add({ type: 'error', title: m.common_remove_failed(), description: error.message })
     },
   })
 
@@ -51,16 +52,13 @@ export function RemoveLogoAlertDialog({ open, onOpenChange, ...props }: RemoveLo
     <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Quitar el logo?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Los reportes se generarán solo con el nombre del residencial. Para volver a usarlo tendrás que
-            subirlo de nuevo.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{m.settings_remove_logo_title()}</AlertDialogTitle>
+          <AlertDialogDescription>{m.settings_remove_logo_description()}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
             variant="destructive"
@@ -69,7 +67,7 @@ export function RemoveLogoAlertDialog({ open, onOpenChange, ...props }: RemoveLo
               mutation.mutate()
             }}
           >
-            Quitar
+            {m.common_action_remove()}
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

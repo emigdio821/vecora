@@ -1,4 +1,5 @@
 import { useQueryState } from 'nuqs'
+import { m } from '@/paraglide/messages'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '../ui/tabs'
 import { AmenitiesDataTable } from './amenities/table/data-table'
 import { PeriodsDataTable } from './periods/table/data-table'
@@ -16,9 +17,9 @@ export function PresidencyMainTabs() {
       }}
     >
       <TabsList>
-        <TabsTab value="periods">Periodos</TabsTab>
-        <TabsTab value="reservations">Reservaciones</TabsTab>
-        <TabsTab value="amenities">Áreas comunes</TabsTab>
+        <TabsTab value="periods">{m.common_section_periods()}</TabsTab>
+        <TabsTab value="reservations">{m.common_section_reservations()}</TabsTab>
+        <TabsTab value="amenities">{m.common_section_amenities()}</TabsTab>
       </TabsList>
       <TabsPanel value="periods">
         <PeriodsDataTable />

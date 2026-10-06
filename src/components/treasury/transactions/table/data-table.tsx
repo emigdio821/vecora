@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
+import { m } from '@/paraglide/messages'
 import { transactionsListQueryOptions } from '@/tanstack-queries/treasury'
 import { transactionsTableColumns } from './columns'
 import { TransactionsDataTableHeader, useKindFilter } from './data-table-header'
@@ -38,7 +39,7 @@ export function TransactionsDataTable() {
       getRowId={(transaction) => transaction.id}
       initialSorting={[{ id: 'occurred_on', desc: true }]}
       header={(table) => <TransactionsDataTableHeader table={table} isLoading={isLoading} />}
-      emptyMessage="Sin movimientos."
+      emptyMessage={m.treasury_transactions_empty()}
       isLoading={isLoading}
     />
   )

@@ -14,6 +14,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { cn, formatDay, formatMonth } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { TransactionQueryData } from '@/tanstack-queries/treasury'
 import { KIND_LABEL, PAYMENT_METHOD_LABEL } from '../../kind'
 
@@ -38,14 +39,14 @@ export function TransactionDetailsDrawer({
       <DrawerPopup variant="inset">
         <DrawerHeader>
           <DrawerTitle>{transaction.description}</DrawerTitle>
-          <DrawerDescription>Información del movimiento</DrawerDescription>
+          <DrawerDescription>{m.treasury_transaction_info()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<IconReceipt />} title="Movimiento">
+          <CollapsibleSection icon={<IconReceipt />} title={m.treasury_transaction()}>
             <div className="grid grid-cols-2 gap-3">
-              <Detail label="Tipo">{KIND_LABEL[kind]}</Detail>
-              <Detail label="Monto">
+              <Detail label={m.common_field_type()}>{KIND_LABEL[kind]}</Detail>
+              <Detail label={m.common_field_amount()}>
                 <span
                   className={cn(
                     'tabular-nums',
@@ -56,38 +57,44 @@ export function TransactionDetailsDrawer({
                   <Money value={transaction.amount} currency={transaction.currency} />
                 </span>
               </Detail>
-              <Detail label="Fecha">{formatDay(transaction.occurred_on)}</Detail>
-              <Detail label="Periodo">{transaction.period.name}</Detail>
-              <Detail label="Categoría">
+              <Detail label={m.common_field_date()}>{formatDay(transaction.occurred_on)}</Detail>
+              <Detail label={m.treasury_period()}>{transaction.period.name}</Detail>
+              <Detail label={m.common_field_category()}>
                 <Badge variant="outline">{transaction.category.name}</Badge>
               </Detail>
-              {property && <Detail label="Casa">{property.number}</Detail>}
-              {fee_month && <Detail label="Mes de la cuota">{formatMonth(fee_month)}</Detail>}
-              {folio && <Detail label="Folio">{folio}</Detail>}
+              {property && <Detail label={m.common_field_house()}>{property.number}</Detail>}
+              {fee_month && <Detail label={m.treasury_fee_month()}>{formatMonth(fee_month)}</Detail>}
+              {folio && <Detail label={m.common_field_folio()}>{folio}</Detail>}
             </div>
           </CollapsibleSection>
 
-          <CollapsibleSection icon={<IconWallet />} title="Pago">
+          <CollapsibleSection icon={<IconWallet />} title={m.treasury_payment()}>
             <div className="grid grid-cols-2 gap-3">
-              <Detail label="Método de pago">{PAYMENT_METHOD_LABEL[transaction.payment_method]}</Detail>
-              {reference && <Detail label="Referencia">{reference}</Detail>}
+              <Detail label={m.common_field_payment_method()}>
+                {PAYMENT_METHOD_LABEL[transaction.payment_method]}
+              </Detail>
+              {reference && <Detail label={m.common_field_reference()}>{reference}</Detail>}
             </div>
           </CollapsibleSection>
 
           {notes && (
-            <CollapsibleSection icon={<IconNotes />} title="Notas">
+            <CollapsibleSection icon={<IconNotes />} title={m.common_field_notes()}>
               <p className="text-sm whitespace-pre-wrap">{notes}</p>
             </CollapsibleSection>
           )}
 
           <dl className="grid grid-cols-2 gap-3 px-1 pt-1">
-            <Timestamp icon={<IconCalendarPlus />} label="Creado" value={transaction.created_at} />
-            <Timestamp icon={<IconHistory />} label="Actualizado" value={transaction.updated_at} />
+            <Timestamp
+              icon={<IconCalendarPlus />}
+              label={m.treasury_created()}
+              value={transaction.created_at}
+            />
+            <Timestamp icon={<IconHistory />} label={m.treasury_updated()} value={transaction.updated_at} />
           </dl>
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />}>Cerrar</DrawerClose>
+          <DrawerClose render={<Button variant="ghost" />}>{m.common_action_close()}</DrawerClose>
         </DrawerFooter>
       </DrawerPopup>
     </Drawer>

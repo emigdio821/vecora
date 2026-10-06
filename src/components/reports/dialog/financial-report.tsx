@@ -29,6 +29,7 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { toastManager } from '@/components/ui/toast'
 import { useToday } from '@/hooks/use-today'
 import { formatMonth, ISO_DAY } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 
 /** How far back the monthly picker goes. */
 const MONTHS_BACK = 24
@@ -43,17 +44,39 @@ function monthItems(today: Date): { value: string; label: string }[] {
     const month = startOfMonth(subMonths(today, i))
     const value = format(month, ISO_DAY)
     const label = formatMonth(value)
-    return { value, label: i === 0 ? `${label} (en curso)` : label }
+    return { value, label: i === 0 ? m.reports_month_in_progress({ month: label }) : label }
   })
 }
 
 const REPORT_PRESETS: RangePreset[] = [
-  { label: 'Este mes', range: (today) => monthRange(today) },
-  { label: 'Mes pasado', range: (today) => monthRange(subMonths(today, 1)) },
-  { label: 'Últimos 3 meses', range: (today) => toRange(startOfMonth(subMonths(today, 2)), today) },
-  { label: 'Este año', range: (today) => toRange(startOfYear(today), today) },
   {
-    label: 'Año pasado',
+    get label() {
+      return m.reports_preset_this_month()
+    },
+    range: (today) => monthRange(today),
+  },
+  {
+    get label() {
+      return m.reports_preset_last_month()
+    },
+    range: (today) => monthRange(subMonths(today, 1)),
+  },
+  {
+    get label() {
+      return m.reports_preset_last_3_months()
+    },
+    range: (today) => toRange(startOfMonth(subMonths(today, 2)), today),
+  },
+  {
+    get label() {
+      return m.reports_preset_this_year()
+    },
+    range: (today) => toRange(startOfYear(today), today),
+  },
+  {
+    get label() {
+      return m.reports_preset_last_year()
+    },
     range: (today) => toRange(startOfYear(subYears(today, 1)), endOfYear(subYears(today, 1))),
   },
 ]
@@ -68,11 +91,11 @@ async function downloadReport(range: DayRange) {
   const isPdf = response.headers.get('Content-Type') === 'application/pdf'
   if (!response.ok || !isPdf) {
     const body: { error?: string } | null = await response.json().catch(() => null)
-    throw new Error(body?.error ?? 'No se pudo generar el reporte. Recarga la página e inténtalo de nuevo.')
+    throw new Error(body?.error ?? m.reports_download_failed())
   }
 
   const disposition = response.headers.get('Content-Disposition') ?? ''
-  const fileName = /filename="(.+)"/.exec(disposition)?.[1] ?? 'reporte.pdf'
+  const fileName = /filename="(.+)"/.exec(disposition)?.[1] ?? m.reports_default_file_name()
   const url = URL.createObjectURL(await response.blob())
   const link = document.createElement('a')
   link.href = url
@@ -102,11 +125,11 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
   const mutation = useMutation({
     mutationFn: downloadReport,
     onSuccess: () => {
-      toastManager.add({ type: 'success', title: 'Reporte descargado' })
+      toastManager.add({ type: 'success', title: m.reports_downloaded() })
       onOpenChange(false)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'Error', description: error.message })
+      toastManager.add({ type: 'error', title: m.common_error(), description: error.message })
     },
   })
 
@@ -114,10 +137,8 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
     <Dialog open={open} onOpenChange={onOpenChange} {...props}>
       <DialogPopup>
         <DialogHeader>
-          <DialogTitle>Reporte financiero</DialogTitle>
-          <DialogDescription>
-            PDF con ingresos, egresos, saldo y casas con cuotas pendientes.
-          </DialogDescription>
+          <DialogTitle>{m.common_section_financial_report()}</DialogTitle>
+          <DialogDescription>{m.reports_dialog_description()}</DialogDescription>
         </DialogHeader>
 
         <DialogPanel>
@@ -128,13 +149,13 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
             }}
           >
             <TabsList>
-              <TabsTab value="monthly">Mensual</TabsTab>
-              <TabsTab value="custom">Manual</TabsTab>
+              <TabsTab value="monthly">{m.reports_tab_monthly()}</TabsTab>
+              <TabsTab value="custom">{m.reports_tab_custom()}</TabsTab>
             </TabsList>
 
             <TabsPanel value="monthly">
               <Field>
-                <FieldLabel>Mes</FieldLabel>
+                <FieldLabel>{m.reports_month_label()}</FieldLabel>
                 <Select
                   items={months}
                   value={month}
@@ -153,15 +174,15 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
                     ))}
                   </SelectPopup>
                 </Select>
-                <FieldDescription>Del día 1 al último día del mes.</FieldDescription>
+                <FieldDescription>{m.reports_month_description()}</FieldDescription>
               </Field>
             </TabsPanel>
 
             <TabsPanel value="custom">
               <Field>
-                <FieldLabel>Rango de fechas</FieldLabel>
+                <FieldLabel>{m.reports_range_label()}</FieldLabel>
                 <RangePicker value={range} onChange={setRange} presets={REPORT_PRESETS} className="w-full" />
-                <FieldDescription>Elige el primer y el último día del reporte.</FieldDescription>
+                <FieldDescription>{m.reports_range_description()}</FieldDescription>
               </Field>
             </TabsPanel>
           </Tabs>
@@ -169,7 +190,7 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
 
         <DialogFooter>
           <DialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DialogClose>
           <Button
             loading={mutation.isPending}
@@ -179,7 +200,7 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
             }}
           >
             <IconDownload />
-            Descargar PDF
+            {m.reports_download_pdf()}
           </Button>
         </DialogFooter>
       </DialogPopup>

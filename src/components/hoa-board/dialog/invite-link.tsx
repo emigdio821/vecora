@@ -14,6 +14,7 @@ import {
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { m } from '@/paraglide/messages'
 import type { InviteResult } from '@/server-actions/hoa-board'
 
 interface InviteLinkDialogProps extends React.ComponentProps<typeof Dialog> {
@@ -23,7 +24,7 @@ interface InviteLinkDialogProps extends React.ComponentProps<typeof Dialog> {
 }
 
 function whatsappUrl({ phone, full_name, link }: InviteResult) {
-  const message = `Hola ${full_name.split(' ')[0]}, te comparto tu acceso a Vecora. Abre este enlace y crea tu contraseña: ${link}`
+  const message = m.board_whatsapp_message({ name: full_name.split(' ')[0], link })
   return `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`
 }
 
@@ -43,8 +44,8 @@ export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: Invit
     } catch {
       toastManager.add({
         type: 'error',
-        title: 'No se pudo copiar',
-        description: 'Selecciona el enlace y cópialo manualmente',
+        title: m.board_copy_failed(),
+        description: m.board_copy_failed_description(),
       })
     }
   }
@@ -53,12 +54,8 @@ export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: Invit
     <Dialog open={open} onOpenChange={onOpenChange} disablePointerDismissal {...props}>
       <DialogPopup>
         <DialogHeader>
-          <DialogTitle>Enlace de acceso para {invite?.full_name}</DialogTitle>
-          <DialogDescription>
-            Compártelo por WhatsApp o cópialo. Al abrirlo, la persona podrá crear su contraseña o
-            restablecerla si la olvidó. El enlace solo se puede usar una vez; si se pierde o necesitas generar
-            uno nuevo, puedes hacerlo desde el menú del integrante.
-          </DialogDescription>
+          <DialogTitle>{m.board_invite_title({ name: invite?.full_name ?? '' })}</DialogTitle>
+          <DialogDescription>{m.board_invite_description()}</DialogDescription>
         </DialogHeader>
 
         <DialogPanel>
@@ -66,7 +63,7 @@ export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: Invit
             <InputGroupInput
               readOnly
               value={invite?.link ?? ''}
-              aria-label="Enlace de acceso"
+              aria-label={m.board_access_link()}
               onFocus={(e) => {
                 e.currentTarget.select()
               }}
@@ -76,19 +73,19 @@ export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: Invit
                 <TooltipTrigger
                   closeOnClick={false}
                   render={
-                    <Button size="icon-xs" variant="ghost" aria-label="Copiar enlace" onClick={copy}>
+                    <Button size="icon-xs" variant="ghost" aria-label={m.board_copy_link()} onClick={copy}>
                       {copied ? <IconCheck className="text-success-foreground" /> : <IconCopy />}
                     </Button>
                   }
                 />
-                <TooltipContent>{copied ? 'Enlace copiado' : 'Copiar enlace'}</TooltipContent>
+                <TooltipContent>{copied ? m.board_link_copied() : m.board_copy_link()}</TooltipContent>
               </Tooltip>
             </InputGroupAddon>
           </InputGroup>
         </DialogPanel>
 
         <DialogFooter>
-          <DialogClose render={<Button variant="ghost" />}>Cerrar</DialogClose>
+          <DialogClose render={<Button variant="ghost" />}>{m.common_action_close()}</DialogClose>
           {invite && (
             <Button
               render={
@@ -96,11 +93,11 @@ export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: Invit
                   href={whatsappUrl(invite)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Enviar por WhatsApp"
+                  aria-label={m.board_send_whatsapp()}
                 />
               }
             >
-              Enviar por WhatsApp
+              {m.board_send_whatsapp()}
             </Button>
           )}
         </DialogFooter>

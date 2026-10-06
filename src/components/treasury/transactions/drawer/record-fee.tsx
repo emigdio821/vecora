@@ -54,6 +54,7 @@ import { useCurrency, useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
 import { formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
 import { type RecordFeePaymentInput, recordFeePaymentSchema } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 import { recordFeePayment } from '@/server-actions/treasury'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { periodsQueryOptions, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
@@ -134,14 +135,20 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
 
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
 
-      const months = summary.fee_count === 1 ? '1 mes' : `${summary.fee_count} meses`
-      const recargo = summary.late_fee_count > 0 ? ' con recargo' : ''
-      // The RPC charges in the currency of the period the payment date falls in.
-      const total = formatCurrency(summary.total, preview?.period.currency ?? home)
+      const description = {
+        house: house ? houseLabel(house) : m.common_field_house(),
+        months: m.treasury_months_count({ count: summary.fee_count }),
+        // The RPC charges in the currency of the period the payment date falls in.
+        total: formatCurrency(summary.total, preview?.period.currency ?? home),
+        folio: values.folio,
+      }
       toastManager.add({
         type: 'success',
-        title: 'Cuota registrada',
-        description: `${house ? houseLabel(house) : 'Casa'}: ${months}${recargo}, ${total} - Folio ${values.folio}`,
+        title: m.treasury_fee_recorded(),
+        description:
+          summary.late_fee_count > 0
+            ? m.treasury_fee_recorded_description_late(description)
+            : m.treasury_fee_recorded_description(description),
       })
       onOpenChange(false)
     },
@@ -177,11 +184,8 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Registrar cuota</DrawerTitle>
-          <DrawerDescription>
-            Un recibo por casa. Si paga varios meses, selecciónalos todos; el recargo se calcula por cada mes
-            pagado después del día límite.
-          </DrawerDescription>
+          <DrawerTitle>{m.treasury_record_fee()}</DrawerTitle>
+          <DrawerDescription>{m.treasury_record_fee_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -201,7 +205,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Casa <span className="text-destructive">*</span>
+                    {m.common_field_house()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <HousesPicker
                     value={field.value || null}
@@ -227,7 +231,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Meses que paga <span className="text-destructive">*</span>
+                    {m.treasury_fee_months()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Combobox
                     multiple
@@ -248,18 +252,20 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                               <ComboboxChip
                                 key={month}
                                 aria-label={formatMonth(month)}
-                                removeProps={{ 'aria-label': 'Quitar' }}
+                                removeProps={{ 'aria-label': m.common_action_remove() }}
                               >
                                 {formatMonth(month)}
                               </ComboboxChip>
                             ))}
-                            <ComboboxChipsInput placeholder={value.length > 0 ? undefined : 'Buscar mes'} />
+                            <ComboboxChipsInput
+                              placeholder={value.length > 0 ? undefined : m.treasury_search_month()}
+                            />
                           </>
                         )}
                       </ComboboxValue>
                     </ComboboxChips>
                     <ComboboxPopup>
-                      <ComboboxEmpty>Sin resultados.</ComboboxEmpty>
+                      <ComboboxEmpty>{m.common_no_results()}</ComboboxEmpty>
                       <ComboboxList>
                         {(month: string) => (
                           <ComboboxItem key={month} value={month}>
@@ -286,7 +292,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                     dirty={fieldState.isDirty}
                   >
                     <FieldLabel>
-                      Fecha de pago <span className="text-destructive">*</span>
+                      {m.treasury_payment_date()} <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                       <PopoverTrigger
@@ -334,7 +340,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                     dirty={fieldState.isDirty}
                   >
                     <FieldLabel>
-                      Folio del recibo <span className="text-destructive">*</span>
+                      {m.treasury_receipt_folio()} <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Input {...field} autoComplete="off" disabled={mutation.isPending} />
                     <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -354,7 +360,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Método de pago <span className="text-destructive">*</span>
+                    {m.common_field_payment_method()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Select
                     items={PAYMENT_METHOD_ITEMS}
@@ -392,10 +398,10 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                     dirty={fieldState.isDirty}
                   >
                     <FieldLabel>
-                      Referencia de la transferencia <span className="text-destructive">*</span>
+                      {m.treasury_transfer_reference()} <span className="text-destructive">*</span>
                     </FieldLabel>
                     <Input {...field} autoComplete="off" disabled={mutation.isPending} />
-                    <FieldDescription>Clave de rastreo o número de referencia del banco.</FieldDescription>
+                    <FieldDescription>{m.treasury_transfer_reference_description()}</FieldDescription>
                     <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                   </Field>
                 )}
@@ -415,11 +421,12 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                       disabled={mutation.isPending}
                     />
                     <div className="flex flex-col gap-1">
-                      <Label htmlFor={waiveSwitchId}>Condonar recargo</Label>
+                      <Label htmlFor={waiveSwitchId}>{m.treasury_waive_late_fee()}</Label>
                       <p className="text-xs text-muted-foreground">
-                        {preview.lateMonths === 1 ? '1 mes se paga' : `${preview.lateMonths} meses se pagan`}{' '}
-                        después del día {preview.period.due_day}. Actívalo si la mesa directiva perdonó el
-                        recargo.
+                        {m.treasury_waive_late_fee_description({
+                          count: preview.lateMonths,
+                          dueDay: preview.period.due_day,
+                        })}
                       </p>
                     </div>
                   </div>
@@ -437,11 +444,9 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                   touched={fieldState.isTouched}
                   dirty={fieldState.isDirty}
                 >
-                  <FieldLabel>Notas</FieldLabel>
+                  <FieldLabel>{m.common_field_notes()}</FieldLabel>
                   <Textarea {...field} rows={3} className="max-h-40" disabled={mutation.isPending} />
-                  <FieldDescription>
-                    Opcional. Quién pagó, acuerdos, o cualquier observación.
-                  </FieldDescription>
+                  <FieldDescription>{m.treasury_fee_notes_description()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -449,27 +454,31 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
 
             {preview ? (
               <Alert>
-                <AlertTitle>Periodo {preview.period.name}</AlertTitle>
+                <AlertTitle>{m.treasury_period_label({ name: preview.period.name })}</AlertTitle>
                 <AlertDescription>
                   <dl className="grid grid-cols-[1fr_auto] gap-x-4 text-sm tabular-nums">
                     <dt className="text-muted-foreground">
-                      {feeMonths.length === 1 ? '1 cuota' : `${feeMonths.length} cuotas`} de{' '}
-                      {formatCurrency(preview.period.monthly_fee, preview.period.currency)}
+                      {m.treasury_fees_of({
+                        count: feeMonths.length,
+                        amount: formatCurrency(preview.period.monthly_fee, preview.period.currency),
+                      })}
                     </dt>
                     <dd className="text-right">{formatCurrency(preview.fees, preview.period.currency)}</dd>
                     {preview.lateMonths > 0 && (
                       <>
                         <dt className="text-muted-foreground">
-                          {preview.lateMonths === 1 ? '1 recargo' : `${preview.lateMonths} recargos`} de{' '}
-                          {formatCurrency(preview.period.late_fee, preview.period.currency)}
-                          {waiveLateFee && ' (condonado)'}
+                          {m.treasury_late_fees_of({
+                            count: preview.lateMonths,
+                            amount: formatCurrency(preview.period.late_fee, preview.period.currency),
+                          })}
+                          {waiveLateFee && ` ${m.treasury_waived()}`}
                         </dt>
                         <dd className="text-right">
                           {formatCurrency(preview.lateFees, preview.period.currency)}
                         </dd>
                       </>
                     )}
-                    <dt className="font-medium">Total a recibir</dt>
+                    <dt className="font-medium">{m.treasury_total_to_receive()}</dt>
                     <dd className="text-right font-medium text-foreground">
                       {formatCurrency(preview.total, preview.period.currency)}
                     </dd>
@@ -480,10 +489,8 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
               periods && (
                 <Alert variant="warning">
                   <IconAlertCircle />
-                  <AlertTitle>Sin periodo</AlertTitle>
-                  <AlertDescription>
-                    Ningún periodo cubre la fecha de pago. Crea el periodo antes de registrar cuotas.
-                  </AlertDescription>
+                  <AlertTitle>{m.treasury_no_period()}</AlertTitle>
+                  <AlertDescription>{m.treasury_no_period_description()}</AlertDescription>
                 </Alert>
               )
             )}
@@ -491,7 +498,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -500,7 +507,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button
             type="submit"
@@ -508,7 +515,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
             disabled={mutation.isPending || !preview}
             loading={mutation.isPending}
           >
-            Registrar
+            {m.treasury_record()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

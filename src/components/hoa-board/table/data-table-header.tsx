@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
+import { m } from '@/paraglide/messages'
 import type { InviteResult } from '@/server-actions/hoa-board'
 import type { BoardMemberQueryData } from '@/tanstack-queries/hoa-board'
 import { InviteLinkDialog } from '../dialog/invite-link'
@@ -49,7 +50,7 @@ export function BoardMembersDataTableHeader({ table, viewer, isLoading }: BoardM
             table={table}
             columnId="full_name"
             param="search-board"
-            hint="Buscar por nombre o correo"
+            hint={m.board_search_hint()}
           />
         </div>
 
@@ -61,7 +62,7 @@ export function BoardMembersDataTableHeader({ table, viewer, isLoading }: BoardM
               setAddOpen(true)
             }}
           >
-            Agregar integrante
+            {m.board_add_member()}
           </Button>
         )}
       </div>

@@ -3,9 +3,10 @@ import { useRender } from '@base-ui/react/use-render'
 import { IconChevronRight, IconDots } from '@tabler/icons-react'
 import type * as React from 'react'
 import { cn } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 
 export function Breadcrumb({ ...props }: React.ComponentProps<'nav'>): React.ReactElement {
-  return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />
+  return <nav aria-label={m.common_breadcrumb()} data-slot="breadcrumb" {...props} />
 }
 
 export function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>): React.ReactElement {
@@ -90,7 +91,7 @@ export function BreadcrumbEllipsis({
       {...props}
     >
       <IconDots className="size-4" />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{m.common_more()}</span>
     </span>
   )
 }

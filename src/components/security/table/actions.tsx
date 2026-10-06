@@ -10,6 +10,7 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from '@/components/ui/menu'
+import { m } from '@/paraglide/messages'
 import type { SecurityRequestQueryData } from '@/tanstack-queries/security'
 import { DeleteRequestAlertDialog } from '../dialog/delete-request'
 import { RejectRequestDialog } from '../dialog/reject-request'
@@ -63,7 +64,7 @@ export function RequestsTableActions({ request, viewer }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={`Acciones de ${request.title}`}
+              aria-label={m.requests_actions_label({ title: request.title })}
             >
               <IconDots className="size-4" />
             </Button>
@@ -80,14 +81,14 @@ export function RequestsTableActions({ request, viewer }: ActionsProps) {
                     setPayOpen(true)
                   }}
                 >
-                  Registrar pago
+                  {m.common_action_record_payment()}
                 </MenuItem>
                 <MenuItem
                   onClick={() => {
                     setRejectOpen(true)
                   }}
                 >
-                  Rechazar
+                  {m.requests_action_reject()}
                 </MenuItem>
               </>
             )}
@@ -98,7 +99,7 @@ export function RequestsTableActions({ request, viewer }: ActionsProps) {
                   setReopenOpen(true)
                 }}
               >
-                Reabrir
+                {m.requests_action_reopen()}
               </MenuItem>
             )}
 
@@ -111,7 +112,7 @@ export function RequestsTableActions({ request, viewer }: ActionsProps) {
                     setEditOpen(true)
                   }}
                 >
-                  Editar
+                  {m.common_action_edit()}
                 </MenuItem>
                 <MenuItem
                   variant="destructive"
@@ -119,7 +120,7 @@ export function RequestsTableActions({ request, viewer }: ActionsProps) {
                     setDeleteOpen(true)
                   }}
                 >
-                  Eliminar
+                  {m.common_action_delete()}
                 </MenuItem>
               </>
             )}

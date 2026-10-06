@@ -4,6 +4,7 @@ import { useHasRole } from '@/components/current-user-provider'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
+import { m } from '@/paraglide/messages'
 import type { AmenityQueryData } from '@/tanstack-queries/presidency'
 import { CreateAmenityDrawer } from '../drawer/create-amenity'
 
@@ -26,7 +27,7 @@ export function AmenitiesDataTableHeader({ table, isLoading }: AmenitiesDataTabl
             table={table}
             columnId="name"
             param="search-amenities"
-            hint="Buscar por nombre del área"
+            hint={m.presidency_amenity_search_hint()}
           />
         </div>
 
@@ -38,7 +39,7 @@ export function AmenitiesDataTableHeader({ table, isLoading }: AmenitiesDataTabl
               setCreateOpen(true)
             }}
           >
-            Nueva área
+            {m.presidency_new_amenity()}
           </Button>
         )}
       </div>

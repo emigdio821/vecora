@@ -3,7 +3,7 @@ import { IconChevronLeft, IconChevronRight, IconSelector } from '@tabler/icons-r
 import type { Month } from 'date-fns'
 import * as React from 'react'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { cn, esLocale } from '@/lib/utils'
+import { cn, dateLocale } from '@/lib/utils'
 
 const buttonClassNames =
   "relative flex size-(--cell-size) text-base sm:text-sm items-center justify-center rounded-lg text-foreground not-in-data-selected:hover:bg-accent disabled:pointer-events-none disabled:opacity-64 [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
@@ -87,7 +87,7 @@ export function Calendar({
   showOutsideDays = true,
   components: userComponents,
   mode = 'single',
-  locale = esLocale,
+  locale = dateLocale(),
   ...props
 }: React.ComponentProps<typeof DayPicker>): React.ReactElement {
   const defaultClassNames = {

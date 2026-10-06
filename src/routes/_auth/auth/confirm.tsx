@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/empty'
 import { siteConfig } from '@/lib/config/site'
 import { pageHead } from '@/lib/metadata'
+import { m } from '@/paraglide/messages'
 
 /**
  * Lands the access link generated in server-actions/hoa-board.ts. Opening it
@@ -38,8 +39,8 @@ export const Route = createFileRoute('/_auth/auth/confirm')({
   // The link is shared over WhatsApp, so this is also its preview.
   head: () =>
     pageHead({
-      title: 'Confirmar acceso',
-      description: `Recibiste un enlace de acceso a ${siteConfig.name}. Ábrelo para crear tu contraseña.`,
+      title: m.auth_confirm_head_title(),
+      description: m.auth_confirm_head_description({ appName: siteConfig.name }),
     }),
   component: ConfirmAccessPage,
 })
@@ -54,11 +55,11 @@ function ConfirmAccessPage() {
           <EmptyMedia variant="icon">
             <IconUserX />
           </EmptyMedia>
-          <EmptyTitle>Ya hay una sesión iniciada</EmptyTitle>
+          <EmptyTitle>{m.auth_confirm_session_title()}</EmptyTitle>
           <EmptyDescription>
-            Este navegador tiene la sesión de{' '}
-            <strong className="font-medium text-foreground">{user.fullName}</strong> ({user.email}). Si
-            continúas con el enlace de acceso, esa sesión se cerrará aquí.
+            {m.auth_confirm_session_before()}{' '}
+            <strong className="font-medium text-foreground">{user.fullName}</strong>{' '}
+            {m.auth_confirm_session_after({ email: user.email })}
           </EmptyDescription>
         </EmptyHeader>
       ) : (
@@ -66,21 +67,19 @@ function ConfirmAccessPage() {
           <EmptyMedia variant="icon">
             <IconKey />
           </EmptyMedia>
-          <EmptyTitle>Tu acceso a Vecora</EmptyTitle>
-          <EmptyDescription>
-            Este es tu enlace de acceso a Vecora. Continúa para crear tu contraseña.
-          </EmptyDescription>
+          <EmptyTitle>{m.auth_confirm_access_title()}</EmptyTitle>
+          <EmptyDescription>{m.auth_confirm_access_description()}</EmptyDescription>
         </EmptyHeader>
       )}
       <EmptyContent>
         <div className="flex flex-wrap justify-center gap-2">
           {user && (
             <Button variant="outline" render={<Link to="/" />}>
-              Cancelar
+              {m.common_action_cancel()}
             </Button>
           )}
           <ConfirmAccessButton tokenHash={tokenHash} type={type}>
-            {user ? 'Cerrar sesión y continuar' : 'Continuar'}
+            {user ? m.auth_confirm_sign_out_and_continue() : m.auth_confirm_continue()}
           </ConfirmAccessButton>
         </div>
       </EmptyContent>

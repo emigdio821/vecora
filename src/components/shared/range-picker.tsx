@@ -16,6 +16,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { useToday } from '@/hooks/use-today'
 import { cn, formatDay, ISO_DAY } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 
 export interface DayRange {
   /** ISO day, inclusive. */
@@ -42,11 +43,36 @@ export function toRange(from: Date, to: Date): DayRange {
 }
 
 const DEFAULT_PRESETS: RangePreset[] = [
-  { label: 'Hoy', range: (today) => toRange(today, today) },
-  { label: 'Últimos 7 días', range: (today) => toRange(subDays(today, 6), today) },
-  { label: 'Últimos 30 días', range: (today) => toRange(subDays(today, 29), today) },
-  { label: 'Este mes', range: (today) => toRange(startOfMonth(today), endOfMonth(today)) },
-  { label: 'Este año', range: (today) => toRange(startOfYear(today), today) },
+  {
+    get label() {
+      return m.common_today()
+    },
+    range: (today) => toRange(today, today),
+  },
+  {
+    get label() {
+      return m.common_range_last_7_days()
+    },
+    range: (today) => toRange(subDays(today, 6), today),
+  },
+  {
+    get label() {
+      return m.common_range_last_30_days()
+    },
+    range: (today) => toRange(subDays(today, 29), today),
+  },
+  {
+    get label() {
+      return m.common_range_this_month()
+    },
+    range: (today) => toRange(startOfMonth(today), endOfMonth(today)),
+  },
+  {
+    get label() {
+      return m.common_range_this_year()
+    },
+    range: (today) => toRange(startOfYear(today), today),
+  },
 ]
 
 /**

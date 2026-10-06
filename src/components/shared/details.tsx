@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Frame, FrameHeader, FramePanel } from '@/components/ui/frame'
 import { formatDate } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 
 /*
  * Building blocks for read-only "details" drawers (resident, house, …).
@@ -41,7 +42,7 @@ export function CollapsibleSection({
           <CollapsibleTrigger
             render={<Button size="icon-sm" variant="ghost" />}
             className="-me-3 [&_svg]:transition-transform data-panel-open:[&_svg]:rotate-180"
-            aria-label={`Mostrar u ocultar ${title.toLowerCase()}`}
+            aria-label={m.common_toggle_section({ title: title.toLowerCase() })}
           >
             <IconChevronDown />
           </CollapsibleTrigger>

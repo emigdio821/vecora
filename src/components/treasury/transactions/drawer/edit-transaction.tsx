@@ -20,6 +20,7 @@ import { toastManager } from '@/components/ui/toast'
 import { useFormatCurrency } from '@/hooks/use-currency'
 import { systemCategorySource } from '@/lib/system-categories'
 import { type UpdateTransactionInput, updateTransactionSchema } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 import { updateTransaction } from '@/server-actions/treasury'
 import { type TransactionQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { TransactionFormFields } from './transaction-form-fields'
@@ -52,7 +53,7 @@ export function EditTransactionDrawer({
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Movimiento actualizado',
+        title: m.treasury_transaction_updated(),
         description: `${values.description} - ${formatCurrency(values.amount, transaction.currency)}`,
       })
       onOpenChange(false)
@@ -72,7 +73,7 @@ export function EditTransactionDrawer({
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar movimiento</DrawerTitle>
+          <DrawerTitle>{m.treasury_edit_transaction()}</DrawerTitle>
           <DrawerDescription>{transaction.description}</DrawerDescription>
         </DrawerHeader>
 
@@ -130,10 +131,9 @@ function EditTransactionForm({
           {key !== null && (
             <Alert variant="info">
               <IconInfoCircle />
-              <AlertTitle>Registrado desde {systemCategorySource(key)}</AlertTitle>
+              <AlertTitle>{m.treasury_recorded_from({ source: systemCategorySource(key) })}</AlertTitle>
               <AlertDescription>
-                Aquí solo puedes corregir el folio, el método de pago, la referencia y las notas. Para cambiar
-                lo demás, elimina el movimiento y regístralo de nuevo desde {systemCategorySource(key)}.
+                {m.treasury_system_transaction_description({ source: systemCategorySource(key) })}
               </AlertDescription>
             </Alert>
           )}
@@ -149,7 +149,7 @@ function EditTransactionForm({
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -158,10 +158,10 @@ function EditTransactionForm({
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DrawerFooter>
     </>

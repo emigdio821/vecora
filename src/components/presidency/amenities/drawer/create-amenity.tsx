@@ -18,6 +18,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { type AmenityInput, amenitySchema } from '@/lib/validations/presidency'
+import { m } from '@/paraglide/messages'
 import { createAmenity } from '@/server-actions/presidency'
 import { PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
 import { AmenityFormFields } from './amenity-form-fields'
@@ -47,7 +48,7 @@ export function CreateAmenityDrawer({ open, onOpenChange, ...props }: CreateAmen
     },
     onSuccess: (_data, values) => {
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'amenities'] })
-      toastManager.add({ type: 'success', title: 'Área creada', description: values.name })
+      toastManager.add({ type: 'success', title: m.presidency_amenity_created(), description: values.name })
       onOpenChange(false)
     },
     onError: (error) => {
@@ -82,10 +83,8 @@ export function CreateAmenityDrawer({ open, onOpenChange, ...props }: CreateAmen
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Nueva área</DrawerTitle>
-          <DrawerDescription>
-            Un área común que las casas pueden reservar por día, por ejemplo "Terraza" o "Alberca".
-          </DrawerDescription>
+          <DrawerTitle>{m.presidency_new_amenity()}</DrawerTitle>
+          <DrawerDescription>{m.presidency_create_amenity_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -99,7 +98,7 @@ export function CreateAmenityDrawer({ open, onOpenChange, ...props }: CreateAmen
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -108,10 +107,10 @@ export function CreateAmenityDrawer({ open, onOpenChange, ...props }: CreateAmen
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Crear
+            {m.common_action_create()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

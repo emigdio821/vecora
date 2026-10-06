@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { useFormatCurrency } from '@/hooks/use-currency'
 import type { CurrencyCode } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import { deleteTransactions, restoreTransactions } from '@/server-actions/treasury'
 import { type TransactionQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 
@@ -28,14 +29,15 @@ async function undoDelete(queryClient: QueryClient, ids: string[]) {
   const result = await restoreTransactions(ids)
 
   if (result.error !== undefined) {
-    toastManager.add({ type: 'error', title: 'No se pudo deshacer', description: result.error })
+    toastManager.add({ type: 'error', title: m.common_undo_failed(), description: result.error })
     return
   }
 
   void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
   toastManager.add({
     type: 'success',
-    title: result.data.restored === 1 ? 'Movimiento restaurado' : 'Movimientos restaurados',
+    title:
+      result.data.restored === 1 ? m.treasury_transaction_restored() : m.treasury_transactions_restored(),
   })
 }
 
@@ -65,17 +67,29 @@ export function DeleteTransactionsAlertDialog({
     totals.set(t.currency, (totals.get(t.currency) ?? 0) + Number(t.amount) * (t.kind === 'income' ? 1 : -1))
   }
   const impact = [...totals]
-    .map(
-      ([currency, total]) => `${formatCurrency(Math.abs(total), currency)} ${total >= 0 ? 'menos' : 'más'}`,
-    )
+    .map(([currency, total]) => {
+      const amount = formatCurrency(Math.abs(total), currency)
+      return total >= 0
+        ? m.treasury_delete_impact_less({ amount })
+        : m.treasury_delete_impact_more({ amount })
+    })
     .join(', ')
   const hasFee = transactions.some((t) => t.category.key === 'fee')
   const feeClause = hasFee
-    ? ` ${isSingle ? 'Es una cuota, así que ese mes volverá a aparecer como pendiente para la casa.' : 'Incluye cuotas, así que esos meses volverán a aparecer como pendientes para sus casas.'}`
-    : ''
+    ? isSingle
+      ? m.treasury_delete_fee_clause_one()
+      : m.treasury_delete_fee_clause_many()
+    : null
   const hasAmenityFee = transactions.some((t) => t.category.key === 'amenity_fee')
-  const amenityClause = hasAmenityFee ? ' La reservación volverá a aparecer como pendiente de pago.' : ''
-  const description = `${isSingle ? 'Dejará' : 'Dejarán'} de contar en el saldo (${impact}).${feeClause}${amenityClause} Solo podrás deshacerlo durante unos segundos.`
+  const amenityClause = hasAmenityFee ? m.treasury_delete_amenity_clause() : null
+  const description = [
+    m.treasury_delete_transactions_impact({ count, impact }),
+    feeClause,
+    amenityClause,
+    m.treasury_delete_undo_hint(),
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -90,15 +104,19 @@ export function DeleteTransactionsAlertDialog({
       const partial = deleted < count // RLS filtered some rows out
       const toastId = toastManager.add({
         type: partial ? 'warning' : 'success',
-        title: partial ? 'Eliminación parcial' : isSingle ? 'Movimiento eliminado' : 'Movimientos eliminados',
+        title: partial
+          ? m.common_partial_delete()
+          : isSingle
+            ? m.treasury_transaction_deleted()
+            : m.treasury_transactions_deleted(),
         description: partial
-          ? `Se eliminaron ${deleted} de ${count} movimientos`
+          ? m.treasury_transactions_deleted_partial({ deleted, count })
           : isSingle
             ? transactions[0].description
-            : `Se eliminaron ${deleted} movimientos`,
+            : m.treasury_transactions_deleted_count({ count: deleted }),
         timeout: UNDO_TOAST_TIMEOUT_MS,
         actionProps: {
-          children: 'Deshacer',
+          children: m.common_action_undo(),
           onClick: () => {
             toastManager.close(toastId)
             void undoDelete(queryClient, ids)
@@ -112,7 +130,7 @@ export function DeleteTransactionsAlertDialog({
     onError: (error) => {
       toastManager.add({
         type: 'error',
-        title: 'No se pudo eliminar',
+        title: m.common_delete_failed(),
         description: error.message,
       })
     },
@@ -131,9 +149,7 @@ export function DeleteTransactionsAlertDialog({
     <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            {isSingle ? '¿Eliminar este movimiento?' : `¿Eliminar ${count} movimientos?`}
-          </AlertDialogTitle>
+          <AlertDialogTitle>{m.treasury_delete_transactions_title({ count })}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -151,7 +167,7 @@ export function DeleteTransactionsAlertDialog({
 
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
             variant="destructive"
@@ -161,7 +177,7 @@ export function DeleteTransactionsAlertDialog({
               mutation.mutate()
             }}
           >
-            Eliminar
+            {m.common_action_delete()}
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

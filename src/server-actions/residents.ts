@@ -8,15 +8,16 @@ import {
   type UpdateResidentInput,
   updateResidentSchema,
 } from '@/lib/validations/residents'
+import { m } from '@/paraglide/messages'
 
 function toMessage(error: PostgrestError, fallback: string) {
   return postgrestErrorMessage(error, {
     fallback,
     unique: {
-      residents_email_unique: 'Ya existe un residente con ese correo',
-      residents_email_account: 'Ese correo ya lo usa una cuenta de la mesa directiva',
+      residents_email_unique: m.residential_resident_email_taken(),
+      residents_email_account: m.residential_resident_email_account(),
     },
-    uniqueFallback: 'Ya existe un residente con esos datos',
+    uniqueFallback: m.residential_resident_duplicate(),
   })
 }
 
@@ -25,7 +26,7 @@ const createResidentFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = createResidentSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { first_name, last_name, phone, email, notes, property_id, relationship } = parsed.data
@@ -45,9 +46,9 @@ const createResidentFn = createServerFn({ method: 'POST' })
     if (error) {
       // P0002: raised by the RPC for a missing/soft-deleted house; 23503: FK race.
       if (error.code === 'P0002' || error.code === '23503') {
-        return { error: 'La casa seleccionada ya no existe' }
+        return { error: m.residential_selected_house_missing() }
       }
-      return { error: toMessage(error, 'No se pudo crear el residente, intenta nuevamente') }
+      return { error: toMessage(error, m.residential_create_resident_failed()) }
     }
 
     return { data: { id: data } }
@@ -60,7 +61,7 @@ const updateResidentFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ id: string }>> => {
     const parsed = updateResidentSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { email, notes, ...rest } = parsed.data
@@ -74,7 +75,7 @@ const updateResidentFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo actualizar el residente, intenta nuevamente') }
+      return { error: toMessage(error, m.residential_update_resident_failed()) }
     }
 
     return { data }
@@ -93,7 +94,7 @@ const deleteResidentsFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: ids }): Promise<ActionResult<{ deleted: number }>> => {
     const uniqueIds = [...new Set(ids)]
     if (uniqueIds.length === 0) {
-      return { error: 'Selecciona al menos un residente' }
+      return { error: m.residential_select_resident_required() }
     }
 
     const supabase = await createClient()
@@ -105,11 +106,11 @@ const deleteResidentsFn = createServerFn({ method: 'POST' })
       .select('id')
 
     if (error) {
-      return { error: toMessage(error, 'No se pudieron eliminar los residentes, intenta nuevamente') }
+      return { error: toMessage(error, m.residential_delete_residents_failed()) }
     }
 
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: { deleted: data.length } }
@@ -123,7 +124,7 @@ const restoreResidentsFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: ids }): Promise<ActionResult<{ restored: number }>> => {
     const uniqueIds = [...new Set(ids)]
     if (uniqueIds.length === 0) {
-      return { error: 'Nada que restaurar' }
+      return { error: m.common_nothing_to_restore() }
     }
 
     const supabase = await createClient()
@@ -135,14 +136,17 @@ const restoreResidentsFn = createServerFn({ method: 'POST' })
       .select('id')
 
     if (error) {
-      const message = toMessage(error, 'No se pudieron restaurar los residentes, intenta nuevamente')
+      const message = toMessage(error, m.residential_restore_residents_failed())
       return {
-        error: error.code === UNIQUE_VIOLATION ? `No se pudo restaurar: ${message.toLowerCase()}` : message,
+        error:
+          error.code === UNIQUE_VIOLATION
+            ? m.residential_restore_failed_reason({ reason: message.toLowerCase() })
+            : message,
       }
     }
 
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: { restored: data.length } }

@@ -3,6 +3,7 @@ import type { Column, RowData } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuCheckboxItem, MenuPopup, MenuTrigger, MenuGroup } from '@/components/ui/menu'
 import { cn } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { DataTableFeatures } from './features'
 
 interface DataTableSortableHeaderProps<TData extends RowData, TValue> {
@@ -48,7 +49,7 @@ export function DataTableSortableHeader<TData extends RowData, TValue>({
                 }
               }}
             >
-              Ascendente
+              {m.common_sort_ascending()}
             </MenuCheckboxItem>
             <MenuCheckboxItem
               checked={isDescSorted}
@@ -60,7 +61,7 @@ export function DataTableSortableHeader<TData extends RowData, TValue>({
                 }
               }}
             >
-              Descendente
+              {m.common_sort_descending()}
             </MenuCheckboxItem>
           </MenuGroup>
         </MenuPopup>

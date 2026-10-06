@@ -17,8 +17,11 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { MULTI_LANGUAGE } from '@/lib/config/i18n'
 import type { Settings } from '@/lib/supabase/settings'
 import { CURRENCY_ITEMS, LANGUAGE_ITEMS, type SetupInput, setupSchema } from '@/lib/validations/settings'
+import { m } from '@/paraglide/messages'
+import { getLocale, setLocale } from '@/paraglide/runtime'
 import { completeSetup } from '@/server-actions/settings'
 import { SETTINGS_QUERY_KEY } from '@/tanstack-queries/settings'
 
@@ -45,7 +48,12 @@ export function SetupDialog({ settings }: { settings: Settings }) {
       const result = await completeSetup(values)
       if (result.error !== undefined) throw new Error(result.error)
     },
-    onSuccess: () => {
+    onSuccess: (_data, values) => {
+      // The admin's pick is also their own screen language; switching reloads.
+      if (MULTI_LANGUAGE && values.default_language !== getLocale()) {
+        void setLocale(values.default_language)
+        return
+      }
       void queryClient.invalidateQueries({ queryKey: [SETTINGS_QUERY_KEY] })
     },
     onError: (error) => {
@@ -57,9 +65,9 @@ export function SetupDialog({ settings }: { settings: Settings }) {
     <Dialog open disablePointerDismissal>
       <DialogPopup showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Configura tu residencial</DialogTitle>
+          <DialogTitle>{m.settings_setup_title()}</DialogTitle>
           <DialogDescription>
-            Antes de empezar, elige cómo se llama el residencial, su idioma y su moneda.
+            {MULTI_LANGUAGE ? m.settings_setup_description() : m.settings_setup_description_single_language()}
           </DialogDescription>
         </DialogHeader>
 
@@ -80,54 +88,55 @@ export function SetupDialog({ settings }: { settings: Settings }) {
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Nombre del residencial <span className="text-destructive">*</span>
+                    {m.settings_residential_name()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input {...field} autoComplete="off" disabled={mutation.isPending} />
-                  <FieldDescription>Aparece en el menú y en los reportes.</FieldDescription>
+                  <FieldDescription>{m.settings_residential_name_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
             />
 
-            <Controller
-              name="default_language"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field
-                  name={field.name}
-                  invalid={fieldState.invalid}
-                  touched={fieldState.isTouched}
-                  dirty={fieldState.isDirty}
-                >
-                  <FieldLabel>
-                    Idioma <span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Select
-                    items={LANGUAGE_ITEMS}
-                    value={field.value}
-                    onValueChange={(value) => {
-                      field.onChange(value)
-                    }}
-                    disabled={mutation.isPending}
+            {/* Single language: the field stays in the form with its default. */}
+            {MULTI_LANGUAGE && (
+              <Controller
+                name="default_language"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    name={field.name}
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
                   >
-                    <SelectTrigger ref={field.ref} className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectPopup>
-                      {LANGUAGE_ITEMS.map((item) => (
-                        <SelectItem key={item.value} value={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectPopup>
-                  </Select>
-                  <FieldDescription>
-                    El de los reportes y los textos que genera la aplicación.
-                  </FieldDescription>
-                  <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
-                </Field>
-              )}
-            />
+                    <FieldLabel>
+                      {m.common_language()} <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <Select
+                      items={LANGUAGE_ITEMS}
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                      }}
+                      disabled={mutation.isPending}
+                    >
+                      <SelectTrigger ref={field.ref} className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectPopup>
+                        {LANGUAGE_ITEMS.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectPopup>
+                    </Select>
+                    <FieldDescription>{m.settings_language_hint()}</FieldDescription>
+                    <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
+            )}
 
             <Controller
               name="currency"
@@ -140,7 +149,7 @@ export function SetupDialog({ settings }: { settings: Settings }) {
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Moneda <span className="text-destructive">*</span>
+                    {m.settings_currency()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Select
                     items={CURRENCY_ITEMS}
@@ -161,9 +170,7 @@ export function SetupDialog({ settings }: { settings: Settings }) {
                       ))}
                     </SelectPopup>
                   </Select>
-                  <FieldDescription>
-                    Puedes cambiarla después en "Ajustes"; lo ya registrado conserva su moneda.
-                  </FieldDescription>
+                  <FieldDescription>{m.settings_setup_currency_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -172,7 +179,7 @@ export function SetupDialog({ settings }: { settings: Settings }) {
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -181,7 +188,7 @@ export function SetupDialog({ settings }: { settings: Settings }) {
 
         <DialogFooter>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Guardar y continuar
+            {m.settings_setup_submit()}
           </Button>
         </DialogFooter>
       </DialogPopup>

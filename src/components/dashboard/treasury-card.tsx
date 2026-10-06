@@ -37,7 +37,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
-import { type CurrencyCode, cn, esLocale, ISO_DAY } from '@/lib/utils'
+import { type CurrencyCode, cn, dateLocale, ISO_DAY, intlLocale } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import {
   type PeriodMovementQueryData,
   type PeriodQueryData,
@@ -47,7 +48,7 @@ import {
   periodsQueryOptions,
 } from '@/tanstack-queries/treasury'
 
-type Series = 'Ingresos' | 'Egresos'
+type Series = 'income' | 'expense'
 
 interface MonthTotals {
   /** "2026-03" */
@@ -67,7 +68,7 @@ const CHART_HEIGHT = 240
 
 // Same green/red as the swatches in the totals; the tokens live in globals.css.
 const SERIES_COLORS = scaleOrdinal<Series, string>(
-  ['Ingresos', 'Egresos'],
+  ['income', 'expense'],
   ['var(--chart-income)', 'var(--chart-expense)'],
 )
 
@@ -81,6 +82,10 @@ const RENDERER = motion({
   initial: 'always',
   transition: { type: 'spring', stiffness: 170, damping: 18, mass: 1 },
 })
+
+function seriesLabel(series: string) {
+  return series === 'income' ? m.common_income() : m.common_expense()
+}
 
 function monthDate(month: string) {
   return parseISO(`${month}-01`)
@@ -129,8 +134,8 @@ export function TreasuryCard() {
     return (
       <CardFrame className="w-full">
         <CardFrameHeader>
-          <CardFrameTitle>Tesorería</CardFrameTitle>
-          <CardFrameDescription>Resumen del periodo</CardFrameDescription>
+          <CardFrameTitle>{m.common_section_treasury()}</CardFrameTitle>
+          <CardFrameDescription>{m.dashboard_treasury_summary()}</CardFrameDescription>
         </CardFrameHeader>
         <Card>
           <CardPanel>
@@ -139,14 +144,12 @@ export function TreasuryCard() {
                 <EmptyMedia variant="icon">
                   <IconCalendarOff />
                 </EmptyMedia>
-                <EmptyTitle>Sin periodo actual</EmptyTitle>
-                <EmptyDescription>
-                  Ningún periodo cubre la fecha de hoy. Crea uno en "Presidencia" para ver el resumen.
-                </EmptyDescription>
+                <EmptyTitle>{m.dashboard_no_current_period()}</EmptyTitle>
+                <EmptyDescription>{m.dashboard_treasury_no_period_description()}</EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
                 <Button variant="outline" render={<Link to="/presidency" search={{ tab: 'periods' }} />}>
-                  Ir a Periodos
+                  {m.dashboard_treasury_go_to_periods()}
                 </Button>
               </EmptyContent>
             </Empty>
@@ -196,12 +199,13 @@ function PeriodTreasury({
   const [summary, ...others] = summaries
   const currency = summary.currency ?? period.currency
   const balance = Number(summary.balance ?? 0)
+  const formatCurrency = useFormatCurrency()
 
   return (
     <CardFrame className="w-full">
       <CardFrameHeader>
-        <CardFrameTitle>Tesorería</CardFrameTitle>
-        <CardFrameDescription>Periodo {period.name}</CardFrameDescription>
+        <CardFrameTitle>{m.common_section_treasury()}</CardFrameTitle>
+        <CardFrameDescription>{m.dashboard_treasury_period_name({ name: period.name })}</CardFrameDescription>
         <CardFrameAction className="text-muted-foreground">
           <IconChartArea />
         </CardFrameAction>
@@ -210,19 +214,19 @@ function PeriodTreasury({
         <CardPanel className="grid min-w-0 gap-6">
           <dl className="grid gap-2 sm:grid-cols-3 sm:gap-4">
             <Total
-              label="Ingresos"
+              label={m.common_income()}
               swatch="bg-(--chart-income)"
               value={summary.total_income ?? 0}
               currency={currency}
             />
             <Total
-              label="Egresos"
+              label={m.common_expense()}
               swatch="bg-(--chart-expense)"
               value={summary.total_expense ?? 0}
               currency={currency}
             />
             <Total
-              label="Saldo"
+              label={m.common_balance()}
               value={balance}
               currency={currency}
               className={balance < 0 ? 'text-destructive-foreground' : undefined}
@@ -234,9 +238,12 @@ function PeriodTreasury({
                 const code = other.currency ?? period.currency
                 return (
                   <li key={code}>
-                    En {code}: ingresos <Money value={other.total_income ?? 0} currency={code} />, egresos{' '}
-                    <Money value={other.total_expense ?? 0} currency={code} />, saldo{' '}
-                    <Money value={other.balance ?? 0} currency={code} />
+                    {m.dashboard_treasury_other_currency({
+                      code,
+                      income: formatCurrency(other.total_income ?? 0, code),
+                      expense: formatCurrency(other.total_expense ?? 0, code),
+                      balance: formatCurrency(other.balance ?? 0, code),
+                    })}
                   </li>
                 )
               })}
@@ -302,14 +309,14 @@ function MonthlyFlowChart({
   const rows = useMemo(
     () =>
       months.flatMap((t): FlowRow[] => [
-        { month: t.month, series: 'Ingresos', amount: t.income },
-        { month: t.month, series: 'Egresos', amount: t.expense },
+        { month: t.month, series: 'income', amount: t.income },
+        { month: t.month, series: 'expense', amount: t.expense },
       ]),
     [months],
   )
 
   const definition = useMemo(() => {
-    const compactCurrency = new Intl.NumberFormat('es-MX', {
+    const compactCurrency = new Intl.NumberFormat(intlLocale(), {
       style: 'currency',
       currency,
       currencyDisplay: 'narrowSymbol',
@@ -332,7 +339,7 @@ function MonthlyFlowChart({
           scale: () => scalePoint<string>().padding(0.25),
           axis: {
             line: false,
-            ticks: { size: 0, format: (month) => format(monthDate(month), 'MMM', { locale: esLocale }) },
+            ticks: { size: 0, format: (month) => format(monthDate(month), 'MMM', { locale: dateLocale() }) },
           },
         },
         y: {
@@ -352,9 +359,9 @@ function MonthlyFlowChart({
         placement: ['right', 'left', 'top'],
         sort: 'color-domain',
         content: (points) => ({
-          title: format(monthDate(String(points[0]?.xValue ?? '')), 'MMMM yyyy', { locale: esLocale }),
+          title: format(monthDate(String(points[0]?.xValue ?? '')), 'MMMM yyyy', { locale: dateLocale() }),
           rows: points.map((point) => ({
-            label: String(point.groupLabel),
+            label: seriesLabel(String(point.groupLabel)),
             value: formatCurrency(point.datum.amount, currency),
             color: point.color,
           })),
@@ -374,26 +381,26 @@ function MonthlyFlowChart({
           definition={definition}
           renderer={RENDERER}
           height={CHART_HEIGHT}
-          ariaLabel={`Ingresos y egresos por mes, periodo ${period.name}`}
-          ariaDescription="Áreas por mes: ingresos en verde y egresos en rojo. La tabla que sigue tiene los montos exactos."
+          ariaLabel={m.dashboard_treasury_chart_label({ name: period.name })}
+          ariaDescription={m.dashboard_treasury_chart_description()}
         />
       </div>
       {/* sr-only on the wrapper: a table ignores its 1px width and overflow, and
           at full width it made the page scroll sideways on phones. */}
       <div className="sr-only">
         <table>
-          <caption>Ingresos y egresos por mes, periodo {period.name}</caption>
+          <caption>{m.dashboard_treasury_chart_label({ name: period.name })}</caption>
           <thead>
             <tr>
-              <th scope="col">Mes</th>
-              <th scope="col">Ingresos</th>
-              <th scope="col">Egresos</th>
+              <th scope="col">{m.dashboard_treasury_month()}</th>
+              <th scope="col">{m.common_income()}</th>
+              <th scope="col">{m.common_expense()}</th>
             </tr>
           </thead>
           <tbody>
             {months.map((t) => (
               <tr key={t.month}>
-                <th scope="row">{format(monthDate(t.month), 'MMMM yyyy', { locale: esLocale })}</th>
+                <th scope="row">{format(monthDate(t.month), 'MMMM yyyy', { locale: dateLocale() })}</th>
                 <td>{formatCurrency(t.income, currency)}</td>
                 <td>{formatCurrency(t.expense, currency)}</td>
               </tr>

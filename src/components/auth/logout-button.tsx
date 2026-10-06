@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { m } from '@/paraglide/messages'
 import { logout } from '@/server-actions/auth'
 
 /** For /no-access, outside the sidebar; plain state instead of a mutation. */
@@ -29,7 +30,7 @@ export function LogoutButton() {
   return (
     <div className="flex flex-col items-center gap-2">
       <Button variant="outline" loading={isLoading} onClick={handleClick}>
-        Cerrar sesión
+        {m.auth_logout()}
       </Button>
       {error && <p className="text-sm text-destructive-foreground">{error}</p>}
     </div>

@@ -4,6 +4,7 @@ import { useHasRole } from '@/components/current-user-provider'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
+import { m } from '@/paraglide/messages'
 import type { PeriodQueryData } from '@/tanstack-queries/treasury'
 import { CreatePeriodDrawer } from '../drawer/create-period'
 import type { PeriodRow } from './columns'
@@ -30,7 +31,7 @@ export function PeriodsDataTableHeader({ table, latest, isLoading }: PeriodsData
             table={table}
             columnId="name"
             param="search-periods"
-            hint='Buscar por nombre del periodo, por ejemplo "2026"'
+            hint={m.presidency_period_search_hint()}
           />
         </div>
 
@@ -42,7 +43,7 @@ export function PeriodsDataTableHeader({ table, latest, isLoading }: PeriodsData
               setCreateOpen(true)
             }}
           >
-            Nuevo periodo
+            {m.presidency_new_period()}
           </Button>
         )}
       </div>

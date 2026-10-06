@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
+import { m } from '@/paraglide/messages'
 import { deleteSecurityRequest } from '@/server-actions/security'
 import { SECURITY_QUERY_KEY, type SecurityRequestQueryData } from '@/tanstack-queries/security'
 
@@ -37,11 +38,11 @@ export function DeleteRequestAlertDialog({
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [SECURITY_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Solicitud eliminada', description: request.title })
+      toastManager.add({ type: 'success', title: m.requests_delete_success(), description: request.title })
       onOpenChange(false)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo eliminar', description: error.message })
+      toastManager.add({ type: 'error', title: m.common_delete_failed(), description: error.message })
     },
   })
 
@@ -58,16 +59,16 @@ export function DeleteRequestAlertDialog({
     <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Eliminar esta solicitud?</AlertDialogTitle>
+          <AlertDialogTitle>{m.requests_delete_title()}</AlertDialogTitle>
           <AlertDialogDescription>
-            {request.title} - <Money value={request.amount} currency={request.currency} />. Esta acción no se
-            puede deshacer.
+            {request.title} - <Money value={request.amount} currency={request.currency} />.{' '}
+            {m.requests_delete_description()}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
             variant="destructive"
@@ -76,7 +77,7 @@ export function DeleteRequestAlertDialog({
               mutation.mutate()
             }}
           >
-            Eliminar
+            {m.common_action_delete()}
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip'
+import { m } from '@/paraglide/messages'
 import { unassignResident } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY, type ResidentQueryData } from '@/tanstack-queries/residents'
@@ -39,12 +40,14 @@ export function ResidentHouses({ resident, disabled }: ResidentHousesProps) {
   )
 
   return (
-    <CollapsibleSection icon={<IconHome />} title="Casas" count={links.length}>
+    <CollapsibleSection icon={<IconHome />} title={m.common_section_houses()} count={links.length}>
       {links.length ? (
         <ul className="grid gap-3">
           {links.map(({ property, relationship }) => (
             <li key={property.id} className="flex items-center justify-between gap-2 text-sm">
-              <span className="truncate font-medium">Casa {property.number}</span>
+              <span className="truncate font-medium">
+                {m.common_house_label({ number: property.number })}
+              </span>
               <div className="flex shrink-0 items-center gap-1">
                 <Badge variant="outline">{RELATIONSHIP_LABEL[relationship]}</Badge>
                 <UnassignHouseButton resident={resident} house={property} disabled={disabled} />
@@ -53,7 +56,7 @@ export function ResidentHouses({ resident, disabled }: ResidentHousesProps) {
           ))}
         </ul>
       ) : (
-        <Muted>No está asignado a ninguna casa.</Muted>
+        <Muted>{m.residential_resident_no_houses()}</Muted>
       )}
 
       <Button
@@ -64,7 +67,7 @@ export function ResidentHouses({ resident, disabled }: ResidentHousesProps) {
           setAssignOpen(true)
         }}
       >
-        Asignar casa
+        {m.residential_assign_house()}
       </Button>
 
       {/* Rendered inside the parent popup so Base UI treats it as a nested drawer. */}
@@ -99,13 +102,13 @@ function UnassignHouseButton({
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Casa quitada',
-        description: `${name} ya no está asignado a la casa ${house.number}`,
+        title: m.residential_house_removed(),
+        description: m.residential_unassigned_description({ name, number: house.number }),
       })
       setConfirmOpen(false)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo quitar', description: error.message })
+      toastManager.add({ type: 'error', title: m.common_remove_failed(), description: error.message })
     },
   })
 
@@ -131,30 +134,28 @@ function UnassignHouseButton({
               onClick={() => {
                 setConfirmOpen(true)
               }}
-              aria-label={`Quitar la casa ${house.number}`}
+              aria-label={m.residential_remove_house({ number: house.number })}
             >
               <IconHomeX />
             </Button>
           }
         />
 
-        <TooltipPopup>Quitar la casa {house.number}</TooltipPopup>
+        <TooltipPopup>{m.residential_remove_house({ number: house.number })}</TooltipPopup>
       </Tooltip>
 
       <AlertDialog open={isConfirmOpen} onOpenChange={handleOpenChange}>
         <AlertDialogPopup>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              ¿Quitar a {name} de la casa {house.number}?
+              {m.residential_remove_resident_title({ name, number: house.number })}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              Dejará de aparecer como residente de esta casa. Podrás volver a asignarlo después.
-            </AlertDialogDescription>
+            <AlertDialogDescription>{m.residential_remove_resident_description()}</AlertDialogDescription>
           </AlertDialogHeader>
 
           <AlertDialogFooter>
             <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-              Cancelar
+              {m.common_action_cancel()}
             </AlertDialogClose>
             <Button
               variant="destructive"
@@ -163,7 +164,7 @@ function UnassignHouseButton({
                 mutation.mutate()
               }}
             >
-              Quitar
+              {m.common_action_remove()}
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

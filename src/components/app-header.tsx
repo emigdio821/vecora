@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { m } from '@/paraglide/messages'
 import { VecoraIcon } from './shared/icons'
 import { SidebarTrigger } from './ui/sidebar'
 
@@ -16,7 +17,7 @@ export function AppHeader() {
           render={
             <Link to="/">
               <VecoraIcon className="size-4" />
-              <span className="text-base font-semibold">Vecora</span>
+              <span className="text-base font-semibold">{m.common_app_name()}</span>
             </Link>
           }
         />

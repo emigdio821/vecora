@@ -7,6 +7,7 @@ export default defineConfig({
     '**/src/components/ui/**',
     '**/src/lib/supabase/database.types.ts',
     '**/src/routeTree.gen.ts',
+    '**/src/paraglide/**',
   ],
   plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'promise', 'react', 'react-perf', 'jsx-a11y'],
   rules: {

@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { getLocale } from '@/paraglide/runtime'
 import { confirmAccessLink } from '@/server-actions/auth'
 
 interface ConfirmAccessButtonProps {
@@ -28,6 +29,11 @@ export function ConfirmAccessButton({ tokenHash, type, children }: ConfirmAccess
     queryClient.clear()
     if (result?.error) {
       await navigate({ to: '/login', search: { error: 'invite' }, replace: true })
+      return
+    }
+    // Now in the HOA's language: a full load renders the next page in it.
+    if (result?.locale && result.locale !== getLocale()) {
+      window.location.replace('/set-password')
       return
     }
     await navigate({ to: '/set-password', replace: true })

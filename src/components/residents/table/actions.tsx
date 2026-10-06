@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
+import { m } from '@/paraglide/messages'
 import { type ResidentQueryData } from '@/tanstack-queries/residents'
 import { DeleteResidentsAlertDialog } from '../dialog/delete-residents'
 import { EditResidentDrawer } from '../drawer/edit-resident'
@@ -40,7 +41,7 @@ export function ResidentsTableActions({ resident }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={`Acciones de ${residentFullName}`}
+              aria-label={m.residential_actions_for({ name: residentFullName })}
             >
               <IconDots className="size-4" />
             </Button>
@@ -57,7 +58,7 @@ export function ResidentsTableActions({ resident }: ActionsProps) {
                 setDetailsOpen(true)
               }}
             >
-              Información
+              {m.residential_action_info()}
             </MenuItem>
 
             {canManage && (
@@ -67,7 +68,7 @@ export function ResidentsTableActions({ resident }: ActionsProps) {
                     setEditOpen(true)
                   }}
                 >
-                  Editar
+                  {m.common_action_edit()}
                 </MenuItem>
 
                 <MenuItem
@@ -76,7 +77,7 @@ export function ResidentsTableActions({ resident }: ActionsProps) {
                     setDeleteOpen(true)
                   }}
                 >
-                  Eliminar
+                  {m.common_action_delete()}
                 </MenuItem>
               </>
             )}

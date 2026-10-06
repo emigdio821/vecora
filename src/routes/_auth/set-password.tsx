@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card'
 import { siteConfig } from '@/lib/config/site'
 import { pageHead } from '@/lib/metadata'
+import { m } from '@/paraglide/messages'
 
 /**
  * Only stop for a session that came from an access link (see /auth/confirm).
@@ -24,8 +25,8 @@ export const Route = createFileRoute('/_auth/set-password')({
   },
   head: () =>
     pageHead({
-      title: 'Crear contraseña',
-      description: `Crea la contraseña con la que entrarás a ${siteConfig.name}.`,
+      title: m.auth_set_password_head_title(),
+      description: m.auth_set_password_head_description({ appName: siteConfig.name }),
     }),
   component: SetPasswordPage,
 })
@@ -37,10 +38,11 @@ function SetPasswordPage() {
   return (
     <CardFrame className="w-full max-w-sm">
       <CardFrameHeader>
-        <CardFrameTitle>Crea tu contraseña</CardFrameTitle>
+        <CardFrameTitle>{m.auth_set_password_title()}</CardFrameTitle>
         <CardFrameDescription>
-          Para <strong className="font-medium text-foreground">{user.email}</strong>. Con ella entrarás a
-          Vecora las próximas veces, junto con tu correo.
+          {m.auth_set_password_for_before()}{' '}
+          <strong className="font-medium text-foreground">{user.email}</strong>
+          {m.auth_set_password_for_after()}
         </CardFrameDescription>
       </CardFrameHeader>
       <Card>

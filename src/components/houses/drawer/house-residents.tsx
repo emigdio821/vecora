@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip'
+import { m } from '@/paraglide/messages'
 import { unassignResident } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
@@ -34,7 +35,7 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
   const residents = sortByRelationship(house.property_residents)
 
   return (
-    <CollapsibleSection icon={<IconUsers />} title="Residentes" count={residents.length}>
+    <CollapsibleSection icon={<IconUsers />} title={m.common_section_residents()} count={residents.length}>
       {residents.length ? (
         <ul className="grid gap-3">
           {residents.map(({ resident, relationship }) => (
@@ -53,7 +54,7 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
           ))}
         </ul>
       ) : (
-        <Muted>Nadie está asignado a esta casa.</Muted>
+        <Muted>{m.residential_house_no_residents()}</Muted>
       )}
 
       <Button
@@ -64,7 +65,7 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
           setAssignOpen(true)
         }}
       >
-        Asignar residentes
+        {m.residential_assign_residents()}
       </Button>
 
       {/* Rendered inside the parent popup so Base UI treats it as a nested drawer. */}
@@ -99,13 +100,13 @@ function UnassignResidentButton({
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Residente quitado',
-        description: `${name} ya no está asignado a la casa ${house.number}`,
+        title: m.residential_resident_removed(),
+        description: m.residential_unassigned_description({ name, number: house.number }),
       })
       setConfirmOpen(false)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo quitar', description: error.message })
+      toastManager.add({ type: 'error', title: m.common_remove_failed(), description: error.message })
     },
   })
 
@@ -131,30 +132,28 @@ function UnassignResidentButton({
               onClick={() => {
                 setConfirmOpen(true)
               }}
-              aria-label={`Quitar a ${name} de la casa`}
+              aria-label={m.residential_remove_resident_from_house({ name })}
             >
               <IconUserMinus />
             </Button>
           }
         />
 
-        <TooltipPopup>Quitar a {name} de la casa</TooltipPopup>
+        <TooltipPopup>{m.residential_remove_resident_from_house({ name })}</TooltipPopup>
       </Tooltip>
 
       <AlertDialog open={isConfirmOpen} onOpenChange={handleOpenChange}>
         <AlertDialogPopup>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              ¿Quitar a {name} de la casa {house.number}?
+              {m.residential_remove_resident_title({ name, number: house.number })}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              Dejará de aparecer como residente de esta casa. Podrás volver a asignarlo después.
-            </AlertDialogDescription>
+            <AlertDialogDescription>{m.residential_remove_resident_description()}</AlertDialogDescription>
           </AlertDialogHeader>
 
           <AlertDialogFooter>
             <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-              Cancelar
+              {m.common_action_cancel()}
             </AlertDialogClose>
             <Button
               variant="destructive"
@@ -163,7 +162,7 @@ function UnassignResidentButton({
                 mutation.mutate()
               }}
             >
-              Quitar
+              {m.common_action_remove()}
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

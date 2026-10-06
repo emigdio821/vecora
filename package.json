@@ -9,7 +9,8 @@
     "start": "node .output/server/index.mjs",
     "lint": "oxlint --fix",
     "format": "oxfmt",
-    "typecheck": "tsc --noEmit",
+    "i18n": "paraglide-js compile --silent",
+    "typecheck": "npm run i18n && tsc --noEmit",
     "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
     "db:reset": "supabase db reset --local",
     "db:seed": "supabase db push --linked --include-seed",
@@ -53,6 +54,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
+    "@inlang/paraglide-js": "^2.25.4",
     "@tailwindcss/vite": "^4.3.3",
     "@types/d3-shape": "^3.2.0",
     "@types/node": "^24.19.1",

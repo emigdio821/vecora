@@ -16,6 +16,7 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { m } from '@/paraglide/messages'
 import type { LogEntryQueryData } from '@/tanstack-queries/logs'
 import { ACTION_LABEL, ACTIONS, identityName, SECTION_LABEL, SECTIONS } from '../entry'
 import {
@@ -28,13 +29,33 @@ import {
 } from './filters'
 
 const SECTION_FILTER_ITEMS: { value: SectionFilter; label: string }[] = [
-  { value: 'all', label: 'Todas' },
-  ...SECTIONS.map((section) => ({ value: section as SectionFilter, label: SECTION_LABEL[section] })),
+  {
+    value: 'all',
+    get label() {
+      return m.common_all_feminine()
+    },
+  },
+  ...SECTIONS.map((section) => ({
+    value: section as SectionFilter,
+    get label() {
+      return SECTION_LABEL[section]
+    },
+  })),
 ]
 
 const ACTION_FILTER_ITEMS: { value: ActionFilter; label: string }[] = [
-  { value: 'all', label: 'Todas' },
-  ...ACTIONS.map((action) => ({ value: action as ActionFilter, label: ACTION_LABEL[action] })),
+  {
+    value: 'all',
+    get label() {
+      return m.common_all_feminine()
+    },
+  },
+  ...ACTIONS.map((action) => ({
+    value: action as ActionFilter,
+    get label() {
+      return ACTION_LABEL[action]
+    },
+  })),
 ]
 
 interface LogsDataTableHeaderProps {
@@ -63,17 +84,14 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
     identity !== 'all' && identity,
   ].filter(Boolean)
   const isFiltered = activeFilterLabels.length > 0
-  const filtersLabel = isFiltered ? `Filtros: ${activeFilterLabels.join(', ')}` : 'Filtros'
+  const filtersLabel = isFiltered
+    ? m.logs_filters_active({ filters: activeFilterLabels.join(', ') })
+    : m.common_filters()
 
   return (
     <div className="flex flex-col justify-between gap-2 sm:flex-row">
       <div className="flex gap-2">
-        <DataTableSearch
-          table={table}
-          columnId="summary"
-          param="search-logs"
-          hint="Buscar por resumen, persona o sección"
-        />
+        <DataTableSearch table={table} columnId="summary" param="search-logs" hint={m.logs_search_hint()} />
 
         <Menu>
           <Tooltip>
@@ -101,7 +119,7 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
 
           <MenuPopup align="end" className="max-h-[70vh] overflow-y-auto">
             <MenuGroup>
-              <MenuGroupLabel>Sección</MenuGroupLabel>
+              <MenuGroupLabel>{m.logs_section()}</MenuGroupLabel>
               <MenuRadioGroup
                 value={section}
                 onValueChange={(value: SectionFilter) => {
@@ -119,7 +137,7 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
             <MenuSeparator />
 
             <MenuGroup>
-              <MenuGroupLabel>Acción</MenuGroupLabel>
+              <MenuGroupLabel>{m.logs_action()}</MenuGroupLabel>
               <MenuRadioGroup
                 value={action}
                 onValueChange={(value: ActionFilter) => {
@@ -137,14 +155,14 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
             <MenuSeparator />
 
             <MenuGroup>
-              <MenuGroupLabel>Quién</MenuGroupLabel>
+              <MenuGroupLabel>{m.logs_who()}</MenuGroupLabel>
               <MenuRadioGroup
                 value={identity}
                 onValueChange={(value: string) => {
                   void setIdentity(value)
                 }}
               >
-                <MenuRadioItem value="all">Todos</MenuRadioItem>
+                <MenuRadioItem value="all">{m.common_all_masculine()}</MenuRadioItem>
                 {identityItems.map((name) => (
                   <MenuRadioItem key={name} value={name}>
                     {name}

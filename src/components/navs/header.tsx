@@ -1,7 +1,8 @@
 import { IconChartLine } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
 import type { Settings } from '@/lib/supabase/settings'
-import { DEFAULT_RESIDENTIAL_LABEL } from '@/lib/validations/settings'
+import { defaultResidentialLabel } from '@/lib/validations/settings'
+import { m } from '@/paraglide/messages'
 import { VecoraIcon } from '../shared/icons'
 import {
   SidebarGroupContent,
@@ -19,7 +20,7 @@ interface HeaderNavProps extends React.ComponentProps<typeof SidebarGroupContent
 export function HeaderNav({ settings, ...props }: HeaderNavProps) {
   const pathname = useLocation({ select: (location) => location.pathname })
   const { setOpenMobile } = useSidebar()
-  const residentialName = settings.residentialName || DEFAULT_RESIDENTIAL_LABEL
+  const residentialName = settings.residentialName || defaultResidentialLabel()
 
   return (
     <SidebarGroupContent className="flex flex-col gap-2" {...props}>
@@ -29,7 +30,9 @@ export function HeaderNav({ settings, ...props }: HeaderNavProps) {
             <VecoraIcon className="size-5 text-sidebar-accent-foreground" />
 
             <div className="grid flex-1 text-left text-sm leading-none">
-              <span className="truncate text-base font-semibold text-sidebar-accent-foreground">Vecora</span>
+              <span className="truncate text-base font-semibold text-sidebar-accent-foreground">
+                {m.common_app_name()}
+              </span>
               <span className="truncate text-sm text-sidebar-foreground" title={residentialName}>
                 {residentialName}
               </span>
@@ -48,7 +51,7 @@ export function HeaderNav({ settings, ...props }: HeaderNavProps) {
             render={
               <Link to="/">
                 <IconChartLine className="size-4" />
-                <span>Inicio</span>
+                <span>{m.common_section_home()}</span>
                 <LinkPendingIndicator to="/" />
               </Link>
             }

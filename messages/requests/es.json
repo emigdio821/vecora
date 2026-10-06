@@ -1,0 +1,93 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "requests_maintenance_page_description": "Trabajos y compras de mantenimiento. Cada registro es una solicitud de pago que \"Tesorería\" marca como pagada o rechazada.",
+  "requests_security_page_description": "Gastos de seguridad: cámaras, guardias, accesos y equipo. Cada registro es una solicitud de pago que \"Tesorería\" marca como pagada o rechazada.",
+
+  "requests_new": "Nueva solicitud",
+  "requests_empty": "Sin solicitudes.",
+  "requests_actions_label": "Acciones de {title}",
+  "requests_maintenance_search_hint": "Buscar por concepto, detalles o quién la solicitó",
+  "requests_security_search_hint": "Buscar por concepto, detalles, tipo o quién la solicitó",
+  "requests_filters_active": "Filtros: {filters}",
+  "requests_status_filter_pending": "Pendientes",
+  "requests_status_filter_paid": "Pagadas",
+  "requests_status_filter_rejected": "Rechazadas",
+  "requests_requester": "Solicitó",
+
+  "requests_action_reject": "Rechazar",
+  "requests_action_reopen": "Reabrir",
+
+  "requests_maintenance_create_description": "Registra lo que se hizo y cuánto costó. Quedará pendiente hasta que la tesorería la pague o la rechace.",
+  "requests_security_create_description": "Registra el gasto de seguridad y cuánto costó. Quedará pendiente hasta que la tesorería lo pague o lo rechace.",
+  "requests_submit": "Enviar solicitud",
+  "requests_create_success": "Solicitud enviada a tesorería",
+
+  "requests_edit_title": "Editar solicitud",
+  "requests_edit_description": "Solo se puede editar mientras esté pendiente.",
+  "requests_update_success": "Solicitud actualizada",
+
+  "requests_title_description": "Qué se hizo o qué se compró. Es lo que verá la tesorería.",
+  "requests_maintenance_work_date": "Fecha del trabajo",
+  "requests_maintenance_details_description": "Opcional. Materiales, dónde se hizo, quién lo hizo, proveedor.",
+  "requests_security_date_description": "Día del servicio, trabajo o compra.",
+  "requests_security_details_description": "Opcional. Proveedor, turnos cubiertos, dónde se instaló, número de cámara.",
+
+  "requests_delete_title": "¿Eliminar esta solicitud?",
+  "requests_delete_description": "Esta acción no se puede deshacer.",
+  "requests_delete_success": "Solicitud eliminada",
+
+  "requests_reopen_title": "¿Reabrir esta solicitud?",
+  "requests_reopen_description": "Volverá a quedar pendiente: se podrá editar, pagar o rechazar de nuevo, y se quitará el motivo del rechazo.",
+  "requests_reopen_success": "Solicitud reabierta",
+  "requests_reopen_failed": "No se pudo reabrir",
+
+  "requests_reject_title": "Rechazar solicitud",
+  "requests_reject_description": "{title}. No se registrará ningún pago y quien la envió verá el motivo.",
+  "requests_reason": "Motivo",
+  "requests_reason_description": "Explica por qué no se pagará, por ejemplo: falta comprobante.",
+  "requests_reject_success": "Solicitud rechazada",
+
+  "requests_pay_description": "{title} - {amount}. Se registrará como egreso en \"Tesorería\" y la solicitud pasará a \"Pagada\".",
+  "requests_pay_success_title": "Pago registrado",
+  "requests_pay_success_description": "{title} - {amount} ya está en \"Tesorería\"",
+  "requests_pay_category_label": "Categoría del egreso",
+  "requests_select_category": "Selecciona una categoría",
+  "requests_payment_date": "Fecha del pago",
+  "requests_transfer_reference_label": "Referencia de la transferencia",
+  "requests_transfer_reference_description": "Clave de rastreo o número de referencia del banco.",
+  "requests_pay_notes_description": "Opcional. Se guardan en el movimiento de \"Tesorería\".",
+
+  "requests_details_description": "Información de la solicitud",
+  "requests_section_request": "Solicitud",
+  "requests_section_payment": "Pago",
+  "requests_section_rejection": "Rechazo",
+  "requests_recorded_by": "Registró",
+  "requests_rejected_by": "Rechazó",
+  "requests_submitted": "Enviada",
+  "requests_resolved": "Resuelta",
+
+  "requests_security_kind_cameras": "Cámaras",
+  "requests_security_kind_guards": "Guardias",
+  "requests_security_kind_access": "Accesos",
+  "requests_security_kind_equipment": "Equipo",
+  "requests_security_kind_other": "Otro",
+  "requests_security_kind_cameras_description": "Compra, instalación o reparación de cámaras y grabadoras.",
+  "requests_security_kind_guards_description": "Pago de guardias, turnos extra o empresa de vigilancia.",
+  "requests_security_kind_access_description": "Plumas, portones, controles, tarjetas o cerraduras.",
+  "requests_security_kind_equipment_description": "Radios, lámparas, uniformes, candados y similares.",
+  "requests_security_kind_other_description": "Cualquier otro gasto de seguridad.",
+
+  "requests_title_required": "Concepto es requerido",
+  "requests_reason_required": "El motivo es requerido",
+  "requests_reference_required": "La referencia es requerida para transferencias",
+  "requests_security_select_kind": "Selecciona un tipo",
+
+  "requests_create_failed": "No se pudo registrar la solicitud, intenta nuevamente",
+  "requests_update_failed": "No se pudo actualizar la solicitud, intenta nuevamente",
+  "requests_delete_failed": "No se pudo eliminar la solicitud, intenta nuevamente",
+  "requests_pay_failed": "No se pudo registrar el pago, intenta nuevamente",
+  "requests_reject_failed": "No se pudo rechazar la solicitud, intenta nuevamente",
+  "requests_reopen_failed_retry": "No se pudo reabrir la solicitud, intenta nuevamente",
+  "requests_category_must_be_expense": "La categoría debe ser de egreso"
+}

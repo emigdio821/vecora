@@ -1,0 +1,93 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "requests_maintenance_page_description": "Maintenance jobs and purchases. Each record is a payment request that \"Treasury\" marks as paid or rejected.",
+  "requests_security_page_description": "Security expenses: cameras, guards, access and equipment. Each record is a payment request that \"Treasury\" marks as paid or rejected.",
+
+  "requests_new": "New request",
+  "requests_empty": "No requests.",
+  "requests_actions_label": "Actions for {title}",
+  "requests_maintenance_search_hint": "Search by description, details or requester",
+  "requests_security_search_hint": "Search by description, details, type or requester",
+  "requests_filters_active": "Filters: {filters}",
+  "requests_status_filter_pending": "Pending",
+  "requests_status_filter_paid": "Paid",
+  "requests_status_filter_rejected": "Rejected",
+  "requests_requester": "Requested by",
+
+  "requests_action_reject": "Reject",
+  "requests_action_reopen": "Reopen",
+
+  "requests_maintenance_create_description": "Record what was done and what it cost. It stays pending until the treasury pays or rejects it.",
+  "requests_security_create_description": "Record the security expense and what it cost. It stays pending until the treasury pays or rejects it.",
+  "requests_submit": "Submit request",
+  "requests_create_success": "Request sent to the treasury",
+
+  "requests_edit_title": "Edit request",
+  "requests_edit_description": "It can only be edited while pending.",
+  "requests_update_success": "Request updated",
+
+  "requests_title_description": "What was done or bought. It's what the treasury will see.",
+  "requests_maintenance_work_date": "Work date",
+  "requests_maintenance_details_description": "Optional. Materials, where it was done, who did it, supplier.",
+  "requests_security_date_description": "Day of the service, job or purchase.",
+  "requests_security_details_description": "Optional. Supplier, shifts covered, where it was installed, camera number.",
+
+  "requests_delete_title": "Delete this request?",
+  "requests_delete_description": "This action can't be undone.",
+  "requests_delete_success": "Request deleted",
+
+  "requests_reopen_title": "Reopen this request?",
+  "requests_reopen_description": "It will be pending again: it can be edited, paid or rejected again, and the rejection reason will be removed.",
+  "requests_reopen_success": "Request reopened",
+  "requests_reopen_failed": "Couldn't reopen",
+
+  "requests_reject_title": "Reject request",
+  "requests_reject_description": "{title}. No payment will be recorded and the requester will see the reason.",
+  "requests_reason": "Reason",
+  "requests_reason_description": "Explain why it won't be paid, for example: missing receipt.",
+  "requests_reject_success": "Request rejected",
+
+  "requests_pay_description": "{title} - {amount}. It will be recorded as an expense in \"Treasury\" and the request will move to \"Paid\".",
+  "requests_pay_success_title": "Payment recorded",
+  "requests_pay_success_description": "{title} - {amount} is now in \"Treasury\"",
+  "requests_pay_category_label": "Expense category",
+  "requests_select_category": "Select a category",
+  "requests_payment_date": "Payment date",
+  "requests_transfer_reference_label": "Transfer reference",
+  "requests_transfer_reference_description": "Bank tracking key or reference number.",
+  "requests_pay_notes_description": "Optional. Saved on the \"Treasury\" transaction.",
+
+  "requests_details_description": "Request details",
+  "requests_section_request": "Request",
+  "requests_section_payment": "Payment",
+  "requests_section_rejection": "Rejection",
+  "requests_recorded_by": "Recorded by",
+  "requests_rejected_by": "Rejected by",
+  "requests_submitted": "Submitted",
+  "requests_resolved": "Resolved",
+
+  "requests_security_kind_cameras": "Cameras",
+  "requests_security_kind_guards": "Guards",
+  "requests_security_kind_access": "Access",
+  "requests_security_kind_equipment": "Equipment",
+  "requests_security_kind_other": "Other",
+  "requests_security_kind_cameras_description": "Purchase, installation or repair of cameras and recorders.",
+  "requests_security_kind_guards_description": "Payment for guards, extra shifts or a security company.",
+  "requests_security_kind_access_description": "Boom gates, gates, remotes, cards or locks.",
+  "requests_security_kind_equipment_description": "Radios, flashlights, uniforms, padlocks and the like.",
+  "requests_security_kind_other_description": "Any other security expense.",
+
+  "requests_title_required": "Description is required",
+  "requests_reason_required": "Reason is required",
+  "requests_reference_required": "Reference is required for transfers",
+  "requests_security_select_kind": "Select a type",
+
+  "requests_create_failed": "Couldn't submit the request, please try again",
+  "requests_update_failed": "Couldn't update the request, please try again",
+  "requests_delete_failed": "Couldn't delete the request, please try again",
+  "requests_pay_failed": "Couldn't record the payment, please try again",
+  "requests_reject_failed": "Couldn't reject the request, please try again",
+  "requests_reopen_failed_retry": "Couldn't reopen the request, please try again",
+  "requests_category_must_be_expense": "The category must be an expense category"
+}

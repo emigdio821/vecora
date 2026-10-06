@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
+import { m } from '@/paraglide/messages'
 import { securityRequestsQueryOptions } from '@/tanstack-queries/security'
 import { requestsTableColumns, type SecurityViewer } from './columns'
 import { RequestsDataTableHeader, useKindFilter, useStatusFilter } from './data-table-header'
@@ -37,7 +38,7 @@ export function RequestsDataTable({ viewer }: RequestsDataTableProps) {
       getRowId={(request) => request.id}
       initialSorting={[{ id: 'requested_on', desc: true }]}
       header={(table) => <RequestsDataTableHeader table={table} viewer={viewer} isLoading={isLoading} />}
-      emptyMessage="Sin solicitudes."
+      emptyMessage={m.requests_empty()}
       isLoading={isLoading}
     />
   )

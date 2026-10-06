@@ -21,6 +21,7 @@ import { toastManager } from '@/components/ui/toast'
 import { useCurrency } from '@/hooks/use-currency'
 import { type CurrencyCode, ISO_DAY } from '@/lib/utils'
 import { type PeriodInput, periodSchema } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 import { createPeriod } from '@/server-actions/treasury'
 import { type PeriodQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { PeriodFormFields } from './period-form-fields'
@@ -71,7 +72,7 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
     },
     onSuccess: (_data, values) => {
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Periodo creado', description: values.name })
+      toastManager.add({ type: 'success', title: m.presidency_period_created(), description: values.name })
       onOpenChange(false)
     },
     onError: (error) => {
@@ -106,11 +107,8 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Nuevo periodo</DrawerTitle>
-          <DrawerDescription>
-            Cada movimiento pertenece a un periodo según su fecha. El periodo define la cuota mensual y el
-            recargo por pago tardío.
-          </DrawerDescription>
+          <DrawerTitle>{m.presidency_new_period()}</DrawerTitle>
+          <DrawerDescription>{m.presidency_create_period_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -124,7 +122,7 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -133,10 +131,10 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Crear
+            {m.common_action_create()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

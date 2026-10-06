@@ -1,12 +1,9 @@
 import { z } from 'zod'
+import { m } from '@/paraglide/messages'
 
 export const loginSchema = z.object({
-  email: z.email('Correo inválido'),
-  password: z.string().min(1, 'Contraseña es requerida'),
+  email: z.email({ error: () => m.auth_email_invalid() }),
+  password: z.string().min(1, { error: () => m.auth_password_required() }),
 })
 
 export type LoginInput = z.infer<typeof loginSchema>
-
-/** Shown by login() and /no-access to accounts without a board role. */
-export const NO_ACCESS_MESSAGE =
-  'Tu cuenta aún no tiene acceso a la aplicación. Si deberías tenerlo, pide a un administrador que te lo dé.'

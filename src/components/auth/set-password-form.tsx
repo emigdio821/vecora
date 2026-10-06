@@ -11,6 +11,7 @@ import { Form } from '@/components/ui/form'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { toastManager } from '@/components/ui/toast'
 import { type SetPasswordInput, setPasswordSchema } from '@/lib/validations/hoa-board'
+import { m } from '@/paraglide/messages'
 import { setPassword } from '@/server-actions/hoa-board'
 import { USER_QUERY_KEY } from '@/tanstack-queries/session'
 
@@ -32,7 +33,7 @@ export function SetPasswordForm() {
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: async () => {
-      toastManager.add({ type: 'success', title: 'Contraseña guardada' })
+      toastManager.add({ type: 'success', title: m.auth_password_saved() })
       // The new session no longer needs a password; the guards must see that.
       queryClient.removeQueries({ queryKey: [USER_QUERY_KEY] })
       await navigate({ to: '/', replace: true })
@@ -58,7 +59,7 @@ export function SetPasswordForm() {
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Nueva contraseña <span className="text-destructive">*</span>
+              {m.auth_new_password()} <span className="text-destructive">*</span>
             </FieldLabel>
             <InputGroup>
               <InputGroupInput {...field} type={type} autoComplete="new-password" />
@@ -69,13 +70,13 @@ export function SetPasswordForm() {
                   onClick={() => {
                     setShowPassword(!showPassword)
                   }}
-                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-label={showPassword ? m.auth_hide_password() : m.auth_show_password()}
                 >
                   {showPassword ? <IconEyeOff /> : <IconEye />}
                 </Button>
               </InputGroupAddon>
             </InputGroup>
-            <FieldDescription>Mínimo 8 caracteres.</FieldDescription>
+            <FieldDescription>{m.auth_password_min_hint()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
@@ -92,7 +93,7 @@ export function SetPasswordForm() {
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Repite la contraseña <span className="text-destructive">*</span>
+              {m.auth_repeat_password()} <span className="text-destructive">*</span>
             </FieldLabel>
             <InputGroup>
               <InputGroupInput {...field} type={type} autoComplete="new-password" />
@@ -105,13 +106,13 @@ export function SetPasswordForm() {
       {form.formState.errors.root && (
         <Alert variant="error">
           <IconAlertCircle />
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>{m.common_error()}</AlertTitle>
           <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
         </Alert>
       )}
 
       <Button type="submit" disabled={isLoading} loading={isLoading}>
-        Guardar contraseña
+        {m.auth_save_password()}
       </Button>
     </Form>
   )

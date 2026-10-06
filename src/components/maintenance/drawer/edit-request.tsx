@@ -18,6 +18,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { type MaintenanceRequestInput, maintenanceRequestSchema } from '@/lib/validations/maintenance'
+import { m } from '@/paraglide/messages'
 import { updateMaintenanceRequest } from '@/server-actions/maintenance'
 import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 import { RequestFormFields } from './request-form-fields'
@@ -42,7 +43,7 @@ export function EditRequestDrawer({ request, open, onOpenChange, ...props }: Edi
     },
     onSuccess: (_data, values) => {
       void queryClient.invalidateQueries({ queryKey: [MAINTENANCE_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Solicitud actualizada', description: values.title })
+      toastManager.add({ type: 'success', title: m.requests_update_success(), description: values.title })
       onOpenChange(false)
     },
   })
@@ -60,8 +61,8 @@ export function EditRequestDrawer({ request, open, onOpenChange, ...props }: Edi
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar solicitud</DrawerTitle>
-          <DrawerDescription>Solo se puede editar mientras esté pendiente.</DrawerDescription>
+          <DrawerTitle>{m.requests_edit_title()}</DrawerTitle>
+          <DrawerDescription>{m.requests_edit_description()}</DrawerDescription>
         </DrawerHeader>
 
         {/* Mounted only while open, so the form starts from the current row
@@ -106,7 +107,7 @@ function EditRequestForm({
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -115,10 +116,10 @@ function EditRequestForm({
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DrawerFooter>
     </>

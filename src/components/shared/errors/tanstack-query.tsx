@@ -8,6 +8,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty'
+import { m } from '@/paraglide/messages'
 
 interface TanstackQueryErrorProps extends React.ComponentProps<typeof Empty> {
   refetch: () => void
@@ -18,8 +19,8 @@ interface TanstackQueryErrorProps extends React.ComponentProps<typeof Empty> {
 export function TanstackQueryError(props: TanstackQueryErrorProps) {
   const {
     refetch,
-    errorTitle = 'Error',
-    errorDescription = 'No se pudo cargar la información, por favor intente nuevamente.',
+    errorTitle = m.common_error(),
+    errorDescription = m.common_load_failed_description(),
     ...emptyProps
   } = props
 
@@ -40,7 +41,7 @@ export function TanstackQueryError(props: TanstackQueryErrorProps) {
               refetch()
             }}
           >
-            Reintentar
+            {m.common_action_retry()}
           </Button>
         </div>
       </EmptyContent>

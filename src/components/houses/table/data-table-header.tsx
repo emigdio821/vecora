@@ -7,6 +7,7 @@ import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { m } from '@/paraglide/messages'
 import type { HouseQueryData } from '@/tanstack-queries/houses'
 import { DeleteHousesAlertDialog } from '../dialog/delete-houses'
 import { CreateHouseDrawer } from '../drawer/create-house'
@@ -42,7 +43,7 @@ export function HousesDataTableHeader({ table, isLoading }: HousesDataTableHeade
             table={table}
             columnId="number"
             param="search-houses"
-            hint="Buscar por número de casa o nombre de residente"
+            hint={m.residential_search_houses_hint()}
           />
         </div>
 
@@ -55,7 +56,7 @@ export function HousesDataTableHeader({ table, isLoading }: HousesDataTableHeade
                   render={
                     <Button
                       variant="destructive-outline"
-                      aria-label={`Eliminar ${selectedRowsLength} casas seleccionadas`}
+                      aria-label={m.residential_delete_selected_houses_label({ count: selectedRowsLength })}
                       onClick={() => {
                         setDeleteSelectedOpen(true)
                       }}
@@ -67,7 +68,7 @@ export function HousesDataTableHeader({ table, isLoading }: HousesDataTableHeade
                     </Button>
                   }
                 />
-                <TooltipContent>Eliminar casas seleccionadas</TooltipContent>
+                <TooltipContent>{m.residential_delete_selected_houses()}</TooltipContent>
               </Tooltip>
             )}
 
@@ -77,7 +78,7 @@ export function HousesDataTableHeader({ table, isLoading }: HousesDataTableHeade
                 setCreateOpen(true)
               }}
             >
-              Nueva casa
+              {m.residential_new_house()}
             </Button>
           </div>
         )}

@@ -5,6 +5,7 @@ import { IconX } from '@tabler/icons-react'
 import type React from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 
 export const Sheet: typeof SheetPrimitive.Root = SheetPrimitive.Root
 
@@ -97,7 +98,7 @@ export function SheetPopup({
           {children}
           {showCloseButton && (
             <SheetPrimitive.Close
-              aria-label="Close"
+              aria-label={m.common_action_close()}
               className="absolute end-2 top-2"
               render={<Button size="icon" variant="ghost" />}
               {...closeProps}

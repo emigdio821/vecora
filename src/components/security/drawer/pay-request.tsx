@@ -30,6 +30,7 @@ import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
 import { formatDay, ISO_DAY } from '@/lib/utils'
 import { type PayRequestInput, payRequestSchema } from '@/lib/validations/requests'
+import { m } from '@/paraglide/messages'
 import { paySecurityRequest } from '@/server-actions/security'
 import { SECURITY_QUERY_KEY, type SecurityRequestQueryData } from '@/tanstack-queries/security'
 import { categoriesQueryOptions, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
@@ -65,8 +66,8 @@ export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayR
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Pago registrado',
-        description: `${request.title} - ${amount} ya está en "Tesorería"`,
+        title: m.requests_pay_success_title(),
+        description: m.requests_pay_success_description({ title: request.title, amount }),
       })
       onOpenChange(false)
     },
@@ -85,10 +86,9 @@ export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayR
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Registrar pago</DrawerTitle>
+          <DrawerTitle>{m.common_action_record_payment()}</DrawerTitle>
           <DrawerDescription>
-            {request.title} - {amount}. Se registrará como egreso en "Tesorería" y la solicitud pasará a
-            "Pagada".
+            {m.requests_pay_description({ title: request.title, amount })}
           </DrawerDescription>
         </DrawerHeader>
 
@@ -156,7 +156,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>
-                  Categoría del egreso <span className="text-destructive">*</span>
+                  {m.requests_pay_category_label()} <span className="text-destructive">*</span>
                 </FieldLabel>
                 <Select
                   items={categoryItems}
@@ -167,7 +167,9 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                   disabled={mutation.isPending || !categories}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={categories ? 'Selecciona una categoría' : 'Cargando…'} />
+                    <SelectValue
+                      placeholder={categories ? m.requests_select_category() : m.common_loading()}
+                    />
                   </SelectTrigger>
                   <SelectPopup>
                     {categoryItems.map((item) => (
@@ -193,7 +195,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>
-                  Fecha del pago <span className="text-destructive">*</span>
+                  {m.requests_payment_date()} <span className="text-destructive">*</span>
                 </FieldLabel>
                 <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                   <PopoverTrigger
@@ -241,7 +243,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>
-                  Método de pago <span className="text-destructive">*</span>
+                  {m.common_field_payment_method()} <span className="text-destructive">*</span>
                 </FieldLabel>
                 <Select
                   items={PAYMENT_METHOD_ITEMS}
@@ -279,10 +281,10 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Referencia de la transferencia <span className="text-destructive">*</span>
+                    {m.requests_transfer_reference_label()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input {...field} autoComplete="off" disabled={mutation.isPending} />
-                  <FieldDescription>Clave de rastreo o número de referencia del banco.</FieldDescription>
+                  <FieldDescription>{m.requests_transfer_reference_description()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -299,9 +301,9 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                 touched={fieldState.isTouched}
                 dirty={fieldState.isDirty}
               >
-                <FieldLabel>Notas</FieldLabel>
+                <FieldLabel>{m.common_field_notes()}</FieldLabel>
                 <Textarea {...field} rows={3} className="max-h-40" disabled={mutation.isPending} />
-                <FieldDescription>Opcional. Se guardan en el movimiento de "Tesorería".</FieldDescription>
+                <FieldDescription>{m.requests_pay_notes_description()}</FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
             )}
@@ -310,7 +312,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -319,10 +321,10 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Registrar pago
+          {m.common_action_record_payment()}
         </Button>
       </DrawerFooter>
     </>

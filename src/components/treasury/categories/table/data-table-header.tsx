@@ -4,6 +4,7 @@ import { useHasRole } from '@/components/current-user-provider'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
+import { m } from '@/paraglide/messages'
 import type { CategoryQueryData } from '@/tanstack-queries/treasury'
 import { CreateCategoryDrawer } from '../drawer/create-category'
 
@@ -26,7 +27,7 @@ export function CategoriesDataTableHeader({ table, isLoading }: CategoriesDataTa
             table={table}
             columnId="name"
             param="search-categories"
-            hint="Buscar por nombre de la categoría"
+            hint={m.treasury_search_categories_hint()}
           />
         </div>
 
@@ -38,7 +39,7 @@ export function CategoriesDataTableHeader({ table, isLoading }: CategoriesDataTa
               setCreateOpen(true)
             }}
           >
-            Nueva categoría
+            {m.treasury_new_category()}
           </Button>
         )}
       </div>

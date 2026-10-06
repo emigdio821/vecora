@@ -25,9 +25,9 @@ import {
   createTransactionSchema,
   type TransactionKind,
 } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 import { createTransaction } from '@/server-actions/treasury'
 import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
-import { KIND_LABEL } from '../../kind'
 import { TransactionFormFields } from './transaction-form-fields'
 
 const FORM_ID = 'create-transaction-form'
@@ -80,7 +80,7 @@ export function CreateTransactionDrawer({
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: `${KIND_LABEL[values.kind]} registrado`,
+        title: values.kind === 'income' ? m.treasury_income_recorded() : m.treasury_expense_recorded(),
         description: `${values.description} - ${formatCurrency(values.amount, currency)}`,
       })
       onOpenChange(false)
@@ -117,11 +117,8 @@ export function CreateTransactionDrawer({
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Registrar movimiento</DrawerTitle>
-          <DrawerDescription>
-            Cualquier ingreso o egreso que no sea una cuota de mantenimiento. Las cuotas se registran con
-            "Registrar cuota".
-          </DrawerDescription>
+          <DrawerTitle>{m.treasury_record_transaction()}</DrawerTitle>
+          <DrawerDescription>{m.treasury_record_transaction_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -135,7 +132,7 @@ export function CreateTransactionDrawer({
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -144,10 +141,10 @@ export function CreateTransactionDrawer({
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Registrar
+            {m.treasury_record()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

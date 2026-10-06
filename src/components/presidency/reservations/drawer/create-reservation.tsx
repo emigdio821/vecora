@@ -23,6 +23,7 @@ import { useCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
 import { formatDay, ISO_DAY } from '@/lib/utils'
 import { type ReservationInput, reservationSchema } from '@/lib/validations/presidency'
+import { m } from '@/paraglide/messages'
 import { createReservation } from '@/server-actions/presidency'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { amenitiesQueryOptions, PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
@@ -57,7 +58,7 @@ export function CreateReservationDrawer({ open, onOpenChange, ...props }: Create
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Reservación registrada',
+        title: m.presidency_reservation_created(),
         description: [amenity?.name, formatDay(values.reserved_on), house && houseLabel(house)]
           .filter(Boolean)
           .join(' - '),
@@ -79,11 +80,8 @@ export function CreateReservationDrawer({ open, onOpenChange, ...props }: Create
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Nueva reservación</DrawerTitle>
-          <DrawerDescription>
-            Cada área se aparta por día completo y solo una casa puede usarla cada día. Si lleva una tarifa,
-            el cobro queda pendiente para la tesorería.
-          </DrawerDescription>
+          <DrawerTitle>{m.presidency_new_reservation()}</DrawerTitle>
+          <DrawerDescription>{m.presidency_create_reservation_description()}</DrawerDescription>
         </DrawerHeader>
 
         {/* Mounted only while open, so the defaults (today, the area) are fresh. */}
@@ -130,7 +128,7 @@ function CreateReservationForm({ mutation }: { mutation: CreateMutation }) {
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -139,10 +137,10 @@ function CreateReservationForm({ mutation }: { mutation: CreateMutation }) {
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Reservar
+          {m.presidency_reserve()}
         </Button>
       </DrawerFooter>
     </>

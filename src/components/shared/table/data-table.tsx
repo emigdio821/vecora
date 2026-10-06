@@ -30,6 +30,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { DataTableFeatures } from './features'
 import { dataTableFeatures } from './features'
 
@@ -71,7 +72,7 @@ export function DataTable<TData extends RowData>({
   pageSize: initialPageSize = 10,
   getRowId,
   tableId,
-  emptyMessage = 'Sin resultados.',
+  emptyMessage = m.common_no_results(),
   isLoading = false,
   className,
 }: DataTableProps<TData>) {
@@ -133,10 +134,10 @@ export function DataTable<TData extends RowData>({
             <EmptyMedia variant="icon">
               <IconAlertTriangle />
             </EmptyMedia>
-            <EmptyTitle>Página fuera de rango</EmptyTitle>
+            <EmptyTitle>{m.common_table_page_out_of_range()}</EmptyTitle>
             <EmptyDescription>
-              La página <span className="font-semibold">{pageIndex + 1}</span> no existe en esta tabla. La
-              última página es <span className="font-semibold">{pageCount}</span>.
+              {m.common_table_page_missing_before()} <span className="font-semibold">{pageIndex + 1}</span>{' '}
+              {m.common_table_page_missing_after()} <span className="font-semibold">{pageCount}</span>.
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
@@ -145,7 +146,7 @@ export function DataTable<TData extends RowData>({
                 table.setPageIndex(0)
               }}
             >
-              Ir a la primera página
+              {m.common_table_go_first_page()}
             </Button>
           </EmptyContent>
         </Empty>
@@ -211,12 +212,14 @@ export function DataTable<TData extends RowData>({
                 {/* One page: nothing to pick or page through, so plain text and no buttons. */}
                 {isSinglePage ? (
                   <p className="text-sm whitespace-nowrap text-muted-foreground">
-                    Mostrando <strong className="font-medium text-foreground">{pageRanges[0]?.label}</strong>{' '}
-                    de <strong className="font-medium text-foreground">{rowCount}</strong> resultados
+                    {m.common_table_showing()}{' '}
+                    <strong className="font-medium text-foreground">{pageRanges[0]?.label}</strong>{' '}
+                    {m.common_table_of()} <strong className="font-medium text-foreground">{rowCount}</strong>{' '}
+                    {m.common_table_results({ count: rowCount })}
                   </p>
                 ) : (
                   <div className="flex items-center gap-2 whitespace-nowrap">
-                    <p className="text-sm text-muted-foreground">Mostrando</p>
+                    <p className="text-sm text-muted-foreground">{m.common_table_showing()}</p>
                     <Select
                       items={pageRanges}
                       value={pageIndex + 1}
@@ -227,7 +230,7 @@ export function DataTable<TData extends RowData>({
                       <SelectTrigger
                         size="sm"
                         className="min-w-none w-fit"
-                        aria-label="Seleccionar rango de resultados"
+                        aria-label={m.common_table_select_range()}
                       >
                         <SelectValue />
                       </SelectTrigger>
@@ -240,7 +243,9 @@ export function DataTable<TData extends RowData>({
                       </SelectPopup>
                     </Select>
                     <p className="text-sm text-muted-foreground">
-                      de <strong className="font-medium text-foreground">{rowCount}</strong> resultados
+                      {m.common_table_of()}{' '}
+                      <strong className="font-medium text-foreground">{rowCount}</strong>{' '}
+                      {m.common_table_results({ count: rowCount })}
                     </p>
                   </div>
                 )}

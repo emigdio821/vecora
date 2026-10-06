@@ -1,3 +1,4 @@
+import { paraglideVitePlugin } from '@inlang/paraglide-js'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
@@ -19,6 +20,8 @@ export default defineConfig({
     },
   },
   plugins: [
+    // The strategy lives in project.inlang/paraglide.config.ts.
+    paraglideVitePlugin({ project: './project.inlang', outdir: './src/paraglide' }),
     tailwindcss(),
     tanstackStart(),
     nitro({

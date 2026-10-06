@@ -24,6 +24,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Switch } from '@/components/ui/switch'
 import { toastManager } from '@/components/ui/toast'
 import { type AssignResidentsInput, assignResidentsSchema } from '@/lib/validations/houses'
+import { m } from '@/paraglide/messages'
 import { assignResidents } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
@@ -63,11 +64,11 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: assigned === 1 ? 'Residente asignado' : 'Residentes asignados',
+        title: assigned === 1 ? m.residential_resident_assigned() : m.residential_residents_assigned(),
         description:
           assigned === 1
-            ? `Se asignó a la casa ${house.number}`
-            : `Se asignaron ${assigned} residentes a la casa ${house.number}`,
+            ? m.residential_resident_assigned_description({ number: house.number })
+            : m.residential_residents_assigned_description({ count: assigned, number: house.number }),
       })
       // Not handleOpenChange: the mutation is still `pending` while onSuccess runs.
       onOpenChange(false)
@@ -107,8 +108,8 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Asignar residentes</DrawerTitle>
-          <DrawerDescription>Casa {house.number}</DrawerDescription>
+          <DrawerTitle>{m.residential_assign_residents()}</DrawerTitle>
+          <DrawerDescription>{m.common_house_label({ number: house.number })}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -128,7 +129,7 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Residentes <span className="text-destructive">*</span>
+                    {m.common_section_residents()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <ResidentsPicker
                     multiple
@@ -139,7 +140,7 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
                     inputRef={field.ref}
                     disabled={mutation.isPending}
                   />
-                  <FieldDescription>Quienes ya viven en esta casa no aparecen en la lista.</FieldDescription>
+                  <FieldDescription>{m.residential_residents_picker_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -153,9 +154,9 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
                 }}
               />
               <span className="grid gap-1">
-                <span>Solo residentes sin casa</span>
+                <span>{m.residential_only_unassigned()}</span>
                 <span className="text-xs font-normal text-muted-foreground">
-                  Desactívalo para incluir a quienes ya tienen otra casa asignada.
+                  {m.residential_only_unassigned_hint()}
                 </span>
               </span>
             </Label>
@@ -171,7 +172,7 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Relación <span className="text-destructive">*</span>
+                    {m.residential_field_relationship()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Select
                     items={RELATIONSHIP_ITEMS}
@@ -182,7 +183,7 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
                     disabled={mutation.isPending}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecciona una relación" />
+                      <SelectValue placeholder={m.residential_relationship_placeholder()} />
                     </SelectTrigger>
                     <SelectPopup>
                       {RELATIONSHIP_ITEMS.map((item) => (
@@ -192,7 +193,7 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
                       ))}
                     </SelectPopup>
                   </Select>
-                  <FieldDescription>Se aplica a todos los residentes seleccionados.</FieldDescription>
+                  <FieldDescription>{m.residential_relationship_applies_to_all()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -201,7 +202,7 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -210,10 +211,10 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Asignar
+            {m.residential_action_assign()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

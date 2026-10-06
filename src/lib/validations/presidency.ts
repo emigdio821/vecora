@@ -1,25 +1,32 @@
 import { z } from 'zod'
-import { requiredText } from './requests'
+import { m } from '@/paraglide/messages'
 import { PAYMENT_METHODS } from './treasury'
 
 /** A bookable common area: terrace, pool, gym... */
 export const amenitySchema = z.object({
   // Unique in the DB (case-insensitive).
-  name: requiredText('Nombre'),
+  name: z
+    .string()
+    .trim()
+    .min(1, { error: () => m.common_name_required() }),
   // Proposed when booking; each reservation can change it. 0 = free.
-  default_fee: z.number('Tarifa es requerida').nonnegative('La tarifa no puede ser negativa'),
+  default_fee: z
+    .number({ error: () => m.presidency_fee_required() })
+    .nonnegative({ error: () => m.presidency_fee_nonnegative() }),
 })
 
 export type AmenityInput = z.infer<typeof amenitySchema>
 
 /** One booking of a common area: the area, a house, a day, its price, optional notes. */
 export const reservationSchema = z.object({
-  amenity_id: z.uuid('Selecciona un área'),
-  property_id: z.uuid('Selecciona una casa'),
+  amenity_id: z.uuid({ error: () => m.presidency_select_amenity() }),
+  property_id: z.uuid({ error: () => m.common_select_house() }),
   // Unique in the DB per area: one live booking per area and day.
-  reserved_on: z.iso.date('Fecha inválida'),
+  reserved_on: z.iso.date({ error: () => m.common_invalid_date() }),
   // Optional fee (e.g. electricity), paid in full when booking; 0 = free.
-  amount: z.number('Monto es requerido').nonnegative('El monto no puede ser negativo'),
+  amount: z
+    .number({ error: () => m.common_amount_required() })
+    .nonnegative({ error: () => m.presidency_amount_nonnegative() }),
   notes: z.string().trim(),
 })
 
@@ -27,15 +34,18 @@ export type ReservationInput = z.infer<typeof reservationSchema>
 
 const transferNeedsReference = {
   path: ['reference'],
-  message: 'La referencia es requerida para transferencias',
+  error: () => m.presidency_reference_required(),
 }
 
 /** Treasurer collecting the fee: the income it becomes in Treasury. */
 export const payReservationSchema = z
   .object({
-    occurred_on: z.iso.date('Fecha inválida'),
+    occurred_on: z.iso.date({ error: () => m.common_invalid_date() }),
     // Like every income: the paper receipt handed to the resident.
-    folio: requiredText('Folio'),
+    folio: z
+      .string()
+      .trim()
+      .min(1, { error: () => m.presidency_folio_required() }),
     payment_method: z.enum(PAYMENT_METHODS),
     reference: z.string().trim(),
     notes: z.string().trim(),
@@ -47,8 +57,10 @@ export type PayReservationInput = z.infer<typeof payReservationSchema>
 /** Treasurer cancelling a paid booking; refund 0 = the house keeps nothing back. */
 export const cancelReservationSchema = z
   .object({
-    refund_amount: z.number('Monto es requerido').nonnegative('El monto no puede ser negativo'),
-    occurred_on: z.iso.date('Fecha inválida'),
+    refund_amount: z
+      .number({ error: () => m.common_amount_required() })
+      .nonnegative({ error: () => m.presidency_amount_nonnegative() }),
+    occurred_on: z.iso.date({ error: () => m.common_invalid_date() }),
     payment_method: z.enum(PAYMENT_METHODS),
     reference: z.string().trim(),
     notes: z.string().trim(),

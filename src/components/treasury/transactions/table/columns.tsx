@@ -5,6 +5,7 @@ import { DataTableSortableHeader } from '@/components/shared/table/sortable-head
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn, formatDay, normalizeString } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { TransactionQueryData } from '@/tanstack-queries/treasury'
 import { PAYMENT_METHOD_LABEL } from '../../kind'
 import { TransactionsTableActions } from './actions'
@@ -19,7 +20,7 @@ export const transactionsTableColumns = columnHelper.columns([
     enableSorting: false,
     header: ({ table }) => (
       <Checkbox
-        aria-label="Seleccionar todo"
+        aria-label={m.common_select_all()}
         checked={table.getIsAllPageRowsSelected()}
         indeterminate={table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected()}
         disabled={table.getFilteredRowModel().rows.length === 0}
@@ -30,7 +31,7 @@ export const transactionsTableColumns = columnHelper.columns([
     ),
     cell: ({ row }) => (
       <Checkbox
-        aria-label="Seleccionar elemento"
+        aria-label={m.common_select_row()}
         checked={row.getIsSelected()}
         onCheckedChange={(value) => {
           row.toggleSelected(!!value)
@@ -42,14 +43,14 @@ export const transactionsTableColumns = columnHelper.columns([
   columnHelper.accessor('occurred_on', {
     id: 'occurred_on',
     size: 120,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Fecha" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_date()} />,
     cell: ({ getValue }) => <span className="whitespace-nowrap tabular-nums">{formatDay(getValue())}</span>,
   }),
 
   columnHelper.accessor('description', {
     id: 'description',
     size: 320,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Concepto" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_description()} />,
     cell: ({ row }) => <TransactionDescriptionCell transaction={row.original} />,
     // Search box target: concept, folio, reference, category or house, accent-insensitive.
     filterFn: (row, _columnId, value: string) => {
@@ -57,23 +58,27 @@ export const transactionsTableColumns = columnHelper.columns([
       if (!filterValue) return true
 
       const { description, folio, reference, category, property } = row.original
-      return [description, folio, reference, category.name, property && `casa ${property.number}`].some(
-        (field) => field && normalizeString(field).includes(filterValue),
-      )
+      return [
+        description,
+        folio,
+        reference,
+        category.name,
+        property && m.common_house_label({ number: property.number }),
+      ].some((field) => field && normalizeString(field).includes(filterValue))
     },
   }),
 
   columnHelper.accessor((row) => row.category.name, {
     id: 'category',
     size: 180,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Categoría" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_category()} />,
     cell: ({ getValue }) => <Badge variant="outline">{getValue()}</Badge>,
   }),
 
   columnHelper.accessor((row) => row.property?.number ?? '', {
     id: 'property',
     size: 110,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Casa" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_house()} />,
     cell: ({ row }) => row.original.property?.number ?? null,
     sortFn: (rowA, rowB) =>
       (rowA.original.property?.number ?? '').localeCompare(rowB.original.property?.number ?? '', 'es', {
@@ -85,14 +90,16 @@ export const transactionsTableColumns = columnHelper.columns([
   columnHelper.accessor('payment_method', {
     id: 'payment_method',
     size: 130,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Método" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.treasury_method()} />,
     cell: ({ getValue }) => PAYMENT_METHOD_LABEL[getValue()],
   }),
 
   columnHelper.accessor((row) => Number(row.amount), {
     id: 'amount',
     size: 130,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Monto" className="justify-end" />,
+    header: ({ column }) => (
+      <DataTableSortableHeader column={column} title={m.common_field_amount()} className="justify-end" />
+    ),
     cell: ({ row, getValue }) => {
       const isIncome = row.original.kind === 'income'
       return (

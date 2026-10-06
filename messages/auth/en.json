@@ -1,0 +1,49 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "auth_login_title": "Sign in",
+  "auth_login_head_description": "Sign in to {appName} with your email and password.",
+  "auth_login_description": "Enter your credentials to access your account.",
+  "auth_login_submit": "Sign in",
+  "auth_invite_invalid_title": "This invite link is no longer valid",
+  "auth_invite_invalid_description": "It may have expired or already been used. Ask whoever sent it to you for a new one.",
+
+  "auth_field_password": "Password",
+  "auth_password_toggle_label": "Password with visibility toggle",
+  "auth_hide_password": "Hide password",
+  "auth_show_password": "Show password",
+
+  "auth_email_invalid": "Invalid email",
+  "auth_password_required": "Password is required",
+  "auth_credentials_required": "Email and password are required",
+  "auth_credentials_invalid": "Invalid email or password",
+  "auth_no_access_message": "Your account doesn't have access to the app yet. If it should, ask an administrator to grant it.",
+
+  "auth_logout": "Sign out",
+  "auth_logout_failed": "Couldn't sign out, please try again",
+
+  "auth_no_access_title": "No access",
+  "auth_no_access_head_description": "Your account doesn't have access to {appName} yet.",
+  "auth_no_access_signed_in_as": "You're signed in as {email}.",
+
+  "auth_set_password_head_title": "Create password",
+  "auth_set_password_head_description": "Create the password you'll use to sign in to {appName}.",
+  "auth_set_password_title": "Create your password",
+  "auth_set_password_for_before": "For",
+  "auth_set_password_for_after": ". From now on, you'll sign in to Vecora with it and your email.",
+  "auth_new_password": "New password",
+  "auth_password_min_hint": "At least 8 characters.",
+  "auth_repeat_password": "Confirm password",
+  "auth_save_password": "Save password",
+  "auth_password_saved": "Password saved",
+
+  "auth_confirm_head_title": "Confirm access",
+  "auth_confirm_head_description": "You received an access link to {appName}. Open it to create your password.",
+  "auth_confirm_session_title": "Someone is already signed in",
+  "auth_confirm_session_before": "This browser is signed in as",
+  "auth_confirm_session_after": "({email}). If you continue with the access link, that session will end here.",
+  "auth_confirm_access_title": "Your access to Vecora",
+  "auth_confirm_access_description": "This is your access link to Vecora. Continue to create your password.",
+  "auth_confirm_sign_out_and_continue": "Sign out and continue",
+  "auth_confirm_continue": "Continue"
+}

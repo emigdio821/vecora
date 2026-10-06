@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
+import { m } from '@/paraglide/messages'
 import type { ReservationQueryData } from '@/tanstack-queries/presidency'
 import { DeleteReservationAlertDialog } from '../dialog/delete-reservation'
 import { CancelReservationDrawer } from '../drawer/cancel-reservation'
@@ -56,7 +57,7 @@ export function ReservationsTableActions({ reservation }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={`Acciones de ${summary}`}
+              aria-label={m.presidency_actions_for({ name: summary })}
             >
               <IconDots className="size-4" />
             </Button>
@@ -72,7 +73,7 @@ export function ReservationsTableActions({ reservation }: ActionsProps) {
                   setPayOpen(true)
                 }}
               >
-                Registrar pago
+                {m.common_action_record_payment()}
               </MenuItem>
             )}
 
@@ -81,7 +82,7 @@ export function ReservationsTableActions({ reservation }: ActionsProps) {
                 setEditOpen(true)
               }}
             >
-              Editar
+              {m.common_action_edit()}
             </MenuItem>
 
             {canCancel && (
@@ -95,7 +96,7 @@ export function ReservationsTableActions({ reservation }: ActionsProps) {
                   }
                 }}
               >
-                Cancelar reservación
+                {m.presidency_cancel_reservation()}
               </MenuItem>
             )}
           </MenuGroup>

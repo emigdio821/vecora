@@ -18,6 +18,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { type PeriodInput, periodSchema } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 import { updatePeriod } from '@/server-actions/treasury'
 import { type PeriodQueryData, transactionCount, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { PeriodFormFields } from './period-form-fields'
@@ -43,7 +44,7 @@ export function EditPeriodDrawer({ period, open, onOpenChange, ...props }: EditP
     onSuccess: (_data, values) => {
       // Movements embed the period name, so their list needs a refresh too.
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Periodo actualizado', description: values.name })
+      toastManager.add({ type: 'success', title: m.presidency_period_updated(), description: values.name })
       onOpenChange(false)
     },
   })
@@ -61,7 +62,7 @@ export function EditPeriodDrawer({ period, open, onOpenChange, ...props }: EditP
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar periodo</DrawerTitle>
+          <DrawerTitle>{m.presidency_edit_period_title()}</DrawerTitle>
           <DrawerDescription>{period.name}</DrawerDescription>
         </DrawerHeader>
 
@@ -113,7 +114,7 @@ function EditPeriodForm({ period, mutation }: { period: PeriodQueryData; mutatio
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -122,10 +123,10 @@ function EditPeriodForm({ period, mutation }: { period: PeriodQueryData; mutatio
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DrawerFooter>
     </>

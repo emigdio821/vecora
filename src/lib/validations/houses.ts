@@ -1,8 +1,12 @@
 import { z } from 'zod'
+import { m } from '@/paraglide/messages'
 
 export const createHouseSchema = z.object({
   // Unique in the DB (case-insensitive, live rows only).
-  number: z.string().trim().min(1, 'Número es requerido'),
+  number: z
+    .string()
+    .trim()
+    .min(1, { error: () => m.residential_house_number_required() }),
   notes: z.string().trim(),
 })
 
@@ -19,16 +23,16 @@ export const RELATIONSHIPS = ['owner', 'tenant', 'family'] as const
 export type Relationship = (typeof RELATIONSHIPS)[number]
 
 export const assignResidentsSchema = z.object({
-  residentIds: z.array(z.uuid()).min(1, 'Selecciona al menos un residente'),
-  relationship: z.enum(RELATIONSHIPS, 'Selecciona el tipo de relación'),
+  residentIds: z.array(z.uuid()).min(1, { error: () => m.residential_select_resident_required() }),
+  relationship: z.enum(RELATIONSHIPS, { error: () => m.residential_relationship_required() }),
 })
 
 export type AssignResidentsInput = z.infer<typeof assignResidentsSchema>
 
 /** The same link from the resident's side: one house for the resident being edited. */
 export const assignHouseSchema = z.object({
-  houseId: z.uuid('Selecciona una casa'),
-  relationship: z.enum(RELATIONSHIPS, 'Selecciona el tipo de relación'),
+  houseId: z.uuid({ error: () => m.common_select_house() }),
+  relationship: z.enum(RELATIONSHIPS, { error: () => m.residential_relationship_required() }),
 })
 
 export type AssignHouseInput = z.infer<typeof assignHouseSchema>

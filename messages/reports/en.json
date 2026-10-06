@@ -1,0 +1,57 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "reports_dialog_description": "PDF with income, expenses, balance and houses with pending fees.",
+  "reports_tab_monthly": "Monthly",
+  "reports_tab_custom": "Custom",
+  "reports_month_label": "Month",
+  "reports_month_in_progress": "{month} (in progress)",
+  "reports_month_description": "From the 1st to the last day of the month.",
+  "reports_range_label": "Date range",
+  "reports_range_description": "Choose the first and last day of the report.",
+  "reports_preset_this_month": "This month",
+  "reports_preset_last_month": "Last month",
+  "reports_preset_last_3_months": "Last 3 months",
+  "reports_preset_this_year": "This year",
+  "reports_preset_last_year": "Last year",
+  "reports_download_pdf": "Download PDF",
+  "reports_downloaded": "Report downloaded",
+  "reports_download_failed": "Couldn't generate the report. Reload the page and try again.",
+  "reports_default_file_name": "report.pdf",
+
+  "reports_sign_in_required": "Sign in to download the report",
+  "reports_invalid_dates": "Invalid dates",
+  "reports_generate_failed": "Couldn't generate the report",
+  "reports_range_end_before_start": "The end date must be on or after the start date",
+  "reports_file_name_prefix": "vecora-report",
+  "reports_file_name_range": "{from}_to_{to}",
+
+  "reports_pdf_document_title": "Financial report - {range}",
+  "reports_pdf_summary": "Summary{suffix}",
+  "reports_pdf_opening_balance": "Opening balance",
+  "reports_pdf_closing_balance": "Closing balance",
+  "reports_pdf_balance_note": "Opening balance: everything recorded before {date}. Closing balance = opening balance + income - expenses.",
+  "reports_pdf_income_by_category": "Income by category{suffix}",
+  "reports_pdf_expense_by_category": "Expenses by category{suffix}",
+  "reports_pdf_no_income": "No income in this period.",
+  "reports_pdf_no_expense": "No expenses in this period.",
+  "reports_pdf_fees_title": "Maintenance fees",
+  "reports_pdf_fees_up_to_date": "{upToDate} of {houses} houses up to date - {months}",
+  "reports_pdf_months_considered": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 month counted",
+        "countPlural=other": "{count} months counted"
+      }
+    }
+  ],
+  "reports_pdf_column_months": "Months",
+  "reports_pdf_column_unpaid": "Unpaid",
+  "reports_pdf_all_up_to_date": "All houses are up to date.",
+  "reports_pdf_no_fees": "No fees due in this date range.",
+  "reports_pdf_dates_note": "Income and expenses are counted by the date they happened. A fee counts as paid if its payment was recorded on or before {date}.",
+  "reports_pdf_generated": "Generated on {date} by {name}",
+  "reports_pdf_page": "Page {page} of {total}"
+}

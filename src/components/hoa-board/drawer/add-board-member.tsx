@@ -20,6 +20,7 @@ import {
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { type AddBoardMemberInput, addBoardMemberSchema } from '@/lib/validations/hoa-board'
+import { m } from '@/paraglide/messages'
 import { addBoardMember, type InviteResult } from '@/server-actions/hoa-board'
 import { boardMembersQueryOptions, HOA_BOARD_QUERY_KEY } from '@/tanstack-queries/hoa-board'
 import { RESIDENTS_QUERY_KEY, residentsPickerQueryOptions } from '@/tanstack-queries/residents'
@@ -104,11 +105,8 @@ export function AddBoardMemberDrawer({
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Agregar integrante</DrawerTitle>
-          <DrawerDescription>
-            Se creará una cuenta para el residente y recibirás un enlace para compartirle. Con él podrá entrar
-            a Vecora y crear su contraseña.
-          </DrawerDescription>
+          <DrawerTitle>{m.board_add_member()}</DrawerTitle>
+          <DrawerDescription>{m.board_add_member_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -128,7 +126,7 @@ export function AddBoardMemberDrawer({
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Residente <span className="text-destructive">*</span>
+                    {m.board_field_resident()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <ResidentsPicker
                     value={field.value || null}
@@ -139,10 +137,7 @@ export function AddBoardMemberDrawer({
                     excludeIds={excludeIds}
                     disabled={mutation.isPending}
                   />
-                  <FieldDescription>
-                    Solo aparecen residentes con correo registrado que aún no son parte de la mesa. Si falta
-                    alguien, agrega su correo en la sección "Residencial" primero.
-                  </FieldDescription>
+                  <FieldDescription>{m.board_resident_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -158,7 +153,7 @@ export function AddBoardMemberDrawer({
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -167,10 +162,10 @@ export function AddBoardMemberDrawer({
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Agregar y generar enlace
+            {m.board_add_submit()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

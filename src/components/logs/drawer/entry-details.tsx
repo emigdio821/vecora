@@ -13,6 +13,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { formatDate } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { LogEntryQueryData } from '@/tanstack-queries/logs'
 import {
   ACTION_BADGE_VARIANT,
@@ -34,8 +35,8 @@ interface EntryDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
 }
 
 function changesTitle(entry: LogEntryQueryData) {
-  if (entry.operation === 'update') return 'Qué cambió'
-  return entry.operation === 'insert' ? 'Datos registrados' : 'Datos eliminados'
+  if (entry.operation === 'update') return m.logs_changes_updated()
+  return entry.operation === 'insert' ? m.logs_changes_inserted() : m.logs_changes_deleted()
 }
 
 /** Read-only: the log can't be changed from the app. */
@@ -56,21 +57,25 @@ export function EntryDetailsDrawer({
         <DrawerHeader>
           <DrawerTitle>{entrySummary(entry)}</DrawerTitle>
           <DrawerDescription>
-            {identityName(entry)} {ACTION_LABEL[action].toLowerCase()} esto el {formatDate(entry.occurred_at)}
+            {m.logs_entry_description({
+              name: identityName(entry),
+              action: ACTION_LABEL[action].toLowerCase(),
+              date: formatDate(entry.occurred_at),
+            })}
           </DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<IconScript />} title="Resumen">
+          <CollapsibleSection icon={<IconScript />} title={m.logs_summary()}>
             <div className="grid grid-cols-2 gap-3">
-              <Detail label="Quién">{identityName(entry)}</Detail>
-              <Detail label="Cuándo">
+              <Detail label={m.logs_who()}>{identityName(entry)}</Detail>
+              <Detail label={m.logs_when()}>
                 <span className="tabular-nums">{formatDate(entry.occurred_at)}</span>
               </Detail>
-              <Detail label="Acción">
+              <Detail label={m.logs_action()}>
                 <Badge variant={ACTION_BADGE_VARIANT[action]}>{ACTION_LABEL[action]}</Badge>
               </Detail>
-              <Detail label="Sección">
+              <Detail label={m.logs_section()}>
                 <Badge variant="outline">{sectionLabel(entry.table_name)}</Badge>
               </Detail>
             </div>
@@ -86,13 +91,15 @@ export function EntryDetailsDrawer({
                       {isUpdate ? (
                         <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                           <span className="whitespace-pre-wrap text-muted-foreground line-through">
-                            {before || <Muted>Vacío</Muted>}
+                            {before || <Muted>{m.logs_value_empty()}</Muted>}
                           </span>
                           <IconArrowRight
-                            aria-label="cambió a"
+                            aria-label={m.logs_changed_to()}
                             className="size-3.5 shrink-0 text-muted-foreground"
                           />
-                          <span className="whitespace-pre-wrap">{after || <Muted>Vacío</Muted>}</span>
+                          <span className="whitespace-pre-wrap">
+                            {after || <Muted>{m.logs_value_empty()}</Muted>}
+                          </span>
                         </span>
                       ) : (
                         <span className="whitespace-pre-wrap">{after || before}</span>
@@ -102,16 +109,13 @@ export function EntryDetailsDrawer({
                 ))}
               </dl>
             ) : (
-              <Muted>Sin datos que mostrar.</Muted>
+              <Muted>{m.logs_no_data()}</Muted>
             )}
           </CollapsibleSection>
 
           {related.length > 0 && (
-            <CollapsibleSection icon={<IconStack2 />} title="Hecho al mismo tiempo" count={related.length}>
-              <p className="mb-3 text-sm text-muted-foreground">
-                Otros cambios que se guardaron junto con este. Por ejemplo, al pagar una solicitud también se
-                registra su movimiento.
-              </p>
+            <CollapsibleSection icon={<IconStack2 />} title={m.logs_related_title()} count={related.length}>
+              <p className="mb-3 text-sm text-muted-foreground">{m.logs_related_description()}</p>
               <ul className="grid gap-3 text-sm">
                 {related.map((other) => {
                   const otherAction = entryAction(other)
@@ -131,7 +135,7 @@ export function EntryDetailsDrawer({
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />}>Cerrar</DrawerClose>
+          <DrawerClose render={<Button variant="ghost" />}>{m.common_action_close()}</DrawerClose>
         </DrawerFooter>
       </DrawerPopup>
     </Drawer>

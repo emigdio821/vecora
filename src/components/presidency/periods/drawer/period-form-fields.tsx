@@ -11,8 +11,9 @@ import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/inp
 import { NumberField, NumberFieldGroup, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { useToday } from '@/hooks/use-today'
-import { type CurrencyCode, currencySymbol, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { PeriodInput } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 
 interface PeriodFormFieldsProps {
   form: UseFormReturn<PeriodInput>
@@ -42,10 +43,10 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Nombre <span className="text-destructive">*</span>
+              {m.common_field_name()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Input {...field} autoComplete="off" disabled={disabled} />
-            <FieldDescription>Por ejemplo "2026-2027".</FieldDescription>
+            <FieldDescription>{m.presidency_period_name_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
@@ -65,7 +66,8 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>
-                  {name === 'starts_on' ? 'Inicio' : 'Fin'} <span className="text-destructive">*</span>
+                  {name === 'starts_on' ? m.presidency_period_starts_on() : m.presidency_period_ends_on()}{' '}
+                  <span className="text-destructive">*</span>
                 </FieldLabel>
                 <Popover
                   open={openDate === name}
@@ -123,7 +125,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Cuota mensual <span className="text-destructive">*</span>
+                {m.presidency_period_monthly_fee()} <span className="text-destructive">*</span>
               </FieldLabel>
               <InputGroup>
                 <NumberField
@@ -132,7 +134,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
                     field.onChange(value)
                   }}
                   min={0}
-                  locale="es-MX"
+                  locale={intlLocale()}
                   format={MONEY_FORMAT}
                   disabled={disabled}
                 >
@@ -161,7 +163,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Recargo <span className="text-destructive">*</span>
+                {m.presidency_period_late_fee()} <span className="text-destructive">*</span>
               </FieldLabel>
               <InputGroup>
                 <NumberField
@@ -170,7 +172,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
                     field.onChange(value)
                   }}
                   min={0}
-                  locale="es-MX"
+                  locale={intlLocale()}
                   format={MONEY_FORMAT}
                   disabled={disabled}
                 >
@@ -200,7 +202,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Día límite de pago <span className="text-destructive">*</span>
+              {m.presidency_period_due_day()} <span className="text-destructive">*</span>
             </FieldLabel>
             <NumberField
               value={field.value ?? null}
@@ -216,9 +218,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
                 <NumberFieldInput ref={field.ref} className="text-left" inputMode="numeric" />
               </NumberFieldGroup>
             </NumberField>
-            <FieldDescription>
-              Las cuotas pagadas después de este día del mes llevan recargo. Entre 1 y 28.
-            </FieldDescription>
+            <FieldDescription>{m.presidency_period_due_day_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
@@ -227,11 +227,8 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
       {inUse && (
         <Alert variant="info">
           <IconInfoCircle />
-          <AlertTitle>Este periodo ya tiene movimientos</AlertTitle>
-          <AlertDescription>
-            Los cambios en la cuota, el recargo o el día límite solo aplican a las cuotas que se registren a
-            partir de ahora.
-          </AlertDescription>
+          <AlertTitle>{m.presidency_period_in_use_title()}</AlertTitle>
+          <AlertDescription>{m.presidency_period_in_use_description()}</AlertDescription>
         </Alert>
       )}
     </>

@@ -17,6 +17,7 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { m } from '@/paraglide/messages'
 import type { TransactionQueryData } from '@/tanstack-queries/treasury'
 import { DeleteTransactionsAlertDialog } from '../dialog/delete-transactions'
 import { CreateTransactionDrawer } from '../drawer/create-transaction'
@@ -26,9 +27,24 @@ export const KIND_FILTERS = ['all', 'income', 'expense'] as const
 export type KindFilter = (typeof KIND_FILTERS)[number]
 
 const KIND_FILTER_ITEMS: { value: KindFilter; label: string }[] = [
-  { value: 'all', label: 'Todos' },
-  { value: 'income', label: 'Ingresos' },
-  { value: 'expense', label: 'Egresos' },
+  {
+    value: 'all',
+    get label() {
+      return m.common_all_masculine()
+    },
+  },
+  {
+    value: 'income',
+    get label() {
+      return m.common_income()
+    },
+  },
+  {
+    value: 'expense',
+    get label() {
+      return m.common_expense()
+    },
+  },
 ]
 
 /** URL-backed kind filter, shared by the header (control) and the table (data). */
@@ -46,6 +62,9 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
   const [kind, setKind] = useKindFilter()
   const isFiltered = kind !== 'all'
   const activeKindLabel = KIND_FILTER_ITEMS.find((item) => item.value === kind)?.label
+  const filtersLabel = isFiltered
+    ? m.treasury_filters_active({ filter: activeKindLabel ?? '' })
+    : m.common_filters()
   const [isRecordFeeOpen, setRecordFeeOpen] = useState(false)
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [isDeleteSelectedOpen, setDeleteSelectedOpen] = useState(false)
@@ -72,7 +91,7 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
             table={table}
             columnId="description"
             param="search-transactions"
-            hint="Buscar por concepto, folio, referencia, categoría o casa"
+            hint={m.treasury_search_transactions_hint()}
           />
 
           <Menu>
@@ -82,12 +101,7 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
                 render={
                   <MenuTrigger
                     render={
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        className="relative"
-                        aria-label={isFiltered ? `Filtros: ${activeKindLabel}` : 'Filtros'}
-                      >
+                      <Button size="icon" variant="outline" className="relative" aria-label={filtersLabel}>
                         <IconFilter className="size-4" />
                         {/* The list is narrowed; don't let that go unnoticed. */}
                         {isFiltered && (
@@ -101,12 +115,12 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
                   />
                 }
               />
-              <TooltipContent>{isFiltered ? `Filtros: ${activeKindLabel}` : 'Filtros'}</TooltipContent>
+              <TooltipContent>{filtersLabel}</TooltipContent>
             </Tooltip>
 
             <MenuPopup align="end">
               <MenuGroup>
-                <MenuGroupLabel>Tipo de movimiento</MenuGroupLabel>
+                <MenuGroupLabel>{m.treasury_transaction_kind()}</MenuGroupLabel>
                 <MenuRadioGroup
                   value={kind}
                   onValueChange={(value: KindFilter) => {
@@ -133,7 +147,7 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
                   render={
                     <Button
                       variant="destructive-outline"
-                      aria-label={`Eliminar ${selectedRowsLength} movimientos seleccionados`}
+                      aria-label={m.treasury_delete_selected_aria({ count: selectedRowsLength })}
                       onClick={() => {
                         setDeleteSelectedOpen(true)
                       }}
@@ -145,7 +159,7 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
                     </Button>
                   }
                 />
-                <TooltipContent>Eliminar movimientos seleccionados</TooltipContent>
+                <TooltipContent>{m.treasury_delete_selected()}</TooltipContent>
               </Tooltip>
             )}
 
@@ -156,7 +170,7 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
                 setCreateOpen(true)
               }}
             >
-              Registrar movimiento
+              {m.treasury_record_transaction()}
             </Button>
             <Button
               disabled={isLoading}
@@ -164,7 +178,7 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
                 setRecordFeeOpen(true)
               }}
             >
-              Registrar cuota
+              {m.treasury_record_fee()}
             </Button>
           </div>
         )}

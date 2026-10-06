@@ -2,7 +2,6 @@ import { IconFilter } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { STATUS_LABEL } from '@/components/shared/request-status'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
@@ -17,8 +16,9 @@ import {
   MenuTrigger,
 } from '@/components/ui/menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { REQUEST_STATUSES, type RequestStatus } from '@/lib/validations/requests'
+import { REQUEST_STATUSES } from '@/lib/validations/requests'
 import { SECURITY_REQUEST_KINDS, type SecurityRequestKind } from '@/lib/validations/security'
+import { m } from '@/paraglide/messages'
 import type { SecurityRequestQueryData } from '@/tanstack-queries/security'
 import { CreateRequestDrawer } from '../drawer/create-request'
 import { KIND_LABEL } from '../kind'
@@ -28,16 +28,48 @@ const STATUS_FILTERS = ['all', ...REQUEST_STATUSES] as const
 export type StatusFilter = (typeof STATUS_FILTERS)[number]
 
 const STATUS_FILTER_ITEMS: { value: StatusFilter; label: string }[] = [
-  { value: 'all', label: 'Todas' },
-  ...REQUEST_STATUSES.map((status: RequestStatus) => ({ value: status, label: `${STATUS_LABEL[status]}s` })),
+  {
+    value: 'all',
+    get label() {
+      return m.common_all_feminine()
+    },
+  },
+  {
+    value: 'pending',
+    get label() {
+      return m.requests_status_filter_pending()
+    },
+  },
+  {
+    value: 'paid',
+    get label() {
+      return m.requests_status_filter_paid()
+    },
+  },
+  {
+    value: 'rejected',
+    get label() {
+      return m.requests_status_filter_rejected()
+    },
+  },
 ]
 
 const KIND_FILTERS = ['all', ...SECURITY_REQUEST_KINDS] as const
 export type KindFilter = (typeof KIND_FILTERS)[number]
 
 const KIND_FILTER_ITEMS: { value: KindFilter; label: string }[] = [
-  { value: 'all', label: 'Todos' },
-  ...SECURITY_REQUEST_KINDS.map((kind: SecurityRequestKind) => ({ value: kind, label: KIND_LABEL[kind] })),
+  {
+    value: 'all',
+    get label() {
+      return m.common_all_masculine()
+    },
+  },
+  ...SECURITY_REQUEST_KINDS.map((kind: SecurityRequestKind) => ({
+    value: kind,
+    get label() {
+      return KIND_LABEL[kind]
+    },
+  })),
 ]
 
 /** URL-backed status filter, shared by the header (control) and the table (data). */
@@ -65,7 +97,9 @@ export function RequestsDataTableHeader({ table, viewer, isLoading }: RequestsDa
     kind !== 'all' && KIND_FILTER_ITEMS.find((item) => item.value === kind)?.label,
   ].filter(Boolean)
   const isFiltered = activeFilterLabels.length > 0
-  const filtersLabel = isFiltered ? `Filtros: ${activeFilterLabels.join(', ')}` : 'Filtros'
+  const filtersLabel = isFiltered
+    ? m.requests_filters_active({ filters: activeFilterLabels.join(', ') })
+    : m.common_filters()
 
   return (
     <>
@@ -77,7 +111,7 @@ export function RequestsDataTableHeader({ table, viewer, isLoading }: RequestsDa
             table={table}
             columnId="title"
             param="search-requests"
-            hint="Buscar por concepto, detalles, tipo o quién la solicitó"
+            hint={m.requests_security_search_hint()}
           />
 
           <Menu>
@@ -106,7 +140,7 @@ export function RequestsDataTableHeader({ table, viewer, isLoading }: RequestsDa
 
             <MenuPopup align="end">
               <MenuGroup>
-                <MenuGroupLabel>Estado</MenuGroupLabel>
+                <MenuGroupLabel>{m.common_field_status()}</MenuGroupLabel>
                 <MenuRadioGroup
                   value={status}
                   onValueChange={(value: StatusFilter) => {
@@ -124,7 +158,7 @@ export function RequestsDataTableHeader({ table, viewer, isLoading }: RequestsDa
               <MenuSeparator />
 
               <MenuGroup>
-                <MenuGroupLabel>Tipo</MenuGroupLabel>
+                <MenuGroupLabel>{m.common_field_type()}</MenuGroupLabel>
                 <MenuRadioGroup
                   value={kind}
                   onValueChange={(value: KindFilter) => {
@@ -150,7 +184,7 @@ export function RequestsDataTableHeader({ table, viewer, isLoading }: RequestsDa
               setCreateOpen(true)
             }}
           >
-            Nueva solicitud
+            {m.requests_new()}
           </Button>
         )}
       </div>

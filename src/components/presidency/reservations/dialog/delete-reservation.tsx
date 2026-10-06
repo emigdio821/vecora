@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
+import { m } from '@/paraglide/messages'
 import { deleteReservation } from '@/server-actions/presidency'
 import { PRESIDENCY_QUERY_KEY, type ReservationQueryData } from '@/tanstack-queries/presidency'
 import { reservationSummary } from '../status'
@@ -37,11 +38,11 @@ export function DeleteReservationAlertDialog({
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Reservación cancelada', description: summary })
+      toastManager.add({ type: 'success', title: m.presidency_reservation_cancelled(), description: summary })
       onOpenChange(false)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo cancelar', description: error.message })
+      toastManager.add({ type: 'error', title: m.presidency_cancel_failed(), description: error.message })
     },
   })
 
@@ -58,15 +59,15 @@ export function DeleteReservationAlertDialog({
     <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Cancelar esta reservación?</AlertDialogTitle>
+          <AlertDialogTitle>{m.presidency_delete_reservation_title()}</AlertDialogTitle>
           <AlertDialogDescription>
-            {summary}. El día quedará libre para otra casa. Esta acción no se puede deshacer.
+            {m.presidency_delete_reservation_description({ summary })}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Volver
+            {m.presidency_go_back()}
           </AlertDialogClose>
           <Button
             variant="destructive"
@@ -75,7 +76,7 @@ export function DeleteReservationAlertDialog({
               mutation.mutate()
             }}
           >
-            Cancelar reservación
+            {m.presidency_cancel_reservation()}
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

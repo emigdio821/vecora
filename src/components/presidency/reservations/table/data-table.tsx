@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
+import { m } from '@/paraglide/messages'
 import { amenitiesQueryOptions, reservationsQueryOptions } from '@/tanstack-queries/presidency'
 import { reservationsTableColumns } from './columns'
 import { ReservationsDataTableHeader, useAmenityFilter } from './data-table-header'
@@ -43,8 +44,8 @@ export function ReservationsDataTable() {
       )}
       emptyMessage={
         amenities.data?.length === 0
-          ? 'Sin reservaciones. Agrega un área en "Áreas comunes" para empezar a reservar.'
-          : 'Sin reservaciones.'
+          ? m.presidency_reservations_empty_no_amenities()
+          : m.presidency_reservations_empty()
       }
       isLoading={isLoading}
     />

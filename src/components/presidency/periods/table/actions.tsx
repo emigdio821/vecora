@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
+import { m } from '@/paraglide/messages'
 import { type PeriodQueryData, transactionCount } from '@/tanstack-queries/treasury'
 import { DeletePeriodAlertDialog } from '../dialog/delete-period'
 import { EditPeriodDrawer } from '../drawer/edit-period'
@@ -33,7 +34,7 @@ export function PeriodsTableActions({ period }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={`Acciones de ${period.name}`}
+              aria-label={m.presidency_actions_for({ name: period.name })}
             >
               <IconDots className="size-4" />
             </Button>
@@ -48,7 +49,7 @@ export function PeriodsTableActions({ period }: ActionsProps) {
                 setEditOpen(true)
               }}
             >
-              Editar
+              {m.common_action_edit()}
             </MenuItem>
 
             {canDelete && (
@@ -58,7 +59,7 @@ export function PeriodsTableActions({ period }: ActionsProps) {
                   setDeleteOpen(true)
                 }}
               >
-                Eliminar
+                {m.common_action_delete()}
               </MenuItem>
             )}
           </MenuGroup>

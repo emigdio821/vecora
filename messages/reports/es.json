@@ -1,0 +1,57 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "reports_dialog_description": "PDF con ingresos, egresos, saldo y casas con cuotas pendientes.",
+  "reports_tab_monthly": "Mensual",
+  "reports_tab_custom": "Manual",
+  "reports_month_label": "Mes",
+  "reports_month_in_progress": "{month} (en curso)",
+  "reports_month_description": "Del día 1 al último día del mes.",
+  "reports_range_label": "Rango de fechas",
+  "reports_range_description": "Elige el primer y el último día del reporte.",
+  "reports_preset_this_month": "Este mes",
+  "reports_preset_last_month": "Mes pasado",
+  "reports_preset_last_3_months": "Últimos 3 meses",
+  "reports_preset_this_year": "Este año",
+  "reports_preset_last_year": "Año pasado",
+  "reports_download_pdf": "Descargar PDF",
+  "reports_downloaded": "Reporte descargado",
+  "reports_download_failed": "No se pudo generar el reporte. Recarga la página e inténtalo de nuevo.",
+  "reports_default_file_name": "reporte.pdf",
+
+  "reports_sign_in_required": "Inicia sesión para descargar el reporte",
+  "reports_invalid_dates": "Fechas inválidas",
+  "reports_generate_failed": "No se pudo generar el reporte",
+  "reports_range_end_before_start": "La fecha final debe ser igual o posterior a la inicial",
+  "reports_file_name_prefix": "vecora-reporte",
+  "reports_file_name_range": "{from}_a_{to}",
+
+  "reports_pdf_document_title": "Reporte financiero - {range}",
+  "reports_pdf_summary": "Resumen{suffix}",
+  "reports_pdf_opening_balance": "Saldo inicial",
+  "reports_pdf_closing_balance": "Saldo final",
+  "reports_pdf_balance_note": "Saldo inicial: todo lo registrado antes del {date}. Saldo final = saldo inicial + ingresos - egresos.",
+  "reports_pdf_income_by_category": "Ingresos por categoría{suffix}",
+  "reports_pdf_expense_by_category": "Egresos por categoría{suffix}",
+  "reports_pdf_no_income": "Sin ingresos en este periodo.",
+  "reports_pdf_no_expense": "Sin egresos en este periodo.",
+  "reports_pdf_fees_title": "Cuotas de mantenimiento",
+  "reports_pdf_fees_up_to_date": "{upToDate} de {houses} casas al corriente - {months}",
+  "reports_pdf_months_considered": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 mes considerado",
+        "countPlural=other": "{count} meses considerados"
+      }
+    }
+  ],
+  "reports_pdf_column_months": "Meses",
+  "reports_pdf_column_unpaid": "Sin pagar",
+  "reports_pdf_all_up_to_date": "Todas las casas están al corriente.",
+  "reports_pdf_no_fees": "No hay cuotas por cobrar en estas fechas.",
+  "reports_pdf_dates_note": "Ingresos y egresos se cuentan por la fecha en que ocurrieron. Una cuota cuenta como pagada si su pago se registró a más tardar el {date}.",
+  "reports_pdf_generated": "Generado el {date} por {name}",
+  "reports_pdf_page": "Página {page} de {total}"
+}

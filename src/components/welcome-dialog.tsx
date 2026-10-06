@@ -31,6 +31,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import type { AppRole } from '@/lib/supabase/current-user'
+import { m } from '@/paraglide/messages'
 import { markWelcomed } from '@/server-actions/profile'
 import { USER_QUERY_KEY } from '@/tanstack-queries/session'
 
@@ -50,50 +51,82 @@ interface Ability {
 const ABILITIES: Ability[] = [
   {
     icon: IconBuildingCommunity,
-    title: 'Residencial',
-    description: 'Da de alta las casas y a sus residentes.',
+    get title() {
+      return m.common_section_residential()
+    },
+    get description() {
+      return m.settings_welcome_ability_residential()
+    },
     roles: ['president'],
   },
   {
     icon: IconGavel,
-    title: 'Presidencia',
-    description: 'Abre los periodos de cuotas y aparta las áreas comunes.',
+    get title() {
+      return m.common_section_presidency()
+    },
+    get description() {
+      return m.settings_welcome_ability_presidency()
+    },
     roles: ['president', 'treasurer'],
   },
   {
     icon: IconHeartHandshake,
-    title: 'Mesa directiva',
-    description: 'Agrega a los integrantes y compárteles su enlace de acceso.',
+    get title() {
+      return m.common_section_hoa_board()
+    },
+    get description() {
+      return m.settings_welcome_ability_hoa_board()
+    },
     roles: ['president'],
   },
   {
     icon: IconPigMoney,
-    title: 'Tesorería',
-    description: 'Registra los ingresos, egresos y cuotas pagadas, y sus categorías.',
+    get title() {
+      return m.common_section_treasury()
+    },
+    get description() {
+      return m.settings_welcome_ability_treasury()
+    },
     roles: ['treasurer'],
   },
   {
     icon: IconReceipt,
-    title: 'Solicitudes de pago',
-    description: 'Marca como pagadas o rechazadas las de "Mantenimiento" y "Seguridad".',
+    get title() {
+      return m.settings_welcome_payment_requests()
+    },
+    get description() {
+      return m.settings_welcome_ability_payment_requests()
+    },
     roles: ['treasurer'],
   },
   {
     icon: IconTool,
-    title: 'Mantenimiento',
-    description: 'Registra trabajos y compras. Cada uno le llega a "Tesorería" como solicitud de pago.',
+    get title() {
+      return m.common_section_maintenance()
+    },
+    get description() {
+      return m.settings_welcome_ability_maintenance()
+    },
     roles: ['maintenance'],
   },
   {
     icon: IconUrgent,
-    title: 'Seguridad',
-    description: 'Registra los gastos de seguridad. Cada uno le llega a "Tesorería" como solicitud de pago.',
+    get title() {
+      return m.common_section_security()
+    },
+    get description() {
+      return m.settings_welcome_ability_security()
+    },
     roles: ['security'],
   },
   {
     icon: IconHistory,
-    title: 'Historial',
-    description: 'Revisa cada cambio en la aplicación: qué se hizo, quién y cuándo.',
+    get title() {
+      return m.common_section_logs()
+    },
+    get description() {
+      return m.settings_welcome_ability_logs()
+    },
     roles: ['admin'],
   },
 ]
@@ -165,11 +198,11 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
 
   const steps: Step[] = [
     {
-      title: 'Te damos la bienvenida a Vecora',
-      description: 'Aquí tienes una breve introducción de lo que puedes hacer en la aplicación.',
+      title: m.settings_welcome_intro_title(),
+      description: m.settings_welcome_intro_description(),
       content: (
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-muted-foreground">Entraste como</span>
+          <span className="text-muted-foreground">{m.settings_welcome_signed_in_as()}</span>
           {user.roles.map((role) => (
             <RoleNameBadge key={role} roleName={role} />
           ))}
@@ -177,8 +210,8 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
       ),
     },
     {
-      title: 'Lo que puedes hacer',
-      description: 'Según tu rol, estas son las secciones donde puedes registrar y editar.',
+      title: m.settings_welcome_abilities_title(),
+      description: m.settings_welcome_abilities_description(),
       content: (
         <InfoList>
           {abilities.map((ability) => (
@@ -190,27 +223,24 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
       ),
     },
     {
-      title: 'Todo a la vista',
-      description: 'Toda la mesa directiva trabaja con la misma información.',
+      title: m.settings_welcome_overview_title(),
+      description: m.settings_welcome_overview_description(),
       content: (
         <InfoList>
-          <InfoRow icon={IconEye} title="Puedes consultar todo">
-            Todas las secciones están abiertas para ti. Los botones para agregar o editar solo aparecen donde
-            tienes permiso.
+          <InfoRow icon={IconEye} title={m.settings_welcome_view_all_title()}>
+            {m.settings_welcome_view_all_body()}
           </InfoRow>
-          <InfoRow icon={IconHome} title="Inicio">
-            El resumen del periodo, las cuotas pendientes y las solicitudes de pago.
+          <InfoRow icon={IconHome} title={m.common_section_home()}>
+            {m.settings_welcome_home_body()}
           </InfoRow>
-          <InfoRow icon={IconFileText} title="Reporte financiero">
-            En "Reportes", en el menú lateral, descarga en PDF los ingresos, egresos y cuotas pendientes de
-            las fechas que elijas.
+          <InfoRow icon={IconFileText} title={m.common_section_financial_report()}>
+            {m.settings_welcome_report_body()}
           </InfoRow>
-          <InfoRow icon={IconHistory} title="Cada cambio queda registrado">
-            Todo lo que se crea, edita o elimina queda registrado en la aplicación con la información de quién
-            lo hizo y cuándo.
+          <InfoRow icon={IconHistory} title={m.settings_welcome_logged_title()}>
+            {m.settings_welcome_logged_body()}
           </InfoRow>
-          <InfoRow icon={IconUser} title="Vuelve a verla cuando quieras">
-            Toca tu nombre en el menú lateral y elige "Ver introducción".
+          <InfoRow icon={IconUser} title={m.settings_welcome_revisit_title()}>
+            {m.settings_welcome_revisit_body()}
           </InfoRow>
         </InfoList>
       ),
@@ -219,17 +249,16 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
 
   if (isManager) {
     steps.push({
-      title: 'Tu primer paso',
-      description: 'Solo pueden entrar las personas que agregues a la mesa directiva.',
+      title: m.settings_welcome_first_step_title(),
+      description: m.settings_welcome_first_step_description(),
       content: (
         <div className="flex flex-col gap-4">
           <InfoList>
-            <InfoRow icon={IconHeartHandshake} title="Invita a la mesa directiva">
-              Agrega a cada integrante en "Mesa directiva" y envíale el enlace de acceso que se genera, por
-              WhatsApp o como prefieras. Al abrirlo, creará su contraseña para entrar.
+            <InfoRow icon={IconHeartHandshake} title={m.settings_welcome_invite_title()}>
+              {m.settings_welcome_invite_body()}
             </InfoRow>
-            <InfoRow icon={IconSettings} title="Ajustes">
-              Pon el nombre del residencial y su logo; se usan en el menú y en los reportes.
+            <InfoRow icon={IconSettings} title={m.common_section_settings()}>
+              {m.settings_welcome_settings_body()}
             </InfoRow>
           </InfoList>
           <Button
@@ -239,7 +268,7 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
             onClick={onLeave}
           >
             <IconHeartHandshake />
-            Ir a "Mesa directiva"
+            {m.settings_welcome_go_to_board()}
           </Button>
         </div>
       ),
@@ -260,7 +289,7 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
 
       <DialogFooter>
         <span className="self-center text-sm text-muted-foreground sm:me-auto">
-          Paso {index + 1} de {steps.length}
+          {m.settings_welcome_step_count({ current: index + 1, total: steps.length })}
         </span>
         {index > 0 && (
           <Button
@@ -269,18 +298,18 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
               setIndex(index - 1)
             }}
           >
-            Atrás
+            {m.common_action_back()}
           </Button>
         )}
         {isLast ? (
-          <Button onClick={onDone}>Empezar</Button>
+          <Button onClick={onDone}>{m.settings_welcome_start()}</Button>
         ) : (
           <Button
             onClick={() => {
               setIndex(index + 1)
             }}
           >
-            Siguiente
+            {m.common_action_next()}
           </Button>
         )}
       </DialogFooter>

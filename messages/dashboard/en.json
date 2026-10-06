@@ -1,0 +1,46 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "dashboard_no_current_period": "No current period",
+
+  "dashboard_treasury_summary": "Period summary",
+  "dashboard_treasury_no_period_description": "No period covers today's date. Create one in \"Presidency\" to see the summary.",
+  "dashboard_treasury_go_to_periods": "Go to Periods",
+  "dashboard_treasury_period_name": "Period {name}",
+  "dashboard_treasury_other_currency": "In {code}: income {income}, expenses {expense}, balance {balance}",
+  "dashboard_treasury_chart_label": "Income and expenses by month, period {name}",
+  "dashboard_treasury_chart_description": "Areas by month: income in green and expenses in red. The table that follows has the exact amounts.",
+  "dashboard_treasury_month": "Month",
+
+  "dashboard_fees_title": "Maintenance fees",
+  "dashboard_fees_current_period": "Current period",
+  "dashboard_fees_none_up_to_date": "No house is up to date",
+  "dashboard_fees_all_up_to_date": "All houses are up to date",
+  "dashboard_fees_some_up_to_date": "{upToDate} of {total} houses up to date",
+  "dashboard_fees_no_period_description": "No period covers today's date.",
+  "dashboard_fees_nothing_owed": "No house owes fees for this period.",
+  "dashboard_fees_months_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": { "countPlural=one": "1 month", "countPlural=other": "{count} months" }
+    }
+  ],
+
+  "dashboard_requests_title": "Payment requests",
+  "dashboard_requests_none_pending": "No pending requests",
+  "dashboard_requests_pending_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": { "countPlural=one": "1 pending request", "countPlural=other": "{count} pending requests" }
+    }
+  ],
+  "dashboard_requests_reservation_fee": "{amenity} fee - House {number}",
+  "dashboard_requests_empty_title": "All caught up",
+  "dashboard_requests_empty_description": "Pending requests from \"Maintenance\", \"Security\" and \"Reservations\" will show up here.",
+
+  "dashboard_notices_upcoming": "Upcoming events",
+  "dashboard_notices_date_pattern": "EEEE, MMMM d",
+  "dashboard_notices_empty_title": "No upcoming events",
+  "dashboard_notices_empty_description": "Common area reservations will show up here."
+}

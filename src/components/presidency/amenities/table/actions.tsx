@@ -5,6 +5,7 @@ import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
+import { m } from '@/paraglide/messages'
 import { setAmenityActive } from '@/server-actions/presidency'
 import { type AmenityQueryData, PRESIDENCY_QUERY_KEY, reservationCount } from '@/tanstack-queries/presidency'
 import { DeleteAmenityAlertDialog } from '../dialog/delete-amenity'
@@ -31,14 +32,14 @@ export function AmenitiesTableActions({ amenity }: ActionsProps) {
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'amenities'] })
       toastManager.add({
         type: 'success',
-        title: amenity.is_active ? 'Área desactivada' : 'Área activada',
+        title: amenity.is_active ? m.presidency_amenity_deactivated() : m.presidency_amenity_activated(),
         description: amenity.is_active
-          ? `${amenity.name} ya no aparecerá al reservar`
-          : `${amenity.name} vuelve a estar disponible al reservar`,
+          ? m.presidency_amenity_deactivated_description({ name: amenity.name })
+          : m.presidency_amenity_activated_description({ name: amenity.name }),
       })
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo actualizar', description: error.message })
+      toastManager.add({ type: 'error', title: m.presidency_update_failed(), description: error.message })
     },
   })
 
@@ -57,7 +58,7 @@ export function AmenitiesTableActions({ amenity }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={`Acciones de ${amenity.name}`}
+              aria-label={m.presidency_actions_for({ name: amenity.name })}
             >
               <IconDots className="size-4" />
             </Button>
@@ -74,7 +75,7 @@ export function AmenitiesTableActions({ amenity }: ActionsProps) {
                 setEditOpen(true)
               }}
             >
-              Editar
+              {m.common_action_edit()}
             </MenuItem>
 
             <MenuItem
@@ -83,7 +84,7 @@ export function AmenitiesTableActions({ amenity }: ActionsProps) {
                 toggleActive.mutate()
               }}
             >
-              {amenity.is_active ? 'Desactivar' : 'Activar'}
+              {amenity.is_active ? m.presidency_deactivate() : m.presidency_activate()}
             </MenuItem>
 
             {canDelete && (
@@ -93,7 +94,7 @@ export function AmenitiesTableActions({ amenity }: ActionsProps) {
                   setDeleteOpen(true)
                 }}
               >
-                Eliminar
+                {m.common_action_delete()}
               </MenuItem>
             )}
           </MenuGroup>

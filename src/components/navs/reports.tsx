@@ -1,6 +1,7 @@
 import { IconFileText } from '@tabler/icons-react'
 import { useState } from 'react'
 import { FinancialReportDialog } from '@/components/reports/dialog/financial-report'
+import { m } from '@/paraglide/messages'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -16,7 +17,7 @@ export function NavReports({ ...props }: React.ComponentProps<typeof SidebarGrou
 
   return (
     <SidebarGroup {...props}>
-      <SidebarGroupLabel>Reportes</SidebarGroupLabel>
+      <SidebarGroupLabel>{m.common_section_reports()}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -26,7 +27,7 @@ export function NavReports({ ...props }: React.ComponentProps<typeof SidebarGrou
               }}
             >
               <IconFileText className="size-4" />
-              <span>Reporte financiero</span>
+              <span>{m.common_section_financial_report()}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

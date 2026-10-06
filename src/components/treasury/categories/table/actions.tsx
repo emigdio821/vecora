@@ -5,6 +5,7 @@ import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
+import { m } from '@/paraglide/messages'
 import { setCategoryActive } from '@/server-actions/treasury'
 import { type CategoryQueryData, transactionCount, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { DeleteCategoryAlertDialog } from '../dialog/delete-category'
@@ -33,14 +34,14 @@ export function CategoriesTableActions({ category }: ActionsProps) {
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY, 'categories'] })
       toastManager.add({
         type: 'success',
-        title: category.is_active ? 'Categoría desactivada' : 'Categoría activada',
+        title: category.is_active ? m.treasury_category_deactivated() : m.treasury_category_activated(),
         description: category.is_active
-          ? `${category.name} ya no aparecerá al registrar movimientos`
-          : `${category.name} vuelve a estar disponible al registrar movimientos`,
+          ? m.treasury_category_deactivated_description({ name: category.name })
+          : m.treasury_category_activated_description({ name: category.name }),
       })
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo actualizar', description: error.message })
+      toastManager.add({ type: 'error', title: m.treasury_update_failed(), description: error.message })
     },
   })
 
@@ -59,7 +60,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={`Acciones de ${category.name}`}
+              aria-label={m.treasury_actions_for({ name: category.name })}
             >
               <IconDots className="size-4" />
             </Button>
@@ -76,7 +77,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
                 setEditOpen(true)
               }}
             >
-              Editar
+              {m.common_action_edit()}
             </MenuItem>
 
             {!isSystem && (
@@ -86,7 +87,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
                   toggleActive.mutate()
                 }}
               >
-                {category.is_active ? 'Desactivar' : 'Activar'}
+                {category.is_active ? m.treasury_category_deactivate() : m.treasury_category_activate()}
               </MenuItem>
             )}
 
@@ -97,7 +98,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
                   setDeleteOpen(true)
                 }}
               >
-                Eliminar
+                {m.common_action_delete()}
               </MenuItem>
             )}
           </MenuGroup>

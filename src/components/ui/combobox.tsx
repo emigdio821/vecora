@@ -3,6 +3,7 @@ import { IconSelector, IconX } from '@tabler/icons-react'
 import * as React from 'react'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 
 export const ComboboxContext: React.Context<{
   chipsRef: React.RefObject<Element | null> | null
@@ -361,7 +362,7 @@ export function ComboboxChip({
 export function ComboboxChipRemove(props: ComboboxPrimitive.ChipRemove.Props): React.ReactElement {
   return (
     <ComboboxPrimitive.ChipRemove
-      aria-label="Remove"
+      aria-label={m.common_action_remove()}
       className="h-full shrink-0 cursor-pointer px-1.5 opacity-80 hover:opacity-100 [&_svg:not([class*='size-'])]:size-4 sm:[&_svg:not([class*='size-'])]:size-3.5"
       data-slot="combobox-chip-remove"
       {...props}

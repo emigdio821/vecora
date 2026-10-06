@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group'
 import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
 import type { CategoryInput } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 import { KIND_ITEMS } from '../../kind'
 
 const kindItemClassName = segmentedControlItemVariants({ className: 'grow', state: 'checked' })
@@ -24,10 +25,10 @@ export function CategoryFormFields({ form, disabled, lockKind }: CategoryFormFie
         control={form.control}
         render={({ field }) => (
           <Field name={field.name}>
-            <FieldLabel>Tipo</FieldLabel>
+            <FieldLabel>{m.common_field_type()}</FieldLabel>
             <RadioGroupPrimitive
               className={segmentedControlRootClassName}
-              aria-label="Tipo de movimiento"
+              aria-label={m.treasury_transaction_kind()}
               name={field.name}
               value={field.value}
               disabled={disabled || lockKind}
@@ -41,7 +42,7 @@ export function CategoryFormFields({ form, disabled, lockKind }: CategoryFormFie
                 </RadioPrimitive.Root>
               ))}
             </RadioGroupPrimitive>
-            {lockKind && <FieldDescription>El tipo no se puede cambiar una vez creada.</FieldDescription>}
+            {lockKind && <FieldDescription>{m.treasury_category_kind_locked()}</FieldDescription>}
           </Field>
         )}
       />
@@ -57,10 +58,10 @@ export function CategoryFormFields({ form, disabled, lockKind }: CategoryFormFie
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Nombre <span className="text-destructive">*</span>
+              {m.common_field_name()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Input {...field} autoComplete="off" disabled={disabled} />
-            <FieldDescription>Como aparecerá en la lista de movimientos.</FieldDescription>
+            <FieldDescription>{m.treasury_category_name_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}

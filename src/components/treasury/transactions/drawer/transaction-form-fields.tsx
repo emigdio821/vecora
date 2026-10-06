@@ -16,8 +16,9 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
 import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
-import { type CurrencyCode, currencySymbol, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { CreateTransactionInput } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 import { categoriesQueryOptions } from '@/tanstack-queries/treasury'
 import { KIND_ITEMS, PAYMENT_METHOD_ITEMS } from '../../kind'
 
@@ -72,10 +73,10 @@ export function TransactionFormFields({
         control={form.control}
         render={({ field }) => (
           <Field name={field.name}>
-            <FieldLabel>Tipo</FieldLabel>
+            <FieldLabel>{m.common_field_type()}</FieldLabel>
             <RadioGroupPrimitive
               className={segmentedControlRootClassName}
-              aria-label="Tipo de movimiento"
+              aria-label={m.treasury_transaction_kind()}
               name={field.name}
               value={field.value}
               disabled={disabled || lockKind}
@@ -106,7 +107,7 @@ export function TransactionFormFields({
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Categoría <span className="text-destructive">*</span>
+              {m.common_field_category()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Select
               items={categoryItems}
@@ -117,7 +118,7 @@ export function TransactionFormFields({
               disabled={lockedForFee || !categories}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder={categories ? 'Selecciona una categoría' : 'Cargando…'} />
+                <SelectValue placeholder={categories ? m.treasury_select_category() : m.common_loading()} />
               </SelectTrigger>
               <SelectPopup>
                 {categoryItems.map((item) => (
@@ -143,7 +144,7 @@ export function TransactionFormFields({
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Concepto <span className="text-destructive">*</span>
+              {m.common_field_description()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Input {...field} autoComplete="off" disabled={lockedForFee} />
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -163,7 +164,7 @@ export function TransactionFormFields({
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Monto <span className="text-destructive">*</span>
+                {m.common_field_amount()} <span className="text-destructive">*</span>
               </FieldLabel>
               <InputGroup>
                 <NumberField
@@ -172,7 +173,7 @@ export function TransactionFormFields({
                     field.onChange(value)
                   }}
                   min={0}
-                  locale="es-MX"
+                  locale={intlLocale()}
                   format={MONEY_FORMAT}
                   disabled={lockedForFee}
                 >
@@ -201,7 +202,7 @@ export function TransactionFormFields({
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Fecha <span className="text-destructive">*</span>
+                {m.common_field_date()} <span className="text-destructive">*</span>
               </FieldLabel>
               <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                 <PopoverTrigger
@@ -250,7 +251,7 @@ export function TransactionFormFields({
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Método de pago <span className="text-destructive">*</span>
+              {m.common_field_payment_method()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Select
               items={PAYMENT_METHOD_ITEMS}
@@ -288,10 +289,10 @@ export function TransactionFormFields({
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Referencia de la transferencia <span className="text-destructive">*</span>
+                {m.treasury_transfer_reference()} <span className="text-destructive">*</span>
               </FieldLabel>
               <Input {...field} autoComplete="off" disabled={disabled} />
-              <FieldDescription>Clave de rastreo o número de referencia del banco.</FieldDescription>
+              <FieldDescription>{m.treasury_transfer_reference_description()}</FieldDescription>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
             </Field>
           )}
@@ -311,7 +312,7 @@ export function TransactionFormFields({
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>
-                  Folio del recibo <span className="text-destructive">*</span>
+                  {m.treasury_receipt_folio()} <span className="text-destructive">*</span>
                 </FieldLabel>
                 <Input {...field} autoComplete="off" disabled={disabled} />
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -329,14 +330,14 @@ export function TransactionFormFields({
                 touched={fieldState.isTouched}
                 dirty={fieldState.isDirty}
               >
-                <FieldLabel>Casa</FieldLabel>
+                <FieldLabel>{m.common_field_house()}</FieldLabel>
                 <HousesPicker
                   value={field.value}
                   onValueChange={field.onChange}
                   inputRef={field.ref}
                   disabled={lockedForFee}
                 />
-                <FieldDescription>Opcional. Si el dinero viene de una casa en particular.</FieldDescription>
+                <FieldDescription>{m.treasury_house_description()}</FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
             )}
@@ -354,9 +355,9 @@ export function TransactionFormFields({
             touched={fieldState.isTouched}
             dirty={fieldState.isDirty}
           >
-            <FieldLabel>Notas</FieldLabel>
+            <FieldLabel>{m.common_field_notes()}</FieldLabel>
             <Textarea {...field} rows={3} className="max-h-40" disabled={disabled} />
-            <FieldDescription>Opcional. Proveedor, acuerdos, o cualquier observación.</FieldDescription>
+            <FieldDescription>{m.treasury_transaction_notes_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}

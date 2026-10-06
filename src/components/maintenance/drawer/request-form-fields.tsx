@@ -11,8 +11,9 @@ import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
-import { type CurrencyCode, currencySymbol, formatDay, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { MaintenanceRequestInput } from '@/lib/validations/maintenance'
+import { m } from '@/paraglide/messages'
 
 interface RequestFormFieldsProps {
   form: UseFormReturn<MaintenanceRequestInput>
@@ -39,10 +40,10 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Concepto <span className="text-destructive">*</span>
+              {m.common_field_description()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Input {...field} autoComplete="off" disabled={disabled} />
-            <FieldDescription>Qué se hizo o qué se compró. Es lo que verá la tesorería.</FieldDescription>
+            <FieldDescription>{m.requests_title_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
@@ -60,7 +61,7 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Monto <span className="text-destructive">*</span>
+                {m.common_field_amount()} <span className="text-destructive">*</span>
               </FieldLabel>
               <InputGroup>
                 <NumberField
@@ -69,7 +70,7 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
                     field.onChange(value)
                   }}
                   min={0}
-                  locale="es-MX"
+                  locale={intlLocale()}
                   format={MONEY_FORMAT}
                   disabled={disabled}
                 >
@@ -98,7 +99,7 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                Fecha del trabajo <span className="text-destructive">*</span>
+                {m.requests_maintenance_work_date()} <span className="text-destructive">*</span>
               </FieldLabel>
               <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                 <PopoverTrigger
@@ -146,11 +147,9 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
             touched={fieldState.isTouched}
             dirty={fieldState.isDirty}
           >
-            <FieldLabel>Detalles</FieldLabel>
+            <FieldLabel>{m.common_field_details()}</FieldLabel>
             <Textarea {...field} rows={3} className="max-h-40" disabled={disabled} />
-            <FieldDescription>
-              Opcional. Materiales, dónde se hizo, quién lo hizo, proveedor.
-            </FieldDescription>
+            <FieldDescription>{m.requests_maintenance_details_description()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}

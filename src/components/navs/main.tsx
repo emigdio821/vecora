@@ -7,6 +7,7 @@ import {
   IconUrgent,
 } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
+import { m } from '@/paraglide/messages'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -24,7 +25,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
 
   return (
     <SidebarGroup {...props}>
-      <SidebarGroupLabel>Secciones</SidebarGroupLabel>
+      <SidebarGroupLabel>{m.common_nav_sections()}</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem>
@@ -36,7 +37,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               render={
                 <Link to="/treasury">
                   <IconPigMoney className="size-4" />
-                  <span>Tesorería</span>
+                  <span>{m.common_section_treasury()}</span>
                   <LinkPendingIndicator to="/treasury" />
                 </Link>
               }
@@ -52,7 +53,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               render={
                 <Link to="/presidency">
                   <IconGavel className="size-4" />
-                  <span>Presidencia</span>
+                  <span>{m.common_section_presidency()}</span>
                   <LinkPendingIndicator to="/presidency" />
                 </Link>
               }
@@ -68,7 +69,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               render={
                 <Link to="/maintenance">
                   <IconTool className="size-4" />
-                  <span>Mantenimiento</span>
+                  <span>{m.common_section_maintenance()}</span>
                   <LinkPendingIndicator to="/maintenance" />
                 </Link>
               }
@@ -84,7 +85,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               render={
                 <Link to="/security">
                   <IconUrgent className="size-4" />
-                  <span>Seguridad</span>
+                  <span>{m.common_section_security()}</span>
                   <LinkPendingIndicator to="/security" />
                 </Link>
               }
@@ -100,7 +101,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               render={
                 <Link to="/hoa-board">
                   <IconHeartHandshake className="size-4" />
-                  <span>Mesa directiva</span>
+                  <span>{m.common_section_hoa_board()}</span>
                   <LinkPendingIndicator to="/hoa-board" />
                 </Link>
               }
@@ -116,7 +117,7 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               render={
                 <Link to="/residential">
                   <IconBuildingCommunity className="size-4" />
-                  <span>Residencial</span>
+                  <span>{m.common_section_residential()}</span>
                   <LinkPendingIndicator to="/residential" />
                 </Link>
               }

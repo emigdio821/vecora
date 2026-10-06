@@ -11,6 +11,7 @@ import {
   type SetupInput,
   setupSchema,
 } from '@/lib/validations/settings'
+import { m } from '@/paraglide/messages'
 
 /** Largest side of the stored logo, in pixels: plenty for the report header. */
 const LOGO_SIZE = 512
@@ -25,7 +26,7 @@ const updateSettingsFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult> => {
     const parsed = settingsSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
@@ -39,13 +40,13 @@ const updateSettingsFn = createServerFn({ method: 'POST' })
     if (error) {
       return {
         error: postgrestErrorMessage(error, {
-          fallback: 'No se pudieron guardar los ajustes, intenta nuevamente',
+          fallback: m.settings_save_failed(),
         }),
       }
     }
     // RLS filtered the row out: not president nor admin.
     if (!data) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -59,7 +60,7 @@ const completeSetupFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult> => {
     const parsed = setupSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
@@ -73,12 +74,12 @@ const completeSetupFn = createServerFn({ method: 'POST' })
     if (error) {
       return {
         error: postgrestErrorMessage(error, {
-          fallback: 'No se pudo guardar la configuración, intenta nuevamente',
+          fallback: m.settings_setup_save_failed(),
         }),
       }
     }
     if (!data) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -115,11 +116,11 @@ async function setLogoPath(path: string | null): Promise<ActionResult> {
 
   if (error) {
     return {
-      error: postgrestErrorMessage(error, { fallback: 'No se pudo guardar el logo, intenta nuevamente' }),
+      error: postgrestErrorMessage(error, { fallback: m.settings_logo_save_failed() }),
     }
   }
   if (!data) {
-    return { error: 'No tienes permisos para realizar esta acción' }
+    return { error: m.common_no_permission() }
   }
 
   // Nothing points at the old file anymore; if the delete fails it's only an orphan.
@@ -136,13 +137,13 @@ const uploadLogoFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: formData }): Promise<ActionResult> => {
     const parsed = logoFileSchema.safeParse(formData.get('logo'))
     if (!parsed.success) {
-      return { error: parsed.error.issues[0]?.message ?? 'Selecciona una imagen' }
+      return { error: parsed.error.issues[0]?.message ?? m.settings_logo_select_image() }
     }
 
     // Processing the image is the expensive part: turn others away before it.
     const user = await getCurrentUser()
     if (!user?.roles.some((role) => role === 'president' || role === 'admin')) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     let png: Buffer
@@ -150,7 +151,7 @@ const uploadLogoFn = createServerFn({ method: 'POST' })
       png = await optimizeLogo(await parsed.data.arrayBuffer())
     } catch (error) {
       console.error('logo optimization failed', error)
-      return { error: 'No se pudo leer la imagen, prueba con otro archivo' }
+      return { error: m.settings_logo_read_failed() }
     }
 
     // A new name every time, so no cache ever serves the previous logo.
@@ -162,7 +163,7 @@ const uploadLogoFn = createServerFn({ method: 'POST' })
 
     if (uploadError) {
       console.error('logo upload failed', uploadError)
-      return { error: 'No se pudo subir el logo, intenta nuevamente' }
+      return { error: m.settings_logo_upload_failed() }
     }
 
     const result = await setLogoPath(path)

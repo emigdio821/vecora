@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card'
 import { siteConfig } from '@/lib/config/site'
 import { pageHead } from '@/lib/metadata'
+import { m } from '@/paraglide/messages'
 
 export const Route = createFileRoute('/_auth/login')({
   // /auth/confirm sends people here when an invite link is expired or reused.
@@ -22,8 +23,8 @@ export const Route = createFileRoute('/_auth/login')({
   },
   head: () =>
     pageHead({
-      title: 'Iniciar sesión',
-      description: `Entra a ${siteConfig.name} con tu correo y contraseña.`,
+      title: m.auth_login_title(),
+      description: m.auth_login_head_description({ appName: siteConfig.name }),
     }),
   component: LoginPage,
 })
@@ -35,18 +36,16 @@ function LoginPage() {
   return (
     <CardFrame className="w-full max-w-sm">
       <CardFrameHeader>
-        <CardFrameTitle>Iniciar sesión</CardFrameTitle>
-        <CardFrameDescription>Ingresa tus credenciales para acceder a tu cuenta.</CardFrameDescription>
+        <CardFrameTitle>{m.auth_login_title()}</CardFrameTitle>
+        <CardFrameDescription>{m.auth_login_description()}</CardFrameDescription>
       </CardFrameHeader>
       <Card>
         <CardPanel className="flex flex-col gap-4">
           {inviteFailed && (
             <Alert variant="warning">
               <IconAlertCircle />
-              <AlertTitle>El enlace de invitación ya no es válido</AlertTitle>
-              <AlertDescription>
-                Puede haber caducado o ya se usó. Pide un enlace nuevo a quien te lo envió.
-              </AlertDescription>
+              <AlertTitle>{m.auth_invite_invalid_title()}</AlertTitle>
+              <AlertDescription>{m.auth_invite_invalid_description()}</AlertDescription>
             </Alert>
           )}
           <LoginForm />

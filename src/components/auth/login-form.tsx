@@ -11,6 +11,8 @@ import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { type LoginInput, loginSchema } from '@/lib/validations/auth'
+import { m } from '@/paraglide/messages'
+import { getLocale } from '@/paraglide/runtime'
 import { login } from '@/server-actions/auth'
 import { USER_QUERY_KEY } from '@/tanstack-queries/session'
 
@@ -35,6 +37,12 @@ export function LoginForm() {
       return
     }
 
+    // Now in the HOA's language: a full load renders the app in it.
+    if (result?.locale && result.locale !== getLocale()) {
+      window.location.replace('/')
+      return
+    }
+
     // The cache still holds the signed-out user; the guards must ask again.
     queryClient.removeQueries({ queryKey: [USER_QUERY_KEY] })
     await navigate({ to: '/', replace: true })
@@ -53,7 +61,7 @@ export function LoginForm() {
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Correo
+              {m.common_field_email()}
               <span className="text-destructive">*</span>
             </FieldLabel>
             <Input {...field} inputMode="email" autoComplete="email" />
@@ -72,14 +80,14 @@ export function LoginForm() {
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Contraseña
+              {m.auth_field_password()}
               <span className="text-destructive">*</span>
             </FieldLabel>
 
             <InputGroup>
               <InputGroupInput
                 type={showPassword ? 'text' : 'password'}
-                aria-label="Contraseña con alternar visibilidad"
+                aria-label={m.auth_password_toggle_label()}
                 {...field}
               />
               <InputGroupAddon align="inline-end">
@@ -89,7 +97,7 @@ export function LoginForm() {
                   onClick={() => {
                     setShowPassword(!showPassword)
                   }}
-                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-label={showPassword ? m.auth_hide_password() : m.auth_show_password()}
                 >
                   {showPassword ? <IconEyeOff /> : <IconEye />}
                 </Button>
@@ -103,13 +111,13 @@ export function LoginForm() {
       {form.formState.errors.root && (
         <Alert variant="error">
           <IconAlertCircle />
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>{m.common_error()}</AlertTitle>
           <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
         </Alert>
       )}
 
       <Button type="submit" disabled={isLoading} loading={isLoading}>
-        Inicia sesión
+        {m.auth_login_submit()}
       </Button>
     </Form>
   )

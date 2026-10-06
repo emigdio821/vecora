@@ -4,6 +4,7 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import type { CreateHouseInput } from '@/lib/validations/houses'
+import { m } from '@/paraglide/messages'
 
 /** The two house fields, shared by the create and edit forms. */
 export function HouseFormFields({ control }: { control: Control<CreateHouseInput> }) {
@@ -20,10 +21,10 @@ export function HouseFormFields({ control }: { control: Control<CreateHouseInput
             dirty={fieldState.isDirty}
           >
             <FieldLabel>
-              Número <span className="text-destructive">*</span>
+              {m.residential_field_house_number()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Input {...field} autoComplete="off" />
-            <FieldDescription>Identificador de la casa. Debe ser único.</FieldDescription>
+            <FieldDescription>{m.residential_house_number_hint()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}
@@ -39,9 +40,9 @@ export function HouseFormFields({ control }: { control: Control<CreateHouseInput
             touched={fieldState.isTouched}
             dirty={fieldState.isDirty}
           >
-            <FieldLabel>Notas</FieldLabel>
+            <FieldLabel>{m.common_field_notes()}</FieldLabel>
             <Textarea {...field} rows={3} className="max-h-40" />
-            <FieldDescription>Visible para todos los miembros.</FieldDescription>
+            <FieldDescription>{m.residential_notes_hint()}</FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}

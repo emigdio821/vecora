@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
+import { m } from '@/paraglide/messages'
 import { removeBoardMember } from '@/server-actions/hoa-board'
 import { type BoardMemberQueryData, HOA_BOARD_QUERY_KEY } from '@/tanstack-queries/hoa-board'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
@@ -40,13 +41,13 @@ export function RemoveBoardMemberAlertDialog({
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Integrante retirado',
-        description: `${member.full_name} ya no puede entrar a Vecora`,
+        title: m.board_member_removed(),
+        description: m.board_member_removed_description({ name: member.full_name }),
       })
       onOpenChange(false)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo retirar', description: error.message })
+      toastManager.add({ type: 'error', title: m.board_remove_failed(), description: error.message })
     },
   })
 
@@ -63,16 +64,13 @@ export function RemoveBoardMemberAlertDialog({
     <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Retirar a {member.full_name} de la mesa directiva?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Perderá todos sus roles y ya no podrá entrar a la aplicación. Sus registros anteriores
-            (movimientos, reservaciones) se conservan. Podrás volver a agregarle después.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{m.board_remove_title({ name: member.full_name })}</AlertDialogTitle>
+          <AlertDialogDescription>{m.board_remove_description()}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
             variant="destructive"
@@ -81,7 +79,7 @@ export function RemoveBoardMemberAlertDialog({
               mutation.mutate()
             }}
           >
-            Retirar
+            {m.board_remove_confirm()}
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

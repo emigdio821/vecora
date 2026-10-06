@@ -19,6 +19,7 @@ import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { formatDay } from '@/lib/utils'
 import { type ReservationInput, reservationSchema } from '@/lib/validations/presidency'
+import { m } from '@/paraglide/messages'
 import { updateReservation } from '@/server-actions/presidency'
 import { PRESIDENCY_QUERY_KEY, type ReservationQueryData } from '@/tanstack-queries/presidency'
 import { reservationPayment, reservationSummary } from '../status'
@@ -51,7 +52,7 @@ export function EditReservationDrawer({
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Reservación actualizada',
+        title: m.presidency_reservation_updated(),
         description: formatDay(values.reserved_on),
       })
       onOpenChange(false)
@@ -71,7 +72,7 @@ export function EditReservationDrawer({
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar reservación</DrawerTitle>
+          <DrawerTitle>{m.presidency_edit_reservation_title()}</DrawerTitle>
           <DrawerDescription>{reservationSummary(reservation)}</DrawerDescription>
         </DrawerHeader>
 
@@ -118,11 +119,8 @@ function EditReservationForm({
           {isPaid && (
             <Alert variant="info">
               <IconInfoCircle />
-              <AlertTitle>Reservación pagada</AlertTitle>
-              <AlertDescription>
-                El pago ya está en "Tesorería", así que el área, la casa y el monto no se pueden cambiar.
-                Puedes mover la fecha.
-              </AlertDescription>
+              <AlertTitle>{m.presidency_reservation_paid_title()}</AlertTitle>
+              <AlertDescription>{m.presidency_reservation_paid_description()}</AlertDescription>
             </Alert>
           )}
 
@@ -137,7 +135,7 @@ function EditReservationForm({
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -146,10 +144,10 @@ function EditReservationForm({
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DrawerFooter>
     </>

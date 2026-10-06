@@ -13,7 +13,8 @@ import {
 } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { useToday } from '@/hooks/use-today'
-import { esLocale, ISO_DAY } from '@/lib/utils'
+import { dateLocale, ISO_DAY } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import { reservationsQueryOptions } from '@/tanstack-queries/presidency'
 
 const MAX_NOTICES = 5
@@ -43,8 +44,8 @@ export function NoticesCard() {
   return (
     <CardFrame className="w-full">
       <CardFrameHeader>
-        <CardFrameTitle>Reservaciones</CardFrameTitle>
-        <CardFrameDescription>Próximos eventos</CardFrameDescription>
+        <CardFrameTitle>{m.common_section_reservations()}</CardFrameTitle>
+        <CardFrameDescription>{m.dashboard_notices_upcoming()}</CardFrameDescription>
         <CardFrameAction>
           <IconConfetti className="text-muted-foreground" />
         </CardFrameAction>
@@ -56,11 +57,14 @@ export function NoticesCard() {
               {upcoming.map((reservation) => (
                 <li key={reservation.id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
                   <span className="truncate font-medium">
-                    {format(parseISO(reservation.reserved_on), "EEEE d 'de' MMMM", { locale: esLocale })}
-                    {reservation.reserved_on === today && ' - Hoy'}
+                    {format(parseISO(reservation.reserved_on), m.dashboard_notices_date_pattern(), {
+                      locale: dateLocale(),
+                    })}
+                    {reservation.reserved_on === today && ` - ${m.common_today()}`}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {reservation.amenity.name} - Casa {reservation.property.number}
+                    {reservation.amenity.name} -{' '}
+                    {m.common_house_label({ number: reservation.property.number })}
                     {reservation.notes && ` - ${reservation.notes}`}
                   </span>
                 </li>
@@ -72,8 +76,8 @@ export function NoticesCard() {
                 <EmptyMedia variant="icon">
                   <IconCalendarMonth />
                 </EmptyMedia>
-                <EmptyTitle>Sin eventos próximos</EmptyTitle>
-                <EmptyDescription>Aquí aparecerán las reservaciones de las áreas comunes.</EmptyDescription>
+                <EmptyTitle>{m.dashboard_notices_empty_title()}</EmptyTitle>
+                <EmptyDescription>{m.dashboard_notices_empty_description()}</EmptyDescription>
               </EmptyHeader>
             </Empty>
           )}

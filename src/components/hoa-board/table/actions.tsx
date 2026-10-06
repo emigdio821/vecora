@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
+import { m } from '@/paraglide/messages'
 import { type InviteResult, resendInvite } from '@/server-actions/hoa-board'
 import type { BoardMemberQueryData } from '@/tanstack-queries/hoa-board'
 import { InviteLinkDialog } from '../dialog/invite-link'
@@ -33,7 +34,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
       setInviteDialogOpen(true)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo generar el enlace', description: error.message })
+      toastManager.add({ type: 'error', title: m.board_link_failed(), description: error.message })
     },
   })
 
@@ -65,7 +66,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={`Acciones de ${member.full_name}`}
+              aria-label={m.board_member_actions({ name: member.full_name })}
               loading={resend.isPending}
             >
               <IconDots className="size-4" />
@@ -81,7 +82,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
                 setEditOpen(true)
               }}
             >
-              Editar roles
+              {m.board_edit_roles()}
             </MenuItem>
 
             <MenuItem
@@ -89,7 +90,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
                 resend.mutate()
               }}
             >
-              Nuevo enlace de acceso
+              {m.board_new_access_link()}
             </MenuItem>
 
             <MenuItem
@@ -98,7 +99,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
                 setRemoveOpen(true)
               }}
             >
-              Quitar de la mesa
+              {m.board_remove_from_board()}
             </MenuItem>
           </MenuGroup>
         </MenuPopup>

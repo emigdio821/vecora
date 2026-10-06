@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { type UpdateResidentInput, updateResidentSchema } from '@/lib/validations/residents'
+import { m } from '@/paraglide/messages'
 import { updateResident } from '@/server-actions/residents'
 import { RESIDENTS_QUERY_KEY, type ResidentQueryData } from '@/tanstack-queries/residents'
 import { ResidentHouses } from './resident-houses'
@@ -48,8 +49,10 @@ export function EditResidentDrawer({ resident, open, onOpenChange, ...props }: E
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Residente actualizado',
-        description: `Los datos de ${values.first_name} ${values.last_name} fueron guardados`,
+        title: m.residential_resident_updated(),
+        description: m.residential_resident_updated_description({
+          name: `${values.first_name} ${values.last_name}`,
+        }),
       })
       onOpenChange(false)
     },
@@ -68,7 +71,7 @@ export function EditResidentDrawer({ resident, open, onOpenChange, ...props }: E
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar residente</DrawerTitle>
+          <DrawerTitle>{m.residential_edit_resident()}</DrawerTitle>
           <DrawerDescription>
             {resident.first_name} {resident.last_name}
           </DrawerDescription>
@@ -129,7 +132,7 @@ function EditResidentForm({
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Nombre <span className="text-destructive">*</span>
+                    {m.residential_field_first_name()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input {...field} autoComplete="given-name" />
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -148,7 +151,7 @@ function EditResidentForm({
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Apellido <span className="text-destructive">*</span>
+                    {m.residential_field_last_name()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input {...field} autoComplete="family-name" />
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -168,7 +171,7 @@ function EditResidentForm({
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>
-                  Teléfono <span className="text-destructive">*</span>
+                  {m.common_field_phone()} <span className="text-destructive">*</span>
                 </FieldLabel>
                 <PhoneInput
                   {...field}
@@ -192,11 +195,9 @@ function EditResidentForm({
                 touched={fieldState.isTouched}
                 dirty={fieldState.isDirty}
               >
-                <FieldLabel>Correo</FieldLabel>
+                <FieldLabel>{m.common_field_email()}</FieldLabel>
                 <Input {...field} inputMode="email" autoComplete="email" />
-                <FieldDescription>
-                  Opcional. Necesario si se le crea una cuenta para iniciar sesión.
-                </FieldDescription>
+                <FieldDescription>{m.residential_email_hint()}</FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
             )}
@@ -212,9 +213,9 @@ function EditResidentForm({
                 touched={fieldState.isTouched}
                 dirty={fieldState.isDirty}
               >
-                <FieldLabel>Notas</FieldLabel>
+                <FieldLabel>{m.common_field_notes()}</FieldLabel>
                 <Textarea {...field} rows={3} className="max-h-40" />
-                <FieldDescription>Visible para todos los miembros.</FieldDescription>
+                <FieldDescription>{m.residential_notes_hint()}</FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
             )}
@@ -223,7 +224,7 @@ function EditResidentForm({
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -235,7 +236,7 @@ function EditResidentForm({
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button
           type="submit"
@@ -243,7 +244,7 @@ function EditResidentForm({
           disabled={mutation.isPending || !form.formState.isDirty}
           loading={mutation.isPending}
         >
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DrawerFooter>
     </>

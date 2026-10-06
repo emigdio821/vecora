@@ -1,0 +1,49 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "dashboard_no_current_period": "Sin periodo actual",
+
+  "dashboard_treasury_summary": "Resumen del periodo",
+  "dashboard_treasury_no_period_description": "Ningún periodo cubre la fecha de hoy. Crea uno en \"Presidencia\" para ver el resumen.",
+  "dashboard_treasury_go_to_periods": "Ir a Periodos",
+  "dashboard_treasury_period_name": "Periodo {name}",
+  "dashboard_treasury_other_currency": "En {code}: ingresos {income}, egresos {expense}, saldo {balance}",
+  "dashboard_treasury_chart_label": "Ingresos y egresos por mes, periodo {name}",
+  "dashboard_treasury_chart_description": "Áreas por mes: ingresos en verde y egresos en rojo. La tabla que sigue tiene los montos exactos.",
+  "dashboard_treasury_month": "Mes",
+
+  "dashboard_fees_title": "Cuotas de mantenimiento",
+  "dashboard_fees_current_period": "Periodo actual",
+  "dashboard_fees_none_up_to_date": "Ninguna casa está al corriente",
+  "dashboard_fees_all_up_to_date": "Todas las casas están al corriente",
+  "dashboard_fees_some_up_to_date": "{upToDate} de {total} casas al corriente",
+  "dashboard_fees_no_period_description": "Ningún periodo cubre la fecha de hoy.",
+  "dashboard_fees_nothing_owed": "Ninguna casa debe cuotas de este periodo.",
+  "dashboard_fees_months_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": { "countPlural=one": "1 mes", "countPlural=other": "{count} meses" }
+    }
+  ],
+
+  "dashboard_requests_title": "Solicitudes de pago",
+  "dashboard_requests_none_pending": "Sin solicitudes pendientes",
+  "dashboard_requests_pending_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 solicitud pendiente",
+        "countPlural=other": "{count} solicitudes pendientes"
+      }
+    }
+  ],
+  "dashboard_requests_reservation_fee": "Tarifa {amenity} - Casa {number}",
+  "dashboard_requests_empty_title": "Todo al día",
+  "dashboard_requests_empty_description": "Aquí aparecerán las solicitudes pendientes de \"Mantenimiento\", \"Seguridad\" y \"Reservaciones\".",
+
+  "dashboard_notices_upcoming": "Próximos eventos",
+  "dashboard_notices_date_pattern": "EEEE d 'de' MMMM",
+  "dashboard_notices_empty_title": "Sin eventos próximos",
+  "dashboard_notices_empty_description": "Aquí aparecerán las reservaciones de las áreas comunes."
+}

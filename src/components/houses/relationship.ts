@@ -1,16 +1,38 @@
 import type { Relationship } from '@/lib/validations/houses'
+import { m } from '@/paraglide/messages'
 
 export const RELATIONSHIP_LABEL: Record<Relationship, string> = {
-  owner: 'Propietario',
-  tenant: 'Inquilino',
-  family: 'Familiar',
+  get owner() {
+    return m.common_relationship_owner()
+  },
+  get tenant() {
+    return m.common_relationship_tenant()
+  },
+  get family() {
+    return m.common_relationship_family()
+  },
 }
 
 /** Options for relationship Selects, in display order. */
 export const RELATIONSHIP_ITEMS: { value: Relationship; label: string }[] = [
-  { value: 'owner', label: RELATIONSHIP_LABEL.owner },
-  { value: 'tenant', label: RELATIONSHIP_LABEL.tenant },
-  { value: 'family', label: RELATIONSHIP_LABEL.family },
+  {
+    value: 'owner',
+    get label() {
+      return RELATIONSHIP_LABEL.owner
+    },
+  },
+  {
+    value: 'tenant',
+    get label() {
+      return RELATIONSHIP_LABEL.tenant
+    },
+  },
+  {
+    value: 'family',
+    get label() {
+      return RELATIONSHIP_LABEL.family
+    },
+  },
 ]
 
 // Owners first, then tenants, then family.

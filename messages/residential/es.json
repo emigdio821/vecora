@@ -1,0 +1,184 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "residential_actions_for": "Acciones de {name}",
+  "residential_action_info": "Información",
+  "residential_action_assign": "Asignar",
+  "residential_undo_window": "Solo podrás deshacerlo durante unos segundos.",
+  "residential_created_feminine": "Creada",
+  "residential_updated_feminine": "Actualizada",
+  "residential_created_masculine": "Creado",
+  "residential_updated_masculine": "Actualizado",
+  "residential_notes_hint": "Visible para todos los miembros.",
+  "residential_restore_failed_reason": "No se pudo restaurar: {reason}",
+
+  "residential_field_relationship": "Relación",
+  "residential_relationship_placeholder": "Selecciona una relación",
+  "residential_relationship_required": "Selecciona el tipo de relación",
+
+  "residential_house_number_required": "Número es requerido",
+  "residential_select_resident_required": "Selecciona al menos un residente",
+  "residential_select_house_required": "Selecciona al menos una casa",
+
+  "residential_house_number_taken": "Ya existe una casa con ese número",
+  "residential_house_duplicate": "Ya existe una casa con esos datos",
+  "residential_create_house_failed": "No se pudo crear la casa, intenta nuevamente",
+  "residential_update_house_failed": "No se pudo actualizar la casa, intenta nuevamente",
+  "residential_delete_houses_failed": "No se pudieron eliminar las casas, intenta nuevamente",
+  "residential_restore_houses_failed": "No se pudieron restaurar las casas, intenta nuevamente",
+  "residential_assign_residents_failed": "No se pudieron asignar los residentes, intenta nuevamente",
+  "residential_resident_already_assigned": "Alguno de los residentes ya está asignado a esta casa",
+  "residential_unassign_resident_failed": "No se pudo quitar al residente, intenta nuevamente",
+
+  "residential_house_restored": "Casa restaurada",
+  "residential_houses_restored": "Casas restauradas",
+  "residential_house_deleted": "Casa eliminada",
+  "residential_houses_deleted": "Casas eliminadas",
+  "residential_houses_deleted_partial": "Se eliminaron {deleted} de {count} casas",
+  "residential_house_deleted_description": "Se eliminó la casa {number}",
+  "residential_houses_deleted_description": "Se eliminaron {count} casas",
+  "residential_delete_house_title": "¿Eliminar la casa {number}?",
+  "residential_delete_houses_title": "¿Eliminar {count} casas?",
+  "residential_delete_house_no_residents": "Dejará de aparecer en el listado de casas.",
+  "residential_delete_houses_no_residents": "Dejarán de aparecer en el listado de casas.",
+  "residential_delete_house_residents": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Su residente seguirá en el directorio, pero ya no aparecerá asignado a esta casa.",
+        "countPlural=other": "Sus {count} residentes seguirán en el directorio, pero ya no aparecerán asignados a esta casa."
+      }
+    }
+  ],
+  "residential_delete_houses_residents": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Su residente seguirá en el directorio, pero ya no aparecerá asignado a estas casas.",
+        "countPlural=other": "Sus {count} residentes seguirán en el directorio, pero ya no aparecerán asignados a estas casas."
+      }
+    }
+  ],
+
+  "residential_assign_residents": "Asignar residentes",
+  "residential_resident_assigned": "Residente asignado",
+  "residential_residents_assigned": "Residentes asignados",
+  "residential_resident_assigned_description": "Se asignó a la casa {number}",
+  "residential_residents_assigned_description": "Se asignaron {count} residentes a la casa {number}",
+  "residential_residents_picker_hint": "Quienes ya viven en esta casa no aparecen en la lista.",
+  "residential_only_unassigned": "Solo residentes sin casa",
+  "residential_only_unassigned_hint": "Desactívalo para incluir a quienes ya tienen otra casa asignada.",
+  "residential_relationship_applies_to_all": "Se aplica a todos los residentes seleccionados.",
+
+  "residential_new_house": "Nueva casa",
+  "residential_new_house_description": "Agrega una casa al registro. Podrás asignarle residentes después.",
+  "residential_house_created": "Casa creada",
+  "residential_house_created_description": "La casa {number} se agregó al registro.",
+  "residential_edit_house": "Editar casa",
+  "residential_house_updated": "Casa actualizada",
+  "residential_house_updated_description": "Los datos de la casa {number} fueron guardados",
+  "residential_field_house_number": "Número",
+  "residential_house_number_hint": "Identificador de la casa. Debe ser único.",
+
+  "residential_house_info": "Información de la casa",
+  "residential_house_no_residents": "Nadie está asignado a esta casa.",
+  "residential_resident_removed": "Residente quitado",
+  "residential_unassigned_description": "{name} ya no está asignado a la casa {number}",
+  "residential_remove_resident_from_house": "Quitar a {name} de la casa",
+  "residential_remove_resident_title": "¿Quitar a {name} de la casa {number}?",
+  "residential_remove_resident_description": "Dejará de aparecer como residente de esta casa. Podrás volver a asignarlo después.",
+
+  "residential_column_owners": "Propietarios",
+  "residential_no_owner": "Sin propietario",
+  "residential_column_people": "Personas",
+  "residential_search_houses_hint": "Buscar por número de casa o nombre de residente",
+  "residential_delete_selected_houses_label": "Eliminar {count} casas seleccionadas",
+  "residential_delete_selected_houses": "Eliminar casas seleccionadas",
+
+  "residential_first_name_required": "Nombre es requerido",
+  "residential_last_name_required": "Apellido es requerido",
+  "residential_phone_required": "Teléfono es requerido",
+  "residential_phone_invalid": "Número de teléfono inválido",
+  "residential_email_invalid": "Correo inválido",
+
+  "residential_resident_email_taken": "Ya existe un residente con ese correo",
+  "residential_resident_email_account": "Ese correo ya lo usa una cuenta de la mesa directiva",
+  "residential_resident_duplicate": "Ya existe un residente con esos datos",
+  "residential_selected_house_missing": "La casa seleccionada ya no existe",
+  "residential_create_resident_failed": "No se pudo crear el residente, intenta nuevamente",
+  "residential_update_resident_failed": "No se pudo actualizar el residente, intenta nuevamente",
+  "residential_delete_residents_failed": "No se pudieron eliminar los residentes, intenta nuevamente",
+  "residential_restore_residents_failed": "No se pudieron restaurar los residentes, intenta nuevamente",
+
+  "residential_resident_restored": "Residente restaurado",
+  "residential_residents_restored": "Residentes restaurados",
+  "residential_resident_deleted": "Residente eliminado",
+  "residential_residents_deleted": "Residentes eliminados",
+  "residential_residents_deleted_partial": "Se eliminaron {deleted} de {count} residentes",
+  "residential_resident_deleted_description": "{name} fue eliminado",
+  "residential_residents_deleted_description": "Se eliminaron {count} residentes",
+  "residential_delete_resident_title": "¿Eliminar a {name}?",
+  "residential_delete_residents_title": "¿Eliminar {count} residentes?",
+  "residential_delete_resident_no_houses": "Dejará de aparecer en el directorio.",
+  "residential_delete_residents_no_houses": "Dejarán de aparecer en el directorio.",
+  "residential_delete_resident_houses": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Dejará de aparecer en el directorio y en la casa donde está asignado.",
+        "countPlural=other": "Dejará de aparecer en el directorio y en las {count} casas donde está asignado."
+      }
+    }
+  ],
+  "residential_delete_residents_houses": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Dejarán de aparecer en el directorio y en la casa donde están asignados.",
+        "countPlural=other": "Dejarán de aparecer en el directorio y en las {count} casas donde están asignados."
+      }
+    }
+  ],
+
+  "residential_assign_house": "Asignar casa",
+  "residential_house_assigned": "Casa asignada",
+  "residential_house_assigned_description": "{name} se asignó a la casa {number}",
+  "residential_house_picker_hint": "Las casas que ya tiene asignadas no aparecen en la lista.",
+
+  "residential_new_resident": "Nuevo residente",
+  "residential_new_resident_description": "Agrega una persona al directorio y, si ya sabes dónde vive, asígnale su casa.",
+  "residential_resident_created": "Residente creado",
+  "residential_resident_created_description": "{name} se agregó al directorio.",
+  "residential_resident_created_with_house": "{name} se agregó al directorio y a la casa {number}.",
+  "residential_field_first_name": "Nombre",
+  "residential_field_last_name": "Apellido",
+  "residential_email_hint": "Opcional. Necesario si se le crea una cuenta para iniciar sesión.",
+  "residential_house_field_hint": "Opcional. Si tiene más de una casa, podrás asignarle las demás al editar al residente.",
+  "residential_edit_resident": "Editar residente",
+  "residential_resident_updated": "Residente actualizado",
+  "residential_resident_updated_description": "Los datos de {name} fueron guardados",
+
+  "residential_resident_info": "Información del residente",
+  "residential_section_contact": "Contacto",
+  "residential_no_email": "Sin correo",
+  "residential_resident_no_houses": "No está asignado a ninguna casa.",
+  "residential_section_account": "Cuenta",
+  "residential_account_name": "Nombre en la cuenta",
+  "residential_no_name": "Sin nombre",
+  "residential_roles": "Roles",
+  "residential_no_role": "Sin rol",
+  "residential_no_app_access": "Este residente no tiene acceso a la aplicación.",
+  "residential_house_removed": "Casa quitada",
+  "residential_remove_house": "Quitar la casa {number}",
+
+  "residential_column_role": "Rol",
+  "residential_no_house": "Sin casa",
+  "residential_no_account": "Sin cuenta",
+  "residential_search_residents_hint": "Buscar por nombre, correo o teléfono",
+  "residential_delete_selected_residents_label": "Eliminar {count} residentes seleccionados",
+  "residential_delete_selected_residents": "Eliminar residentes seleccionados"
+}

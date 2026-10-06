@@ -13,6 +13,7 @@ import {
   type ComboboxPrimitive,
   ComboboxValue,
 } from '@/components/ui/combobox'
+import { m } from '@/paraglide/messages'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
 
 type HousesPickerProps = Omit<ComboboxPrimitive.Root.Props<string, boolean | undefined>, 'items'> & {
@@ -21,7 +22,7 @@ type HousesPickerProps = Omit<ComboboxPrimitive.Root.Props<string, boolean | und
 }
 
 export function houseLabel(house: { number: string }) {
-  return `Casa ${house.number}`
+  return m.common_house_label({ number: house.number })
 }
 
 /** Pick one house (`string | null`) or, with `multiple`, several (`string[]`), by id. */
@@ -47,25 +48,33 @@ export function HousesPicker({ excludeIds, ...props }: HousesPickerProps) {
             {(value: string[] | null) => (
               <>
                 {value?.map((id) => (
-                  <ComboboxChip key={id} aria-label={label(id)} removeProps={{ 'aria-label': 'Quitar' }}>
+                  <ComboboxChip
+                    key={id}
+                    aria-label={label(id)}
+                    removeProps={{ 'aria-label': m.common_action_remove() }}
+                  >
                     {label(id)}
                   </ComboboxChip>
                 ))}
-                <ComboboxChipsInput placeholder={value?.length ? undefined : 'Buscar casas'} />
+                <ComboboxChipsInput placeholder={value?.length ? undefined : m.common_search_houses()} />
               </>
             )}
           </ComboboxValue>
         </ComboboxChips>
       ) : (
         <ComboboxInput
-          placeholder="Buscar casa"
+          placeholder={m.common_search_house()}
           showClear
-          clearProps={{ 'aria-label': 'Limpiar selección' }}
+          clearProps={{ 'aria-label': m.common_clear_selection() }}
         />
       )}
       <ComboboxPopup>
         <ComboboxEmpty>
-          {isPending ? 'Cargando casas…' : isError ? 'No se pudieron cargar las casas' : 'Sin resultados.'}
+          {isPending
+            ? m.common_loading_houses()
+            : isError
+              ? m.common_houses_load_failed()
+              : m.common_no_results()}
         </ComboboxEmpty>
         <ComboboxList>
           {(id: string) => {
@@ -77,7 +86,7 @@ export function HousesPicker({ excludeIds, ...props }: HousesPickerProps) {
                   <span className="truncate text-xs text-muted-foreground">
                     {owners
                       .map(({ resident }) => `${resident.first_name} ${resident.last_name}`)
-                      .join(', ') || 'Sin propietario'}
+                      .join(', ') || m.common_no_owner()}
                   </span>
                 </div>
               </ComboboxItem>

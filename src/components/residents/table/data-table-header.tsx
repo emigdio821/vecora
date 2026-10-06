@@ -7,6 +7,7 @@ import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { m } from '@/paraglide/messages'
 import { type ResidentQueryData } from '@/tanstack-queries/residents'
 import { DeleteResidentsAlertDialog } from '../dialog/delete-residents'
 import { CreateResidentDrawer } from '../drawer/create-resident'
@@ -42,7 +43,7 @@ export function ResidentsDataTableHeader({ table, isLoading }: ResidentsDataTabl
             table={table}
             columnId="name"
             param="search-residents"
-            hint="Buscar por nombre, correo o teléfono"
+            hint={m.residential_search_residents_hint()}
           />
         </div>
 
@@ -55,7 +56,9 @@ export function ResidentsDataTableHeader({ table, isLoading }: ResidentsDataTabl
                   render={
                     <Button
                       variant="destructive-outline"
-                      aria-label={`Eliminar ${selectedRowsLength} residentes seleccionados`}
+                      aria-label={m.residential_delete_selected_residents_label({
+                        count: selectedRowsLength,
+                      })}
                       onClick={() => {
                         setDeleteSelectedOpen(true)
                       }}
@@ -67,7 +70,7 @@ export function ResidentsDataTableHeader({ table, isLoading }: ResidentsDataTabl
                     </Button>
                   }
                 />
-                <TooltipContent>Eliminar residentes seleccionados</TooltipContent>
+                <TooltipContent>{m.residential_delete_selected_residents()}</TooltipContent>
               </Tooltip>
             )}
 
@@ -84,7 +87,7 @@ export function ResidentsDataTableHeader({ table, isLoading }: ResidentsDataTabl
                 setCreateResidentDrawerOpen(true)
               }}
             >
-              Nuevo residente
+              {m.residential_new_resident()}
             </Button>
           </div>
         )}

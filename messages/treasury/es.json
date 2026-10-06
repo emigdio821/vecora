@@ -1,0 +1,206 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "treasury_kind_income": "Ingreso",
+  "treasury_kind_expense": "Egreso",
+  "treasury_transaction_kind": "Tipo de movimiento",
+
+  "treasury_source_record_fee": "\"Registrar cuota\"",
+  "treasury_source_reservations": "\"Presidencia\" - \"Reservaciones\"",
+
+  "treasury_actions_for": "Acciones de {name}",
+  "treasury_update_failed": "No se pudo actualizar",
+  "treasury_record": "Registrar",
+
+  "treasury_new_category": "Nueva categoría",
+  "treasury_new_category_description": "Las categorías agrupan los movimientos, por ejemplo \"Jardinería\" o \"Donativos\".",
+  "treasury_edit_category": "Editar categoría",
+  "treasury_category_created": "Categoría creada",
+  "treasury_category_updated": "Categoría actualizada",
+  "treasury_category_deleted": "Categoría eliminada",
+  "treasury_category_activated": "Categoría activada",
+  "treasury_category_deactivated": "Categoría desactivada",
+  "treasury_category_activated_description": "{name} vuelve a estar disponible al registrar movimientos",
+  "treasury_category_deactivated_description": "{name} ya no aparecerá al registrar movimientos",
+  "treasury_category_activate": "Activar",
+  "treasury_category_deactivate": "Desactivar",
+  "treasury_category_active": "Activa",
+  "treasury_category_inactive": "Inactiva",
+  "treasury_category_kind_locked": "El tipo no se puede cambiar una vez creada.",
+  "treasury_category_name_description": "Como aparecerá en la lista de movimientos.",
+  "treasury_category_used_by": "La usa {source}",
+  "treasury_system_category": "Categoría del sistema",
+  "treasury_system_category_description": "{source} usa esta categoría. Puedes cambiarle el nombre, pero no desactivarla ni eliminarla.",
+  "treasury_delete_category_title": "¿Eliminar la categoría \"{name}\"?",
+  "treasury_delete_category_description": "No tiene movimientos registrados, así que se eliminará por completo. Esta acción no se puede deshacer.",
+  "treasury_search_categories_hint": "Buscar por nombre de la categoría",
+  "treasury_categories_empty": "Sin categorías.",
+
+  "treasury_record_transaction": "Registrar movimiento",
+  "treasury_record_transaction_description": "Cualquier ingreso o egreso que no sea una cuota de mantenimiento. Las cuotas se registran con \"Registrar cuota\".",
+  "treasury_income_recorded": "Ingreso registrado",
+  "treasury_expense_recorded": "Egreso registrado",
+  "treasury_edit_transaction": "Editar movimiento",
+  "treasury_transaction_updated": "Movimiento actualizado",
+  "treasury_recorded_from": "Registrado desde {source}",
+  "treasury_system_transaction_description": "Aquí solo puedes corregir el folio, el método de pago, la referencia y las notas. Para cambiar lo demás, elimina el movimiento y regístralo de nuevo desde {source}.",
+  "treasury_select_category": "Selecciona una categoría",
+  "treasury_receipt_folio": "Folio del recibo",
+  "treasury_transfer_reference": "Referencia de la transferencia",
+  "treasury_transfer_reference_description": "Clave de rastreo o número de referencia del banco.",
+  "treasury_house_description": "Opcional. Si el dinero viene de una casa en particular.",
+  "treasury_transaction_notes_description": "Opcional. Proveedor, acuerdos, o cualquier observación.",
+
+  "treasury_transaction": "Movimiento",
+  "treasury_transaction_info": "Información del movimiento",
+  "treasury_payment": "Pago",
+  "treasury_period": "Periodo",
+  "treasury_fee_month": "Mes de la cuota",
+  "treasury_created": "Creado",
+  "treasury_updated": "Actualizado",
+
+  "treasury_method": "Método",
+  "treasury_search_transactions_hint": "Buscar por concepto, folio, referencia, categoría o casa",
+  "treasury_filters_active": "Filtros: {filter}",
+  "treasury_delete_selected": "Eliminar movimientos seleccionados",
+  "treasury_delete_selected_aria": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Eliminar el movimiento seleccionado",
+        "countPlural=other": "Eliminar {count} movimientos seleccionados"
+      }
+    }
+  ],
+  "treasury_transactions_empty": "Sin movimientos.",
+
+  "treasury_delete_transactions_title": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "¿Eliminar este movimiento?",
+        "countPlural=other": "¿Eliminar {count} movimientos?"
+      }
+    }
+  ],
+  "treasury_delete_transactions_impact": [
+    {
+      "declarations": ["input count", "input impact", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Dejará de contar en el saldo ({impact}).",
+        "countPlural=other": "Dejarán de contar en el saldo ({impact})."
+      }
+    }
+  ],
+  "treasury_delete_impact_less": "{amount} menos",
+  "treasury_delete_impact_more": "{amount} más",
+  "treasury_delete_fee_clause_one": "Es una cuota, así que ese mes volverá a aparecer como pendiente para la casa.",
+  "treasury_delete_fee_clause_many": "Incluye cuotas, así que esos meses volverán a aparecer como pendientes para sus casas.",
+  "treasury_delete_amenity_clause": "La reservación volverá a aparecer como pendiente de pago.",
+  "treasury_delete_undo_hint": "Solo podrás deshacerlo durante unos segundos.",
+  "treasury_transaction_deleted": "Movimiento eliminado",
+  "treasury_transactions_deleted": "Movimientos eliminados",
+  "treasury_transactions_deleted_count": "Se eliminaron {count} movimientos",
+  "treasury_transactions_deleted_partial": "Se eliminaron {deleted} de {count} movimientos",
+  "treasury_transaction_restored": "Movimiento restaurado",
+  "treasury_transactions_restored": "Movimientos restaurados",
+
+  "treasury_record_fee": "Registrar cuota",
+  "treasury_record_fee_description": "Un recibo por casa. Si paga varios meses, selecciónalos todos; el recargo se calcula por cada mes pagado después del día límite.",
+  "treasury_fee_months": "Meses que paga",
+  "treasury_search_month": "Buscar mes",
+  "treasury_payment_date": "Fecha de pago",
+  "treasury_waive_late_fee": "Condonar recargo",
+  "treasury_waive_late_fee_description": [
+    {
+      "declarations": ["input count", "input dueDay", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 mes se paga después del día {dueDay}. Actívalo si la mesa directiva perdonó el recargo.",
+        "countPlural=other": "{count} meses se pagan después del día {dueDay}. Actívalo si la mesa directiva perdonó el recargo."
+      }
+    }
+  ],
+  "treasury_fee_notes_description": "Opcional. Quién pagó, acuerdos, o cualquier observación.",
+  "treasury_period_label": "Periodo {name}",
+  "treasury_fees_of": [
+    {
+      "declarations": ["input count", "input amount", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 cuota de {amount}",
+        "countPlural=other": "{count} cuotas de {amount}"
+      }
+    }
+  ],
+  "treasury_late_fees_of": [
+    {
+      "declarations": ["input count", "input amount", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 recargo de {amount}",
+        "countPlural=other": "{count} recargos de {amount}"
+      }
+    }
+  ],
+  "treasury_waived": "(condonado)",
+  "treasury_total_to_receive": "Total a recibir",
+  "treasury_no_period": "Sin periodo",
+  "treasury_no_period_description": "Ningún periodo cubre la fecha de pago. Crea el periodo antes de registrar cuotas.",
+  "treasury_fee_recorded": "Cuota registrada",
+  "treasury_months_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 mes",
+        "countPlural=other": "{count} meses"
+      }
+    }
+  ],
+  "treasury_fee_recorded_description": "{house}: {months}, {total} - Folio {folio}",
+  "treasury_fee_recorded_description_late": "{house}: {months} con recargo, {total} - Folio {folio}",
+
+  "treasury_select_month_required": "Selecciona al menos un mes",
+  "treasury_folio_required": "Folio es requerido",
+  "treasury_description_required": "Concepto es requerido",
+  "treasury_reference_required": "La referencia es requerida para transferencias",
+  "treasury_monthly_fee_required": "Cuota es requerida",
+  "treasury_monthly_fee_positive": "La cuota debe ser mayor a cero",
+  "treasury_late_fee_required": "Recargo es requerido",
+  "treasury_late_fee_negative": "El recargo no puede ser negativo",
+  "treasury_due_day_required": "Día límite es requerido",
+  "treasury_due_day_range": "Entre 1 y 28",
+  "treasury_ends_after_start": "Debe ser posterior al inicio",
+
+  "treasury_error_fee_month_taken": "Esa casa ya tiene registrada la cuota de uno de los meses seleccionados",
+  "treasury_error_fee_months_taken": "Esa casa ya tiene registrada la cuota de {months}",
+  "treasury_error_reservation_paid": "Esa reservación ya tiene su pago registrado",
+  "treasury_error_category_name_taken": "Ya existe una categoría con ese nombre",
+  "treasury_error_period_name_taken": "Ya existe un periodo con ese nombre",
+  "treasury_error_system_category": "Los movimientos de esa categoría se registran desde {source}",
+  "treasury_error_no_period": "Ningún periodo cubre esa fecha. Crea el periodo primero.",
+  "treasury_error_house_gone": "La casa seleccionada ya no existe",
+  "treasury_error_record_fee_failed": "No se pudo registrar la cuota, intenta nuevamente",
+  "treasury_error_category_kind_mismatch": "La categoría no corresponde al tipo de movimiento",
+  "treasury_error_create_transaction_failed": "No se pudo registrar el movimiento, intenta nuevamente",
+  "treasury_error_transaction_gone": "El movimiento ya no existe",
+  "treasury_error_update_transaction_failed": "No se pudo actualizar el movimiento, intenta nuevamente",
+  "treasury_error_select_transaction": "Selecciona al menos un movimiento",
+  "treasury_error_delete_transactions_failed": "No se pudieron eliminar los movimientos, intenta nuevamente",
+  "treasury_error_restore_transactions_failed": "No se pudieron restaurar los movimientos, intenta nuevamente",
+  "treasury_error_restore_reason": "No se pudo restaurar: {reason}",
+  "treasury_error_create_category_failed": "No se pudo crear la categoría, intenta nuevamente",
+  "treasury_error_update_category_failed": "No se pudo actualizar la categoría, intenta nuevamente",
+  "treasury_error_category_system_active": "Esta categoría la usa el sistema para las cuotas y no se puede desactivar",
+  "treasury_error_category_in_use": "No se puede eliminar: hay movimientos con esta categoría. Desactívala en su lugar.",
+  "treasury_error_delete_category_failed": "No se pudo eliminar la categoría, intenta nuevamente",
+  "treasury_error_period_overlap": "Las fechas se traslapan con otro periodo",
+  "treasury_error_create_period_failed": "No se pudo crear el periodo, intenta nuevamente",
+  "treasury_error_update_period_failed": "No se pudo actualizar el periodo, intenta nuevamente",
+  "treasury_error_period_has_transactions": "No se puede eliminar: el periodo ya tiene movimientos registrados",
+  "treasury_error_delete_period_failed": "No se pudo eliminar el periodo, intenta nuevamente"
+}

@@ -3,7 +3,6 @@ import { createServerFn } from '@tanstack/react-start'
 import {
   type ActionResult,
   EXCLUSION_VIOLATION,
-  FOLIO_TAKEN_MESSAGE,
   isFolioTaken,
   postgrestErrorMessage,
   UNIQUE_VIOLATION,
@@ -23,27 +22,27 @@ import {
   type UpdateTransactionInput,
   updateTransactionSchema,
 } from '@/lib/validations/treasury'
+import { m } from '@/paraglide/messages'
 
 // Postgres error codes not covered by postgrestErrorMessage.
 const FK_VIOLATION = '23503'
 const CHECK_VIOLATION = '23514'
 
 function toMessage(error: PostgrestError, fallback: string) {
-  if (isFolioTaken(error)) return FOLIO_TAKEN_MESSAGE
+  if (isFolioTaken(error)) return m.common_folio_taken()
   return postgrestErrorMessage(error, {
     fallback,
     unique: {
-      transactions_one_per_house_month_category:
-        'Esa casa ya tiene registrada la cuota de uno de los meses seleccionados',
-      transactions_one_per_amenity_reservation_category: 'Esa reservación ya tiene su pago registrado',
-      transaction_categories_name_unique: 'Ya existe una categoría con ese nombre',
-      periods_name_unique: 'Ya existe un periodo con ese nombre',
+      transactions_one_per_house_month_category: m.treasury_error_fee_month_taken(),
+      transactions_one_per_amenity_reservation_category: m.treasury_error_reservation_paid(),
+      transaction_categories_name_unique: m.treasury_error_category_name_taken(),
+      periods_name_unique: m.treasury_error_period_name_taken(),
     },
   })
 }
 
 function systemCategoryMessage(key: string) {
-  return `Los movimientos de esa categoría se registran desde ${systemCategorySource(key)}`
+  return m.treasury_error_system_category({ source: systemCategorySource(key) })
 }
 
 export interface FeePaymentSummary {
@@ -57,7 +56,7 @@ const recordFeePaymentFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<FeePaymentSummary>> => {
     const parsed = recordFeePaymentSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { property_id, fee_months, occurred_on, payment_method, folio, reference, notes, waive_late_fee } =
@@ -83,8 +82,8 @@ const recordFeePaymentFn = createServerFn({ method: 'POST' })
       if (error.code === 'P0002') {
         return {
           error: error.message.includes('no period')
-            ? 'Ningún periodo cubre esa fecha. Crea el periodo primero.'
-            : 'La casa seleccionada ya no existe',
+            ? m.treasury_error_no_period()
+            : m.treasury_error_house_gone(),
         }
       }
       // Postgres only reports the first clash, so look up every selected month already paid.
@@ -98,10 +97,10 @@ const recordFeePaymentFn = createServerFn({ method: 'POST' })
           .order('fee_month')
         const months = [...new Set(paid?.map((row) => formatMonth(row.fee_month)))]
         if (months.length > 0) {
-          return { error: `Esa casa ya tiene registrada la cuota de ${months.join(', ')}` }
+          return { error: m.treasury_error_fee_months_taken({ months: months.join(', ') }) }
         }
       }
-      return { error: toMessage(error, 'No se pudo registrar la cuota, intenta nuevamente') }
+      return { error: toMessage(error, m.treasury_error_record_fee_failed()) }
     }
 
     return {
@@ -116,7 +115,7 @@ const createTransactionFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = createTransactionSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const {
@@ -151,7 +150,7 @@ const createTransactionFn = createServerFn({ method: 'POST' })
       .gte('ends_on', occurred_on)
       .maybeSingle()
     if (!period) {
-      return { error: 'Ningún periodo cubre esa fecha. Crea el periodo primero.' }
+      return { error: m.treasury_error_no_period() }
     }
 
     const { data, error } = await supabase
@@ -175,9 +174,9 @@ const createTransactionFn = createServerFn({ method: 'POST' })
     if (error) {
       // Composite FK: the category belongs to the other kind.
       if (error.code === FK_VIOLATION) {
-        return { error: 'La categoría no corresponde al tipo de movimiento' }
+        return { error: m.treasury_error_category_kind_mismatch() }
       }
-      return { error: toMessage(error, 'No se pudo registrar el movimiento, intenta nuevamente') }
+      return { error: toMessage(error, m.treasury_error_create_transaction_failed()) }
     }
 
     return { data }
@@ -190,7 +189,7 @@ const updateTransactionFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ id: string }>> => {
     const parsed = updateTransactionSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const {
@@ -213,7 +212,7 @@ const updateTransactionFn = createServerFn({ method: 'POST' })
       .is('deleted_at', null)
       .maybeSingle()
     if (!current) {
-      return { error: 'El movimiento ya no existe' }
+      return { error: m.treasury_error_transaction_gone() }
     }
 
     // Fee and late-fee rows are produced by record_fee_payment from the period's
@@ -230,7 +229,7 @@ const updateTransactionFn = createServerFn({ method: 'POST' })
         .single()
 
       if (error) {
-        return { error: toMessage(error, 'No se pudo actualizar el movimiento, intenta nuevamente') }
+        return { error: toMessage(error, m.treasury_error_update_transaction_failed()) }
       }
       return { data }
     }
@@ -252,7 +251,7 @@ const updateTransactionFn = createServerFn({ method: 'POST' })
       .gte('ends_on', occurred_on)
       .maybeSingle()
     if (!period) {
-      return { error: 'Ningún periodo cubre esa fecha. Crea el periodo primero.' }
+      return { error: m.treasury_error_no_period() }
     }
 
     const { data, error } = await supabase
@@ -275,9 +274,9 @@ const updateTransactionFn = createServerFn({ method: 'POST' })
 
     if (error) {
       if (error.code === FK_VIOLATION) {
-        return { error: 'La categoría no corresponde al tipo de movimiento' }
+        return { error: m.treasury_error_category_kind_mismatch() }
       }
-      return { error: toMessage(error, 'No se pudo actualizar el movimiento, intenta nuevamente') }
+      return { error: toMessage(error, m.treasury_error_update_transaction_failed()) }
     }
 
     return { data }
@@ -296,7 +295,7 @@ const deleteTransactionsFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: ids }): Promise<ActionResult<{ deleted: number }>> => {
     const uniqueIds = [...new Set(ids)]
     if (uniqueIds.length === 0) {
-      return { error: 'Selecciona al menos un movimiento' }
+      return { error: m.treasury_error_select_transaction() }
     }
 
     const supabase = await createClient()
@@ -308,11 +307,11 @@ const deleteTransactionsFn = createServerFn({ method: 'POST' })
       .select('id')
 
     if (error) {
-      return { error: toMessage(error, 'No se pudieron eliminar los movimientos, intenta nuevamente') }
+      return { error: toMessage(error, m.treasury_error_delete_transactions_failed()) }
     }
 
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: { deleted: data.length } }
@@ -329,7 +328,7 @@ const restoreTransactionsFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: ids }): Promise<ActionResult<{ restored: number }>> => {
     const uniqueIds = [...new Set(ids)]
     if (uniqueIds.length === 0) {
-      return { error: 'Nada que restaurar' }
+      return { error: m.common_nothing_to_restore() }
     }
 
     const supabase = await createClient()
@@ -341,17 +340,17 @@ const restoreTransactionsFn = createServerFn({ method: 'POST' })
       .select('id')
 
     if (error) {
-      const message = toMessage(error, 'No se pudieron restaurar los movimientos, intenta nuevamente')
+      const message = toMessage(error, m.treasury_error_restore_transactions_failed())
       return {
         error:
           error.code === UNIQUE_VIOLATION || isFolioTaken(error)
-            ? `No se pudo restaurar: ${message.toLowerCase()}`
+            ? m.treasury_error_restore_reason({ reason: message.toLowerCase() })
             : message,
       }
     }
 
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: { restored: data.length } }
@@ -368,7 +367,7 @@ const createCategoryFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = categorySchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
@@ -379,7 +378,7 @@ const createCategoryFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo crear la categoría, intenta nuevamente') }
+      return { error: toMessage(error, m.treasury_error_create_category_failed()) }
     }
 
     return { data }
@@ -393,7 +392,7 @@ const updateCategoryFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = categorySchema.pick({ name: true }).safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
@@ -405,10 +404,10 @@ const updateCategoryFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo actualizar la categoría, intenta nuevamente') }
+      return { error: toMessage(error, m.treasury_error_update_category_failed()) }
     }
     if (!data) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -432,12 +431,12 @@ const setCategoryActiveFn = createServerFn({ method: 'POST' })
     if (error) {
       // transaction_categories_system_active: fee / late fee can't be retired.
       if (error.code === CHECK_VIOLATION) {
-        return { error: 'Esta categoría la usa el sistema para las cuotas y no se puede desactivar' }
+        return { error: m.treasury_error_category_system_active() }
       }
-      return { error: toMessage(error, 'No se pudo actualizar la categoría, intenta nuevamente') }
+      return { error: toMessage(error, m.treasury_error_update_category_failed()) }
     }
     if (!data) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -455,12 +454,12 @@ const deleteCategoryFn = createServerFn({ method: 'POST' })
 
     if (error) {
       if (error.code === FK_VIOLATION) {
-        return { error: 'No se puede eliminar: hay movimientos con esta categoría. Desactívala en su lugar.' }
+        return { error: m.treasury_error_category_in_use() }
       }
-      return { error: toMessage(error, 'No se pudo eliminar la categoría, intenta nuevamente') }
+      return { error: toMessage(error, m.treasury_error_delete_category_failed()) }
     }
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -475,7 +474,7 @@ export const deleteCategory = (id: string) => deleteCategoryFn({ data: id })
 function periodErrorMessage(error: PostgrestError, fallback: string) {
   // periods_no_overlap: two periods can't cover the same day.
   if (error.code === EXCLUSION_VIOLATION) {
-    return 'Las fechas se traslapan con otro periodo'
+    return m.treasury_error_period_overlap()
   }
   return toMessage(error, fallback)
 }
@@ -485,14 +484,14 @@ const createPeriodFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = periodSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
     const { data, error } = await supabase.from('periods').insert(parsed.data).select('id').single()
 
     if (error) {
-      return { error: periodErrorMessage(error, 'No se pudo crear el periodo, intenta nuevamente') }
+      return { error: periodErrorMessage(error, m.treasury_error_create_period_failed()) }
     }
 
     return { data }
@@ -505,7 +504,7 @@ const updatePeriodFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = periodSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
@@ -517,10 +516,10 @@ const updatePeriodFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: periodErrorMessage(error, 'No se pudo actualizar el periodo, intenta nuevamente') }
+      return { error: periodErrorMessage(error, m.treasury_error_update_period_failed()) }
     }
     if (!data) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -537,12 +536,12 @@ const deletePeriodFn = createServerFn({ method: 'POST' })
 
     if (error) {
       if (error.code === FK_VIOLATION) {
-        return { error: 'No se puede eliminar: el periodo ya tiene movimientos registrados' }
+        return { error: m.treasury_error_period_has_transactions() }
       }
-      return { error: toMessage(error, 'No se pudo eliminar el periodo, intenta nuevamente') }
+      return { error: toMessage(error, m.treasury_error_delete_period_failed()) }
     }
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }

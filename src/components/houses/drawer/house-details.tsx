@@ -14,6 +14,7 @@ import {
   DrawerPopup,
   DrawerTitle,
 } from '@/components/ui/drawer'
+import { m } from '@/paraglide/messages'
 import type { HouseQueryData } from '@/tanstack-queries/houses'
 import { RELATIONSHIP_LABEL, sortByRelationship } from '../relationship'
 import { EditHouseDrawer } from './edit-house'
@@ -33,12 +34,16 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
     <Drawer position="right" open={open} onOpenChange={onOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Casa {house.number}</DrawerTitle>
-          <DrawerDescription>Información de la casa</DrawerDescription>
+          <DrawerTitle>{m.common_house_label({ number: house.number })}</DrawerTitle>
+          <DrawerDescription>{m.residential_house_info()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<IconUsers />} title="Residentes" count={residents.length}>
+          <CollapsibleSection
+            icon={<IconUsers />}
+            title={m.common_section_residents()}
+            count={residents.length}
+          >
             {residents.length ? (
               <ul className="grid gap-3">
                 {residents.map(({ resident, relationship }) => (
@@ -61,24 +66,32 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
                 ))}
               </ul>
             ) : (
-              <Muted>Nadie está asignado a esta casa.</Muted>
+              <Muted>{m.residential_house_no_residents()}</Muted>
             )}
           </CollapsibleSection>
 
           {house.notes && (
-            <CollapsibleSection icon={<IconNotes />} title="Notas">
+            <CollapsibleSection icon={<IconNotes />} title={m.common_field_notes()}>
               <p className="text-sm whitespace-pre-wrap">{house.notes}</p>
             </CollapsibleSection>
           )}
 
           <dl className="grid grid-cols-2 gap-3 px-1 pt-1">
-            <Timestamp icon={<IconCalendarPlus />} label="Creada" value={house.created_at} />
-            <Timestamp icon={<IconHistory />} label="Actualizada" value={house.updated_at} />
+            <Timestamp
+              icon={<IconCalendarPlus />}
+              label={m.residential_created_feminine()}
+              value={house.created_at}
+            />
+            <Timestamp
+              icon={<IconHistory />}
+              label={m.residential_updated_feminine()}
+              value={house.updated_at}
+            />
           </dl>
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />}>Cerrar</DrawerClose>
+          <DrawerClose render={<Button variant="ghost" />}>{m.common_action_close()}</DrawerClose>
           {canManage && (
             <>
               <Button
@@ -87,7 +100,7 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
                   setEditOpen(true)
                 }}
               >
-                Editar
+                {m.common_action_edit()}
               </Button>
               {/* Rendered inside this popup so Base UI treats it as a nested drawer. */}
               <EditHouseDrawer house={house} open={isEditOpen} onOpenChange={setEditOpen} />

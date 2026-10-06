@@ -18,6 +18,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { type UpdateBoardMemberRolesInput, updateBoardMemberRolesSchema } from '@/lib/validations/hoa-board'
+import { m } from '@/paraglide/messages'
 import { updateBoardMemberRoles } from '@/server-actions/hoa-board'
 import { type BoardMemberQueryData, HOA_BOARD_QUERY_KEY } from '@/tanstack-queries/hoa-board'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
@@ -51,7 +52,7 @@ export function EditBoardMemberDrawer({
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [HOA_BOARD_QUERY_KEY] })
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Roles actualizados', description: member.full_name })
+      toastManager.add({ type: 'success', title: m.board_roles_updated(), description: member.full_name })
       onOpenChange(false)
     },
   })
@@ -69,7 +70,7 @@ export function EditBoardMemberDrawer({
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Editar roles</DrawerTitle>
+          <DrawerTitle>{m.board_edit_roles()}</DrawerTitle>
           <DrawerDescription>{member.full_name}</DrawerDescription>
         </DrawerHeader>
 
@@ -113,7 +114,7 @@ function EditBoardMemberForm({
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -122,10 +123,10 @@ function EditBoardMemberForm({
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DrawerFooter>
     </>

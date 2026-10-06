@@ -4,6 +4,7 @@ import { DataTableSortableHeader } from '@/components/shared/table/sortable-head
 import { Badge } from '@/components/ui/badge'
 import { systemCategorySource } from '@/lib/system-categories'
 import { normalizeString } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 import type { CategoryQueryData } from '@/tanstack-queries/treasury'
 import { KIND_LABEL } from '../../kind'
 import { CategoriesTableActions } from './actions'
@@ -14,14 +15,16 @@ export const categoriesTableColumns = columnHelper.columns([
   columnHelper.accessor('name', {
     id: 'name',
     size: 320,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Nombre" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_name()} />,
     cell: ({ row }) => {
       const { name, key } = row.original
       return (
         <div className="grid gap-0.5">
           <span className="truncate">{name}</span>
           {key !== null && (
-            <span className="text-xs text-muted-foreground">La usa {systemCategorySource(key)}</span>
+            <span className="text-xs text-muted-foreground">
+              {m.treasury_category_used_by({ source: systemCategorySource(key) })}
+            </span>
           )}
         </div>
       )
@@ -36,16 +39,20 @@ export const categoriesTableColumns = columnHelper.columns([
   columnHelper.accessor('kind', {
     id: 'kind',
     size: 140,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Tipo" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_type()} />,
     cell: ({ getValue }) => <Badge variant="outline">{KIND_LABEL[getValue()]}</Badge>,
   }),
 
   columnHelper.accessor('is_active', {
     id: 'is_active',
     size: 140,
-    header: ({ column }) => <DataTableSortableHeader column={column} title="Estado" />,
+    header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_status()} />,
     cell: ({ getValue }) =>
-      getValue() ? <Badge variant="success">Activa</Badge> : <Badge variant="secondary">Inactiva</Badge>,
+      getValue() ? (
+        <Badge variant="success">{m.treasury_category_active()}</Badge>
+      ) : (
+        <Badge variant="secondary">{m.treasury_category_inactive()}</Badge>
+      ),
   }),
 
   columnHelper.display({

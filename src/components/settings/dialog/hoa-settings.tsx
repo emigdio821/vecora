@@ -7,85 +7,42 @@ import { useCurrentUser } from '@/components/current-user-provider'
 import { RemoveLogoAlertDialog } from '@/components/settings/dialog/remove-logo'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import type { DialogPrimitive } from '@/components/ui/dialog'
-import {
-  Dialog,
-  DialogClose,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogPanel,
-  DialogPopup,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { DialogClose, DialogFooter, DialogPanel } from '@/components/ui/dialog'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toastManager } from '@/components/ui/toast'
+import { MULTI_LANGUAGE } from '@/lib/config/i18n'
 import type { Settings } from '@/lib/supabase/settings'
 import {
   CURRENCY_ITEMS,
-  DEFAULT_RESIDENTIAL_LABEL,
+  defaultResidentialLabel,
   LANGUAGE_ITEMS,
   logoFileSchema,
   type SettingsInput,
   settingsSchema,
 } from '@/lib/validations/settings'
-import { updateSettings, uploadLogo } from '@/server-actions/settings'
+import { m } from '@/paraglide/messages'
+import { uploadLogo } from '@/server-actions/settings'
 import { logoUrlQueryOptions, SETTINGS_QUERY_KEY } from '@/tanstack-queries/settings'
 
-const FORM_ID = 'edit-settings-form'
+const FORM_ID = 'hoa-settings-form'
 
-interface EditSettingsDialogProps extends React.ComponentProps<typeof Dialog> {
+/** Owned by the dialog, which can't close while it's pending. */
+export type UpdateSettingsMutation = UseMutationResult<void, Error, SettingsInput>
+
+interface HoaSettingsPanelProps {
   settings: Settings
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  mutation: UpdateSettingsMutation
 }
 
-type UpdateSettingsMutation = UseMutationResult<void, Error, SettingsInput>
-
-/** President: the residential's details. The sidebar reads them from the settings query. */
-export function EditSettingsDialog({ settings, open, onOpenChange, ...props }: EditSettingsDialogProps) {
-  const queryClient = useQueryClient()
-
-  const mutation = useMutation({
-    mutationFn: async (values: SettingsInput) => {
-      const result = await updateSettings(values)
-      if (result.error !== undefined) throw new Error(result.error)
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [SETTINGS_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Ajustes guardados' })
-      onOpenChange(false)
-    },
-  })
-
-  const handleOpenChange: DialogPrimitive.Root.Props['onOpenChange'] = (nextOpen, eventDetails) => {
-    if (!nextOpen && mutation.isPending) {
-      eventDetails.cancel()
-      return
-    }
-
-    onOpenChange(nextOpen)
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={handleOpenChange} {...props}>
-      <DialogPopup>
-        <DialogHeader>
-          <DialogTitle>Ajustes del residencial</DialogTitle>
-          <DialogDescription>Datos generales que se muestran en toda la aplicación.</DialogDescription>
-        </DialogHeader>
-
-        {/* Mounted only while open so the form always starts from the saved values. */}
-        <EditSettingsForm settings={settings} mutation={mutation} />
-      </DialogPopup>
-    </Dialog>
-  )
-}
-
-function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation: UpdateSettingsMutation }) {
+/**
+ * The settings dialog's "Residencial" tab, for president and admin: the HOA's
+ * details. The sidebar reads them from the settings query. Mounted with the
+ * dialog, so the form always starts from the saved values.
+ */
+export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) {
   const user = useCurrentUser()
   // Language and currency shape the whole HOA's records, so they're admin only.
   const isAdmin = user.roles.includes('admin')
@@ -94,7 +51,8 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
     defaultValues: isAdmin
       ? {
           residential_name: settings.residentialName,
-          default_language: settings.defaultLanguage,
+          // Left out with a single language, so saving never touches it.
+          default_language: MULTI_LANGUAGE ? settings.defaultLanguage : undefined,
           currency: settings.currency,
         }
       : { residential_name: settings.residentialName },
@@ -125,10 +83,10 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
                 touched={fieldState.isTouched}
                 dirty={fieldState.isDirty}
               >
-                <FieldLabel>Nombre del residencial</FieldLabel>
+                <FieldLabel>{m.settings_residential_name()}</FieldLabel>
                 <Input {...field} autoComplete="off" disabled={mutation.isPending} />
                 <FieldDescription>
-                  Si lo dejas vacío se mostrará como "{DEFAULT_RESIDENTIAL_LABEL}".
+                  {m.settings_residential_name_empty_hint({ label: defaultResidentialLabel() })}
                 </FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
@@ -137,43 +95,43 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
 
           {isAdmin && (
             <>
-              <Controller
-                name="default_language"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field
-                    name={field.name}
-                    invalid={fieldState.invalid}
-                    touched={fieldState.isTouched}
-                    dirty={fieldState.isDirty}
-                  >
-                    <FieldLabel>Idioma</FieldLabel>
-                    <Select
-                      items={LANGUAGE_ITEMS}
-                      value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value)
-                      }}
-                      disabled={mutation.isPending}
+              {MULTI_LANGUAGE && (
+                <Controller
+                  name="default_language"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field
+                      name={field.name}
+                      invalid={fieldState.invalid}
+                      touched={fieldState.isTouched}
+                      dirty={fieldState.isDirty}
                     >
-                      <SelectTrigger ref={field.ref} className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectPopup>
-                        {LANGUAGE_ITEMS.map((item) => (
-                          <SelectItem key={item.value} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectPopup>
-                    </Select>
-                    <FieldDescription>
-                      El de los reportes y los textos que genera la aplicación.
-                    </FieldDescription>
-                    <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
-                  </Field>
-                )}
-              />
+                      <FieldLabel>{m.common_language()}</FieldLabel>
+                      <Select
+                        items={LANGUAGE_ITEMS}
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                        }}
+                        disabled={mutation.isPending}
+                      >
+                        <SelectTrigger ref={field.ref} className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectPopup>
+                          {LANGUAGE_ITEMS.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectPopup>
+                      </Select>
+                      <FieldDescription>{m.settings_language_hint()}</FieldDescription>
+                      <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                    </Field>
+                  )}
+                />
+              )}
 
               <Controller
                 name="currency"
@@ -185,7 +143,7 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
                     touched={fieldState.isTouched}
                     dirty={fieldState.isDirty}
                   >
-                    <FieldLabel>Moneda</FieldLabel>
+                    <FieldLabel>{m.settings_currency()}</FieldLabel>
                     <Select
                       items={CURRENCY_ITEMS}
                       value={field.value}
@@ -213,11 +171,8 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
               {currency && currency !== settings.currency && (
                 <Alert variant="warning">
                   <IconAlertTriangle />
-                  <AlertTitle>Cambiar la moneda a {currency}</AlertTitle>
-                  <AlertDescription>
-                    Lo ya registrado conserva su moneda, incluidos los periodos existentes y sus cuotas.
-                    Revisa las tarifas sugeridas de las áreas comunes: se usarán tal cual en {currency}.
-                  </AlertDescription>
+                  <AlertTitle>{m.settings_currency_change_title({ currency })}</AlertTitle>
+                  <AlertDescription>{m.settings_currency_change_description({ currency })}</AlertDescription>
                 </Alert>
               )}
             </>
@@ -226,7 +181,7 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -235,10 +190,10 @@ function EditSettingsForm({ settings, mutation }: { settings: Settings; mutation
 
       <DialogFooter>
         <DialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DialogClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Guardar
+          {m.common_action_save()}
         </Button>
       </DialogFooter>
     </>
@@ -258,7 +213,7 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
   const upload = useMutation({
     mutationFn: async (file: File) => {
       const parsed = logoFileSchema.safeParse(file)
-      if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Selecciona una imagen')
+      if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? m.settings_logo_select_image())
 
       const formData = new FormData()
       formData.set('logo', parsed.data)
@@ -267,23 +222,23 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [SETTINGS_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Logo actualizado' })
+      toastManager.add({ type: 'success', title: m.settings_logo_updated() })
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'Error', description: error.message })
+      toastManager.add({ type: 'error', title: m.common_error(), description: error.message })
     },
   })
 
   return (
     <Field>
-      <FieldLabel>Logo</FieldLabel>
+      <FieldLabel>{m.settings_logo()}</FieldLabel>
       <div className="flex items-center gap-4">
         {/* White like the report page, so the preview shows how it will print. */}
         <div className="flex size-20 shrink-0 items-center justify-center rounded-lg border bg-muted p-2">
           {logoUrl.data ? (
             <img
               src={logoUrl.data}
-              alt="Logo del residencial"
+              alt={m.settings_logo_alt()}
               width={64}
               height={64}
               className="size-full object-contain"
@@ -303,7 +258,7 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
             }}
           >
             <IconUpload />
-            {logoPath ? 'Cambiar logo' : 'Subir logo'}
+            {logoPath ? m.settings_logo_change() : m.settings_logo_upload()}
           </Button>
           {logoPath && (
             <Button
@@ -315,7 +270,7 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
               }}
             >
               <IconTrash />
-              Quitar
+              {m.common_action_remove()}
             </Button>
           )}
         </div>
@@ -332,10 +287,7 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
           }}
         />
       </div>
-      <FieldDescription>
-        Aparece en los reportes. Es recomendable usar el formato PNG con fondo transparente, con un máximo de
-        2 MB.
-      </FieldDescription>
+      <FieldDescription>{m.settings_logo_hint()}</FieldDescription>
 
       <RemoveLogoAlertDialog open={isRemoveOpen} onOpenChange={setRemoveOpen} />
     </Field>

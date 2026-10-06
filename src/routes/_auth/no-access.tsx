@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/empty'
 import { siteConfig } from '@/lib/config/site'
 import { pageHead } from '@/lib/metadata'
-import { NO_ACCESS_MESSAGE } from '@/lib/validations/auth'
+import { m } from '@/paraglide/messages'
 
 /** Signed in, but not on the board. Reached from the _authed layout. */
 export const Route = createFileRoute('/_auth/no-access')({
@@ -22,8 +22,8 @@ export const Route = createFileRoute('/_auth/no-access')({
   },
   head: () =>
     pageHead({
-      title: 'Sin acceso',
-      description: `Tu cuenta aún no tiene acceso a ${siteConfig.name}.`,
+      title: m.auth_no_access_title(),
+      description: m.auth_no_access_head_description({ appName: siteConfig.name }),
     }),
   component: NoAccessPage,
 })
@@ -37,9 +37,9 @@ function NoAccessPage() {
         <EmptyMedia variant="icon">
           <IconShieldOff />
         </EmptyMedia>
-        <EmptyTitle>Sin acceso</EmptyTitle>
+        <EmptyTitle>{m.auth_no_access_title()}</EmptyTitle>
         <EmptyDescription>
-          Iniciaste sesión como {user.email}. {NO_ACCESS_MESSAGE}
+          {m.auth_no_access_signed_in_as({ email: user.email })} {m.auth_no_access_message()}
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>

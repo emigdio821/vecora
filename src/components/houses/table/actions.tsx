@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
+import { m } from '@/paraglide/messages'
 import type { HouseQueryData } from '@/tanstack-queries/houses'
 import { DeleteHousesAlertDialog } from '../dialog/delete-houses'
 import { EditHouseDrawer } from '../drawer/edit-house'
@@ -17,7 +18,7 @@ export function HousesTableActions({ house }: ActionsProps) {
   const [isDetailsOpen, setDetailsOpen] = useState(false)
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
-  const label = `Casa ${house.number}`
+  const label = m.common_house_label({ number: house.number })
 
   return (
     <>
@@ -32,7 +33,12 @@ export function HousesTableActions({ house }: ActionsProps) {
       <Menu>
         <MenuTrigger
           render={
-            <Button size="icon" variant="ghost" className="ms-auto flex" aria-label={`Acciones de ${label}`}>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="ms-auto flex"
+              aria-label={m.residential_actions_for({ name: label })}
+            >
               <IconDots className="size-4" />
             </Button>
           }
@@ -46,7 +52,7 @@ export function HousesTableActions({ house }: ActionsProps) {
                 setDetailsOpen(true)
               }}
             >
-              Información
+              {m.residential_action_info()}
             </MenuItem>
 
             {canManage && (
@@ -56,7 +62,7 @@ export function HousesTableActions({ house }: ActionsProps) {
                     setEditOpen(true)
                   }}
                 >
-                  Editar
+                  {m.common_action_edit()}
                 </MenuItem>
 
                 <MenuItem
@@ -65,7 +71,7 @@ export function HousesTableActions({ house }: ActionsProps) {
                     setDeleteOpen(true)
                   }}
                 >
-                  Eliminar
+                  {m.common_action_delete()}
                 </MenuItem>
               </>
             )}

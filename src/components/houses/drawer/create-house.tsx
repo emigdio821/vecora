@@ -18,6 +18,7 @@ import {
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { type CreateHouseInput, createHouseSchema } from '@/lib/validations/houses'
+import { m } from '@/paraglide/messages'
 import { createHouse } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY } from '@/tanstack-queries/houses'
 import { HouseFormFields } from './house-form-fields'
@@ -52,8 +53,8 @@ export function CreateHouseDrawer({ open, onOpenChange, ...props }: CreateHouseD
       void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Casa creada',
-        description: `La casa ${values.number} se agregó al registro.`,
+        title: m.residential_house_created(),
+        description: m.residential_house_created_description({ number: values.number }),
       })
       // Not handleOpenChange: the mutation is still `pending` while onSuccess runs.
       onOpenChange(false)
@@ -90,10 +91,8 @@ export function CreateHouseDrawer({ open, onOpenChange, ...props }: CreateHouseD
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Nueva casa</DrawerTitle>
-          <DrawerDescription>
-            Agrega una casa al registro. Podrás asignarle residentes después.
-          </DrawerDescription>
+          <DrawerTitle>{m.residential_new_house()}</DrawerTitle>
+          <DrawerDescription>{m.residential_new_house_description()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>
@@ -107,7 +106,7 @@ export function CreateHouseDrawer({ open, onOpenChange, ...props }: CreateHouseD
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -116,10 +115,10 @@ export function CreateHouseDrawer({ open, onOpenChange, ...props }: CreateHouseD
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Crear
+            {m.common_action_create()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

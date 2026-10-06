@@ -10,14 +10,15 @@ import {
   type UpdateHouseInput,
   updateHouseSchema,
 } from '@/lib/validations/houses'
+import { m } from '@/paraglide/messages'
 
 // "House" in the app, `properties` in the database.
 
 function toMessage(error: PostgrestError, fallback: string) {
   return postgrestErrorMessage(error, {
     fallback,
-    unique: { properties_number_unique: 'Ya existe una casa con ese número' },
-    uniqueFallback: 'Ya existe una casa con esos datos',
+    unique: { properties_number_unique: m.residential_house_number_taken() },
+    uniqueFallback: m.residential_house_duplicate(),
   })
 }
 
@@ -26,7 +27,7 @@ const createHouseFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = createHouseSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { notes, ...rest } = parsed.data
@@ -39,7 +40,7 @@ const createHouseFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo crear la casa, intenta nuevamente') }
+      return { error: toMessage(error, m.residential_create_house_failed()) }
     }
 
     return { data }
@@ -52,7 +53,7 @@ const updateHouseFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ id: string }>> => {
     const parsed = updateHouseSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { notes, ...rest } = parsed.data
@@ -66,7 +67,7 @@ const updateHouseFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo actualizar la casa, intenta nuevamente') }
+      return { error: toMessage(error, m.residential_update_house_failed()) }
     }
 
     return { data }
@@ -84,7 +85,7 @@ const deleteHousesFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: ids }): Promise<ActionResult<{ deleted: number }>> => {
     const uniqueIds = [...new Set(ids)]
     if (uniqueIds.length === 0) {
-      return { error: 'Selecciona al menos una casa' }
+      return { error: m.residential_select_house_required() }
     }
 
     const supabase = await createClient()
@@ -96,11 +97,11 @@ const deleteHousesFn = createServerFn({ method: 'POST' })
       .select('id')
 
     if (error) {
-      return { error: toMessage(error, 'No se pudieron eliminar las casas, intenta nuevamente') }
+      return { error: toMessage(error, m.residential_delete_houses_failed()) }
     }
 
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: { deleted: data.length } }
@@ -114,7 +115,7 @@ const restoreHousesFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: ids }): Promise<ActionResult<{ restored: number }>> => {
     const uniqueIds = [...new Set(ids)]
     if (uniqueIds.length === 0) {
-      return { error: 'Nada que restaurar' }
+      return { error: m.common_nothing_to_restore() }
     }
 
     const supabase = await createClient()
@@ -126,14 +127,17 @@ const restoreHousesFn = createServerFn({ method: 'POST' })
       .select('id')
 
     if (error) {
-      const message = toMessage(error, 'No se pudieron restaurar las casas, intenta nuevamente')
+      const message = toMessage(error, m.residential_restore_houses_failed())
       return {
-        error: error.code === UNIQUE_VIOLATION ? `No se pudo restaurar: ${message.toLowerCase()}` : message,
+        error:
+          error.code === UNIQUE_VIOLATION
+            ? m.residential_restore_failed_reason({ reason: message.toLowerCase() })
+            : message,
       }
     }
 
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: { restored: data.length } }
@@ -147,7 +151,7 @@ const assignResidentsFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { houseId, input } }): Promise<ActionResult<{ assigned: number }>> => {
     const parsed = assignResidentsSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { relationship } = parsed.data
@@ -162,8 +166,8 @@ const assignResidentsFn = createServerFn({ method: 'POST' })
     if (error) {
       return {
         error: postgrestErrorMessage(error, {
-          fallback: 'No se pudieron asignar los residentes, intenta nuevamente',
-          uniqueFallback: 'Alguno de los residentes ya está asignado a esta casa',
+          fallback: m.residential_assign_residents_failed(),
+          uniqueFallback: m.residential_resident_already_assigned(),
         }),
       }
     }
@@ -190,14 +194,14 @@ const unassignResidentFn = createServerFn({ method: 'POST' })
     if (error) {
       return {
         error: postgrestErrorMessage(error, {
-          fallback: 'No se pudo quitar al residente, intenta nuevamente',
+          fallback: m.residential_unassign_resident_failed(),
         }),
       }
     }
 
     // RLS filters instead of raising on DELETE, so 0 rows means no permission (or already gone).
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: { removed: data.length } }

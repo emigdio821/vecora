@@ -14,6 +14,7 @@ import {
   type RejectRequestInput,
   rejectRequestSchema,
 } from '@/lib/validations/requests'
+import { m } from '@/paraglide/messages'
 
 function toMessage(error: PostgrestError, fallback: string) {
   return postgrestErrorMessage(error, { fallback })
@@ -24,7 +25,7 @@ const createMaintenanceRequestFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = maintenanceRequestSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { title, details, amount, requested_on } = parsed.data
@@ -37,7 +38,7 @@ const createMaintenanceRequestFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo registrar la solicitud, intenta nuevamente') }
+      return { error: toMessage(error, m.requests_create_failed()) }
     }
 
     return { data }
@@ -52,7 +53,7 @@ const updateMaintenanceRequestFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = maintenanceRequestSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { title, details, amount, requested_on } = parsed.data
@@ -66,7 +67,7 @@ const updateMaintenanceRequestFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo actualizar la solicitud, intenta nuevamente') }
+      return { error: toMessage(error, m.requests_update_failed()) }
     }
 
     return { data: undefined }
@@ -83,7 +84,7 @@ const deleteMaintenanceRequestFn = createServerFn({ method: 'POST' })
     const { error } = await supabase.from('maintenance_requests').delete().eq('id', id).select('id').single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo eliminar la solicitud, intenta nuevamente') }
+      return { error: toMessage(error, m.requests_delete_failed()) }
     }
 
     return { data: undefined }
@@ -97,7 +98,7 @@ const payMaintenanceRequestFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ transaction_id: string }>> => {
     const parsed = payRequestSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { category_id, occurred_on, payment_method, reference, notes } = parsed.data
@@ -113,9 +114,9 @@ const payMaintenanceRequestFn = createServerFn({ method: 'POST' })
     })
 
     if (error) {
-      if (error.code === FK_VIOLATION) return { error: 'La categoría debe ser de egreso' }
+      if (error.code === FK_VIOLATION) return { error: m.requests_category_must_be_expense() }
       return {
-        error: requestResolutionErrorMessage(error, 'No se pudo registrar el pago, intenta nuevamente'),
+        error: requestResolutionErrorMessage(error, m.requests_pay_failed()),
       }
     }
 
@@ -130,7 +131,7 @@ const rejectMaintenanceRequestFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = rejectRequestSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
@@ -142,7 +143,7 @@ const rejectMaintenanceRequestFn = createServerFn({ method: 'POST' })
 
     if (error) {
       return {
-        error: requestResolutionErrorMessage(error, 'No se pudo rechazar la solicitud, intenta nuevamente'),
+        error: requestResolutionErrorMessage(error, m.requests_reject_failed()),
       }
     }
 
@@ -162,7 +163,7 @@ const reopenMaintenanceRequestFn = createServerFn({ method: 'POST' })
 
     if (error) {
       return {
-        error: requestResolutionErrorMessage(error, 'No se pudo reabrir la solicitud, intenta nuevamente'),
+        error: requestResolutionErrorMessage(error, m.requests_reopen_failed_retry()),
       }
     }
 

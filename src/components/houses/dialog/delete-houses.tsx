@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
+import { m } from '@/paraglide/messages'
 import { deleteHouses, restoreHouses } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
@@ -27,7 +28,7 @@ async function undoDelete(queryClient: QueryClient, ids: string[]) {
   const result = await restoreHouses(ids)
 
   if (result.error !== undefined) {
-    toastManager.add({ type: 'error', title: 'No se pudo deshacer', description: result.error })
+    toastManager.add({ type: 'error', title: m.common_undo_failed(), description: result.error })
     return
   }
 
@@ -36,7 +37,7 @@ async function undoDelete(queryClient: QueryClient, ids: string[]) {
   void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
   toastManager.add({
     type: 'success',
-    title: result.data.restored === 1 ? 'Casa restaurada' : 'Casas restauradas',
+    title: result.data.restored === 1 ? m.residential_house_restored() : m.residential_houses_restored(),
   })
 }
 
@@ -59,13 +60,17 @@ export function DeleteHousesAlertDialog({
   const queryClient = useQueryClient()
   const count = houses.length
   const isSingle = count === 1
-  const singleLabel = isSingle ? `la casa ${houses[0].number}` : null
+  const singleNumber = isSingle ? houses[0].number : ''
   const residentCount = new Set(houses.flatMap((h) => h.property_residents.map((pr) => pr.resident.id))).size
   const residentsClause =
     residentCount === 0
-      ? `${isSingle ? 'Dejará' : 'Dejarán'} de aparecer en el listado de casas.`
-      : `${residentCount === 1 ? 'Su residente seguirá' : `Sus ${residentCount} residentes seguirán`} en el directorio, pero ya no ${residentCount === 1 ? 'aparecerá asignado' : 'aparecerán asignados'} a ${isSingle ? 'esta casa' : 'estas casas'}.`
-  const description = `${residentsClause} Solo podrás deshacerlo durante unos segundos.`
+      ? isSingle
+        ? m.residential_delete_house_no_residents()
+        : m.residential_delete_houses_no_residents()
+      : isSingle
+        ? m.residential_delete_house_residents({ count: residentCount })
+        : m.residential_delete_houses_residents({ count: residentCount })
+  const description = `${residentsClause} ${m.residential_undo_window()}`
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -82,15 +87,19 @@ export function DeleteHousesAlertDialog({
       const partial = deleted < count // RLS filtered some rows out
       const toastId = toastManager.add({
         type: partial ? 'warning' : 'success',
-        title: partial ? 'Eliminación parcial' : isSingle ? 'Casa eliminada' : 'Casas eliminadas',
-        description: partial
-          ? `Se eliminaron ${deleted} de ${count} casas`
+        title: partial
+          ? m.common_partial_delete()
           : isSingle
-            ? `Se eliminó ${singleLabel}`
-            : `Se eliminaron ${deleted} casas`,
+            ? m.residential_house_deleted()
+            : m.residential_houses_deleted(),
+        description: partial
+          ? m.residential_houses_deleted_partial({ deleted, count })
+          : isSingle
+            ? m.residential_house_deleted_description({ number: singleNumber })
+            : m.residential_houses_deleted_description({ count: deleted }),
         timeout: UNDO_TOAST_TIMEOUT_MS,
         actionProps: {
-          children: 'Deshacer',
+          children: m.common_action_undo(),
           onClick: () => {
             toastManager.close(toastId)
             void undoDelete(queryClient, ids)
@@ -104,7 +113,7 @@ export function DeleteHousesAlertDialog({
     onError: (error) => {
       toastManager.add({
         type: 'error',
-        title: 'No se pudo eliminar',
+        title: m.common_delete_failed(),
         description: error.message,
       })
     },
@@ -124,7 +133,9 @@ export function DeleteHousesAlertDialog({
       <AlertDialogPopup>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            {isSingle ? `¿Eliminar ${singleLabel}?` : `¿Eliminar ${count} casas?`}
+            {isSingle
+              ? m.residential_delete_house_title({ number: singleNumber })
+              : m.residential_delete_houses_title({ count })}
           </AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
@@ -141,7 +152,7 @@ export function DeleteHousesAlertDialog({
 
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
             variant="destructive"
@@ -151,7 +162,7 @@ export function DeleteHousesAlertDialog({
               mutation.mutate()
             }}
           >
-            Eliminar
+            {m.common_action_delete()}
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

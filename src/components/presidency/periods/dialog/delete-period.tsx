@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
+import { m } from '@/paraglide/messages'
 import { deletePeriod } from '@/server-actions/treasury'
 import { type PeriodQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 
@@ -36,11 +37,11 @@ export function DeletePeriodAlertDialog({
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: 'Periodo eliminado', description: period.name })
+      toastManager.add({ type: 'success', title: m.presidency_period_deleted(), description: period.name })
       onOpenChange(false)
     },
     onError: (error) => {
-      toastManager.add({ type: 'error', title: 'No se pudo eliminar', description: error.message })
+      toastManager.add({ type: 'error', title: m.common_delete_failed(), description: error.message })
     },
   })
 
@@ -57,16 +58,13 @@ export function DeletePeriodAlertDialog({
     <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Eliminar el periodo "{period.name}"?</AlertDialogTitle>
-          <AlertDialogDescription>
-            No tiene movimientos registrados, así que se eliminará por completo. Esta acción no se puede
-            deshacer.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{m.presidency_delete_period_title({ name: period.name })}</AlertDialogTitle>
+          <AlertDialogDescription>{m.presidency_delete_period_description()}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
             variant="destructive"
@@ -75,7 +73,7 @@ export function DeletePeriodAlertDialog({
               mutation.mutate()
             }}
           >
-            Eliminar
+            {m.common_action_delete()}
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

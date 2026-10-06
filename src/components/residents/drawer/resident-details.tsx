@@ -22,15 +22,22 @@ import {
   DrawerPopup,
   DrawerTitle,
 } from '@/components/ui/drawer'
+import { m } from '@/paraglide/messages'
 import type { ResidentQueryData } from '@/tanstack-queries/residents'
 import { EditResidentDrawer } from './edit-resident'
 
 type Relationship = ResidentQueryData['property_residents'][number]['relationship']
 
 const RELATIONSHIP_LABEL: Record<Relationship, string> = {
-  owner: 'Propietario',
-  tenant: 'Inquilino',
-  family: 'Familiar',
+  get owner() {
+    return m.common_relationship_owner()
+  },
+  get tenant() {
+    return m.common_relationship_tenant()
+  },
+  get family() {
+    return m.common_relationship_family()
+  },
 }
 
 interface ResidentDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
@@ -55,28 +62,32 @@ export function ResidentDetailsDrawer({
       <DrawerPopup variant="inset">
         <DrawerHeader>
           <DrawerTitle>{fullName}</DrawerTitle>
-          <DrawerDescription>Información del residente</DrawerDescription>
+          <DrawerDescription>{m.residential_resident_info()}</DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel className="grid gap-3">
-          <CollapsibleSection icon={<IconPhone />} title="Contacto">
-            <Detail label="Teléfono">
+          <CollapsibleSection icon={<IconPhone />} title={m.residential_section_contact()}>
+            <Detail label={m.common_field_phone()}>
               <a className="hover:underline" href={`tel:${resident.phone}`}>
                 {resident.phone}
               </a>
             </Detail>
-            <Detail label="Correo">
+            <Detail label={m.common_field_email()}>
               {resident.email ? (
                 <a className="hover:underline" href={`mailto:${resident.email}`}>
                   {resident.email}
                 </a>
               ) : (
-                <Muted>Sin correo</Muted>
+                <Muted>{m.residential_no_email()}</Muted>
               )}
             </Detail>
           </CollapsibleSection>
 
-          <CollapsibleSection icon={<IconHome />} title="Casas" count={resident.property_residents.length}>
+          <CollapsibleSection
+            icon={<IconHome />}
+            title={m.common_section_houses()}
+            count={resident.property_residents.length}
+          >
             {resident.property_residents.length ? (
               <ul className="grid gap-2">
                 {resident.property_residents.map(({ property, relationship }) => (
@@ -87,17 +98,17 @@ export function ResidentDetailsDrawer({
                 ))}
               </ul>
             ) : (
-              <Muted>No está asignado a ninguna casa.</Muted>
+              <Muted>{m.residential_resident_no_houses()}</Muted>
             )}
           </CollapsibleSection>
 
-          <CollapsibleSection icon={<IconUserCircle />} title="Cuenta">
+          <CollapsibleSection icon={<IconUserCircle />} title={m.residential_section_account()}>
             {resident.profile ? (
               <>
-                <Detail label="Nombre en la cuenta">
-                  {resident.profile.full_name || <Muted>Sin nombre</Muted>}
+                <Detail label={m.residential_account_name()}>
+                  {resident.profile.full_name || <Muted>{m.residential_no_name()}</Muted>}
                 </Detail>
-                <Detail label="Roles">
+                <Detail label={m.residential_roles()}>
                   {roles.length ? (
                     <div className="flex flex-wrap gap-1">
                       {roles.map((role) => (
@@ -105,29 +116,37 @@ export function ResidentDetailsDrawer({
                       ))}
                     </div>
                   ) : (
-                    <Badge variant="warning">Sin rol</Badge>
+                    <Badge variant="warning">{m.residential_no_role()}</Badge>
                   )}
                 </Detail>
               </>
             ) : (
-              <Muted>Este residente no tiene acceso a la aplicación.</Muted>
+              <Muted>{m.residential_no_app_access()}</Muted>
             )}
           </CollapsibleSection>
 
           {resident.notes && (
-            <CollapsibleSection icon={<IconNotes />} title="Notas">
+            <CollapsibleSection icon={<IconNotes />} title={m.common_field_notes()}>
               <p className="text-sm whitespace-pre-wrap">{resident.notes}</p>
             </CollapsibleSection>
           )}
 
           <dl className="grid grid-cols-2 gap-3 px-1 pt-1">
-            <Timestamp icon={<IconCalendarPlus />} label="Creado" value={resident.created_at} />
-            <Timestamp icon={<IconHistory />} label="Actualizado" value={resident.updated_at} />
+            <Timestamp
+              icon={<IconCalendarPlus />}
+              label={m.residential_created_masculine()}
+              value={resident.created_at}
+            />
+            <Timestamp
+              icon={<IconHistory />}
+              label={m.residential_updated_masculine()}
+              value={resident.updated_at}
+            />
           </dl>
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />}>Cerrar</DrawerClose>
+          <DrawerClose render={<Button variant="ghost" />}>{m.common_action_close()}</DrawerClose>
           {canManage && (
             <>
               <Button
@@ -136,7 +155,7 @@ export function ResidentDetailsDrawer({
                   setEditOpen(true)
                 }}
               >
-                Editar
+                {m.common_action_edit()}
               </Button>
               {/* Rendered inside this popup so Base UI treats it as a nested drawer. */}
               <EditResidentDrawer resident={resident} open={isEditOpen} onOpenChange={setEditOpen} />

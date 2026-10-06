@@ -1,4 +1,5 @@
 import { useQueryState } from 'nuqs'
+import { m } from '@/paraglide/messages'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '../ui/tabs'
 import { CategoriesDataTable } from './categories/table/data-table'
 import { TransactionsDataTable } from './transactions/table/data-table'
@@ -15,8 +16,8 @@ export function TreasuryMainTabs() {
       }}
     >
       <TabsList>
-        <TabsTab value="transactions">Movimientos</TabsTab>
-        <TabsTab value="categories">Categorías</TabsTab>
+        <TabsTab value="transactions">{m.common_section_transactions()}</TabsTab>
+        <TabsTab value="categories">{m.common_section_categories()}</TabsTab>
       </TabsList>
       <TabsPanel value="transactions">
         <TransactionsDataTable />

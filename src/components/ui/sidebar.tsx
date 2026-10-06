@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils'
+import { m } from '@/paraglide/messages'
 
 const SIDEBAR_COOKIE_NAME: string = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE: number = 60 * 60 * 24 * 7
@@ -206,8 +207,8 @@ export function Sidebar({
           }
         >
           <DrawerHeader className="sr-only">
-            <DrawerTitle>Sidebar</DrawerTitle>
-            <DrawerDescription>Displays the mobile sidebar.</DrawerDescription>
+            <DrawerTitle>{m.common_sidebar()}</DrawerTitle>
+            <DrawerDescription>{m.common_sidebar_description()}</DrawerDescription>
           </DrawerHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </DrawerPopup>
@@ -284,7 +285,7 @@ export function SidebarTrigger({
       {...props}
     >
       <IconLayoutSidebar />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">{m.common_sidebar_toggle()}</span>
     </Button>
   )
 }
@@ -294,7 +295,7 @@ export function SidebarRail({ className, ...props }: React.ComponentProps<'butto
 
   return (
     <button
-      aria-label="Toggle Sidebar"
+      aria-label={m.common_sidebar_toggle()}
       className={cn(
         'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border sm:flex',
         'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
@@ -308,7 +309,7 @@ export function SidebarRail({ className, ...props }: React.ComponentProps<'butto
       data-slot="sidebar-rail"
       onClick={toggleSidebar}
       tabIndex={-1}
-      title="Toggle Sidebar"
+      title={m.common_sidebar_toggle()}
       type="button"
       {...props}
     />

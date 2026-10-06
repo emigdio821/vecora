@@ -22,6 +22,7 @@ import { Form } from '@/components/ui/form'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toastManager } from '@/components/ui/toast'
 import { type AssignHouseInput, assignHouseSchema } from '@/lib/validations/houses'
+import { m } from '@/paraglide/messages'
 import { assignResidents } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY, type ResidentQueryData } from '@/tanstack-queries/residents'
@@ -64,8 +65,10 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Casa asignada',
-        description: house ? `${name} se asignó a la casa ${house.number}` : undefined,
+        title: m.residential_house_assigned(),
+        description: house
+          ? m.residential_house_assigned_description({ name, number: house.number })
+          : undefined,
       })
       // Not handleOpenChange: the mutation is still `pending` while onSuccess runs.
       onOpenChange(false)
@@ -102,7 +105,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
     >
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Asignar casa</DrawerTitle>
+          <DrawerTitle>{m.residential_assign_house()}</DrawerTitle>
           <DrawerDescription>{name}</DrawerDescription>
         </DrawerHeader>
 
@@ -123,7 +126,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Casa <span className="text-destructive">*</span>
+                    {m.common_field_house()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <HousesPicker
                     excludeIds={currentHouseIds}
@@ -134,9 +137,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
                     inputRef={field.ref}
                     disabled={mutation.isPending}
                   />
-                  <FieldDescription>
-                    Las casas que ya tiene asignadas no aparecen en la lista.
-                  </FieldDescription>
+                  <FieldDescription>{m.residential_house_picker_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -153,7 +154,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Relación <span className="text-destructive">*</span>
+                    {m.residential_field_relationship()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Select
                     items={RELATIONSHIP_ITEMS}
@@ -164,7 +165,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
                     disabled={mutation.isPending}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecciona una relación" />
+                      <SelectValue placeholder={m.residential_relationship_placeholder()} />
                     </SelectTrigger>
                     <SelectPopup>
                       {RELATIONSHIP_ITEMS.map((item) => (
@@ -182,7 +183,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{m.common_error()}</AlertTitle>
                 <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
               </Alert>
             )}
@@ -191,10 +192,10 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
 
         <DrawerFooter>
           <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-            Cancelar
+            {m.common_action_cancel()}
           </DrawerClose>
           <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-            Asignar
+            {m.residential_action_assign()}
           </Button>
         </DrawerFooter>
       </DrawerPopup>

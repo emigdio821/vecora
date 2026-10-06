@@ -22,9 +22,9 @@ export function AppSidebar({ user, settings, ...props }: AppSidebarProps) {
       <SidebarContent>
         <NavMain />
         <NavReports />
+        {user.roles.includes('admin') && <NavAdmin />}
       </SidebarContent>
       <SidebarFooter>
-        {user.roles.includes('admin') && <NavAdmin />}
         <NavSettings settings={settings} />
         <NavUser user={user} />
       </SidebarFooter>

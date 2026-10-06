@@ -5,18 +5,24 @@ import { Field, FieldDescription, FieldError, FieldItem, FieldLabel } from '@/co
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset'
 import { getRoleLabel } from '@/lib/utils'
 import { APP_ROLES, type AppRole } from '@/lib/validations/hoa-board'
+import { m } from '@/paraglide/messages'
 
 const ROLE_DESCRIPTION: Record<AppRole, string> = {
-  admin:
-    'Todo, incluyendo administrar la mesa directiva y otros administradores, y ver el "Historial" de cambios.',
-  president:
-    '"Residencial" (casas y residentes), "Presidencia" (periodos y áreas comunes), "Mesa directiva" y los "Ajustes" del residencial.',
-  treasurer:
-    '"Tesorería" (movimientos, cuotas y categorías), los periodos de "Presidencia" y pagar o rechazar las solicitudes de "Mantenimiento" y "Seguridad".',
-  security:
-    'Envía solicitudes de pago en "Seguridad" y puede editarlas mientras estén pendientes. Solo lectura en las demás secciones.',
-  maintenance:
-    'Envía solicitudes de pago en "Mantenimiento" y puede editarlas mientras estén pendientes. Solo lectura en las demás secciones.',
+  get admin() {
+    return m.board_role_description_admin()
+  },
+  get president() {
+    return m.board_role_description_president()
+  },
+  get treasurer() {
+    return m.board_role_description_treasurer()
+  },
+  get security() {
+    return m.board_role_description_security()
+  },
+  get maintenance() {
+    return m.board_role_description_maintenance()
+  },
 }
 
 interface RolesFieldProps<T extends FieldValues> {
@@ -49,7 +55,7 @@ export function RolesField<T extends FieldValues>({
           render={(props) => <Fieldset {...props} />}
         >
           <FieldsetLegend className="text-sm font-medium">
-            Roles <span className="text-destructive">*</span>
+            {m.board_roles()} <span className="text-destructive">*</span>
           </FieldsetLegend>
           <CheckboxGroup
             className="gap-2"
@@ -73,7 +79,7 @@ export function RolesField<T extends FieldValues>({
               </FieldItem>
             ))}
           </CheckboxGroup>
-          <FieldDescription>Una persona puede tener más de un rol.</FieldDescription>
+          <FieldDescription>{m.board_roles_hint()}</FieldDescription>
           <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
         </Field>
       )}

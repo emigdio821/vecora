@@ -30,6 +30,7 @@ import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
 import { formatDay, ISO_DAY } from '@/lib/utils'
 import { type PayReservationInput, payReservationSchema } from '@/lib/validations/presidency'
+import { m } from '@/paraglide/messages'
 import { payReservation } from '@/server-actions/presidency'
 import { PRESIDENCY_QUERY_KEY, type ReservationQueryData } from '@/tanstack-queries/presidency'
 import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
@@ -69,8 +70,8 @@ export function PayReservationDrawer({
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
-        title: 'Pago registrado',
-        description: `${summary} - ${amount} ya está en "Tesorería"`,
+        title: m.presidency_payment_recorded(),
+        description: m.presidency_payment_recorded_description({ summary, amount }),
       })
       onOpenChange(false)
     },
@@ -89,10 +90,9 @@ export function PayReservationDrawer({
     <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
       <DrawerPopup variant="inset">
         <DrawerHeader>
-          <DrawerTitle>Registrar pago</DrawerTitle>
+          <DrawerTitle>{m.common_action_record_payment()}</DrawerTitle>
           <DrawerDescription>
-            {summary} - {amount}. Se registrará como ingreso en "Tesorería" y la reservación pasará a
-            "Pagada".
+            {m.presidency_pay_reservation_description({ summary, amount })}
           </DrawerDescription>
         </DrawerHeader>
 
@@ -143,7 +143,7 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Fecha del pago <span className="text-destructive">*</span>
+                    {m.presidency_payment_date()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Popover open={isDateOpen} onOpenChange={setDateOpen}>
                     <PopoverTrigger
@@ -191,10 +191,10 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Folio <span className="text-destructive">*</span>
+                    {m.common_field_folio()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input {...field} autoComplete="off" disabled={mutation.isPending} />
-                  <FieldDescription>El número del recibo entregado.</FieldDescription>
+                  <FieldDescription>{m.presidency_folio_description()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -212,7 +212,7 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>
-                  Método de pago <span className="text-destructive">*</span>
+                  {m.common_field_payment_method()} <span className="text-destructive">*</span>
                 </FieldLabel>
                 <Select
                   items={PAYMENT_METHOD_ITEMS}
@@ -250,10 +250,10 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>
-                    Referencia de la transferencia <span className="text-destructive">*</span>
+                    {m.presidency_transfer_reference()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <Input {...field} autoComplete="off" disabled={mutation.isPending} />
-                  <FieldDescription>Clave de rastreo o número de referencia del banco.</FieldDescription>
+                  <FieldDescription>{m.presidency_transfer_reference_description()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}
@@ -270,9 +270,9 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
                 touched={fieldState.isTouched}
                 dirty={fieldState.isDirty}
               >
-                <FieldLabel>Notas</FieldLabel>
+                <FieldLabel>{m.common_field_notes()}</FieldLabel>
                 <Textarea {...field} rows={3} className="max-h-40" disabled={mutation.isPending} />
-                <FieldDescription>Opcional. Se guardan en el movimiento de "Tesorería".</FieldDescription>
+                <FieldDescription>{m.presidency_payment_notes_description()}</FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
             )}
@@ -281,7 +281,7 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
-              <AlertTitle>Error</AlertTitle>
+              <AlertTitle>{m.common_error()}</AlertTitle>
               <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
             </Alert>
           )}
@@ -290,10 +290,10 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
 
       <DrawerFooter>
         <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          Cancelar
+          {m.common_action_cancel()}
         </DrawerClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          Registrar pago
+          {m.common_action_record_payment()}
         </Button>
       </DrawerFooter>
     </>

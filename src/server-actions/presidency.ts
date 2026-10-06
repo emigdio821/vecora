@@ -3,7 +3,6 @@ import { createServerFn } from '@tanstack/react-start'
 import {
   type ActionResult,
   FK_VIOLATION,
-  FOLIO_TAKEN_MESSAGE,
   isFolioTaken,
   postgrestErrorMessage,
   requestResolutionErrorMessage,
@@ -19,6 +18,7 @@ import {
   type ReservationInput,
   reservationSchema,
 } from '@/lib/validations/presidency'
+import { m } from '@/paraglide/messages'
 
 // ---------------------------------------------------------------------------
 // amenities
@@ -27,7 +27,7 @@ import {
 function toAmenityMessage(error: PostgrestError, fallback: string) {
   return postgrestErrorMessage(error, {
     fallback,
-    unique: { amenities_name_unique: 'Ya existe un área con ese nombre' },
+    unique: { amenities_name_unique: m.presidency_error_amenity_name_taken() },
   })
 }
 
@@ -36,14 +36,14 @@ const createAmenityFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = amenitySchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
     const { data, error } = await supabase.from('amenities').insert(parsed.data).select('id').single()
 
     if (error) {
-      return { error: toAmenityMessage(error, 'No se pudo crear el área, intenta nuevamente') }
+      return { error: toAmenityMessage(error, m.presidency_error_create_amenity()) }
     }
 
     return { data }
@@ -57,7 +57,7 @@ const updateAmenityFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = amenitySchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const supabase = await createClient()
@@ -69,10 +69,10 @@ const updateAmenityFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toAmenityMessage(error, 'No se pudo actualizar el área, intenta nuevamente') }
+      return { error: toAmenityMessage(error, m.presidency_error_update_amenity()) }
     }
     if (!data) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -93,10 +93,10 @@ const setAmenityActiveFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toAmenityMessage(error, 'No se pudo actualizar el área, intenta nuevamente') }
+      return { error: toAmenityMessage(error, m.presidency_error_update_amenity()) }
     }
     if (!data) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -114,12 +114,12 @@ const deleteAmenityFn = createServerFn({ method: 'POST' })
 
     if (error) {
       if (error.code === FK_VIOLATION) {
-        return { error: 'No se puede eliminar: el área tiene reservaciones. Desactívala en su lugar.' }
+        return { error: m.presidency_error_amenity_in_use() }
       }
-      return { error: toAmenityMessage(error, 'No se pudo eliminar el área, intenta nuevamente') }
+      return { error: toAmenityMessage(error, m.presidency_error_delete_amenity()) }
     }
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -136,25 +136,25 @@ const PAID = 'P0003'
 
 function toMessage(error: PostgrestError, fallback: string) {
   if (error.code === PAID && error.message.includes('cancel it instead')) {
-    return 'La reservación ya está pagada. El tesorero puede cancelarla y registrar el reembolso.'
+    return m.presidency_error_reservation_paid_cancel()
   }
   if (error.code === PAID) {
-    return 'La reservación ya está pagada: no se puede cambiar el área, la casa ni el monto'
+    return m.presidency_error_reservation_paid_locked()
   }
   return postgrestErrorMessage(error, {
     fallback,
-    unique: { amenity_reservations_one_per_day: 'El área ya está reservada ese día' },
+    unique: { amenity_reservations_one_per_day: m.presidency_error_day_taken() },
   })
 }
 
 /** Errors from pay_amenity_reservation / cancel_amenity_reservation. */
 function toResolutionMessage(error: PostgrestError, fallback: string) {
-  if (isFolioTaken(error)) return FOLIO_TAKEN_MESSAGE
-  if (error.message.includes('already paid')) return 'Esta reservación ya tiene su pago registrado'
-  if (error.message.includes('cancelled')) return 'Esta reservación ya fue cancelada'
-  if (error.message.includes('no cost')) return 'Esta reservación es sin costo, no hay nada que cobrar'
-  if (error.message.includes('exceeds')) return 'El reembolso no puede ser mayor a lo que se pagó'
-  if (error.message.includes('not found')) return 'La reservación ya no existe'
+  if (isFolioTaken(error)) return m.common_folio_taken()
+  if (error.message.includes('already paid')) return m.presidency_error_already_paid()
+  if (error.message.includes('cancelled')) return m.presidency_error_already_cancelled()
+  if (error.message.includes('no cost')) return m.presidency_error_no_cost()
+  if (error.message.includes('exceeds')) return m.presidency_error_refund_exceeds()
+  if (error.message.includes('not found')) return m.presidency_error_reservation_not_found()
   return requestResolutionErrorMessage(error, fallback)
 }
 
@@ -163,7 +163,7 @@ const createReservationFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = reservationSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { amenity_id, property_id, reserved_on, amount, notes } = parsed.data
@@ -175,7 +175,7 @@ const createReservationFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo registrar la reservación, intenta nuevamente') }
+      return { error: toMessage(error, m.presidency_error_create_reservation()) }
     }
 
     return { data }
@@ -189,7 +189,7 @@ const updateReservationFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = reservationSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { amenity_id, property_id, reserved_on, amount, notes } = parsed.data
@@ -202,10 +202,10 @@ const updateReservationFn = createServerFn({ method: 'POST' })
       .single()
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo actualizar la reservación, intenta nuevamente') }
+      return { error: toMessage(error, m.presidency_error_update_reservation()) }
     }
     if (!data) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -222,10 +222,10 @@ const deleteReservationFn = createServerFn({ method: 'POST' })
     const { data, error } = await supabase.from('amenity_reservations').delete().eq('id', id).select('id')
 
     if (error) {
-      return { error: toMessage(error, 'No se pudo cancelar la reservación, intenta nuevamente') }
+      return { error: toMessage(error, m.presidency_error_cancel_reservation()) }
     }
     if (data.length === 0) {
-      return { error: 'No tienes permisos para realizar esta acción' }
+      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -238,7 +238,7 @@ const payReservationFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ transaction_id: string }>> => {
     const parsed = payReservationSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { occurred_on, folio, payment_method, reference, notes } = parsed.data
@@ -253,7 +253,7 @@ const payReservationFn = createServerFn({ method: 'POST' })
     })
 
     if (error) {
-      return { error: toResolutionMessage(error, 'No se pudo registrar el pago, intenta nuevamente') }
+      return { error: toResolutionMessage(error, m.presidency_error_record_payment()) }
     }
 
     return { data: { transaction_id: data } }
@@ -267,7 +267,7 @@ const cancelReservationFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = cancelReservationSchema.safeParse(input)
     if (!parsed.success) {
-      return { error: 'Revisa los campos del formulario' }
+      return { error: m.common_form_invalid() }
     }
 
     const { refund_amount, occurred_on, payment_method, reference, notes } = parsed.data
@@ -282,7 +282,7 @@ const cancelReservationFn = createServerFn({ method: 'POST' })
     })
 
     if (error) {
-      return { error: toResolutionMessage(error, 'No se pudo cancelar la reservación, intenta nuevamente') }
+      return { error: toResolutionMessage(error, m.presidency_error_cancel_reservation()) }
     }
 
     return { data: undefined }

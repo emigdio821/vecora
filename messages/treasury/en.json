@@ -1,0 +1,206 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "treasury_kind_income": "Income",
+  "treasury_kind_expense": "Expense",
+  "treasury_transaction_kind": "Transaction type",
+
+  "treasury_source_record_fee": "\"Record fee\"",
+  "treasury_source_reservations": "\"Presidency\" - \"Reservations\"",
+
+  "treasury_actions_for": "Actions for {name}",
+  "treasury_update_failed": "Couldn't update",
+  "treasury_record": "Record",
+
+  "treasury_new_category": "New category",
+  "treasury_new_category_description": "Categories group transactions, for example \"Landscaping\" or \"Donations\".",
+  "treasury_edit_category": "Edit category",
+  "treasury_category_created": "Category created",
+  "treasury_category_updated": "Category updated",
+  "treasury_category_deleted": "Category deleted",
+  "treasury_category_activated": "Category activated",
+  "treasury_category_deactivated": "Category deactivated",
+  "treasury_category_activated_description": "{name} is available again when recording transactions",
+  "treasury_category_deactivated_description": "{name} will no longer appear when recording transactions",
+  "treasury_category_activate": "Activate",
+  "treasury_category_deactivate": "Deactivate",
+  "treasury_category_active": "Active",
+  "treasury_category_inactive": "Inactive",
+  "treasury_category_kind_locked": "The type can't be changed once created.",
+  "treasury_category_name_description": "How it will appear in the transactions list.",
+  "treasury_category_used_by": "Used by {source}",
+  "treasury_system_category": "System category",
+  "treasury_system_category_description": "{source} uses this category. You can rename it, but you can't deactivate or delete it.",
+  "treasury_delete_category_title": "Delete the category \"{name}\"?",
+  "treasury_delete_category_description": "It has no recorded transactions, so it will be deleted permanently. This action can't be undone.",
+  "treasury_search_categories_hint": "Search by category name",
+  "treasury_categories_empty": "No categories.",
+
+  "treasury_record_transaction": "Record transaction",
+  "treasury_record_transaction_description": "Any income or expense that isn't a maintenance fee. Fees are recorded with \"Record fee\".",
+  "treasury_income_recorded": "Income recorded",
+  "treasury_expense_recorded": "Expense recorded",
+  "treasury_edit_transaction": "Edit transaction",
+  "treasury_transaction_updated": "Transaction updated",
+  "treasury_recorded_from": "Recorded from {source}",
+  "treasury_system_transaction_description": "Here you can only correct the receipt number, payment method, reference and notes. To change anything else, delete the transaction and record it again from {source}.",
+  "treasury_select_category": "Select a category",
+  "treasury_receipt_folio": "Receipt number",
+  "treasury_transfer_reference": "Transfer reference",
+  "treasury_transfer_reference_description": "Bank tracking key or reference number.",
+  "treasury_house_description": "Optional. If the money comes from a specific house.",
+  "treasury_transaction_notes_description": "Optional. Vendor, agreements, or any remarks.",
+
+  "treasury_transaction": "Transaction",
+  "treasury_transaction_info": "Transaction details",
+  "treasury_payment": "Payment",
+  "treasury_period": "Period",
+  "treasury_fee_month": "Fee month",
+  "treasury_created": "Created",
+  "treasury_updated": "Updated",
+
+  "treasury_method": "Method",
+  "treasury_search_transactions_hint": "Search by description, receipt number, reference, category or house",
+  "treasury_filters_active": "Filters: {filter}",
+  "treasury_delete_selected": "Delete selected transactions",
+  "treasury_delete_selected_aria": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Delete the selected transaction",
+        "countPlural=other": "Delete {count} selected transactions"
+      }
+    }
+  ],
+  "treasury_transactions_empty": "No transactions.",
+
+  "treasury_delete_transactions_title": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Delete this transaction?",
+        "countPlural=other": "Delete {count} transactions?"
+      }
+    }
+  ],
+  "treasury_delete_transactions_impact": [
+    {
+      "declarations": ["input count", "input impact", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "It will no longer count toward the balance ({impact}).",
+        "countPlural=other": "They will no longer count toward the balance ({impact})."
+      }
+    }
+  ],
+  "treasury_delete_impact_less": "{amount} less",
+  "treasury_delete_impact_more": "{amount} more",
+  "treasury_delete_fee_clause_one": "It's a fee, so that month will show as pending again for the house.",
+  "treasury_delete_fee_clause_many": "It includes fees, so those months will show as pending again for their houses.",
+  "treasury_delete_amenity_clause": "The reservation will show as pending payment again.",
+  "treasury_delete_undo_hint": "You'll only be able to undo it for a few seconds.",
+  "treasury_transaction_deleted": "Transaction deleted",
+  "treasury_transactions_deleted": "Transactions deleted",
+  "treasury_transactions_deleted_count": "Deleted {count} transactions",
+  "treasury_transactions_deleted_partial": "Deleted {deleted} of {count} transactions",
+  "treasury_transaction_restored": "Transaction restored",
+  "treasury_transactions_restored": "Transactions restored",
+
+  "treasury_record_fee": "Record fee",
+  "treasury_record_fee_description": "One receipt per house. If they pay several months, select them all; the late fee is charged for each month paid after the due day.",
+  "treasury_fee_months": "Months paid",
+  "treasury_search_month": "Search month",
+  "treasury_payment_date": "Payment date",
+  "treasury_waive_late_fee": "Waive late fee",
+  "treasury_waive_late_fee_description": [
+    {
+      "declarations": ["input count", "input dueDay", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 month is paid after day {dueDay}. Turn this on if the HOA board waived the late fee.",
+        "countPlural=other": "{count} months are paid after day {dueDay}. Turn this on if the HOA board waived the late fee."
+      }
+    }
+  ],
+  "treasury_fee_notes_description": "Optional. Who paid, agreements, or any remarks.",
+  "treasury_period_label": "Period {name}",
+  "treasury_fees_of": [
+    {
+      "declarations": ["input count", "input amount", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 fee of {amount}",
+        "countPlural=other": "{count} fees of {amount}"
+      }
+    }
+  ],
+  "treasury_late_fees_of": [
+    {
+      "declarations": ["input count", "input amount", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 late fee of {amount}",
+        "countPlural=other": "{count} late fees of {amount}"
+      }
+    }
+  ],
+  "treasury_waived": "(waived)",
+  "treasury_total_to_receive": "Total to collect",
+  "treasury_no_period": "No period",
+  "treasury_no_period_description": "No period covers the payment date. Create the period before recording fees.",
+  "treasury_fee_recorded": "Fee recorded",
+  "treasury_months_count": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "1 month",
+        "countPlural=other": "{count} months"
+      }
+    }
+  ],
+  "treasury_fee_recorded_description": "{house}: {months}, {total} - Receipt no. {folio}",
+  "treasury_fee_recorded_description_late": "{house}: {months} with late fee, {total} - Receipt no. {folio}",
+
+  "treasury_select_month_required": "Select at least one month",
+  "treasury_folio_required": "Receipt number is required",
+  "treasury_description_required": "Description is required",
+  "treasury_reference_required": "The reference is required for transfers",
+  "treasury_monthly_fee_required": "Fee is required",
+  "treasury_monthly_fee_positive": "The fee must be greater than zero",
+  "treasury_late_fee_required": "Late fee is required",
+  "treasury_late_fee_negative": "The late fee can't be negative",
+  "treasury_due_day_required": "Due day is required",
+  "treasury_due_day_range": "Between 1 and 28",
+  "treasury_ends_after_start": "Must be after the start",
+
+  "treasury_error_fee_month_taken": "That house already has the fee recorded for one of the selected months",
+  "treasury_error_fee_months_taken": "That house already has the fee recorded for {months}",
+  "treasury_error_reservation_paid": "That reservation already has its payment recorded",
+  "treasury_error_category_name_taken": "A category with that name already exists",
+  "treasury_error_period_name_taken": "A period with that name already exists",
+  "treasury_error_system_category": "Transactions in that category are recorded from {source}",
+  "treasury_error_no_period": "No period covers that date. Create the period first.",
+  "treasury_error_house_gone": "The selected house no longer exists",
+  "treasury_error_record_fee_failed": "Couldn't record the fee, please try again",
+  "treasury_error_category_kind_mismatch": "The category doesn't match the transaction type",
+  "treasury_error_create_transaction_failed": "Couldn't record the transaction, please try again",
+  "treasury_error_transaction_gone": "The transaction no longer exists",
+  "treasury_error_update_transaction_failed": "Couldn't update the transaction, please try again",
+  "treasury_error_select_transaction": "Select at least one transaction",
+  "treasury_error_delete_transactions_failed": "Couldn't delete the transactions, please try again",
+  "treasury_error_restore_transactions_failed": "Couldn't restore the transactions, please try again",
+  "treasury_error_restore_reason": "Couldn't restore: {reason}",
+  "treasury_error_create_category_failed": "Couldn't create the category, please try again",
+  "treasury_error_update_category_failed": "Couldn't update the category, please try again",
+  "treasury_error_category_system_active": "The system uses this category for fees, so it can't be deactivated",
+  "treasury_error_category_in_use": "Can't delete: there are transactions in this category. Deactivate it instead.",
+  "treasury_error_delete_category_failed": "Couldn't delete the category, please try again",
+  "treasury_error_period_overlap": "The dates overlap another period",
+  "treasury_error_create_period_failed": "Couldn't create the period, please try again",
+  "treasury_error_update_period_failed": "Couldn't update the period, please try again",
+  "treasury_error_period_has_transactions": "Can't delete: the period already has transactions recorded",
+  "treasury_error_delete_period_failed": "Couldn't delete the period, please try again"
+}
