@@ -4,13 +4,12 @@ import { useHasRole } from '@/components/current-user-provider'
 import { AppSettingsPanel } from '@/components/settings/dialog/app-settings'
 import { HoaSettingsPanel } from '@/components/settings/dialog/hoa-settings'
 import {
-  Dialog,
-  DialogDescription,
-  DialogHeader,
-  type DialogPrimitive,
-  DialogPopup,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  ResponsiveDialog,
+  ResponsiveDialogDescription,
+  ResponsiveDialogHeader,
+  ResponsiveDialogPopup,
+  ResponsiveDialogTitle,
+} from '@/components/shared/responsive-dialog'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { toastManager } from '@/components/ui/toast'
 import type { Settings } from '@/lib/supabase/settings'
@@ -21,7 +20,7 @@ import { SETTINGS_QUERY_KEY } from '@/tanstack-queries/settings'
 
 type SettingsTab = 'app' | 'hoa'
 
-interface SettingsDialogProps extends React.ComponentProps<typeof Dialog> {
+interface SettingsDialogProps {
   settings: Settings
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -30,9 +29,9 @@ interface SettingsDialogProps extends React.ComponentProps<typeof Dialog> {
 /**
  * Everything configurable: this device's preferences for everyone, and the
  * HOA's details for president or admin (RLS re-checks the role). Without the
- * role there are no tabs, only the device's preferences.
+ * role there are no tabs, only the device's preferences. A drawer on mobile.
  */
-export function SettingsDialog({ settings, open, onOpenChange, ...props }: SettingsDialogProps) {
+export function SettingsDialog({ settings, open, onOpenChange }: SettingsDialogProps) {
   const canEditHoa = useHasRole('president')
   const [tab, setTab] = useState<SettingsTab>('app')
   const queryClient = useQueryClient()
@@ -49,7 +48,7 @@ export function SettingsDialog({ settings, open, onOpenChange, ...props }: Setti
     },
   })
 
-  const handleOpenChange: DialogPrimitive.Root.Props['onOpenChange'] = (nextOpen, eventDetails) => {
+  const handleOpenChange = (nextOpen: boolean, eventDetails: { cancel: () => void }) => {
     if (!nextOpen && mutation.isPending) {
       eventDetails.cancel()
       return
@@ -59,8 +58,8 @@ export function SettingsDialog({ settings, open, onOpenChange, ...props }: Setti
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange} {...props}>
-      <DialogPopup>
+    <ResponsiveDialog open={open} onOpenChange={handleOpenChange}>
+      <ResponsiveDialogPopup>
         {canEditHoa ? (
           <Tabs
             className="min-h-0 flex-1 gap-0"
@@ -92,17 +91,17 @@ export function SettingsDialog({ settings, open, onOpenChange, ...props }: Setti
             <AppSettingsPanel />
           </>
         )}
-      </DialogPopup>
-    </Dialog>
+      </ResponsiveDialogPopup>
+    </ResponsiveDialog>
   )
 }
 
 function SettingsHeader({ description, children }: { description: string; children?: React.ReactNode }) {
   return (
-    <DialogHeader>
-      <DialogTitle>{m.common_section_settings()}</DialogTitle>
-      <DialogDescription>{description}</DialogDescription>
+    <ResponsiveDialogHeader>
+      <ResponsiveDialogTitle>{m.common_section_settings()}</ResponsiveDialogTitle>
+      <ResponsiveDialogDescription>{description}</ResponsiveDialogDescription>
       {children}
-    </DialogHeader>
+    </ResponsiveDialogHeader>
   )
 }

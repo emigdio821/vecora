@@ -1,7 +1,11 @@
 import { pickLanguage } from '@/components/language-menu'
+import {
+  ResponsiveDialogClose,
+  ResponsiveDialogFooter,
+  ResponsiveDialogPanel,
+} from '@/components/shared/responsive-dialog'
 import { type Theme, useTheme } from '@/components/theme-provider'
 import { Button } from '@/components/ui/button'
-import { DialogClose, DialogFooter, DialogPanel } from '@/components/ui/dialog'
 import { Field, FieldDescription, FieldItem, FieldLabel } from '@/components/ui/field'
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset'
 import { Radio, RadioGroup } from '@/components/ui/radio-group'
@@ -42,7 +46,7 @@ export function AppSettingsPanel() {
 
   return (
     <>
-      <DialogPanel className="flex flex-col gap-6">
+      <ResponsiveDialogPanel className="flex flex-col gap-6">
         <Field className="gap-4" name="theme" render={(fieldProps) => <Fieldset {...fieldProps} />}>
           <FieldsetLegend className="text-sm font-medium">{m.common_section_appearance()}</FieldsetLegend>
           <RadioGroup
@@ -92,11 +96,13 @@ export function AppSettingsPanel() {
             <FieldDescription>{m.settings_screen_language_hint()}</FieldDescription>
           </Field>
         )}
-      </DialogPanel>
+      </ResponsiveDialogPanel>
 
-      <DialogFooter>
-        <DialogClose render={<Button variant="outline" />}>{m.common_action_done()}</DialogClose>
-      </DialogFooter>
+      <ResponsiveDialogFooter>
+        <ResponsiveDialogClose render={<Button variant="outline" />}>
+          {m.common_action_done()}
+        </ResponsiveDialogClose>
+      </ResponsiveDialogFooter>
     </>
   )
 }

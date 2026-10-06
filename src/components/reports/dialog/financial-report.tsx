@@ -12,17 +12,17 @@ import {
 } from 'date-fns'
 import { useState } from 'react'
 import { type DayRange, RangePicker, type RangePreset, toRange } from '@/components/shared/range-picker'
-import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogClose,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogPanel,
-  DialogPopup,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  ResponsiveDialog,
+  ResponsiveDialogClose,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogPanel,
+  ResponsiveDialogPopup,
+  ResponsiveDialogTitle,
+} from '@/components/shared/responsive-dialog'
+import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
@@ -109,13 +109,16 @@ async function downloadReport(range: DayRange) {
 
 type ReportTab = 'monthly' | 'custom'
 
-interface FinancialReportDialogProps extends React.ComponentProps<typeof Dialog> {
+interface FinancialReportDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-/** One month, or any range of days. The choices survive closing, so a second download is one click. */
-export function FinancialReportDialog({ open, onOpenChange, ...props }: FinancialReportDialogProps) {
+/**
+ * One month, or any range of days. The choices survive closing, so a second
+ * download is one click. A drawer on mobile.
+ */
+export function FinancialReportDialog({ open, onOpenChange }: FinancialReportDialogProps) {
   const today = useToday()
   const [tab, setTab] = useState<ReportTab>('monthly')
   const [months] = useState(() => monthItems(today))
@@ -134,14 +137,14 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
   })
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} {...props}>
-      <DialogPopup>
-        <DialogHeader>
-          <DialogTitle>{m.common_section_financial_report()}</DialogTitle>
-          <DialogDescription>{m.reports_dialog_description()}</DialogDescription>
-        </DialogHeader>
+    <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
+      <ResponsiveDialogPopup>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>{m.common_section_financial_report()}</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>{m.reports_dialog_description()}</ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
-        <DialogPanel>
+        <ResponsiveDialogPanel>
           <Tabs
             value={tab}
             onValueChange={(value: ReportTab) => {
@@ -186,12 +189,12 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
               </Field>
             </TabsPanel>
           </Tabs>
-        </DialogPanel>
+        </ResponsiveDialogPanel>
 
-        <DialogFooter>
-          <DialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+        <ResponsiveDialogFooter>
+          <ResponsiveDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
             {m.common_action_cancel()}
-          </DialogClose>
+          </ResponsiveDialogClose>
           <Button
             loading={mutation.isPending}
             disabled={mutation.isPending}
@@ -202,8 +205,8 @@ export function FinancialReportDialog({ open, onOpenChange, ...props }: Financia
             <IconDownload />
             {m.reports_download_pdf()}
           </Button>
-        </DialogFooter>
-      </DialogPopup>
-    </Dialog>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogPopup>
+    </ResponsiveDialog>
   )
 }

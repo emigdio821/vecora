@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 
-type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'
+export type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'
 
 const DrawerContext: React.Context<{ position: DrawerPosition }> = createContext<{
   position: DrawerPosition

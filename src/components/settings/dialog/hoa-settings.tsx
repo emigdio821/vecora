@@ -5,9 +5,13 @@ import { useRef, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useCurrentUser } from '@/components/current-user-provider'
 import { RemoveLogoAlertDialog } from '@/components/settings/dialog/remove-logo'
+import {
+  ResponsiveDialogClose,
+  ResponsiveDialogFooter,
+  ResponsiveDialogPanel,
+} from '@/components/shared/responsive-dialog'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { DialogClose, DialogFooter, DialogPanel } from '@/components/ui/dialog'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -61,7 +65,7 @@ export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) 
 
   return (
     <>
-      <DialogPanel className="flex flex-col gap-6">
+      <ResponsiveDialogPanel className="flex flex-col gap-6">
         <LogoField logoPath={settings.logoPath} />
 
         <Form
@@ -186,16 +190,16 @@ export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) 
             </Alert>
           )}
         </Form>
-      </DialogPanel>
+      </ResponsiveDialogPanel>
 
-      <DialogFooter>
-        <DialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+      <ResponsiveDialogFooter>
+        <ResponsiveDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
           {m.common_action_cancel()}
-        </DialogClose>
+        </ResponsiveDialogClose>
         <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
           {m.common_action_save()}
         </Button>
-      </DialogFooter>
+      </ResponsiveDialogFooter>
     </>
   )
 }

@@ -1,10 +1,17 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { IconLayoutSidebar } from '@tabler/icons-react'
+import { IconLayoutSidebar, IconMenu2 } from '@tabler/icons-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import { Drawer, DrawerDescription, DrawerHeader, DrawerPopup, DrawerTitle } from '@/components/ui/drawer'
+import {
+  Drawer,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerPopup,
+  DrawerPosition,
+  DrawerTitle,
+} from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -16,7 +23,6 @@ import { m } from '@/paraglide/messages'
 const SIDEBAR_COOKIE_NAME: string = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE: number = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH: string = '16rem'
-const SIDEBAR_WIDTH_MOBILE: string = '18rem'
 const SIDEBAR_WIDTH_ICON: string = '3rem'
 const SIDEBAR_KEYBOARD_SHORTCUT: string = 'b'
 
@@ -170,7 +176,7 @@ export function Sidebar({
   children,
   ...props
 }: React.ComponentProps<'div'> & {
-  side?: 'left' | 'right'
+  side?: DrawerPosition
   variant?: 'sidebar' | 'floating' | 'inset'
   collapsible?: 'offcanvas' | 'icon' | 'none'
 }): React.ReactElement {
@@ -191,26 +197,24 @@ export function Sidebar({
     )
   }
 
+  // On mobile it's a bottom sheet with a drag bar, like the responsive dialogs,
+  // whatever `side` is: a dialog opened from it then stacks on it as coss intends.
   if (isMobile) {
     return (
-      <Drawer position={side} onOpenChange={setOpenMobile} open={openMobile} {...props}>
+      <Drawer position="bottom" onOpenChange={setOpenMobile} open={openMobile} {...props}>
         <DrawerPopup
-          variant="inset"
-          className="w-(--sidebar-width) bg-sidebar text-sidebar-foreground after:bg-sidebar"
+          showBar
+          className="bg-sidebar text-sidebar-foreground after:bg-sidebar"
           data-mobile="true"
           data-sidebar="sidebar"
           data-slot="sidebar"
-          style={
-            {
-              '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
-            } as React.CSSProperties
-          }
         >
           <DrawerHeader className="sr-only">
             <DrawerTitle>{m.common_sidebar()}</DrawerTitle>
             <DrawerDescription>{m.common_sidebar_description()}</DrawerDescription>
           </DrawerHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
+          {/* Top padding clears the drag bar. */}
+          <div className="flex min-h-0 w-full flex-1 flex-col pt-4">{children}</div>
         </DrawerPopup>
       </Drawer>
     )
@@ -284,7 +288,10 @@ export function SidebarTrigger({
       variant="ghost"
       {...props}
     >
-      <IconLayoutSidebar />
+      {/* A menu on mobile (it opens from the bottom), a side panel on desktop.
+          CSS picks, at the same breakpoint as isMobile, so SSR shows the right one. */}
+      <IconMenu2 className="md:hidden" />
+      <IconLayoutSidebar className="max-md:hidden" />
       <span className="sr-only">{m.common_sidebar_toggle()}</span>
     </Button>
   )
