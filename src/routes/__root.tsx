@@ -77,11 +77,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     // The theme script sets the class before React hydrates.
-    <html suppressHydrationWarning lang={getLocale()} className="font-sans">
+    <html suppressHydrationWarning lang={getLocale()} className="relative font-sans">
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="isolate">
         {children}
         <Scripts />
       </body>
