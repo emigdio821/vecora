@@ -1,3 +1,5 @@
+import interRegularUrl from '@fontsource/inter/files/inter-latin-400-normal.woff?inline'
+import interSemiBoldUrl from '@fontsource/inter/files/inter-latin-600-normal.woff?inline'
 import { Document, Font, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns'
 import type { CurrencyTotals, FinancialReport } from '@/lib/supabase/financial-report'
@@ -13,20 +15,18 @@ import {
 } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import type { Locale } from '@/paraglide/runtime'
-import geistRegularUrl from '../../../../assets/fonts/Geist-Regular.ttf?inline'
-import geistSemiBoldUrl from '../../../../assets/fonts/Geist-SemiBold.ttf?inline'
 
 // Rendered on the server by /reports/pdf. Only react-pdf primitives here: no
 // DOM, no Tailwind.
 
-// Geist, like the app. The app's fontsource package only ships woff2, so the
-// TTFs live in assets/fonts, bundled as data URLs; react-pdf embeds just the
-// glyphs the report uses.
+// Inter, like the app. The app's variable woff2 would render every weight as
+// regular here, so this uses the static woff files, bundled as data URLs;
+// react-pdf embeds just the glyphs the report uses.
 Font.register({
-  family: 'Geist',
+  family: 'Inter',
   fonts: [
-    { src: geistRegularUrl, fontWeight: 400 },
-    { src: geistSemiBoldUrl, fontWeight: 600 },
+    { src: interRegularUrl, fontWeight: 400 },
+    { src: interSemiBoldUrl, fontWeight: 600 },
   ],
 })
 
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     paddingTop: 84,
     paddingBottom: 56,
     paddingHorizontal: 40,
-    fontFamily: 'Geist',
+    fontFamily: 'Inter',
     fontSize: 9,
     color: COLOR.text,
   },

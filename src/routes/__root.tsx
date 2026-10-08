@@ -1,4 +1,4 @@
-import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url'
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url'
 import { IconAlertTriangle, IconCheck, IconCopy, IconWind } from '@tabler/icons-react'
 import type { QueryClient } from '@tanstack/react-query'
 import {
@@ -61,7 +61,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: 'stylesheet', href: globalsCss },
-      { rel: 'preload', href: geistLatin, as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+      { rel: 'preload', href: interLatin, as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
       { rel: 'icon', href: '/favicon.ico' },
       { rel: 'shortcut icon', href: '/favicon-16x16.png' },
       { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },

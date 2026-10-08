@@ -1,10 +1,10 @@
+import interRegularUrl from '@fontsource/inter/files/inter-latin-400-normal.woff?inline'
+import interSemiBoldUrl from '@fontsource/inter/files/inter-latin-600-normal.woff?inline'
 import { Resvg } from '@resvg/resvg-js'
 import { createFileRoute } from '@tanstack/react-router'
 import satori from 'satori'
 import { VecoraIcon } from '@/components/shared/icons'
 import { siteConfig } from '@/lib/config/site'
-import geistRegularUrl from '../../../assets/fonts/Geist-Regular.ttf?inline'
-import geistSemiBoldUrl from '../../../assets/fonts/Geist-SemiBold.ttf?inline'
 
 // Link previews: /api/og?title=…&description=… (both optional). Build the URL
 // with ogImageUrl() in lib/metadata.ts.
@@ -19,8 +19,9 @@ function fromDataUrl(url: string): ArrayBuffer {
   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
 }
 
-const geistRegular = fromDataUrl(geistRegularUrl)
-const geistSemiBold = fromDataUrl(geistSemiBoldUrl)
+// satori can't read woff2, so these are fontsource's static woff files.
+const interRegular = fromDataUrl(interRegularUrl)
+const interSemiBold = fromDataUrl(interSemiBoldUrl)
 
 // The light theme's foreground (neutral-800) and muted foreground.
 const FOREGROUND = '#262626'
@@ -47,7 +48,7 @@ async function GET(request: Request) {
         gap: 28,
         padding: 96,
         backgroundColor: '#ffffff',
-        fontFamily: 'Geist',
+        fontFamily: 'Inter',
       }}
     >
       {/* lineClamp (display: block) ends long text with "…" instead of running off the image. */}
@@ -90,8 +91,8 @@ async function GET(request: Request) {
       width: WIDTH,
       height: HEIGHT,
       fonts: [
-        { name: 'Geist', data: geistRegular, weight: 400, style: 'normal' },
-        { name: 'Geist', data: geistSemiBold, weight: 600, style: 'normal' },
+        { name: 'Inter', data: interRegular, weight: 400, style: 'normal' },
+        { name: 'Inter', data: interSemiBold, weight: 600, style: 'normal' },
       ],
     },
   )
