@@ -21,7 +21,12 @@ interface RemoveLogoAlertDialogProps extends React.ComponentProps<typeof AlertDi
 }
 
 /** Opened from Settings; the file is deleted, so it has to be uploaded again to get it back. */
-export function RemoveLogoAlertDialog({ open, onOpenChange, ...props }: RemoveLogoAlertDialogProps) {
+export function RemoveLogoAlertDialog({
+  open,
+  onOpenChange,
+  onOpenChangeComplete,
+  ...props
+}: RemoveLogoAlertDialogProps) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
@@ -48,8 +53,22 @@ export function RemoveLogoAlertDialog({ open, onOpenChange, ...props }: RemoveLo
     onOpenChange(nextOpen)
   }
 
+  // Still busy after a removal, until the dialog has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
+    <AlertDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the buttons busy while the dialog closes.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <AlertDialogPopup>
         <AlertDialogHeader>
           <AlertDialogTitle>{m.settings_remove_logo_title()}</AlertDialogTitle>
@@ -57,12 +76,12 @@ export function RemoveLogoAlertDialog({ open, onOpenChange, ...props }: RemoveLo
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
             variant="destructive"
-            loading={mutation.isPending}
+            loading={isBusy}
             onClick={() => {
               mutation.mutate()
             }}

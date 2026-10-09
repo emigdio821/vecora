@@ -38,7 +38,12 @@ interface CreateReservationDrawerProps extends React.ComponentProps<typeof Drawe
 
 type CreateMutation = UseMutationResult<{ id: string }, Error, ReservationInput>
 
-export function CreateReservationDrawer({ open, onOpenChange, ...props }: CreateReservationDrawerProps) {
+export function CreateReservationDrawer({
+  open,
+  onOpenChange,
+  onOpenChangeComplete,
+  ...props
+}: CreateReservationDrawerProps) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
@@ -77,7 +82,19 @@ export function CreateReservationDrawer({ open, onOpenChange, ...props }: Create
   }
 
   return (
-    <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
+    <Drawer
+      position="right"
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the form busy while the drawer slides out.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <DrawerPopup variant="inset">
         <DrawerHeader>
           <DrawerTitle>{m.presidency_new_reservation()}</DrawerTitle>
@@ -110,6 +127,9 @@ function CreateReservationForm({ mutation }: { mutation: CreateMutation }) {
     },
   })
 
+  // Still busy after a save, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
     <>
       <DrawerPanel>
@@ -123,7 +143,7 @@ function CreateReservationForm({ mutation }: { mutation: CreateMutation }) {
             }),
           )}
         >
-          <ReservationFormFields form={form} currency={currency} disabled={mutation.isPending} />
+          <ReservationFormFields form={form} currency={currency} disabled={isBusy} />
 
           {form.formState.errors.root && (
             <Alert variant="error">
@@ -136,10 +156,10 @@ function CreateReservationForm({ mutation }: { mutation: CreateMutation }) {
       </DrawerPanel>
 
       <DrawerFooter>
-        <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+        <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.common_action_cancel()}
         </DrawerClose>
-        <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+        <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
           {m.presidency_reserve()}
         </Button>
       </DrawerFooter>

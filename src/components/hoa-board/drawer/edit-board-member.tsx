@@ -40,6 +40,7 @@ export function EditBoardMemberDrawer({
   open,
   onOpenChange,
   canGrantAdmin,
+  onOpenChangeComplete,
   ...props
 }: EditBoardMemberDrawerProps) {
   const queryClient = useQueryClient()
@@ -67,7 +68,19 @@ export function EditBoardMemberDrawer({
   }
 
   return (
-    <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
+    <Drawer
+      position="right"
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the form busy while the drawer slides out.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <DrawerPopup variant="inset">
         <DrawerHeader>
           <DrawerTitle>{m.board_edit_roles()}</DrawerTitle>
@@ -96,6 +109,9 @@ function EditBoardMemberForm({
     defaultValues: { roles: member.user_roles.map((r) => r.role) },
   })
 
+  // Still busy after a save, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
     <>
       <DrawerPanel>
@@ -109,7 +125,7 @@ function EditBoardMemberForm({
             }),
           )}
         >
-          <RolesField form={form} name="roles" disabled={mutation.isPending} canGrantAdmin={canGrantAdmin} />
+          <RolesField form={form} name="roles" disabled={isBusy} canGrantAdmin={canGrantAdmin} />
 
           {form.formState.errors.root && (
             <Alert variant="error">
@@ -122,10 +138,10 @@ function EditBoardMemberForm({
       </DrawerPanel>
 
       <DrawerFooter>
-        <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+        <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.common_action_cancel()}
         </DrawerClose>
-        <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+        <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
           {m.common_action_save()}
         </Button>
       </DrawerFooter>

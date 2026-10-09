@@ -35,7 +35,13 @@ interface RejectRequestDialogProps extends React.ComponentProps<typeof Dialog> {
 type RejectMutation = UseMutationResult<void, Error, RejectRequestInput>
 
 /** Treasurer: declines a pending request; the reason stays visible to the requester. */
-export function RejectRequestDialog({ request, open, onOpenChange, ...props }: RejectRequestDialogProps) {
+export function RejectRequestDialog({
+  request,
+  open,
+  onOpenChange,
+  onOpenChangeComplete,
+  ...props
+}: RejectRequestDialogProps) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
@@ -60,7 +66,18 @@ export function RejectRequestDialog({ request, open, onOpenChange, ...props }: R
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange} {...props}>
+    <Dialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the form busy while the dialog closes.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <DialogPopup>
         <DialogHeader>
           <DialogTitle>{m.requests_reject_title()}</DialogTitle>
@@ -79,6 +96,9 @@ function RejectRequestForm({ mutation }: { mutation: RejectMutation }) {
     resolver: zodResolver(rejectRequestSchema),
     defaultValues: { reason: '' },
   })
+
+  // Still busy after a reject, until the dialog has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
     <>
@@ -105,7 +125,7 @@ function RejectRequestForm({ mutation }: { mutation: RejectMutation }) {
                 <FieldLabel>
                   {m.requests_reason()} <span className="text-destructive">*</span>
                 </FieldLabel>
-                <Textarea {...field} rows={3} className="max-h-40" disabled={mutation.isPending} />
+                <Textarea {...field} rows={3} className="max-h-40" disabled={isBusy} />
                 <FieldDescription>{m.requests_reason_description()}</FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
@@ -123,16 +143,10 @@ function RejectRequestForm({ mutation }: { mutation: RejectMutation }) {
       </DialogPanel>
 
       <DialogFooter>
-        <DialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+        <DialogClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.common_action_cancel()}
         </DialogClose>
-        <Button
-          type="submit"
-          form={FORM_ID}
-          variant="destructive"
-          disabled={mutation.isPending}
-          loading={mutation.isPending}
-        >
+        <Button type="submit" form={FORM_ID} variant="destructive" disabled={isBusy} loading={isBusy}>
           {m.requests_action_reject()}
         </Button>
       </DialogFooter>

@@ -70,8 +70,12 @@ export function CreateAmenityDrawer({ open, onOpenChange, ...props }: CreateAmen
 
     if (!isOpen) {
       form.reset(DEFAULT_VALUES)
+      mutation.reset()
     }
   }
+
+  // Still busy after a save, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
     <Drawer
@@ -93,7 +97,7 @@ export function CreateAmenityDrawer({ open, onOpenChange, ...props }: CreateAmen
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
           >
-            <AmenityFormFields form={form} disabled={mutation.isPending} />
+            <AmenityFormFields form={form} disabled={isBusy} />
 
             {form.formState.errors.root && (
               <Alert variant="error">
@@ -106,10 +110,10 @@ export function CreateAmenityDrawer({ open, onOpenChange, ...props }: CreateAmen
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </DrawerClose>
-          <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+          <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
             {m.common_action_create()}
           </Button>
         </DrawerFooter>

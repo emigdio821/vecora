@@ -92,8 +92,12 @@ export function AddBoardMemberDrawer({
 
     if (!isOpen) {
       form.reset(DEFAULT_VALUES)
+      mutation.reset()
     }
   }
+
+  // Still busy after a save, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
     <Drawer
@@ -135,7 +139,7 @@ export function AddBoardMemberDrawer({
                     }}
                     inputRef={field.ref}
                     excludeIds={excludeIds}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   />
                   <FieldDescription>{m.board_resident_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -143,12 +147,7 @@ export function AddBoardMemberDrawer({
               )}
             />
 
-            <RolesField
-              form={form}
-              name="roles"
-              disabled={mutation.isPending}
-              canGrantAdmin={canGrantAdmin}
-            />
+            <RolesField form={form} name="roles" disabled={isBusy} canGrantAdmin={canGrantAdmin} />
 
             {form.formState.errors.root && (
               <Alert variant="error">
@@ -161,10 +160,10 @@ export function AddBoardMemberDrawer({
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </DrawerClose>
-          <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+          <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
             {m.board_add_submit()}
           </Button>
         </DrawerFooter>

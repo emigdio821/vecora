@@ -58,7 +58,16 @@ export function SettingsDialog({ settings, open, onOpenChange }: SettingsDialogP
   }
 
   return (
-    <ResponsiveDialog open={open} onOpenChange={handleOpenChange}>
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the form busy while the dialog closes.
+        if (!isOpen) {
+          mutation.reset()
+        }
+      }}
+    >
       <ResponsiveDialogPopup>
         {canEditHoa ? (
           <Tabs

@@ -136,8 +136,20 @@ export function FinancialReportDialog({ open, onOpenChange }: FinancialReportDia
     },
   })
 
+  // Still busy after a download, until the dialog has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
-    <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the buttons busy while the dialog closes.
+        if (!isOpen) {
+          mutation.reset()
+        }
+      }}
+    >
       <ResponsiveDialogPopup>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>{m.common_section_financial_report()}</ResponsiveDialogTitle>
@@ -192,12 +204,12 @@ export function FinancialReportDialog({ open, onOpenChange }: FinancialReportDia
         </ResponsiveDialogPanel>
 
         <ResponsiveDialogFooter>
-          <ResponsiveDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <ResponsiveDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </ResponsiveDialogClose>
           <Button
-            loading={mutation.isPending}
-            disabled={mutation.isPending}
+            loading={isBusy}
+            disabled={isBusy}
             onClick={() => {
               mutation.mutate(tab === 'monthly' ? monthRange(parseISO(month)) : range)
             }}

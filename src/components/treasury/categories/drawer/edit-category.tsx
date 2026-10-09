@@ -34,7 +34,13 @@ interface EditCategoryDrawerProps extends React.ComponentProps<typeof Drawer> {
 
 type UpdateCategoryMutation = UseMutationResult<void, Error, CategoryInput>
 
-export function EditCategoryDrawer({ category, open, onOpenChange, ...props }: EditCategoryDrawerProps) {
+export function EditCategoryDrawer({
+  category,
+  open,
+  onOpenChange,
+  onOpenChangeComplete,
+  ...props
+}: EditCategoryDrawerProps) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
@@ -60,7 +66,19 @@ export function EditCategoryDrawer({ category, open, onOpenChange, ...props }: E
   }
 
   return (
-    <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
+    <Drawer
+      position="right"
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the form busy while the drawer slides out.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <DrawerPopup variant="inset">
         <DrawerHeader>
           <DrawerTitle>{m.treasury_edit_category()}</DrawerTitle>
@@ -89,6 +107,9 @@ function EditCategoryForm({
   // The fee, late fee and common area categories: the RPCs look them up by key.
   const { key } = category
 
+  // Still busy after a save, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
     <>
       <DrawerPanel>
@@ -112,7 +133,7 @@ function EditCategoryForm({
             </Alert>
           )}
 
-          <CategoryFormFields form={form} disabled={mutation.isPending} lockKind />
+          <CategoryFormFields form={form} disabled={isBusy} lockKind />
 
           {form.formState.errors.root && (
             <Alert variant="error">
@@ -125,10 +146,10 @@ function EditCategoryForm({
       </DrawerPanel>
 
       <DrawerFooter>
-        <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+        <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.common_action_cancel()}
         </DrawerClose>
-        <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+        <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
           {m.common_action_save()}
         </Button>
       </DrawerFooter>

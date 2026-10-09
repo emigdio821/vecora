@@ -55,6 +55,7 @@ export function DeleteTransactionsAlertDialog({
   open,
   onOpenChange,
   onDeleted,
+  onOpenChangeComplete,
   ...props
 }: DeleteTransactionsAlertDialogProps) {
   const queryClient = useQueryClient()
@@ -145,8 +146,22 @@ export function DeleteTransactionsAlertDialog({
     onOpenChange(nextOpen)
   }
 
+  // Still busy after a delete, until the dialog has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
+    <AlertDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the buttons busy while the dialog closes.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <AlertDialogPopup>
         <AlertDialogHeader>
           <AlertDialogTitle>{m.treasury_delete_transactions_title({ count })}</AlertDialogTitle>
@@ -166,12 +181,12 @@ export function DeleteTransactionsAlertDialog({
         </ul>
 
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
             variant="destructive"
-            loading={mutation.isPending}
+            loading={isBusy}
             disabled={count === 0}
             onClick={() => {
               mutation.mutate()

@@ -90,8 +90,14 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
   function handleOpenChangeComplete(isOpen: boolean) {
     props.onOpenChangeComplete?.(isOpen)
 
-    if (!isOpen) form.reset(defaultValues)
+    if (!isOpen) {
+      form.reset(defaultValues)
+      mutation.reset()
+    }
   }
+
+  // Still busy after a save, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
 
   const currentHouseIds = resident.property_residents.map(({ property }) => property.id)
 
@@ -135,7 +141,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
                       field.onChange(value ?? '')
                     }}
                     inputRef={field.ref}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   />
                   <FieldDescription>{m.residential_house_picker_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -162,7 +168,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
                     onValueChange={(value) => {
                       field.onChange(value)
                     }}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder={m.residential_relationship_placeholder()} />
@@ -191,10 +197,10 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </DrawerClose>
-          <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+          <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
             {m.residential_action_assign()}
           </Button>
         </DrawerFooter>

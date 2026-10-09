@@ -119,6 +119,9 @@ function UnassignResidentButton({
     setConfirmOpen(nextOpen)
   }
 
+  // Still busy after a removal, until the dialog has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
     <>
       <Tooltip>
@@ -142,7 +145,16 @@ function UnassignResidentButton({
         <TooltipPopup>{m.residential_remove_resident_from_house({ name })}</TooltipPopup>
       </Tooltip>
 
-      <AlertDialog open={isConfirmOpen} onOpenChange={handleOpenChange}>
+      <AlertDialog
+        open={isConfirmOpen}
+        onOpenChange={handleOpenChange}
+        onOpenChangeComplete={(isOpen) => {
+          // Clears `success`, which keeps the buttons busy while the dialog closes.
+          if (!isOpen) {
+            mutation.reset()
+          }
+        }}
+      >
         <AlertDialogPopup>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -152,12 +164,12 @@ function UnassignResidentButton({
           </AlertDialogHeader>
 
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+            <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
               {m.common_action_cancel()}
             </AlertDialogClose>
             <Button
               variant="destructive"
-              loading={mutation.isPending}
+              loading={isBusy}
               onClick={() => {
                 mutation.mutate()
               }}

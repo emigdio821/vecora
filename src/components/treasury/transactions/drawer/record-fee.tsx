@@ -172,8 +172,12 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
 
     if (!isOpen) {
       form.reset(defaultValues())
+      mutation.reset()
     }
   }
+
+  // Still busy after a save, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
     <Drawer
@@ -214,7 +218,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                       field.onChange(value ?? '')
                     }}
                     inputRef={field.ref}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   />
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
@@ -243,7 +247,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                       field.onChange([...value].sort())
                     }}
                     inputRef={field.ref}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   >
                     <ComboboxChips>
                       <ComboboxValue>
@@ -304,7 +308,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                           <Button
                             variant="outline"
                             aria-invalid={fieldState.invalid}
-                            disabled={mutation.isPending}
+                            disabled={isBusy}
                             className="w-full justify-between pr-2"
                           >
                             <span id={`${dateTriggerId}-value`} className="truncate font-normal">
@@ -347,7 +351,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                     <FieldLabel>
                       {m.treasury_receipt_folio()} <span className="text-destructive">*</span>
                     </FieldLabel>
-                    <Input {...field} autoComplete="off" disabled={mutation.isPending} />
+                    <Input {...field} autoComplete="off" disabled={isBusy} />
                     <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                   </Field>
                 )}
@@ -373,7 +377,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                     onValueChange={(value) => {
                       field.onChange(value)
                     }}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />
@@ -405,7 +409,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                     <FieldLabel>
                       {m.treasury_transfer_reference()} <span className="text-destructive">*</span>
                     </FieldLabel>
-                    <Input {...field} autoComplete="off" disabled={mutation.isPending} />
+                    <Input {...field} autoComplete="off" disabled={isBusy} />
                     <FieldDescription>{m.treasury_transfer_reference_description()}</FieldDescription>
                     <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                   </Field>
@@ -423,7 +427,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                       id={waiveSwitchId}
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={mutation.isPending}
+                      disabled={isBusy}
                     />
                     <div className="flex flex-col gap-1">
                       <Label htmlFor={waiveSwitchId}>{m.treasury_waive_late_fee()}</Label>
@@ -450,7 +454,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                   dirty={fieldState.isDirty}
                 >
                   <FieldLabel>{m.common_field_notes()}</FieldLabel>
-                  <Textarea {...field} rows={3} className="max-h-40" disabled={mutation.isPending} />
+                  <Textarea {...field} rows={3} className="max-h-40" disabled={isBusy} />
                   <FieldDescription>{m.treasury_fee_notes_description()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
@@ -511,15 +515,10 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </DrawerClose>
-          <Button
-            type="submit"
-            form={FORM_ID}
-            disabled={mutation.isPending || !preview}
-            loading={mutation.isPending}
-          >
+          <Button type="submit" form={FORM_ID} disabled={isBusy || !preview} loading={isBusy}>
             {m.treasury_record()}
           </Button>
         </DrawerFooter>

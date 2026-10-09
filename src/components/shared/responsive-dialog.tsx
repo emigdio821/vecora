@@ -31,6 +31,7 @@ const IsDrawerContext = createContext(false)
 interface ResponsiveDialogProps {
   open: boolean
   onOpenChange: (open: boolean, eventDetails: { cancel: () => void }) => void
+  onOpenChangeComplete?: (open: boolean) => void
   children: React.ReactNode
 }
 

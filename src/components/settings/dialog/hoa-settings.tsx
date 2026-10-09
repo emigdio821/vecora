@@ -62,6 +62,8 @@ export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) 
       : { residential_name: settings.residentialName },
   })
   const currency = useWatch({ control: form.control, name: 'currency' })
+  // Still busy after a save, until the dialog has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
     <>
@@ -88,7 +90,7 @@ export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) 
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>{m.settings_residential_name()}</FieldLabel>
-                <Input {...field} autoComplete="off" disabled={mutation.isPending} />
+                <Input {...field} autoComplete="off" disabled={isBusy} />
                 <FieldDescription>
                   {m.settings_residential_name_empty_hint({ label: defaultResidentialLabel() })}
                 </FieldDescription>
@@ -117,7 +119,7 @@ export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) 
                         onValueChange={(value) => {
                           field.onChange(value)
                         }}
-                        disabled={mutation.isPending}
+                        disabled={isBusy}
                       >
                         <SelectTrigger ref={field.ref} className="w-full">
                           <SelectValue />
@@ -154,7 +156,7 @@ export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) 
                       onValueChange={(value) => {
                         field.onChange(value)
                       }}
-                      disabled={mutation.isPending}
+                      disabled={isBusy}
                     >
                       <SelectTrigger ref={field.ref} className="w-full">
                         <SelectValue />
@@ -193,10 +195,10 @@ export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) 
       </ResponsiveDialogPanel>
 
       <ResponsiveDialogFooter>
-        <ResponsiveDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+        <ResponsiveDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.common_action_cancel()}
         </ResponsiveDialogClose>
-        <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+        <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
           {m.common_action_save()}
         </Button>
       </ResponsiveDialogFooter>

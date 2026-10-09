@@ -61,6 +61,10 @@ export function SetupDialog({ settings }: { settings: Settings }) {
     },
   })
 
+  // Still busy after a save, until the settings refetch (or the language
+  // switch reloads) and this dialog unmounts, so it never needs a reset.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
     <Dialog open disablePointerDismissal>
       <DialogPopup showCloseButton={false}>
@@ -90,7 +94,7 @@ export function SetupDialog({ settings }: { settings: Settings }) {
                   <FieldLabel>
                     {m.settings_residential_name()} <span className="text-destructive">*</span>
                   </FieldLabel>
-                  <Input {...field} autoComplete="off" disabled={mutation.isPending} />
+                  <Input {...field} autoComplete="off" disabled={isBusy} />
                   <FieldDescription>{m.settings_residential_name_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
@@ -118,7 +122,7 @@ export function SetupDialog({ settings }: { settings: Settings }) {
                       onValueChange={(value) => {
                         field.onChange(value)
                       }}
-                      disabled={mutation.isPending}
+                      disabled={isBusy}
                     >
                       <SelectTrigger ref={field.ref} className="w-full">
                         <SelectValue />
@@ -157,7 +161,7 @@ export function SetupDialog({ settings }: { settings: Settings }) {
                     onValueChange={(value) => {
                       field.onChange(value)
                     }}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   >
                     <SelectTrigger ref={field.ref} className="w-full">
                       <SelectValue />
@@ -187,7 +191,7 @@ export function SetupDialog({ settings }: { settings: Settings }) {
         </DialogPanel>
 
         <DialogFooter>
-          <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+          <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
             {m.settings_setup_submit()}
           </Button>
         </DialogFooter>

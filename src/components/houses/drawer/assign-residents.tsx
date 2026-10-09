@@ -93,8 +93,12 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
     if (!isOpen) {
       form.reset(defaultValues)
       setScope('unassigned')
+      mutation.reset()
     }
   }
+
+  // Still busy after a save, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
 
   const currentResidentIds = house.property_residents.map((pr) => pr.resident.id)
 
@@ -138,7 +142,7 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
                     value={field.value}
                     onValueChange={field.onChange}
                     inputRef={field.ref}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   />
                   <FieldDescription>{m.residential_residents_picker_hint()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
@@ -180,7 +184,7 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
                     onValueChange={(value) => {
                       field.onChange(value)
                     }}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder={m.residential_relationship_placeholder()} />
@@ -210,10 +214,10 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </DrawerClose>
-          <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+          <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
             {m.residential_action_assign()}
           </Button>
         </DrawerFooter>

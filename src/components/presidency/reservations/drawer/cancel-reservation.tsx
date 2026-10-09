@@ -56,6 +56,7 @@ export function CancelReservationDrawer({
   reservation,
   open,
   onOpenChange,
+  onOpenChangeComplete,
   ...props
 }: CancelReservationDrawerProps) {
   const queryClient = useQueryClient()
@@ -97,7 +98,19 @@ export function CancelReservationDrawer({
   }
 
   return (
-    <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
+    <Drawer
+      position="right"
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the form busy while the drawer slides out.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <DrawerPopup variant="inset">
         <DrawerHeader>
           <DrawerTitle>{m.presidency_cancel_reservation()}</DrawerTitle>
@@ -144,6 +157,9 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
   const paymentMethod = useWatch({ control: form.control, name: 'payment_method' })
   const hasRefund = refundAmount > 0
 
+  // Still busy after a cancellation, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
     <>
       <DrawerPanel>
@@ -179,7 +195,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                     max={paid}
                     locale={intlLocale()}
                     format={MONEY_FORMAT}
-                    disabled={mutation.isPending}
+                    disabled={isBusy}
                   >
                     <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
                   </NumberField>
@@ -221,7 +237,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                             <Button
                               variant="outline"
                               aria-invalid={fieldState.invalid}
-                              disabled={mutation.isPending}
+                              disabled={isBusy}
                               className="w-full justify-between pr-2"
                             >
                               <span id={`${dateTriggerId}-value`} className="truncate font-normal">
@@ -270,7 +286,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                         onValueChange={(value) => {
                           field.onChange(value)
                         }}
-                        disabled={mutation.isPending}
+                        disabled={isBusy}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue />
@@ -303,7 +319,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                       <FieldLabel>
                         {m.presidency_transfer_reference()} <span className="text-destructive">*</span>
                       </FieldLabel>
-                      <Input {...field} autoComplete="off" disabled={mutation.isPending} />
+                      <Input {...field} autoComplete="off" disabled={isBusy} />
                       <FieldDescription>{m.presidency_transfer_reference_description()}</FieldDescription>
                       <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                     </Field>
@@ -322,7 +338,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                     dirty={fieldState.isDirty}
                   >
                     <FieldLabel>{m.common_field_notes()}</FieldLabel>
-                    <Textarea {...field} rows={3} className="max-h-40" disabled={mutation.isPending} />
+                    <Textarea {...field} rows={3} className="max-h-40" disabled={isBusy} />
                     <FieldDescription>{m.presidency_refund_notes_description()}</FieldDescription>
                     <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                   </Field>
@@ -342,16 +358,10 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
       </DrawerPanel>
 
       <DrawerFooter>
-        <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+        <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.presidency_go_back()}
         </DrawerClose>
-        <Button
-          type="submit"
-          form={FORM_ID}
-          variant="destructive"
-          disabled={mutation.isPending}
-          loading={mutation.isPending}
-        >
+        <Button type="submit" form={FORM_ID} variant="destructive" disabled={isBusy} loading={isBusy}>
           {m.presidency_cancel_reservation()}
         </Button>
       </DrawerFooter>

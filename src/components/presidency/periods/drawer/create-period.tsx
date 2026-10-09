@@ -94,8 +94,12 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
 
     if (!isOpen) {
       form.reset(defaultValues(latest, currency))
+      mutation.reset()
     }
   }
+
+  // Still busy after a save, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
     <Drawer
@@ -117,7 +121,7 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
           >
-            <PeriodFormFields form={form} currency={currency} disabled={mutation.isPending} />
+            <PeriodFormFields form={form} currency={currency} disabled={isBusy} />
 
             {form.formState.errors.root && (
               <Alert variant="error">
@@ -130,10 +134,10 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
         </DrawerPanel>
 
         <DrawerFooter>
-          <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </DrawerClose>
-          <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+          <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
             {m.common_action_create()}
           </Button>
         </DrawerFooter>

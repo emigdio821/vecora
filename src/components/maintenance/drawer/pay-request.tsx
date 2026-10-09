@@ -49,7 +49,13 @@ interface PayRequestDrawerProps extends React.ComponentProps<typeof Drawer> {
 type PayMutation = UseMutationResult<{ transaction_id: string }, Error, PayRequestInput>
 
 /** Treasurer: records the expense in the ledger and marks the request paid. */
-export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayRequestDrawerProps) {
+export function PayRequestDrawer({
+  request,
+  open,
+  onOpenChange,
+  onOpenChangeComplete,
+  ...props
+}: PayRequestDrawerProps) {
   const queryClient = useQueryClient()
   const formatCurrency = useFormatCurrency()
   const amount = formatCurrency(request.amount, request.currency)
@@ -83,7 +89,19 @@ export function PayRequestDrawer({ request, open, onOpenChange, ...props }: PayR
   }
 
   return (
-    <Drawer position="right" open={open} onOpenChange={handleOpenChange} {...props}>
+    <Drawer
+      position="right"
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the form busy while the drawer slides out.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <DrawerPopup variant="inset">
         <DrawerHeader>
           <DrawerTitle>{m.common_action_record_payment()}</DrawerTitle>
@@ -134,6 +152,9 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
     }
   }, [defaultCategoryId, form])
 
+  // Still busy after a payment, until the drawer has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
     <>
       <DrawerPanel>
@@ -165,7 +186,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                   onValueChange={(value) => {
                     field.onChange(value ?? '')
                   }}
-                  disabled={mutation.isPending || !categories}
+                  disabled={isBusy || !categories}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue
@@ -207,7 +228,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                       <Button
                         variant="outline"
                         aria-invalid={fieldState.invalid}
-                        disabled={mutation.isPending}
+                        disabled={isBusy}
                         className="w-full justify-between pr-2"
                       >
                         <span id={`${dateTriggerId}-value`} className="truncate font-normal">
@@ -256,7 +277,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                   onValueChange={(value) => {
                     field.onChange(value)
                   }}
-                  disabled={mutation.isPending}
+                  disabled={isBusy}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -288,7 +309,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                   <FieldLabel>
                     {m.requests_transfer_reference_label()} <span className="text-destructive">*</span>
                   </FieldLabel>
-                  <Input {...field} autoComplete="off" disabled={mutation.isPending} />
+                  <Input {...field} autoComplete="off" disabled={isBusy} />
                   <FieldDescription>{m.requests_transfer_reference_description()}</FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
@@ -307,7 +328,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel>{m.common_field_notes()}</FieldLabel>
-                <Textarea {...field} rows={3} className="max-h-40" disabled={mutation.isPending} />
+                <Textarea {...field} rows={3} className="max-h-40" disabled={isBusy} />
                 <FieldDescription>{m.requests_pay_notes_description()}</FieldDescription>
                 <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
               </Field>
@@ -325,10 +346,10 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
       </DrawerPanel>
 
       <DrawerFooter>
-        <DrawerClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+        <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.common_action_cancel()}
         </DrawerClose>
-        <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+        <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
           {m.common_action_record_payment()}
         </Button>
       </DrawerFooter>

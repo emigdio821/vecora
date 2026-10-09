@@ -27,6 +27,7 @@ export function DeleteRequestAlertDialog({
   request,
   open,
   onOpenChange,
+  onOpenChangeComplete,
   ...props
 }: DeleteRequestAlertDialogProps) {
   const queryClient = useQueryClient()
@@ -55,8 +56,22 @@ export function DeleteRequestAlertDialog({
     onOpenChange(nextOpen)
   }
 
+  // Still busy after a delete, until the dialog has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
+    <AlertDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the buttons busy while the dialog closes.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <AlertDialogPopup>
         <AlertDialogHeader>
           <AlertDialogTitle>{m.requests_delete_title()}</AlertDialogTitle>
@@ -67,12 +82,12 @@ export function DeleteRequestAlertDialog({
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
             variant="destructive"
-            loading={mutation.isPending}
+            loading={isBusy}
             onClick={() => {
               mutation.mutate()
             }}

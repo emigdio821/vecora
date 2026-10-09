@@ -27,6 +27,7 @@ export function ReopenRequestAlertDialog({
   request,
   open,
   onOpenChange,
+  onOpenChangeComplete,
   ...props
 }: ReopenRequestAlertDialogProps) {
   const queryClient = useQueryClient()
@@ -55,8 +56,22 @@ export function ReopenRequestAlertDialog({
     onOpenChange(nextOpen)
   }
 
+  // Still busy after a reopen, until the dialog has closed and reset the mutation.
+  const isBusy = mutation.isPending || mutation.isSuccess
+
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange} {...props}>
+    <AlertDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      onOpenChangeComplete={(isOpen) => {
+        // Clears `success`, which keeps the buttons busy while the dialog closes.
+        if (!isOpen) {
+          mutation.reset()
+        }
+        onOpenChangeComplete?.(isOpen)
+      }}
+      {...props}
+    >
       <AlertDialogPopup>
         <AlertDialogHeader>
           <AlertDialogTitle>{m.requests_reopen_title()}</AlertDialogTitle>
@@ -67,11 +82,11 @@ export function ReopenRequestAlertDialog({
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
+          <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </AlertDialogClose>
           <Button
-            loading={mutation.isPending}
+            loading={isBusy}
             onClick={() => {
               mutation.mutate()
             }}
