@@ -23,9 +23,11 @@ function fromDataUrl(url: string): ArrayBuffer {
 const interRegular = fromDataUrl(interRegularUrl)
 const interSemiBold = fromDataUrl(interSemiBoldUrl)
 
-// The light theme's foreground (neutral-800) and muted foreground.
+// The light theme's foreground (neutral-800), muted foreground and primary
+// (emerald-700, the brand color).
 const FOREGROUND = '#262626'
 const MUTED = '#686868'
+const PRIMARY = '#007a55'
 
 const WIDTH = 1200
 const HEIGHT = 630
@@ -80,11 +82,11 @@ async function GET(request: Request) {
           {description}
         </span>
       )}
-      {/* Like the login header: the logo takes the text color. */}
+      {/* Like the login header: the logo in the brand color. */}
       <VecoraIcon
         width={88}
         height={80}
-        style={{ position: 'absolute', right: 80, bottom: 72, color: FOREGROUND }}
+        style={{ position: 'absolute', right: 80, bottom: 72, color: PRIMARY }}
       />
     </div>,
     {

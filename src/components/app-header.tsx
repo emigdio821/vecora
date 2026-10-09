@@ -16,7 +16,8 @@ export function AppHeader() {
           className="px-2"
           render={
             <Link to="/">
-              <VecoraIcon className="size-4" />
+              {/* opacity-100: Button dims its icons, but the brand color stays full. */}
+              <VecoraIcon className="size-4 text-primary opacity-100" />
               <span className="text-base font-semibold">{m.common_app_name()}</span>
             </Link>
           }

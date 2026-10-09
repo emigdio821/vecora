@@ -1,7 +1,8 @@
 import interRegularUrl from '@fontsource/inter/files/inter-latin-400-normal.woff?inline'
 import interSemiBoldUrl from '@fontsource/inter/files/inter-latin-600-normal.woff?inline'
-import { Document, Font, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import { Document, Font, Image, Page, Path, StyleSheet, Svg, Text, View } from '@react-pdf/renderer'
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns'
+import { VECORA_MARK } from '@/components/shared/icons'
 import type { CurrencyTotals, FinancialReport } from '@/lib/supabase/financial-report'
 import {
   type CurrencyCode,
@@ -82,6 +83,10 @@ const styles = StyleSheet.create({
     fontSize: 7.5,
     color: COLOR.muted,
   },
+  // A signature, not a co-brand: the residential's logo leads the header.
+  footerSignature: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  footerMark: { width: 7.5 * (VECORA_MARK.width / VECORA_MARK.height), height: 7.5 },
+  footerAppName: { fontWeight: 600 },
   section: { marginBottom: 18 },
   sectionTitle: { fontSize: 11, fontWeight: 600, marginBottom: 6 },
   sectionHint: { fontSize: 8, color: COLOR.muted, marginBottom: 6 },
@@ -359,12 +364,19 @@ export function FinancialReportDocument({
         </Text>
 
         <View style={styles.footer} fixed>
-          <Text>
-            {m.reports_pdf_generated(
-              { date: formatGeneratedAt(generatedAt, language), name: generatedBy },
-              locale,
-            )}
-          </Text>
+          <View style={styles.footerSignature}>
+            <Text>
+              {m.reports_pdf_generated(
+                { date: formatGeneratedAt(generatedAt, language), name: generatedBy },
+                locale,
+              )}
+            </Text>
+            <Text>-</Text>
+            <Svg viewBox={VECORA_MARK.viewBox} style={styles.footerMark}>
+              <Path d={VECORA_MARK.path} fill={COLOR.muted} fillRule="evenodd" />
+            </Svg>
+            <Text style={styles.footerAppName}>{m.common_app_name({}, locale)}</Text>
+          </View>
           <Text
             render={({ pageNumber, totalPages }) =>
               m.reports_pdf_page({ page: pageNumber, total: totalPages }, locale)

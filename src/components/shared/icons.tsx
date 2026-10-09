@@ -1,16 +1,28 @@
 type IconProps = React.SVGProps<SVGSVGElement>
 
+/**
+ * The Vecora mark: the brand's favicon cut (a wider smile), meant for anything
+ * under 32 px, which every use here is; above that the two cuts are hard to
+ * tell apart. The viewBox is cropped to the ink (the tip's rounding lifts the
+ * bottom to y 58.06), so it fills its box. One evenodd path: the smile is a
+ * hole, not a second color. Shared with the PDF footer.
+ */
+export const VECORA_MARK = {
+  width: 56,
+  height: 51.06,
+  viewBox: '4 7 56 51.06',
+  path: 'M4 22A15 15 0 0 1 19 7H45A15 15 0 0 1 60 22V27.9A12 12 0 0 1 56.33 36.54L35.47 56.65A5 5 0 0 1 28.53 56.65L7.67 36.54A12 12 0 0 1 4 27.9Z M19 27.5C19 39.5 45 39.5 45 27.5H37.5C37.5 30.2 26.5 30.2 26.5 27.5Z',
+}
+
+/** The mark in the text color. */
 export const VecoraIcon = (props: IconProps) => (
-  <svg width="54.5" height="49.409" viewBox="0 0 54.5 49.409" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <g
-      strokeLinecap="round"
-      fillRule="evenodd"
-      fontSize="9pt"
-      strokeWidth="0.25mm"
-      fill="currentColor"
-      stroke="currentColor"
-    >
-      <path d="M 15.383 4.609 Q 15.383 11.309 12.983 19.809 Q 13.183 23.009 13.183 26.009 Q 13.183 29.009 13.583 31.209 Q 15.083 35.209 17.383 36.109 Q 19.383 36.109 21.783 32.659 Q 24.183 29.209 26.683 24.409 Q 25.483 19.809 25.483 15.709 Q 25.483 8.509 27.683 5.209 Q 30.383 1.009 35.883 1.009 Q 41.383 1.009 43.183 5.209 Q 43.883 6.809 43.883 8.809 Q 43.883 12.409 42.083 16.159 Q 40.283 19.909 36.283 26.009 Q 38.083 31.309 41.683 31.309 Q 46.083 31.209 49.283 28.209 Q 50.483 27.009 51.333 26.109 Q 52.183 25.209 53.083 25.209 Q 54.483 25.209 54.483 28.509 Q 54.483 34.709 50.933 37.559 Q 47.383 40.409 41.983 40.409 Q 34.883 40.409 30.683 34.209 Q 18.983 49.409 11.083 49.409 Q 7.983 49.409 4.983 40.609 Q 1.983 31.809 0.383 16.809 Q -0.817 7.309 1.783 3.209 Q 3.983 0.009 10.383 0.009 Q 12.783 0.009 14.083 1.459 Q 15.383 2.909 15.383 4.609 Z" />
-    </g>
+  <svg
+    width={VECORA_MARK.width}
+    height={VECORA_MARK.height}
+    viewBox={VECORA_MARK.viewBox}
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path fill="currentColor" fillRule="evenodd" d={VECORA_MARK.path} />
   </svg>
 )

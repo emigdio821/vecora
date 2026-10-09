@@ -62,6 +62,9 @@ async function GET(request: Request) {
 
   const residentialName = settings.residentialName || defaultResidentialLabel(settings.defaultLanguage)
   const logo = settings.logoPath ? await getLogo(settings.logoPath) : null
+  const generatedBy = user.isMainAdmin
+    ? m.common_role_admin({}, { locale: settings.defaultLanguage })
+    : user.fullName
   const pdf = await renderToBuffer(
     <FinancialReportDocument
       report={report}
@@ -69,7 +72,7 @@ async function GET(request: Request) {
       currency={settings.currency}
       language={settings.defaultLanguage}
       logo={logo}
-      generatedBy={user.fullName}
+      generatedBy={generatedBy}
       generatedAt={new Date()}
     />,
   )

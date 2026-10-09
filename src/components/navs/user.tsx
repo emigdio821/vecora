@@ -49,7 +49,9 @@ export function NavUser({ user }: NavUserProps) {
               >
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <Avatar>
-                    <AvatarFallback>{getAvatarFallback(user.fullName)}</AvatarFallback>
+                    <AvatarFallback className="bg-linear-to-br from-primary to-emerald-900 font-medium text-white">
+                      {getAvatarFallback(user.fullName)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid min-w-0 flex-1 gap-1 text-left leading-none">
                     <span className="truncate font-medium">{user.fullName}</span>

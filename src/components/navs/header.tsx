@@ -27,7 +27,7 @@ export function HeaderNav({ settings, ...props }: HeaderNavProps) {
       <SidebarMenu>
         <SidebarMenuItem>
           <div className="flex items-center gap-2 p-2">
-            <VecoraIcon className="size-5 text-sidebar-accent-foreground" />
+            <VecoraIcon className="size-5 text-primary" />
 
             <div className="grid flex-1 text-left text-sm leading-none">
               <span className="truncate text-base font-semibold text-sidebar-accent-foreground">
