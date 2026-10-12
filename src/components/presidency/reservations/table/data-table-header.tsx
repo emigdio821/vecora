@@ -15,7 +15,6 @@ import {
   MenuRadioItem,
   MenuTrigger,
 } from '@/components/ui/menu'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { m } from '@/paraglide/messages'
 import type { AmenityQueryData, ReservationQueryData } from '@/tanstack-queries/presidency'
 import { CreateReservationDrawer } from '../drawer/create-reservation'
@@ -61,28 +60,25 @@ export function ReservationsDataTableHeader({
           {/* With a single area there's nothing to narrow down. */}
           {amenities.length > 1 && (
             <Menu>
-              <Tooltip>
-                <TooltipTrigger
-                  closeOnClick={false}
-                  render={
-                    <MenuTrigger
-                      render={
-                        <Button size="icon" variant="outline" className="relative" aria-label={filterLabel}>
-                          <IconFilter2 className="size-4" />
-                          {/* The list is narrowed; don't let that go unnoticed. */}
-                          {activeAmenity && (
-                            <span
-                              aria-hidden
-                              className="absolute -top-1 -right-1 size-2.5 rounded-full border-2 border-background bg-primary"
-                            />
-                          )}
-                        </Button>
-                      }
-                    />
-                  }
-                />
-                <TooltipContent>{filterLabel}</TooltipContent>
-              </Tooltip>
+              <MenuTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    className="relative max-sm:w-9 max-sm:px-0"
+                    aria-label={filterLabel}
+                  >
+                    <IconFilter2 className="size-4" />
+                    <span className="max-sm:hidden">{m.common_filters()}</span>
+                    {/* The list is narrowed; don't let that go unnoticed. */}
+                    {activeAmenity && (
+                      <span
+                        aria-hidden
+                        className="absolute -top-1 -right-1 size-2.5 rounded-full border-2 border-background bg-primary"
+                      />
+                    )}
+                  </Button>
+                }
+              />
 
               <MenuPopup align="end">
                 <MenuGroup>

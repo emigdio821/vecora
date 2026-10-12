@@ -95,28 +95,25 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
           />
 
           <Menu>
-            <Tooltip>
-              <TooltipTrigger
-                closeOnClick={false}
-                render={
-                  <MenuTrigger
-                    render={
-                      <Button size="icon" variant="outline" className="relative" aria-label={filtersLabel}>
-                        <IconFilter2 className="size-4" />
-                        {/* The list is narrowed; don't let that go unnoticed. */}
-                        {isFiltered && (
-                          <span
-                            aria-hidden
-                            className="absolute -top-1 -right-1 size-2.5 rounded-full border-2 border-background bg-primary"
-                          />
-                        )}
-                      </Button>
-                    }
-                  />
-                }
-              />
-              <TooltipContent>{filtersLabel}</TooltipContent>
-            </Tooltip>
+            <MenuTrigger
+              render={
+                <Button
+                  variant="outline"
+                  className="relative max-sm:w-9 max-sm:px-0"
+                  aria-label={filtersLabel}
+                >
+                  <IconFilter2 className="size-4" />
+                  <span className="max-sm:hidden">{m.common_filters()}</span>
+                  {/* The list is narrowed; don't let that go unnoticed. */}
+                  {isFiltered && (
+                    <span
+                      aria-hidden
+                      className="absolute -top-1 -right-1 size-2.5 rounded-full border-2 border-background bg-primary"
+                    />
+                  )}
+                </Button>
+              }
+            />
 
             <MenuPopup align="end">
               <MenuGroup>
