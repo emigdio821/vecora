@@ -1,5 +1,6 @@
 import { IconCalendarOff, IconCoins } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -89,9 +90,13 @@ export function FeeStatusCard() {
                   <li key={house.property_id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
                     <div className="flex min-w-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
                       <span className="max-w-full truncate">
-                        <span className="font-medium">
+                        <Link
+                          to="/residential"
+                          search={{ 'search-houses': house.number ?? '' }}
+                          className="font-medium hover:underline"
+                        >
                           {m.common_house_label({ number: house.number ?? '' })}
-                        </span>
+                        </Link>
                         {owners && <span className="text-muted-foreground"> - {owners}</span>}
                       </span>
                       <Badge variant="warning" className="shrink-0">

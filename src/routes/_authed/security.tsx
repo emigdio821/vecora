@@ -1,9 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { z } from 'zod'
 import { RequestsDataTable } from '@/components/security/table/data-table'
 import { pageTitle } from '@/lib/metadata'
 import { m } from '@/paraglide/messages'
 
 export const Route = createFileRoute('/_authed/security')({
+  // Only types the links into a search; the table's search box reads it through nuqs.
+  validateSearch: z.object({
+    'search-requests': z.string().optional().catch(undefined),
+  }),
   head: () => ({ meta: [{ title: pageTitle(m.common_section_security()) }] }),
   component: SecurityPage,
 })

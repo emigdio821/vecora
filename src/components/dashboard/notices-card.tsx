@@ -1,5 +1,6 @@
 import { IconCalendarMonth, IconConfetti } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { format, parseISO } from 'date-fns'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import {
@@ -56,12 +57,21 @@ export function NoticesCard() {
             <ul className="flex max-h-56 flex-col divide-y overflow-y-auto">
               {upcoming.map((reservation) => (
                 <li key={reservation.id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
-                  <span className="truncate font-medium">
+                  {/* The search only matches the house; the area filter narrows it to the amenity. */}
+                  <Link
+                    to="/presidency"
+                    search={{
+                      tab: 'reservations',
+                      'search-reservations': m.common_house_label({ number: reservation.property.number }),
+                      area: reservation.amenity.id,
+                    }}
+                    className="max-w-full justify-self-start truncate font-medium hover:underline"
+                  >
                     {format(parseISO(reservation.reserved_on), m.dashboard_notices_date_pattern(), {
                       locale: dateLocale(),
                     })}
                     {reservation.reserved_on === today && ` - ${m.common_today()}`}
-                  </span>
+                  </Link>
                   <span className="truncate text-xs text-muted-foreground">
                     {reservation.amenity.name} -{' '}
                     {m.common_house_label({ number: reservation.property.number })}

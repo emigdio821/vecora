@@ -56,7 +56,7 @@ export function PaymentRequestsCard() {
       .filter((r) => r.status === 'pending')
       .map((r) => ({
         key: `maintenance-${r.id}`,
-        link: linkOptions({ to: '/maintenance' }),
+        link: linkOptions({ to: '/maintenance', search: { 'search-requests': r.title } }),
         section: m.common_section_maintenance(),
         title: r.title,
         amount: r.amount,
@@ -67,7 +67,7 @@ export function PaymentRequestsCard() {
       .filter((r) => r.status === 'pending')
       .map((r) => ({
         key: `security-${r.id}`,
-        link: linkOptions({ to: '/security' }),
+        link: linkOptions({ to: '/security', search: { 'search-requests': r.title } }),
         section: `${m.common_section_security()} - ${SECURITY_KIND_LABEL[r.kind]}`,
         title: r.title,
         amount: r.amount,
@@ -78,7 +78,15 @@ export function PaymentRequestsCard() {
       .filter((r) => reservationStatus(r) === 'pending')
       .map((r) => ({
         key: `reservation-${r.id}`,
-        link: linkOptions({ to: '/presidency', search: { tab: 'reservations' } }),
+        // The reservations search only matches the house, so the area filter narrows it to the amenity.
+        link: linkOptions({
+          to: '/presidency',
+          search: {
+            tab: 'reservations',
+            'search-reservations': m.common_house_label({ number: r.property.number }),
+            area: r.amenity.id,
+          },
+        }),
         section: m.common_section_reservations(),
         title: m.dashboard_requests_reservation_fee({ amenity: r.amenity.name, number: r.property.number }),
         amount: Number(r.amount),
