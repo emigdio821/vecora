@@ -29,7 +29,7 @@ export const periodsTableColumns = columnHelper.columns([
     size: 180,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.presidency_period()} />,
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
+      <div className="flex w-0 min-w-full items-center gap-2">
         <span className="truncate">{row.original.name}</span>
         {isCurrentPeriod(row.original) && <Badge variant="info">{m.presidency_period_current()}</Badge>}
       </div>

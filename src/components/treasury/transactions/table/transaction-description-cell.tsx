@@ -11,7 +11,7 @@ export function TransactionDescriptionCell({ transaction }: TransactionDescripti
   const [isDetailsOpen, setDetailsOpen] = useState(false)
 
   return (
-    <>
+    <div className="w-0 min-w-full">
       <TransactionDetailsDrawer
         transaction={transaction}
         open={isDetailsOpen}
@@ -27,6 +27,6 @@ export function TransactionDescriptionCell({ transaction }: TransactionDescripti
       >
         <span className="truncate">{transaction.description}</span>
       </Button>
-    </>
+    </div>
   )
 }

@@ -19,7 +19,7 @@ export const categoriesTableColumns = columnHelper.columns([
     cell: ({ row }) => {
       const { name, key } = row.original
       return (
-        <div className="grid gap-0.5">
+        <div className="grid w-0 min-w-full gap-0.5">
           <span className="truncate">{name}</span>
           {key !== null && (
             <span className="text-xs text-muted-foreground">

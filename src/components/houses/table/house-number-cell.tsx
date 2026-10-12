@@ -11,7 +11,7 @@ export function HouseNumberCell({ house }: HouseNumberCellProps) {
   const [isDetailsOpen, setDetailsOpen] = useState(false)
 
   return (
-    <>
+    <div className="w-0 min-w-full">
       <HouseDetailsDrawer house={house} open={isDetailsOpen} onOpenChange={setDetailsOpen} />
 
       <Button
@@ -23,6 +23,6 @@ export function HouseNumberCell({ house }: HouseNumberCellProps) {
       >
         <span className="truncate">{house.number}</span>
       </Button>
-    </>
+    </div>
   )
 }

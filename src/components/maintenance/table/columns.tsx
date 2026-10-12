@@ -53,7 +53,7 @@ export function requestsTableColumns(viewer: MaintenanceViewer) {
       id: 'requester',
       size: 180,
       header: ({ column }) => <DataTableSortableHeader column={column} title={m.requests_requester()} />,
-      cell: ({ getValue }) => <span className="truncate">{getValue()}</span>,
+      cell: ({ getValue }) => <span className="block w-0 min-w-full truncate">{getValue()}</span>,
     }),
 
     columnHelper.accessor((row) => Number(row.amount), {

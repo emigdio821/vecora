@@ -11,7 +11,7 @@ export function RequestTitleCell({ request }: RequestTitleCellProps) {
   const [isDetailsOpen, setDetailsOpen] = useState(false)
 
   return (
-    <>
+    <div className="w-0 min-w-full">
       <RequestDetailsDrawer request={request} open={isDetailsOpen} onOpenChange={setDetailsOpen} />
 
       <Button
@@ -23,6 +23,6 @@ export function RequestTitleCell({ request }: RequestTitleCellProps) {
       >
         <span className="truncate">{request.title}</span>
       </Button>
-    </>
+    </div>
   )
 }

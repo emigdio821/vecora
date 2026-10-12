@@ -96,7 +96,7 @@ export const residentsTableColumns = columnHelper.columns([
       const email = getValue()
       if (!email) return null
 
-      return <span className="truncate">{email}</span>
+      return <span className="block w-0 min-w-full truncate">{email}</span>
     },
   }),
 

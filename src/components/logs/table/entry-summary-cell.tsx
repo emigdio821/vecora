@@ -21,7 +21,7 @@ export function EntrySummaryCell({ entry, table }: EntrySummaryCellProps) {
     .filter((other) => other.txid === entry.txid && other.id !== entry.id)
 
   return (
-    <>
+    <div className="w-0 min-w-full">
       <EntryDetailsDrawer
         entry={entry}
         related={related}
@@ -38,6 +38,6 @@ export function EntrySummaryCell({ entry, table }: EntrySummaryCellProps) {
       >
         <span className="truncate">{entrySummary(entry)}</span>
       </Button>
-    </>
+    </div>
   )
 }

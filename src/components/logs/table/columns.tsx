@@ -29,7 +29,7 @@ export const logsTableColumns = columnHelper.columns([
     id: 'identity',
     size: 160,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.logs_who()} />,
-    cell: ({ getValue }) => <span className="truncate">{getValue()}</span>,
+    cell: ({ getValue }) => <span className="block w-0 min-w-full truncate">{getValue()}</span>,
   }),
 
   columnHelper.accessor((row) => entryAction(row), {

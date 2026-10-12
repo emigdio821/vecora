@@ -12,7 +12,7 @@ export function ResidentNameCell({ resident }: ResidentNameCellProps) {
   const fullName = `${resident.first_name} ${resident.last_name}`
 
   return (
-    <>
+    <div className="w-0 min-w-full">
       <ResidentDetailsDrawer resident={resident} open={isDetailsOpen} onOpenChange={setDetailsOpen} />
 
       <Button
@@ -24,6 +24,6 @@ export function ResidentNameCell({ resident }: ResidentNameCellProps) {
       >
         <span className="truncate">{fullName}</span>
       </Button>
-    </>
+    </div>
   )
 }

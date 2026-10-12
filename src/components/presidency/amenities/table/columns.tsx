@@ -15,7 +15,7 @@ export const amenitiesTableColumns = columnHelper.columns([
     id: 'name',
     size: 320,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_name()} />,
-    cell: ({ getValue }) => <span className="truncate">{getValue()}</span>,
+    cell: ({ getValue }) => <span className="block w-0 min-w-full truncate">{getValue()}</span>,
     filterFn: (row, _columnId, value: string) => {
       const filterValue = normalizeString(value)
       if (!filterValue) return true

@@ -27,7 +27,7 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
       size: 220,
       header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_name()} />,
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
+        <div className="flex w-0 min-w-full items-center gap-2">
           <span className="truncate">{row.original.full_name}</span>
           {row.original.id === viewer.id && <Badge variant="info">{m.board_you()}</Badge>}
         </div>
@@ -77,7 +77,9 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
       id: 'email',
       size: 220,
       header: m.common_field_email(),
-      cell: ({ row }) => <span className="truncate">{row.original.resident?.email}</span>,
+      cell: ({ row }) => (
+        <span className="block w-0 min-w-full truncate">{row.original.resident?.email}</span>
+      ),
     }),
 
     columnHelper.display({
