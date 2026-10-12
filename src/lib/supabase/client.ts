@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
+import { env } from '@/lib/config/env'
 import type { Database } from './database.types'
 
 /**
@@ -6,5 +7,5 @@ import type { Database } from './database.types'
  * Safe to call on every render; the library caches the instance in the browser.
  */
 export function createClient() {
-  return createBrowserClient<Database>(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY)
+  return createBrowserClient<Database>(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_KEY)
 }

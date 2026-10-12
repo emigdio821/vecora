@@ -1,5 +1,7 @@
 import '@tanstack/react-start/server-only'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { env } from '@/lib/config/env'
+import { serverEnv } from '@/lib/config/env.server'
 import type { Database } from './database.types'
 
 /**
@@ -8,12 +10,7 @@ import type { Database } from './database.types'
  * permission check and table write through the caller's regular client.
  */
 export function createAdminClient() {
-  const secretKey = process.env.SUPABASE_SECRET_KEY
-  if (!secretKey) {
-    throw new Error('SUPABASE_SECRET_KEY is not set')
-  }
-
-  return createSupabaseClient<Database>(process.env.VITE_SUPABASE_URL!, secretKey, {
+  return createSupabaseClient<Database>(env.VITE_SUPABASE_URL, serverEnv.SUPABASE_SECRET_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   })
 }

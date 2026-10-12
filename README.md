@@ -31,11 +31,14 @@ You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
    npx supabase status
    ```
 
-   | Variable              | Value from `supabase status`              |
-   | --------------------- | ----------------------------------------- |
-   | `VITE_SUPABASE_URL`   | `API_URL` (`http://127.0.0.1:54321`)      |
-   | `VITE_SUPABASE_KEY`   | `PUBLISHABLE_KEY`                         |
-   | `SUPABASE_SECRET_KEY` | `SECRET_KEY` (server-only, never `VITE_`) |
+   | Variable              | Value                                                            |
+   | --------------------- | ---------------------------------------------------------------- |
+   | `VITE_SUPABASE_URL`   | `API_URL` from `supabase status` (`http://127.0.0.1:54321`)      |
+   | `VITE_SUPABASE_KEY`   | `PUBLISHABLE_KEY` from `supabase status`                         |
+   | `VITE_SITE_URL`       | `http://localhost:3000`                                          |
+   | `SUPABASE_SECRET_KEY` | `SECRET_KEY` from `supabase status` (server-only, never `VITE_`) |
+
+   The app checks them on start and stops with the name of any that's missing or invalid.
 
 4. **Load the schema and test data**. Applies every migration and both seeds; it also wipes any local data, so run it whenever you want a clean slate.
 
@@ -127,6 +130,7 @@ The app runs on Vercel against a hosted Supabase project.
    | --------------------- | ------------------------------------------------------- |
    | `VITE_SUPABASE_URL`   | `https://<project-ref>.supabase.co`                     |
    | `VITE_SUPABASE_KEY`   | A publishable key                                       |
+   | `VITE_SITE_URL`       | The app's URL, e.g. `https://vecora.vercel.app`         |
    | `SUPABASE_SECRET_KEY` | A secret key (server-only, needed to add board members) |
 
    The `VITE_` values are bundled into the browser code at build time, so redeploy after changing them.

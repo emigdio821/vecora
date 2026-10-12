@@ -1,10 +1,12 @@
+import { env } from './env'
+
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
   name: 'Vecora',
   description: 'An open-source and simple residential manager.',
-  url: 'https://vecora.vercel.app/',
-  ogUrl: 'https://vecora.vercel.app/api/og',
+  url: env.VITE_SITE_URL,
+  ogUrl: new URL('/api/og', env.VITE_SITE_URL).href,
   autors: [
     {
       name: 'María Rodríguez',

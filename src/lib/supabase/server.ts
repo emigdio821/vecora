@@ -1,6 +1,7 @@
 import '@tanstack/react-start/server-only'
 import { createServerClient } from '@supabase/ssr'
 import { getCookies, setCookie, setResponseHeaders } from '@tanstack/react-start/server'
+import { env } from '@/lib/config/env'
 import type { Database } from './database.types'
 
 /**
@@ -11,7 +12,7 @@ import type { Database } from './database.types'
  * cookies on the response, so there's no separate refresh middleware.
  */
 export async function createClient() {
-  return createServerClient<Database>(process.env.VITE_SUPABASE_URL!, process.env.VITE_SUPABASE_KEY!, {
+  return createServerClient<Database>(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_KEY, {
     cookies: {
       getAll() {
         return Object.entries(getCookies()).map(([name, value]) => ({ name, value }))
