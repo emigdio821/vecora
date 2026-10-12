@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 import type { CurrentUser } from '@/lib/supabase/current-user'
 import { getAvatarFallback } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
@@ -10,7 +11,7 @@ import { Badge } from '../ui/badge'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuSeparator, MenuTrigger } from '../ui/menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '../ui/sidebar'
 import { toastManager } from '../ui/toast'
-import { useWelcomeParam } from '../welcome-dialog'
+import { WelcomeDialog } from '../welcome-dialog'
 
 interface NavUserProps {
   user: CurrentUser
@@ -20,7 +21,7 @@ export function NavUser({ user }: NavUserProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { setOpenMobile } = useSidebar()
-  const [, setWelcome] = useWelcomeParam()
+  const [isWelcomeOpen, setWelcomeOpen] = useState(false)
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -81,9 +82,7 @@ export function NavUser({ user }: NavUserProps) {
 
             <MenuItem
               onClick={() => {
-                // On mobile the sidebar is a sheet that would sit over the dialog.
-                setOpenMobile(false)
-                void setWelcome(true)
+                setWelcomeOpen(true)
               }}
             >
               {m.common_view_intro()}
@@ -99,6 +98,18 @@ export function NavUser({ user }: NavUserProps) {
             </MenuItem>
           </MenuPopup>
         </Menu>
+
+        {/* Inside the sidebar, so on mobile it stacks on the sidebar's drawer. */}
+        <WelcomeDialog
+          open={isWelcomeOpen}
+          onClose={() => {
+            setWelcomeOpen(false)
+          }}
+          onLeave={() => {
+            setWelcomeOpen(false)
+            setOpenMobile(false)
+          }}
+        />
       </SidebarMenuItem>
     </SidebarMenu>
   )

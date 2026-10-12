@@ -5,7 +5,7 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { CurrentUserProvider } from '@/components/current-user-provider'
 import { SetupDialog } from '@/components/setup-dialog'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { WelcomeDialog } from '@/components/welcome-dialog'
+import { FirstVisitWelcomeDialog } from '@/components/welcome-dialog'
 import { settingsQueryOptions } from '@/tanstack-queries/session'
 
 export const Route = createFileRoute('/_authed')({
@@ -43,7 +43,11 @@ function AuthedLayout() {
         </SidebarInset>
       </SidebarProvider>
       {/* The main admin sets up the HOA first; the welcome comes after. */}
-      {user.isMainAdmin && !settings.isConfigured ? <SetupDialog settings={settings} /> : <WelcomeDialog />}
+      {user.isMainAdmin && !settings.isConfigured ? (
+        <SetupDialog settings={settings} />
+      ) : (
+        <FirstVisitWelcomeDialog />
+      )}
     </CurrentUserProvider>
   )
 }

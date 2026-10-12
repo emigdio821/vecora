@@ -32,6 +32,7 @@ interface ResponsiveDialogProps {
   open: boolean
   onOpenChange: (open: boolean, eventDetails: { cancel: () => void }) => void
   onOpenChangeComplete?: (open: boolean) => void
+  disablePointerDismissal?: boolean
   children: React.ReactNode
 }
 

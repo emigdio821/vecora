@@ -16,29 +16,23 @@ import {
 } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { useCurrentUser } from '@/components/current-user-provider'
+import {
+  ResponsiveDialog,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogPanel,
+  ResponsiveDialogPopup,
+  ResponsiveDialogTitle,
+} from '@/components/shared/responsive-dialog'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogPanel,
-  DialogPopup,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import type { AppRole } from '@/lib/supabase/current-user'
 import { m } from '@/paraglide/messages'
 import { markWelcomed } from '@/server-actions/profile'
 import { USER_QUERY_KEY } from '@/tanstack-queries/session'
-
-/** `?welcome=true` reopens the dialog; the user menu sets it. */
-export function useWelcomeParam() {
-  return useQueryState('welcome', parseAsBoolean.withDefault(false))
-}
 
 interface Ability {
   icon: TablerIcon
@@ -131,15 +125,11 @@ const ABILITIES: Ability[] = [
   },
 ]
 
-/**
- * A few pages about the app and what the user's roles let them do. Opens by
- * itself until it's closed once, then only from the user menu.
- */
-export function WelcomeDialog() {
+/** Opens by itself until it's closed once; after that, the user menu opens its own. */
+export function FirstVisitWelcomeDialog() {
   const user = useCurrentUser()
   const queryClient = useQueryClient()
-  const [isRequested, setRequested] = useWelcomeParam()
-  const [isFirstVisit, setFirstVisit] = useState(!user.welcomed)
+  const [isOpen, setOpen] = useState(!user.welcomed)
 
   // Nothing to tell the user if it fails: the dialog just shows up once more.
   const mutation = useMutation({
@@ -150,32 +140,37 @@ export function WelcomeDialog() {
     },
   })
 
-  function markSeen() {
-    if (isFirstVisit) {
-      setFirstVisit(false)
-      mutation.mutate()
-    }
-  }
-
   function close() {
-    markSeen()
-    void setRequested(null)
+    setOpen(false)
+    mutation.mutate()
   }
 
+  return <WelcomeDialog open={isOpen} onClose={close} onLeave={close} />
+}
+
+interface WelcomeDialogProps {
+  open: boolean
+  onClose: () => void
+  /** A link inside was followed. */
+  onLeave: () => void
+}
+
+/** A few pages about the app and what the user's roles let them do. */
+export function WelcomeDialog({ open, onClose, onLeave }: WelcomeDialogProps) {
   return (
-    <Dialog
-      open={isFirstVisit || isRequested}
-      onOpenChange={(open) => {
-        if (!open) close()
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose()
       }}
-      // A stray click outside shouldn't skip it; the X and Escape still close it.
+      // A stray click outside shouldn't skip it; the X, Escape and a swipe down still close it.
       disablePointerDismissal
     >
-      <DialogPopup>
+      <ResponsiveDialogPopup>
         {/* Mounted only while open, so it always starts from the first page. */}
-        <WelcomeSteps onDone={close} onLeave={markSeen} />
-      </DialogPopup>
-    </Dialog>
+        <WelcomeSteps onDone={onClose} onLeave={onLeave} />
+      </ResponsiveDialogPopup>
+    </ResponsiveDialog>
   )
 }
 
@@ -185,7 +180,6 @@ interface Step {
   content: React.ReactNode
 }
 
-/** `onLeave`: a link inside was followed; the new URL already drops `?welcome`. */
 function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => void }) {
   const user = useCurrentUser()
   const [index, setIndex] = useState(0)
@@ -280,14 +274,14 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
 
   return (
     <>
-      <DialogHeader>
-        <DialogTitle>{step.title}</DialogTitle>
-        <DialogDescription>{step.description}</DialogDescription>
-      </DialogHeader>
+      <ResponsiveDialogHeader>
+        <ResponsiveDialogTitle>{step.title}</ResponsiveDialogTitle>
+        <ResponsiveDialogDescription>{step.description}</ResponsiveDialogDescription>
+      </ResponsiveDialogHeader>
 
-      <DialogPanel>{step.content}</DialogPanel>
+      <ResponsiveDialogPanel>{step.content}</ResponsiveDialogPanel>
 
-      <DialogFooter>
+      <ResponsiveDialogFooter>
         <span className="self-center text-sm text-muted-foreground sm:me-auto">
           {m.settings_welcome_step_count({ current: index + 1, total: steps.length })}
         </span>
@@ -312,7 +306,7 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
             {m.common_action_next()}
           </Button>
         )}
-      </DialogFooter>
+      </ResponsiveDialogFooter>
     </>
   )
 }
