@@ -24,7 +24,7 @@ import {
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { siteConfig } from '@/lib/config/site'
-import { pageTitle } from '@/lib/metadata'
+import { OG_IMAGE_SIZE, pageTitle } from '@/lib/metadata'
 import { intlLocale } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import { getLocale } from '@/paraglide/runtime'
@@ -48,12 +48,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       ...siteConfig.autors.map((author) => ({ name: 'author', content: author.name })),
       { name: 'theme-color', media: '(prefers-color-scheme: light)', content: '#fff' },
       { name: 'theme-color', media: '(prefers-color-scheme: dark)', content: '#000' },
+      // No og:url: one shared value would name the home page as every page's canonical
+      // address, and without it crawlers use the URL they fetched.
+      { property: 'og:title', content: pageTitle() },
       { property: 'og:description', content: siteConfig.description },
-      { property: 'og:url', content: siteConfig.url },
       { property: 'og:site_name', content: siteConfig.name },
       { property: 'og:locale', content: intlLocale().replace('-', '_') },
       { property: 'og:type', content: 'website' },
       { property: 'og:image', content: siteConfig.ogUrl },
+      // Every page's image is the same size and type, so these stand for the route's own og:image too.
+      { property: 'og:image:type', content: 'image/png' },
+      { property: 'og:image:width', content: String(OG_IMAGE_SIZE.width) },
+      { property: 'og:image:height', content: String(OG_IMAGE_SIZE.height) },
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: siteConfig.name },
       { name: 'twitter:description', content: siteConfig.description },

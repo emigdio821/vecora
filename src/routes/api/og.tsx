@@ -5,6 +5,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import satori from 'satori'
 import { VecoraIcon } from '@/components/shared/icons'
 import { siteConfig } from '@/lib/config/site'
+import { OG_IMAGE_SIZE } from '@/lib/metadata'
 
 // Link previews: /api/og?title=…&description=… (both optional). Build the URL
 // with ogImageUrl() in lib/metadata.ts.
@@ -29,8 +30,7 @@ const FOREGROUND = '#262626'
 const MUTED = '#686868'
 const PRIMARY = '#007a55'
 
-const WIDTH = 1200
-const HEIGHT = 630
+const { width: WIDTH, height: HEIGHT } = OG_IMAGE_SIZE
 
 // satori lays the JSX out as SVG and resvg rasterizes it: what @vercel/og's
 // ImageResponse does, minus its Node build that breaks outside webpack.

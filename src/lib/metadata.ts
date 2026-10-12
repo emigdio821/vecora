@@ -5,6 +5,9 @@ interface PageText {
   description?: string
 }
 
+/** /api/og renders at this size; declaring it lets WhatsApp show the large card without guessing. */
+export const OG_IMAGE_SIZE = { width: 1200, height: 630 }
+
 /** The /api/og image for a page. No title shows the app name; no description, none. */
 export function ogImageUrl({ title, description }: PageText = {}) {
   const params = new URLSearchParams()
@@ -36,6 +39,9 @@ export function pageHead({ title, description }: PageText) {
   return {
     meta: [
       { title: pageTitle(title) },
+      // Previews read these before <title>; without them WhatsApp shows the root's "Vecora".
+      { property: 'og:title', content: pageTitle(title) },
+      { name: 'twitter:title', content: pageTitle(title) },
       ...descriptionTags,
       { property: 'og:image', content: image },
       { name: 'twitter:image', content: image },
