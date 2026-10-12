@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { AppSettingsPanel } from '@/components/settings/dialog/app-settings'
-import { HoaSettingsPanel } from '@/components/settings/dialog/hoa-settings'
+import { type HoaSettingsSave, HoaSettingsPanel } from '@/components/settings/dialog/hoa-settings'
 import {
   ResponsiveDialog,
   ResponsiveDialogDescription,
@@ -13,9 +13,8 @@ import {
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { toastManager } from '@/components/ui/toast'
 import type { Settings } from '@/lib/supabase/settings'
-import type { SettingsInput } from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
-import { updateSettings } from '@/server-actions/settings'
+import { removeLogo, updateSettings, uploadLogo } from '@/server-actions/settings'
 import { SETTINGS_QUERY_KEY } from '@/tanstack-queries/settings'
 
 type SettingsTab = 'app' | 'hoa'
@@ -37,7 +36,18 @@ export function SettingsDialog({ settings, open, onOpenChange }: SettingsDialogP
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: async (values: SettingsInput) => {
+    mutationFn: async ({ values, logo }: HoaSettingsSave) => {
+      // The logo first: if it fails, nothing else has changed yet.
+      if (logo) {
+        const formData = new FormData()
+        formData.set('logo', logo.file)
+        const result = await uploadLogo(formData)
+        if (result.error !== undefined) throw new Error(result.error)
+      } else if (logo === null) {
+        const result = await removeLogo()
+        if (result.error !== undefined) throw new Error(result.error)
+      }
+
       const result = await updateSettings(values)
       if (result.error !== undefined) throw new Error(result.error)
     },

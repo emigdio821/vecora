@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconAlertCircle, IconAlertTriangle, IconPhoto, IconTrash, IconUpload } from '@tabler/icons-react'
-import { useMutation, type UseMutationResult, useQuery, useQueryClient } from '@tanstack/react-query'
+import { type UseMutationResult, useQuery } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { useCurrentUser } from '@/components/current-user-provider'
-import { RemoveLogoAlertDialog } from '@/components/settings/dialog/remove-logo'
 import {
   ResponsiveDialogClose,
   ResponsiveDialogFooter,
@@ -16,7 +15,6 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { toastManager } from '@/components/ui/toast'
 import { MULTI_LANGUAGE } from '@/lib/config/i18n'
 import type { Settings } from '@/lib/supabase/settings'
 import {
@@ -28,13 +26,24 @@ import {
   settingsSchema,
 } from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
-import { uploadLogo } from '@/server-actions/settings'
-import { logoUrlQueryOptions, SETTINGS_QUERY_KEY } from '@/tanstack-queries/settings'
+import { logoUrlQueryOptions } from '@/tanstack-queries/settings'
 
 const FORM_ID = 'hoa-settings-form'
 
+/** A logo picked but not saved yet; `preview` is the file as a data URL. */
+interface PendingLogo {
+  file: File
+  preview: string
+}
+
+/** `logo`: a new one to upload, `null` to remove the current one, or left out to keep it. */
+export interface HoaSettingsSave {
+  values: SettingsInput
+  logo?: PendingLogo | null
+}
+
 /** Owned by the dialog, which can't close while it's pending. */
-export type UpdateSettingsMutation = UseMutationResult<void, Error, SettingsInput>
+export type UpdateSettingsMutation = UseMutationResult<void, Error, HoaSettingsSave>
 
 interface HoaSettingsPanelProps {
   settings: Settings
@@ -62,21 +71,26 @@ export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) 
       : { residential_name: settings.residentialName },
   })
   const currency = useWatch({ control: form.control, name: 'currency' })
+  // Outside the form: zod would strip the file from its values.
+  const [logo, setLogo] = useState<PendingLogo | null>()
   // Still busy after a save, until the dialog has closed and reset the mutation.
   const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
     <>
       <ResponsiveDialogPanel className="flex flex-col gap-6">
-        <LogoField logoPath={settings.logoPath} />
+        <LogoField logoPath={settings.logoPath} logo={logo} onLogoChange={setLogo} disabled={isBusy} />
 
         <Form
           id={FORM_ID}
           className="flex flex-col gap-4"
           onSubmit={form.handleSubmit((values) =>
-            mutation.mutate(values, {
-              onError: (error) => form.setError('root', { message: error.message }),
-            }),
+            mutation.mutate(
+              { values, logo },
+              {
+                onError: (error) => form.setError('root', { message: error.message }),
+              },
+            ),
           )}
         >
           <Controller
@@ -206,44 +220,36 @@ export function HoaSettingsPanel({ settings, mutation }: HoaSettingsPanelProps) 
   )
 }
 
+interface LogoFieldProps {
+  logoPath: string | null
+  /** The change Save will apply; `undefined` while the saved logo stands. */
+  logo: PendingLogo | null | undefined
+  onLogoChange: (logo: PendingLogo | null | undefined) => void
+  disabled: boolean
+}
+
 /**
- * Saved as soon as it's picked, apart from Save. The server shrinks it,
- * so the size check here only spares uploading something it would refuse.
+ * Applied with Save, like the rest of the tab, so Cancel undoes a pick or a
+ * removal. The server shrinks it, so the size check here only spares
+ * uploading something it would refuse.
  */
-function LogoField({ logoPath }: { logoPath: string | null }) {
-  const queryClient = useQueryClient()
+function LogoField({ logoPath, logo, onLogoChange, disabled }: LogoFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const logoUrl = useQuery(logoUrlQueryOptions(logoPath))
-  const [isRemoveOpen, setRemoveOpen] = useState(false)
+  const [error, setError] = useState<string>()
 
-  const upload = useMutation({
-    mutationFn: async (file: File) => {
-      const parsed = logoFileSchema.safeParse(file)
-      if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? m.settings_logo_select_image())
-
-      const formData = new FormData()
-      formData.set('logo', parsed.data)
-      const result = await uploadLogo(formData)
-      if (result.error !== undefined) throw new Error(result.error)
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [SETTINGS_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: m.settings_logo_updated() })
-    },
-    onError: (error) => {
-      toastManager.add({ type: 'error', title: m.common_error(), description: error.message })
-    },
-  })
+  const previewUrl = logo === undefined ? logoUrl.data : logo?.preview
+  const hasLogo = logo === undefined ? !!logoPath : logo !== null
 
   return (
-    <Field>
+    <Field invalid={!!error}>
       <FieldLabel>{m.settings_logo()}</FieldLabel>
       <div className="flex items-center gap-4">
         {/* White like the report page, so the preview shows how it will print. */}
         <div className="flex size-20 shrink-0 items-center justify-center rounded-lg border bg-muted p-2">
-          {logoUrl.data ? (
+          {previewUrl ? (
             <img
-              src={logoUrl.data}
+              src={previewUrl}
               alt={m.settings_logo_alt()}
               width={64}
               height={64}
@@ -257,22 +263,23 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
           <Button
             type="button"
             variant="outline"
-            loading={upload.isPending}
-            disabled={upload.isPending}
+            disabled={disabled}
             onClick={() => {
               inputRef.current?.click()
             }}
           >
             <IconUpload />
-            {logoPath ? m.settings_logo_change() : m.settings_logo_upload()}
+            {hasLogo ? m.settings_logo_change() : m.settings_logo_upload()}
           </Button>
-          {logoPath && (
+          {hasLogo && (
             <Button
               type="button"
               variant="destructive-outline"
-              disabled={upload.isPending}
+              disabled={disabled}
               onClick={() => {
-                setRemoveOpen(true)
+                setError(undefined)
+                // Without a saved logo there's nothing to remove, only the pick to drop.
+                onLogoChange(logoPath ? null : undefined)
               }}
             >
               <IconTrash />
@@ -289,13 +296,28 @@ function LogoField({ logoPath }: { logoPath: string | null }) {
             const file = event.target.files?.[0]
             // Reset so picking the same file again still fires a change.
             event.target.value = ''
-            if (file) upload.mutate(file)
+            if (!file) return
+
+            const parsed = logoFileSchema.safeParse(file)
+            if (!parsed.success) {
+              setError(parsed.error.issues[0]?.message ?? m.settings_logo_select_image())
+              return
+            }
+
+            setError(undefined)
+            const reader = new FileReader()
+            reader.onload = () => {
+              // readAsDataURL always yields a string; the check narrows the type.
+              if (typeof reader.result === 'string') {
+                onLogoChange({ file: parsed.data, preview: reader.result })
+              }
+            }
+            reader.readAsDataURL(parsed.data)
           }}
         />
       </div>
       <FieldDescription>{m.settings_logo_hint()}</FieldDescription>
-
-      <RemoveLogoAlertDialog open={isRemoveOpen} onOpenChange={setRemoveOpen} />
+      <FieldError match={!!error}>{error}</FieldError>
     </Field>
   )
 }
