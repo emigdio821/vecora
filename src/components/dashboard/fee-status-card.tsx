@@ -33,18 +33,22 @@ function feeStatusDescription(upToDate: number, total: number): string {
   return m.dashboard_fees_some_up_to_date({ upToDate, total })
 }
 
+// On phones the badge goes below the house, so a row is 102px: two are 205px with the divider.
+const PANEL_CLASS = cn(CARD_LIST_PANEL_CLASS, 'h-51.25 sm:h-38.25')
+
 /** A row's lines: the house and its badge, then the months. */
 function FeeStatusSkeleton() {
   return (
     <CardListSkeleton
-      rows={4}
+      rows={2}
+      panelClassName={PANEL_CLASS}
       row={
         <>
           <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex h-5 w-1/2 items-center">
               <Skeleton className="h-3.5 w-full" />
             </div>
-            <Skeleton className="h-4.5 w-20 shrink-0" />
+            <Skeleton className="h-5.5 w-20 shrink-0 sm:h-4.5" />
           </div>
           <div className="flex h-4 items-center">
             <Skeleton className="h-3 w-3/4" />
@@ -89,7 +93,7 @@ export function FeeStatusCard() {
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel className={CARD_LIST_PANEL_CLASS}>
+        <CardPanel className={PANEL_CLASS}>
           {total === 0 ? (
             <Empty className={CARD_LIST_EMPTY_CLASS}>
               <EmptyHeader>

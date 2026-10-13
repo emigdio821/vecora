@@ -38,11 +38,15 @@ interface PaymentRequest {
   requested_on: string
 }
 
+// On phones the amount goes below the title, so a row is 100px: two are 201px with the divider.
+const PANEL_CLASS = cn(CARD_LIST_PANEL_CLASS, 'h-50.25 sm:h-38.25')
+
 /** A row's lines: title and section, and the amount (beside them, or below on phones). */
 function PaymentRequestsSkeleton() {
   return (
     <CardListSkeleton
-      rows={4}
+      rows={2}
+      panelClassName={PANEL_CLASS}
       row={
         <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div className="grid w-1/2 gap-1">
@@ -136,7 +140,7 @@ export function PaymentRequestsCard() {
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel className={CARD_LIST_PANEL_CLASS}>
+        <CardPanel className={PANEL_CLASS}>
           {pending.length ? (
             <ul className={CARD_LIST_CLASS}>
               {pending.map((request) => (

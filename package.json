@@ -13,6 +13,7 @@
     "typecheck": "npm run i18n && tsc --noEmit",
     "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
     "db:reset": "supabase db reset --local",
+    "db:reset:empty": "supabase db reset --local --no-seed && supabase db query --local -f supabase/seed.sql",
     "db:seed": "supabase db push --linked --include-seed",
     "prepare": "husky"
   },

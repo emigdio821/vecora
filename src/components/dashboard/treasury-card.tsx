@@ -64,7 +64,7 @@ interface FlowRow {
   amount: number
 }
 
-const CHART_HEIGHT = 240
+const CHART_HEIGHT = 200
 
 // Same green/red as the swatches in the totals; the tokens live in globals.css.
 const SERIES_COLORS = scaleOrdinal<Series, string>(
@@ -136,10 +136,18 @@ export function TreasuryCard() {
         <CardFrameHeader>
           <CardFrameTitle>{m.common_section_treasury()}</CardFrameTitle>
           <CardFrameDescription>{m.dashboard_treasury_summary()}</CardFrameDescription>
+          <CardFrameAction className="text-muted-foreground">
+            <IconChartArea />
+          </CardFrameAction>
         </CardFrameHeader>
         <Card>
-          <CardPanel>
-            <Empty>
+          {/* The skeleton's totals and chart, unseen, hold the space; the empty state sits
+              centered on them, so the card is as tall as the skeleton was. */}
+          <CardPanel className="grid">
+            <div aria-hidden className="invisible col-start-1 row-start-1">
+              <TreasuryCardSkeletonContent />
+            </div>
+            <Empty className="col-start-1 row-start-1 py-0 md:py-0">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <IconCalendarOff />
@@ -166,23 +174,31 @@ export function TreasuryCard() {
 function TreasuryCardSkeleton() {
   return (
     <CardFrameSkeleton className="w-full">
-      <CardPanel className="grid min-w-0 gap-6">
-        <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
-          {Array.from({ length: 3 }, (_, i) => (
-            <div key={i} className="flex items-center justify-between gap-2 sm:grid sm:gap-1">
-              {/* Boxes as tall as the real lines: text-sm label, text-base / sm:text-2xl value. */}
-              <div className="flex h-5 items-center">
-                <Skeleton className="h-3.5 w-16" />
-              </div>
-              <div className="flex h-6 items-center sm:h-8">
-                <Skeleton className="h-4 w-24 sm:h-6 sm:w-32" />
-              </div>
-            </div>
-          ))}
-        </div>
-        <Skeleton style={{ height: CHART_HEIGHT }} />
+      <CardPanel>
+        <TreasuryCardSkeletonContent />
       </CardPanel>
     </CardFrameSkeleton>
+  )
+}
+
+function TreasuryCardSkeletonContent() {
+  return (
+    <div className="grid min-w-0 gap-6">
+      <div className="grid gap-2 sm:grid-cols-3 sm:gap-4">
+        {Array.from({ length: 3 }, (_, i) => (
+          <div key={i} className="flex items-center justify-between gap-2 sm:grid sm:gap-1">
+            {/* Boxes as tall as the real lines: text-sm label, text-base / sm:text-xl value. */}
+            <div className="flex h-5 items-center">
+              <Skeleton className="h-3.5 w-16" />
+            </div>
+            <div className="flex h-6 items-center sm:h-7">
+              <Skeleton className="h-4 w-24 sm:h-5 sm:w-28" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <Skeleton style={{ height: CHART_HEIGHT }} />
+    </div>
   )
 }
 
@@ -275,7 +291,7 @@ function Total({
         {swatch && <span aria-hidden className={cn('h-0.5 w-3 rounded-full', swatch)} />}
         {label}
       </dt>
-      <dd className={cn('text-base font-semibold tabular-nums sm:text-2xl', className)}>
+      <dd className={cn('text-base font-semibold tabular-nums sm:text-xl', className)}>
         <Money value={value} currency={currency} />
       </dd>
     </div>

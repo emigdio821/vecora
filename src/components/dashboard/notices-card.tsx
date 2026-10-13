@@ -31,7 +31,7 @@ const MAX_NOTICES = 5
 function NoticesSkeleton() {
   return (
     <CardListSkeleton
-      rows={3}
+      rows={2}
       row={
         <>
           <div className="flex h-5 items-center">
