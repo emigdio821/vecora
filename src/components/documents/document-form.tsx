@@ -19,6 +19,7 @@ import {
   documentContentSchema,
   documentSchema,
   EMPTY_DOCUMENT_CONTENT,
+  hasContent,
 } from '@/lib/validations/documents'
 import { m } from '@/paraglide/messages'
 import { AiPromptDialog } from './dialog/ai-prompt'
@@ -51,6 +52,20 @@ function loadDraft(): DocumentInput | null {
 
 export function clearDraft() {
   localStorage.removeItem(DRAFT_KEY)
+}
+
+/** The form loads it when it mounts (a template, before remounting it). */
+export function saveDraft(document: DocumentInput) {
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(document))
+}
+
+/** Something written on this device that replacing the draft would lose. */
+export function hasWrittenDraft(): boolean {
+  const draft = loadDraft()
+  if (!draft) {
+    return false
+  }
+  return draft.title.trim() !== '' || hasContent(draft.content)
 }
 
 function blankDocument(today: Date): DocumentInput {

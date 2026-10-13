@@ -1,6 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "documents_page_description": "Write notices, circulars or any other document with the community's logo and name, and download it as a PDF.",
+  "documents_page_description": "Write notices, meeting minutes or any other document and download it as a PDF with the community's logo and name.",
   "documents_draft_hint": "What you write is saved on this device until you start a new document.",
 
   "documents_field_header_title": "Header",
@@ -59,6 +59,30 @@
   "documents_start_over_title": "Start a new document?",
   "documents_start_over_description": "Everything you wrote in this document will be erased. This can't be undone.",
 
+  "documents_templates": "Templates",
+  "documents_template_use": "Use template",
+  "documents_template_confirm_title": "Use the \"{name}\" template?",
+  "documents_template_notice_name": "Notice",
+  "documents_template_notice_description": "Maintenance work, service outages or any announcement.",
+  "documents_template_notice_header": "Notice",
+  "documents_template_notice_title": "Maintenance work in [area]",
+  "documents_template_notice_content": "Dear residents,\n\nPlease note that on **[day and date]**, from **[start time]** to **[end time]**, there will be maintenance work in **[area]**.\n\n## What you need to know\n\n- During that time [the area won't be available / the water will be shut off].\n- Please [move your vehicles / stay out of the area].\n- If you have any questions, contact the HOA board.\n\nThank you for your understanding.\n\nSincerely,\nThe HOA board",
+  "documents_template_meeting_call_name": "Meeting notice",
+  "documents_template_meeting_call_description": "Date, place and agenda of a residents' meeting.",
+  "documents_template_meeting_call_header": "Meeting notice",
+  "documents_template_meeting_call_title": "Notice of [regular / special] residents' meeting",
+  "documents_template_meeting_call_content": "Dear residents,\n\nThe HOA board invites you to the [regular / special] meeting, to be held:\n\n- **Date:** [day and date]\n- **Time:** [time] on first call and [time] on second call\n- **Place:** [place]\n\n## Agenda\n\n1. Attendance and quorum check.\n2. Board report.\n3. Treasury report.\n4. [Topic]\n5. Other business.\n\n> If you can't attend, you can name a representative with a signed proxy letter.\n\nYour participation matters for the decisions of our community.\n\nSincerely,\nThe HOA board",
+  "documents_template_minutes_name": "Meeting minutes",
+  "documents_template_minutes_description": "Attendance, what was discussed and what was agreed at a meeting.",
+  "documents_template_minutes_header": "Meeting minutes",
+  "documents_template_minutes_title": "Minutes of the [regular / special] residents' meeting",
+  "documents_template_minutes_content": "At [place], at [time] on [day and date], the residents met for the [regular / special] meeting, with [number] of [number] houses present.\n\n## Agenda\n\n1. Attendance and quorum check.\n2. [Topic]\n3. Other business.\n\n## Proceedings\n\n### 1. Attendance\n\n[Number] houses signed in, so there was a quorum to start the meeting.\n\n### 2. [Topic]\n\n[Summary of what was discussed.]\n\n### 3. Other business\n\n[Other topics that came up.]\n\n## Decisions\n\n1. **[Decision]:** approved with [number] votes in favor, [number] against and [number] abstentions.\n2. **[Decision]:** [result of the vote].\n\nWith no further business, the meeting was adjourned at [time].\n\nPresident: [name]\nSecretary: [name]",
+  "documents_template_fee_reminder_name": "Payment reminder",
+  "documents_template_fee_reminder_description": "This month's fee, how to pay it and the late fee.",
+  "documents_template_fee_reminder_header": "Reminder",
+  "documents_template_fee_reminder_title": "Maintenance fee payment reminder",
+  "documents_template_fee_reminder_content": "Dear residents,\n\nThis is a reminder that the maintenance fee for **[month]** is **[amount]** and is due on **[due date]**.\n\n## How to pay\n\n- **Bank transfer:** [bank], account [number], to [account holder].\n- **Reference:** your house number.\n- **Cash:** with [person], [days and hours].\n\nAfter the due date, a late fee of **[amount or percentage]** will apply.\n\nIf you've already paid, thank you, and please disregard this notice.\n\nSincerely,\nThe HOA board",
+
   "documents_ai_write": "Write with AI",
   "documents_ai_description": "If you use ChatGPT, Gemini or another assistant, this text tells it how to write the document so it looks right in the PDF.",
   "documents_ai_step_copy": "Copy the text.",
@@ -70,5 +94,5 @@
   "documents_ai_copy_failed": "Couldn't copy",
   "documents_ai_copy_failed_description": "Select the text and copy it manually",
   "documents_ai_unnamed_residential": "our community",
-  "documents_ai_prompt": "I need to write a document for the residents of {residential}. It comes from the HOA board.\n\nWhat I want to say: [describe the document here: a notice, a circular, meeting minutes… what happened or what's going to happen, with dates, amounts and decisions]\n\nInstructions:\n- Write in English, in a formal, clear and friendly tone.\n- Reply with the document's text only, with no introduction or closing comments, and don't put it inside a code block.\n- Don't write the document's title, its date or the community's name: they're already in the header.\n- Format it only with headings (up to four levels), paragraphs, bulleted or numbered lists, bold, italics, strikethrough, quotes and links.\n- Don't use tables, divider lines, emojis or images: the document can't show them.\n- If a detail is missing (a date, an amount, a name), leave it in brackets, like [date], to fill in later."
+  "documents_ai_prompt": "I need to write a document for the residents of {residential}. It comes from the HOA board.\n\nWhat I want to say: [describe the document here: a notice, meeting minutes, a reminder… what happened or what's going to happen, with dates, amounts and decisions]\n\nInstructions:\n- Write in English, in a formal, clear and friendly tone.\n- Reply with the document's text only, with no introduction or closing comments, and don't put it inside a code block.\n- Don't write the document's title, its date or the community's name: they're already in the header.\n- Format it only with headings (up to four levels), paragraphs, bulleted or numbered lists, bold, italics, strikethrough, quotes and links.\n- Don't use tables, divider lines, emojis or images: the document can't show them.\n- If a detail is missing (a date, an amount, a name), leave it in brackets, like [date], to fill in later."
 }

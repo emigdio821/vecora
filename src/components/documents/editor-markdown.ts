@@ -1,5 +1,5 @@
-import { Extension, type JSONContent } from '@tiptap/core'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
+import { Extension, type JSONContent } from '@tiptap/react'
 
 /** A line only Markdown starts like that: a heading, a list item or a quote. */
 const MARKDOWN_LINE = /^(#{1,6} |[-*+] |\d+[.)] |> )/m

@@ -232,7 +232,7 @@ interface ContentTree {
 }
 
 /** An empty editor still holds one empty paragraph: this looks for actual words or an image. */
-function hasContent(node: ContentTree): boolean {
+export function hasContent(node: ContentTree): boolean {
   if (node.type === 'image') {
     return true
   }

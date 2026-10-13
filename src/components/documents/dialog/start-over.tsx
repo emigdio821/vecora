@@ -12,16 +12,25 @@ import { Button } from '@/components/ui/button'
 import { m } from '@/paraglide/messages'
 
 interface StartOverAlertDialogProps extends Omit<ResponsiveAlertDialogProps, 'children'> {
+  /** Starting from a template instead of a blank document. */
+  templateName: string | null
   onConfirm: () => void
 }
 
 /** Discards the draft on this device; there's no undo since it's only stored here. */
-export function StartOverAlertDialog({ onConfirm, ...props }: StartOverAlertDialogProps) {
+export function StartOverAlertDialog({ templateName, onConfirm, ...props }: StartOverAlertDialogProps) {
+  let title = m.documents_start_over_title()
+  let confirmLabel = m.documents_start_over()
+  if (templateName !== null) {
+    title = m.documents_template_confirm_title({ name: templateName })
+    confirmLabel = m.documents_template_use()
+  }
+
   return (
     <ResponsiveAlertDialog {...props}>
       <ResponsiveAlertDialogPopup>
         <ResponsiveAlertDialogHeader>
-          <ResponsiveAlertDialogTitle>{m.documents_start_over_title()}</ResponsiveAlertDialogTitle>
+          <ResponsiveAlertDialogTitle>{title}</ResponsiveAlertDialogTitle>
           <ResponsiveAlertDialogDescription>
             {m.documents_start_over_description()}
           </ResponsiveAlertDialogDescription>
@@ -36,7 +45,7 @@ export function StartOverAlertDialog({ onConfirm, ...props }: StartOverAlertDial
               onConfirm()
             }}
           >
-            {m.documents_start_over()}
+            {confirmLabel}
           </Button>
         </ResponsiveAlertDialogFooter>
       </ResponsiveAlertDialogPopup>

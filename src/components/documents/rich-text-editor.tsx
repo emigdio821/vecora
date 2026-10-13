@@ -2,7 +2,7 @@ import FileHandler from '@tiptap/extension-file-handler'
 import Highlight from '@tiptap/extension-highlight'
 import TextAlign from '@tiptap/extension-text-align'
 import { Markdown } from '@tiptap/markdown'
-import { EditorContent, type JSONContent, useEditor } from '@tiptap/react'
+import { Editor, EditorContent, type JSONContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { useImperativeHandle } from 'react'
 import { cn } from '@/lib/utils'
@@ -52,6 +52,17 @@ const extensions = [
 // The text is styled like the PDF by typeset-document (src/styles/typeset-document.css).
 // flex-1: fills the scroll area below the toolbar, so a click anywhere in it starts typing.
 const CONTENT_CLASS = 'typeset typeset-document min-h-72 flex-1 px-[calc(--spacing(3)-1px)] py-2 outline-none'
+
+/**
+ * Markdown as the editor's content, read the way a paste is (the templates). An editor
+ * that's never shown does the parsing, so the result fits this editor exactly. Browser only.
+ */
+export function markdownToContent(markdown: string): JSONContent {
+  const editor = new Editor({ extensions, content: markdown, contentType: 'markdown' })
+  const content = editor.getJSON()
+  editor.destroy()
+  return content
+}
 
 export interface RichTextEditorHandle {
   focus: () => void

@@ -1,6 +1,6 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "documents_page_description": "Escribe avisos, circulares o cualquier otro documento con el logo y el nombre del residencial, y descárgalo en PDF.",
+  "documents_page_description": "Escribe avisos, minutas o cualquier otro documento y descárgalo en PDF con el logo y el nombre del residencial.",
   "documents_draft_hint": "Lo que escribes se guarda en este dispositivo hasta que empieces un documento nuevo.",
 
   "documents_field_header_title": "Encabezado",
@@ -59,6 +59,30 @@
   "documents_start_over_title": "¿Empezar un documento nuevo?",
   "documents_start_over_description": "Se borrará todo lo que escribiste en este documento. Esta acción no se puede deshacer.",
 
+  "documents_templates": "Plantillas",
+  "documents_template_use": "Usar plantilla",
+  "documents_template_confirm_title": "¿Usar la plantilla \"{name}\"?",
+  "documents_template_notice_name": "Aviso",
+  "documents_template_notice_description": "Trabajos de mantenimiento, cortes de servicio o cualquier comunicado.",
+  "documents_template_notice_header": "Aviso",
+  "documents_template_notice_title": "Trabajos de mantenimiento en [área]",
+  "documents_template_notice_content": "Estimados residentes:\n\nLes informamos que el **[día y fecha]**, de **[hora de inicio]** a **[hora de término]**, se realizarán trabajos de mantenimiento en **[área]**.\n\n## Qué deben saber\n\n- Durante ese horario [el área no estará disponible / habrá cortes de agua].\n- Les pedimos [mover sus vehículos / no usar el área].\n- Si tienen alguna duda, comuníquense con la mesa directiva.\n\nAgradecemos su comprensión.\n\nAtentamente,\nLa mesa directiva",
+  "documents_template_meeting_call_name": "Convocatoria a asamblea",
+  "documents_template_meeting_call_description": "Fecha, lugar y orden del día de una asamblea.",
+  "documents_template_meeting_call_header": "Convocatoria",
+  "documents_template_meeting_call_title": "Convocatoria a asamblea [ordinaria / extraordinaria] de residentes",
+  "documents_template_meeting_call_content": "Estimados residentes:\n\nLa mesa directiva los convoca a la asamblea [ordinaria / extraordinaria], que se llevará a cabo:\n\n- **Fecha:** [día y fecha]\n- **Hora:** [hora] en primera convocatoria y [hora] en segunda convocatoria\n- **Lugar:** [lugar]\n\n## Orden del día\n\n1. Registro de asistencia y verificación del quórum.\n2. Informe de la mesa directiva.\n3. Informe de tesorería.\n4. [Tema a tratar]\n5. Asuntos generales.\n\n> Si no puede asistir, puede nombrar a un representante con una carta poder firmada.\n\nSu participación es importante para tomar las decisiones de nuestra comunidad.\n\nAtentamente,\nLa mesa directiva",
+  "documents_template_minutes_name": "Acta de asamblea",
+  "documents_template_minutes_description": "Asistencia, lo que se discutió y los acuerdos de una asamblea.",
+  "documents_template_minutes_header": "Acta de asamblea",
+  "documents_template_minutes_title": "Acta de la asamblea [ordinaria / extraordinaria] de residentes",
+  "documents_template_minutes_content": "En [lugar], a las [hora] del [día y fecha], se reunieron los residentes para celebrar la asamblea [ordinaria / extraordinaria], con la asistencia de [número] de [número] casas.\n\n## Orden del día\n\n1. Registro de asistencia y verificación del quórum.\n2. [Tema]\n3. Asuntos generales.\n\n## Desarrollo\n\n### 1. Registro de asistencia\n\nSe registraron [número] casas, por lo que hubo quórum para iniciar la asamblea.\n\n### 2. [Tema]\n\n[Resumen de lo que se discutió.]\n\n### 3. Asuntos generales\n\n[Otros temas que se trataron.]\n\n## Acuerdos\n\n1. **[Acuerdo]:** aprobado con [número] votos a favor, [número] en contra y [número] abstenciones.\n2. **[Acuerdo]:** [resultado de la votación].\n\nSin más asuntos que tratar, se dio por terminada la asamblea a las [hora].\n\nPresidente: [nombre]\nSecretario: [nombre]",
+  "documents_template_fee_reminder_name": "Recordatorio de pago",
+  "documents_template_fee_reminder_description": "La cuota del mes, cómo pagarla y el recargo por pagar tarde.",
+  "documents_template_fee_reminder_header": "Recordatorio",
+  "documents_template_fee_reminder_title": "Recordatorio de pago de la cuota de mantenimiento",
+  "documents_template_fee_reminder_content": "Estimados residentes:\n\nLes recordamos que la cuota de mantenimiento de **[mes]** es de **[monto]** y vence el **[fecha límite]**.\n\n## Cómo pagar\n\n- **Transferencia:** [banco], cuenta [número], CLABE [número], a nombre de [titular].\n- **Referencia:** el número de su casa.\n- **En efectivo:** con [persona], [días y horario].\n\nDespués de la fecha límite se aplicará un recargo de **[monto o porcentaje]**.\n\nSi ya realizaron su pago, se lo agradecemos y les pedimos ignorar este aviso.\n\nAtentamente,\nLa mesa directiva",
+
   "documents_ai_write": "Redactar con IA",
   "documents_ai_description": "Si usas ChatGPT, Gemini u otro asistente, este texto le explica cómo escribir el documento para que se vea bien en el PDF.",
   "documents_ai_step_copy": "Copia el texto.",
@@ -70,5 +94,5 @@
   "documents_ai_copy_failed": "No se pudo copiar",
   "documents_ai_copy_failed_description": "Selecciona el texto y cópialo manualmente",
   "documents_ai_unnamed_residential": "nuestro residencial",
-  "documents_ai_prompt": "Necesito redactar un documento para los residentes de {residential}. Lo envía la mesa directiva.\n\nLo que quiero comunicar: [describe aquí el documento: un aviso, una circular, un acta de asamblea… qué pasó o qué se va a hacer, con fechas, montos y acuerdos]\n\nInstrucciones:\n- Escribe en español de México, con un tono formal, claro y cordial.\n- Responde solo con el texto del documento, sin introducción ni comentarios al final, y no lo pongas dentro de un bloque de código.\n- No escribas el título del documento, su fecha ni el nombre del residencial: ya van en el encabezado.\n- Da formato solo con títulos (hasta cuatro niveles), párrafos, listas con viñetas o numeradas, negritas, cursivas, tachado, citas y enlaces.\n- No uses tablas, líneas separadoras, emojis ni imágenes: el documento no los puede mostrar.\n- Si te falta un dato (una fecha, un monto, un nombre), déjalo entre corchetes, como [fecha], para completarlo después."
+  "documents_ai_prompt": "Necesito redactar un documento para los residentes de {residential}. Lo envía la mesa directiva.\n\nLo que quiero comunicar: [describe aquí el documento: un aviso, una minuta, un recordatorio… qué pasó o qué se va a hacer, con fechas, montos y acuerdos]\n\nInstrucciones:\n- Escribe en español de México, con un tono formal, claro y cordial.\n- Responde solo con el texto del documento, sin introducción ni comentarios al final, y no lo pongas dentro de un bloque de código.\n- No escribas el título del documento, su fecha ni el nombre del residencial: ya van en el encabezado.\n- Da formato solo con títulos (hasta cuatro niveles), párrafos, listas con viñetas o numeradas, negritas, cursivas, tachado, citas y enlaces.\n- No uses tablas, líneas separadoras, emojis ni imágenes: el documento no los puede mostrar.\n- Si te falta un dato (una fecha, un monto, un nombre), déjalo entre corchetes, como [fecha], para completarlo después."
 }
