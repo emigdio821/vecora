@@ -152,7 +152,7 @@ export function DataTable<TData extends RowData>({
         </Empty>
       ) : (
         <CardFrame className="w-full">
-          <Table variant="card">
+          <Table variant="card" className="table-fixed">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow className="hover:bg-transparent" key={headerGroup.id}>

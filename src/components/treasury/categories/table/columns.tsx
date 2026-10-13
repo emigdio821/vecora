@@ -22,7 +22,7 @@ export const categoriesTableColumns = columnHelper.columns([
         <div className="grid w-0 min-w-full gap-0.5">
           <span className="truncate">{name}</span>
           {key !== null && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs whitespace-normal text-muted-foreground">
               {m.treasury_category_used_by({ source: systemCategorySource(key) })}
             </span>
           )}
