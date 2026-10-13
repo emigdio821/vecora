@@ -5,7 +5,6 @@ export type SiteConfig = typeof siteConfig
 export const siteConfig = {
   name: 'Vecora',
   description: 'An open-source and simple residential manager.',
-  url: env.VITE_SITE_URL,
   ogUrl: new URL('/api/og', env.VITE_SITE_URL).href,
   autors: [
     {

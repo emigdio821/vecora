@@ -29,10 +29,6 @@
   "settings_logo_change": "Change logo",
   "settings_logo_upload": "Upload logo",
   "settings_logo_hint": "Shown on reports. A PNG with a transparent background is recommended, up to 2 MB.",
-  "settings_logo_updated": "Logo updated",
-  "settings_logo_removed": "Logo removed",
-  "settings_remove_logo_title": "Remove the logo?",
-  "settings_remove_logo_description": "Reports will only show the HOA name. To use the logo again, you'll have to upload it again.",
 
   "settings_save_failed": "Couldn't save the settings, please try again",
   "settings_setup_save_failed": "Couldn't save the setup, please try again",

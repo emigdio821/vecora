@@ -9,7 +9,7 @@ import {
   intlLocale,
   MONEY_FORMAT,
 } from '@/lib/utils'
-import { LANGUAGE_LABEL } from '@/lib/validations/settings'
+import { CURRENCY_LABEL, defaultResidentialLabel, LANGUAGE_LABEL } from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
 import type { LogEntryQueryData } from '@/tanstack-queries/logs'
 
@@ -181,6 +181,61 @@ function formatAmount(row: RowData, value: unknown): string {
     : new Intl.NumberFormat(intlLocale(), MONEY_FORMAT).format(Number(text))
 }
 
+/**
+ * Settings is a single row, so its label (the residential's name) says nothing about what
+ * happened. Each change is spelled out instead, in plain words for whoever reads the log.
+ */
+function settingsSummary(entry: LogEntryQueryData): string {
+  const before = (entry.old_data ?? {}) as RowData
+  const after = (entry.new_data ?? {}) as RowData
+  const changedFields = entry.changed_fields ?? []
+
+  // The main admin's setup dialog fills in the name, language and currency at once.
+  if (changedFields.includes('configured_at')) {
+    return m.logs_summary_setup_completed()
+  }
+
+  const changes: string[] = []
+
+  if (changedFields.includes('residential_name')) {
+    const name = asText(after.residential_name)
+    if (name) {
+      changes.push(m.logs_summary_residential_name_changed({ name }))
+    } else {
+      // Emptying the name brings back the app's generic one.
+      changes.push(m.logs_summary_residential_name_reset())
+    }
+  }
+
+  if (changedFields.includes('logo_path')) {
+    if (!after.logo_path) {
+      changes.push(m.logs_summary_logo_removed())
+    } else if (!before.logo_path) {
+      changes.push(m.logs_summary_logo_added())
+    } else {
+      changes.push(m.logs_summary_logo_updated())
+    }
+  }
+
+  if (changedFields.includes('currency')) {
+    const currency = CURRENCIES.find((code) => code === after.currency)
+    const currencyLabel = currency ? CURRENCY_LABEL[currency] : asText(after.currency)
+    changes.push(m.logs_summary_currency_changed({ currency: currencyLabel }))
+  }
+
+  if (changedFields.includes('default_language')) {
+    const languageLabel = enumLabel(after.default_language) ?? asText(after.default_language)
+    changes.push(m.logs_summary_language_changed({ language: languageLabel }))
+  }
+
+  if (changes.length > 0) {
+    return changes.join(' - ')
+  }
+
+  // Nothing worth naming changed (or the row was created): the name the app shows.
+  return entry.label || defaultResidentialLabel()
+}
+
 /** One line for the "what" column: the label plus whatever makes it unambiguous. */
 export function entrySummary(entry: LogEntryQueryData): string {
   const row = entryRow(entry)
@@ -210,6 +265,8 @@ export function entrySummary(entry: LogEntryQueryData): string {
       return m.common_house_label({ number: label })
     case 'user_roles':
       return `${enumLabel(row.role) ?? asText(row.role)} - ${label}`
+    case 'settings':
+      return settingsSummary(entry)
     default:
       return label
   }

@@ -29,10 +29,6 @@
   "settings_logo_change": "Cambiar logo",
   "settings_logo_upload": "Subir logo",
   "settings_logo_hint": "Aparece en los reportes. Es recomendable usar el formato PNG con fondo transparente, con un máximo de 2 MB.",
-  "settings_logo_updated": "Logo actualizado",
-  "settings_logo_removed": "Logo eliminado",
-  "settings_remove_logo_title": "¿Quitar el logo?",
-  "settings_remove_logo_description": "Los reportes se generarán solo con el nombre del residencial. Para volver a usarlo tendrás que subirlo de nuevo.",
 
   "settings_save_failed": "No se pudieron guardar los ajustes, intenta nuevamente",
   "settings_setup_save_failed": "No se pudo guardar la configuración, intenta nuevamente",

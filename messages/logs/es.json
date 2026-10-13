@@ -16,6 +16,14 @@
   "logs_action_cancelled": "Canceló",
 
   "logs_resident": "Residente",
+  "logs_summary_setup_completed": "Configuración inicial completada",
+  "logs_summary_residential_name_changed": "Nombre del residencial cambiado a \"{name}\"",
+  "logs_summary_residential_name_reset": "Nombre del residencial restablecido al valor predeterminado",
+  "logs_summary_logo_added": "Logo agregado",
+  "logs_summary_logo_updated": "Logo actualizado",
+  "logs_summary_logo_removed": "Logo eliminado",
+  "logs_summary_currency_changed": "Moneda cambiada a {currency}",
+  "logs_summary_language_changed": "Idioma predeterminado cambiado a {language}",
 
   "logs_field_number": "Número",
   "logs_field_first_name": "Nombre",

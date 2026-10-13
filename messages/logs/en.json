@@ -16,6 +16,14 @@
   "logs_action_cancelled": "Cancelled",
 
   "logs_resident": "Resident",
+  "logs_summary_setup_completed": "Initial setup completed",
+  "logs_summary_residential_name_changed": "Community name changed to \"{name}\"",
+  "logs_summary_residential_name_reset": "Community name reset to the default",
+  "logs_summary_logo_added": "Logo added",
+  "logs_summary_logo_updated": "Logo updated",
+  "logs_summary_logo_removed": "Logo removed",
+  "logs_summary_currency_changed": "Currency changed to {currency}",
+  "logs_summary_language_changed": "Default language changed to {language}",
 
   "logs_field_number": "Number",
   "logs_field_first_name": "First name",
