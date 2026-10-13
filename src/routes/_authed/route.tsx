@@ -35,9 +35,10 @@ function AuthedLayout() {
     <CurrentUserProvider user={user}>
       <SidebarProvider>
         <AppSidebar user={user} settings={settings} />
-        <SidebarInset>
+        {/* min-w-0: a flex item grows to fit wide content; this way wide tables scroll inside instead. */}
+        <SidebarInset className="min-w-0">
           <AppHeader />
-          <section className="mx-auto flex w-full flex-1 flex-col gap-4 p-4 md:max-w-lg lg:max-w-3xl xl:max-w-5xl 2xl:max-w-7xl">
+          <section className="mx-auto flex w-full flex-1 flex-col gap-4 p-4 2xl:max-w-7xl">
             <Outlet />
           </section>
         </SidebarInset>
