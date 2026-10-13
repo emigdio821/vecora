@@ -7,14 +7,15 @@ export const HOA_BOARD_QUERY_KEY = 'hoa-board'
 /**
  * Board members = accounts holding at least one role (`!inner` drops the
  * role-less ones). The resident link is optional: an account created outside
- * the app (seeds, dashboard) may not be tied to the registry yet.
+ * the app (seeds, dashboard) may not be tied to the registry yet. The main
+ * admin is the app's own account, not a board seat, so it isn't listed.
  */
 function boardMembersQuery() {
   return createClient()
     .from('profiles')
     .select(
       `
-      id, full_name, is_main_admin,
+      id, full_name,
       user_roles!user_id!inner ( role ),
       resident:residents!profile_id (
         id, first_name, last_name, email, phone,
@@ -22,6 +23,7 @@ function boardMembersQuery() {
       )
       `,
     )
+    .eq('is_main_admin', false)
     .order('full_name')
 }
 

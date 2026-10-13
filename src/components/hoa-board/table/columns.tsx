@@ -88,13 +88,9 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
       cell: ({ row }) => {
         const member = row.original
         const isAdminRow = member.user_roles.some((r) => r.role === 'admin')
-        // Mirrors the server: nobody manages their own seat or the main admin's;
-        // admins only by admins.
-        const canManage =
-          viewer.isManager &&
-          member.id !== viewer.id &&
-          !member.is_main_admin &&
-          (viewer.isAdmin || !isAdminRow)
+        // Mirrors the server: nobody manages their own seat; admins only by admins.
+        // The main admin, which nobody manages, isn't listed (see boardMembersQuery).
+        const canManage = viewer.isManager && member.id !== viewer.id && (viewer.isAdmin || !isAdminRow)
 
         return canManage ? <BoardMembersTableActions member={member} viewer={viewer} /> : null
       },
