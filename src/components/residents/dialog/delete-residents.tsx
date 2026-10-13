@@ -1,14 +1,14 @@
 import { type QueryClient, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogPopup,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogClose,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogPopup,
+  type ResponsiveAlertDialogProps,
+  ResponsiveAlertDialogTitle,
+} from '@/components/shared/responsive-alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { m } from '@/paraglide/messages'
@@ -42,7 +42,7 @@ async function undoDelete(queryClient: QueryClient, ids: string[]) {
   })
 }
 
-interface DeleteResidentsAlertDialogProps extends React.ComponentProps<typeof AlertDialog> {
+interface DeleteResidentsAlertDialogProps extends Omit<ResponsiveAlertDialogProps, 'children'> {
   /** One resident from a row menu, or many from the table selection. */
   residents: ResidentQueryData[]
   open: boolean
@@ -122,7 +122,7 @@ export function DeleteResidentsAlertDialog({
     },
   })
 
-  const handleOpenChange: AlertDialogPrimitive.Root.Props['onOpenChange'] = (nextOpen, eventDetails) => {
+  const handleOpenChange = (nextOpen: boolean, eventDetails: { cancel: () => void }) => {
     if (!nextOpen && mutation.isPending) {
       eventDetails.cancel()
       return
@@ -135,7 +135,7 @@ export function DeleteResidentsAlertDialog({
   const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
-    <AlertDialog
+    <ResponsiveAlertDialog
       open={open}
       onOpenChange={handleOpenChange}
       onOpenChangeComplete={(isOpen) => {
@@ -147,15 +147,15 @@ export function DeleteResidentsAlertDialog({
       }}
       {...props}
     >
-      <AlertDialogPopup>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
+      <ResponsiveAlertDialogPopup>
+        <ResponsiveAlertDialogHeader>
+          <ResponsiveAlertDialogTitle>
             {isSingle
               ? m.residential_delete_resident_title({ name: singleName })
               : m.residential_delete_residents_title({ count })}
-          </AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
-        </AlertDialogHeader>
+          </ResponsiveAlertDialogTitle>
+          <ResponsiveAlertDialogDescription>{description}</ResponsiveAlertDialogDescription>
+        </ResponsiveAlertDialogHeader>
 
         {!isSingle && (
           <ul className="max-h-48 scroll-fade overflow-y-auto px-6 pb-4 text-sm">
@@ -167,10 +167,10 @@ export function DeleteResidentsAlertDialog({
           </ul>
         )}
 
-        <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
+        <ResponsiveAlertDialogFooter>
+          <ResponsiveAlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
-          </AlertDialogClose>
+          </ResponsiveAlertDialogClose>
           <Button
             variant="destructive"
             loading={isBusy}
@@ -181,8 +181,8 @@ export function DeleteResidentsAlertDialog({
           >
             {m.common_action_delete()}
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogPopup>
-    </AlertDialog>
+        </ResponsiveAlertDialogFooter>
+      </ResponsiveAlertDialogPopup>
+    </ResponsiveAlertDialog>
   )
 }

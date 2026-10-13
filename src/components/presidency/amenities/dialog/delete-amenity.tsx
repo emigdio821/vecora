@@ -1,21 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogPopup,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogClose,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogPopup,
+  type ResponsiveAlertDialogProps,
+  ResponsiveAlertDialogTitle,
+} from '@/components/shared/responsive-alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { m } from '@/paraglide/messages'
 import { deleteAmenity } from '@/server-actions/presidency'
 import { type AmenityQueryData, PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
 
-interface DeleteAmenityAlertDialogProps extends React.ComponentProps<typeof AlertDialog> {
+interface DeleteAmenityAlertDialogProps extends Omit<ResponsiveAlertDialogProps, 'children'> {
   amenity: AmenityQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -46,7 +46,7 @@ export function DeleteAmenityAlertDialog({
     },
   })
 
-  const handleOpenChange: AlertDialogPrimitive.Root.Props['onOpenChange'] = (nextOpen, eventDetails) => {
+  const handleOpenChange = (nextOpen: boolean, eventDetails: { cancel: () => void }) => {
     if (!nextOpen && mutation.isPending) {
       eventDetails.cancel()
       return
@@ -59,7 +59,7 @@ export function DeleteAmenityAlertDialog({
   const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
-    <AlertDialog
+    <ResponsiveAlertDialog
       open={open}
       onOpenChange={handleOpenChange}
       onOpenChangeComplete={(isOpen) => {
@@ -71,16 +71,20 @@ export function DeleteAmenityAlertDialog({
       }}
       {...props}
     >
-      <AlertDialogPopup>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{m.presidency_delete_amenity_title({ name: amenity.name })}</AlertDialogTitle>
-          <AlertDialogDescription>{m.presidency_delete_amenity_description()}</AlertDialogDescription>
-        </AlertDialogHeader>
+      <ResponsiveAlertDialogPopup>
+        <ResponsiveAlertDialogHeader>
+          <ResponsiveAlertDialogTitle>
+            {m.presidency_delete_amenity_title({ name: amenity.name })}
+          </ResponsiveAlertDialogTitle>
+          <ResponsiveAlertDialogDescription>
+            {m.presidency_delete_amenity_description()}
+          </ResponsiveAlertDialogDescription>
+        </ResponsiveAlertDialogHeader>
 
-        <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
+        <ResponsiveAlertDialogFooter>
+          <ResponsiveAlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
-          </AlertDialogClose>
+          </ResponsiveAlertDialogClose>
           <Button
             variant="destructive"
             loading={isBusy}
@@ -90,8 +94,8 @@ export function DeleteAmenityAlertDialog({
           >
             {m.common_action_delete()}
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogPopup>
-    </AlertDialog>
+        </ResponsiveAlertDialogFooter>
+      </ResponsiveAlertDialogPopup>
+    </ResponsiveAlertDialog>
   )
 }

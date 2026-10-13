@@ -1,22 +1,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Money } from '@/components/shared/money'
-import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogPopup,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogClose,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogPopup,
+  type ResponsiveAlertDialogProps,
+  ResponsiveAlertDialogTitle,
+} from '@/components/shared/responsive-alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { m } from '@/paraglide/messages'
 import { reopenMaintenanceRequest } from '@/server-actions/maintenance'
 import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 
-interface ReopenRequestAlertDialogProps extends React.ComponentProps<typeof AlertDialog> {
+interface ReopenRequestAlertDialogProps extends Omit<ResponsiveAlertDialogProps, 'children'> {
   request: MaintenanceRequestQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -47,7 +47,7 @@ export function ReopenRequestAlertDialog({
     },
   })
 
-  const handleOpenChange: AlertDialogPrimitive.Root.Props['onOpenChange'] = (nextOpen, eventDetails) => {
+  const handleOpenChange = (nextOpen: boolean, eventDetails: { cancel: () => void }) => {
     if (!nextOpen && mutation.isPending) {
       eventDetails.cancel()
       return
@@ -60,7 +60,7 @@ export function ReopenRequestAlertDialog({
   const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
-    <AlertDialog
+    <ResponsiveAlertDialog
       open={open}
       onOpenChange={handleOpenChange}
       onOpenChangeComplete={(isOpen) => {
@@ -72,19 +72,19 @@ export function ReopenRequestAlertDialog({
       }}
       {...props}
     >
-      <AlertDialogPopup>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{m.requests_reopen_title()}</AlertDialogTitle>
-          <AlertDialogDescription>
+      <ResponsiveAlertDialogPopup>
+        <ResponsiveAlertDialogHeader>
+          <ResponsiveAlertDialogTitle>{m.requests_reopen_title()}</ResponsiveAlertDialogTitle>
+          <ResponsiveAlertDialogDescription>
             {request.title} - <Money value={request.amount} currency={request.currency} />.{' '}
             {m.requests_reopen_description()}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          </ResponsiveAlertDialogDescription>
+        </ResponsiveAlertDialogHeader>
 
-        <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
+        <ResponsiveAlertDialogFooter>
+          <ResponsiveAlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
-          </AlertDialogClose>
+          </ResponsiveAlertDialogClose>
           <Button
             loading={isBusy}
             onClick={() => {
@@ -93,8 +93,8 @@ export function ReopenRequestAlertDialog({
           >
             {m.requests_action_reopen()}
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogPopup>
-    </AlertDialog>
+        </ResponsiveAlertDialogFooter>
+      </ResponsiveAlertDialogPopup>
+    </ResponsiveAlertDialog>
   )
 }

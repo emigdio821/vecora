@@ -1,21 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogPopup,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogClose,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogPopup,
+  type ResponsiveAlertDialogProps,
+  ResponsiveAlertDialogTitle,
+} from '@/components/shared/responsive-alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { m } from '@/paraglide/messages'
 import { deleteCategory } from '@/server-actions/treasury'
 import { type CategoryQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 
-interface DeleteCategoryAlertDialogProps extends React.ComponentProps<typeof AlertDialog> {
+interface DeleteCategoryAlertDialogProps extends Omit<ResponsiveAlertDialogProps, 'children'> {
   category: CategoryQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -46,7 +46,7 @@ export function DeleteCategoryAlertDialog({
     },
   })
 
-  const handleOpenChange: AlertDialogPrimitive.Root.Props['onOpenChange'] = (nextOpen, eventDetails) => {
+  const handleOpenChange = (nextOpen: boolean, eventDetails: { cancel: () => void }) => {
     if (!nextOpen && mutation.isPending) {
       eventDetails.cancel()
       return
@@ -59,7 +59,7 @@ export function DeleteCategoryAlertDialog({
   const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
-    <AlertDialog
+    <ResponsiveAlertDialog
       open={open}
       onOpenChange={handleOpenChange}
       onOpenChangeComplete={(isOpen) => {
@@ -71,16 +71,20 @@ export function DeleteCategoryAlertDialog({
       }}
       {...props}
     >
-      <AlertDialogPopup>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{m.treasury_delete_category_title({ name: category.name })}</AlertDialogTitle>
-          <AlertDialogDescription>{m.treasury_delete_category_description()}</AlertDialogDescription>
-        </AlertDialogHeader>
+      <ResponsiveAlertDialogPopup>
+        <ResponsiveAlertDialogHeader>
+          <ResponsiveAlertDialogTitle>
+            {m.treasury_delete_category_title({ name: category.name })}
+          </ResponsiveAlertDialogTitle>
+          <ResponsiveAlertDialogDescription>
+            {m.treasury_delete_category_description()}
+          </ResponsiveAlertDialogDescription>
+        </ResponsiveAlertDialogHeader>
 
-        <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
+        <ResponsiveAlertDialogFooter>
+          <ResponsiveAlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
-          </AlertDialogClose>
+          </ResponsiveAlertDialogClose>
           <Button
             variant="destructive"
             loading={isBusy}
@@ -90,8 +94,8 @@ export function DeleteCategoryAlertDialog({
           >
             {m.common_action_delete()}
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogPopup>
-    </AlertDialog>
+        </ResponsiveAlertDialogFooter>
+      </ResponsiveAlertDialogPopup>
+    </ResponsiveAlertDialog>
   )
 }

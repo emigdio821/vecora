@@ -1,22 +1,22 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Money } from '@/components/shared/money'
-import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogPopup,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogClose,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogPopup,
+  type ResponsiveAlertDialogProps,
+  ResponsiveAlertDialogTitle,
+} from '@/components/shared/responsive-alert-dialog'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { m } from '@/paraglide/messages'
 import { deleteMaintenanceRequest } from '@/server-actions/maintenance'
 import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 
-interface DeleteRequestAlertDialogProps extends React.ComponentProps<typeof AlertDialog> {
+interface DeleteRequestAlertDialogProps extends Omit<ResponsiveAlertDialogProps, 'children'> {
   request: MaintenanceRequestQueryData
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -47,7 +47,7 @@ export function DeleteRequestAlertDialog({
     },
   })
 
-  const handleOpenChange: AlertDialogPrimitive.Root.Props['onOpenChange'] = (nextOpen, eventDetails) => {
+  const handleOpenChange = (nextOpen: boolean, eventDetails: { cancel: () => void }) => {
     if (!nextOpen && mutation.isPending) {
       eventDetails.cancel()
       return
@@ -60,7 +60,7 @@ export function DeleteRequestAlertDialog({
   const isBusy = mutation.isPending || mutation.isSuccess
 
   return (
-    <AlertDialog
+    <ResponsiveAlertDialog
       open={open}
       onOpenChange={handleOpenChange}
       onOpenChangeComplete={(isOpen) => {
@@ -72,19 +72,19 @@ export function DeleteRequestAlertDialog({
       }}
       {...props}
     >
-      <AlertDialogPopup>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{m.requests_delete_title()}</AlertDialogTitle>
-          <AlertDialogDescription>
+      <ResponsiveAlertDialogPopup>
+        <ResponsiveAlertDialogHeader>
+          <ResponsiveAlertDialogTitle>{m.requests_delete_title()}</ResponsiveAlertDialogTitle>
+          <ResponsiveAlertDialogDescription>
             {request.title} - <Money value={request.amount} currency={request.currency} />.{' '}
             {m.requests_delete_description()}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          </ResponsiveAlertDialogDescription>
+        </ResponsiveAlertDialogHeader>
 
-        <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
+        <ResponsiveAlertDialogFooter>
+          <ResponsiveAlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
-          </AlertDialogClose>
+          </ResponsiveAlertDialogClose>
           <Button
             variant="destructive"
             loading={isBusy}
@@ -94,8 +94,8 @@ export function DeleteRequestAlertDialog({
           >
             {m.common_action_delete()}
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogPopup>
-    </AlertDialog>
+        </ResponsiveAlertDialogFooter>
+      </ResponsiveAlertDialogPopup>
+    </ResponsiveAlertDialog>
   )
 }

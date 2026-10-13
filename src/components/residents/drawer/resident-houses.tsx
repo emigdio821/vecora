@@ -3,16 +3,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { RELATIONSHIP_LABEL } from '@/components/houses/relationship'
 import { CollapsibleSection, Muted } from '@/components/shared/details'
-import type { AlertDialogPrimitive } from '@/components/ui/alert-dialog'
 import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogPopup,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogClose,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogPopup,
+  ResponsiveAlertDialogTitle,
+} from '@/components/shared/responsive-alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
@@ -112,7 +111,7 @@ function UnassignHouseButton({
     },
   })
 
-  const handleOpenChange: AlertDialogPrimitive.Root.Props['onOpenChange'] = (nextOpen, eventDetails) => {
+  const handleOpenChange = (nextOpen: boolean, eventDetails: { cancel: () => void }) => {
     if (!nextOpen && mutation.isPending) {
       eventDetails.cancel()
       return
@@ -147,7 +146,7 @@ function UnassignHouseButton({
         <TooltipPopup>{m.residential_remove_house({ number: house.number })}</TooltipPopup>
       </Tooltip>
 
-      <AlertDialog
+      <ResponsiveAlertDialog
         open={isConfirmOpen}
         onOpenChange={handleOpenChange}
         onOpenChangeComplete={(isOpen) => {
@@ -157,18 +156,20 @@ function UnassignHouseButton({
           }
         }}
       >
-        <AlertDialogPopup>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
+        <ResponsiveAlertDialogPopup>
+          <ResponsiveAlertDialogHeader>
+            <ResponsiveAlertDialogTitle>
               {m.residential_remove_resident_title({ name, number: house.number })}
-            </AlertDialogTitle>
-            <AlertDialogDescription>{m.residential_remove_resident_description()}</AlertDialogDescription>
-          </AlertDialogHeader>
+            </ResponsiveAlertDialogTitle>
+            <ResponsiveAlertDialogDescription>
+              {m.residential_remove_resident_description()}
+            </ResponsiveAlertDialogDescription>
+          </ResponsiveAlertDialogHeader>
 
-          <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
+          <ResponsiveAlertDialogFooter>
+            <ResponsiveAlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
               {m.common_action_cancel()}
-            </AlertDialogClose>
+            </ResponsiveAlertDialogClose>
             <Button
               variant="destructive"
               loading={isBusy}
@@ -178,9 +179,9 @@ function UnassignHouseButton({
             >
               {m.common_action_remove()}
             </Button>
-          </AlertDialogFooter>
-        </AlertDialogPopup>
-      </AlertDialog>
+          </ResponsiveAlertDialogFooter>
+        </ResponsiveAlertDialogPopup>
+      </ResponsiveAlertDialog>
     </>
   )
 }
