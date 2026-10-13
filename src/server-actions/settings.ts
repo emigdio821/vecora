@@ -102,11 +102,9 @@ function optimizeLogo(input: ArrayBuffer): Promise<Buffer> {
     .toBuffer()
 }
 
-/** Points the settings row at a new logo (or none) and deletes the previous file. */
+/** Points the settings row at a new logo (or none), then deletes every other file in the bucket. */
 async function setLogoPath(path: string | null): Promise<ActionResult> {
   const supabase = await createClient()
-  const { data: current } = await supabase.from('settings').select('logo_path').maybeSingle()
-
   const { data, error } = await supabase
     .from('settings')
     .update({ logo_path: path })
@@ -123,9 +121,21 @@ async function setLogoPath(path: string | null): Promise<ActionResult> {
     return { error: m.common_no_permission() }
   }
 
-  // Nothing points at the old file anymore; if the delete fails it's only an orphan.
-  if (current?.logo_path && current.logo_path !== path) {
-    await supabase.storage.from(LOGO_BUCKET).remove([current.logo_path])
+  // The bucket only needs the current logo. Clearing everything else, not just the previous
+  // file, also picks up orphans: files a hosted db reset unlinked, or an earlier failed delete.
+  // The logo is already saved, so a failure here is only logged.
+  const { data: files, error: listError } = await supabase.storage.from(LOGO_BUCKET).list()
+  if (listError) {
+    console.error('listing logos failed', listError)
+    return { data: undefined }
+  }
+
+  const stalePaths = files.filter((file) => file.name !== path).map((file) => file.name)
+  if (stalePaths.length > 0) {
+    const { error: removeError } = await supabase.storage.from(LOGO_BUCKET).remove(stalePaths)
+    if (removeError) {
+      console.error('removing old logos failed', removeError)
+    }
   }
 
   return { data: undefined }
