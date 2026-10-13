@@ -1,4 +1,4 @@
-import { IconFileDescription, IconFileText } from '@tabler/icons-react'
+import { IconClipboardText, IconReportMoney } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { useState } from 'react'
 import { FinancialReportDialog } from '@/components/reports/dialog/financial-report'
@@ -22,7 +22,8 @@ export function NavReports({ ...props }: React.ComponentProps<typeof SidebarGrou
 
   return (
     <SidebarGroup {...props}>
-      <SidebarGroupLabel>{m.common_section_reports()}</SidebarGroupLabel>
+      {/* Both make a PDF with the HOA's logo: the report from the books, the rest written here. */}
+      <SidebarGroupLabel>{m.common_section_documents()}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -31,7 +32,7 @@ export function NavReports({ ...props }: React.ComponentProps<typeof SidebarGrou
                 setOpen(true)
               }}
             >
-              <IconFileText className="size-4" />
+              <IconReportMoney className="size-4" />
               <span>{m.common_section_financial_report()}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -44,8 +45,8 @@ export function NavReports({ ...props }: React.ComponentProps<typeof SidebarGrou
               isActive={pathname === '/documents'}
               render={
                 <Link to="/documents">
-                  <IconFileDescription className="size-4" />
-                  <span>{m.common_section_documents()}</span>
+                  <IconClipboardText className="size-4" />
+                  <span>{m.common_section_notices()}</span>
                   <LinkPendingIndicator to="/documents" />
                 </Link>
               }

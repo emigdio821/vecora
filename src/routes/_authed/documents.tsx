@@ -11,7 +11,7 @@ import { m } from '@/paraglide/messages'
 import { settingsQueryOptions } from '@/tanstack-queries/session'
 
 export const Route = createFileRoute('/_authed/documents')({
-  head: () => ({ meta: [{ title: pageTitle(m.common_section_documents()) }] }),
+  head: () => ({ meta: [{ title: pageTitle(m.common_section_notices()) }] }),
   component: DocumentsPage,
 })
 
@@ -39,7 +39,7 @@ function DocumentsPage() {
       <div className="flex flex-col gap-4 md:h-[calc(100svh-(--spacing(8)))]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-1">
-            <h1 className="font-heading text-base font-semibold">{m.common_section_documents()}</h1>
+            <h1 className="font-heading text-base font-semibold">{m.common_section_notices()}</h1>
             <p className="text-sm text-muted-foreground">{m.documents_page_description()}</p>
           </div>
           <TemplateMenu

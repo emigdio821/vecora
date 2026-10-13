@@ -50,8 +50,11 @@ const extensions = [
 ]
 
 // The text is styled like the PDF by typeset-document (src/styles/typeset-document.css).
-// flex-1: fills the scroll area below the toolbar, so a click anywhere in it starts typing.
-const CONTENT_CLASS = 'typeset typeset-document min-h-72 flex-1 px-[calc(--spacing(3)-1px)] py-2 outline-none'
+// grow: fills the scroll area below the toolbar, so a click anywhere in it starts typing.
+// shrink-0: a long text makes it taller instead of overflowing it, so the bottom padding
+// stays after the last line.
+const CONTENT_CLASS =
+  'typeset typeset-document min-h-72 shrink-0 grow px-[calc(--spacing(3)-1px)] py-2 outline-none'
 
 /**
  * Markdown as the editor's content, read the way a paste is (the templates). An editor

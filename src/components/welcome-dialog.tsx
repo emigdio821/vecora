@@ -1,13 +1,13 @@
 import {
   IconBuildingCommunity,
   IconEye,
-  IconFileText,
   IconGavel,
   IconHeartHandshake,
   IconHistory,
   IconHome,
   IconPigMoney,
   IconReceipt,
+  IconReportMoney,
   IconSettings,
   IconTool,
   IconUrgent,
@@ -227,7 +227,7 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
           <InfoRow icon={IconHome} title={m.common_section_home()}>
             {m.settings_welcome_home_body()}
           </InfoRow>
-          <InfoRow icon={IconFileText} title={m.common_section_financial_report()}>
+          <InfoRow icon={IconReportMoney} title={m.common_section_financial_report()}>
             {m.settings_welcome_report_body()}
           </InfoRow>
           <InfoRow icon={IconHistory} title={m.settings_welcome_logged_title()}>
