@@ -48,7 +48,7 @@ export function ReservationsDataTableHeader({
     <>
       <CreateReservationDrawer open={isCreateOpen} onOpenChange={setCreateOpen} />
 
-      <div className="flex flex-col justify-between gap-2 sm:flex-row">
+      <div className="flex flex-col flex-wrap justify-between gap-2 sm:flex-row">
         <div className="flex gap-2">
           <DataTableSearch
             table={table}
