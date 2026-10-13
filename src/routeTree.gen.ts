@@ -15,6 +15,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthNoAccessRouteImport } from './routes/_auth/no-access'
 import { Route as AuthSetPasswordRouteImport } from './routes/_auth/set-password'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AuthedDocumentsRouteImport } from './routes/_authed/documents'
 import { Route as AuthedHoaBoardRouteImport } from './routes/_authed/hoa-board'
 import { Route as AuthedLogsRouteImport } from './routes/_authed/logs'
 import { Route as AuthedMaintenanceRouteImport } from './routes/_authed/maintenance'
@@ -23,6 +24,7 @@ import { Route as AuthedResidentialRouteImport } from './routes/_authed/resident
 import { Route as AuthedSecurityRouteImport } from './routes/_authed/security'
 import { Route as AuthedTreasuryRouteImport } from './routes/_authed/treasury'
 import { Route as ApiOgRouteImport } from './routes/api/og'
+import { Route as ReportsDocumentRouteImport } from './routes/reports/document'
 import { Route as ReportsPdfRouteImport } from './routes/reports/pdf'
 import { Route as AuthAuthConfirmRouteImport } from './routes/_auth/auth/confirm'
 
@@ -52,6 +54,11 @@ const AuthSetPasswordRoute = AuthSetPasswordRouteImport.update({
 const AuthedIndexRoute = AuthedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+const AuthedDocumentsRoute = AuthedDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 const AuthedHoaBoardRoute = AuthedHoaBoardRouteImport.update({
@@ -94,6 +101,11 @@ const ApiOgRoute = ApiOgRouteImport.update({
   path: '/api/og',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportsDocumentRoute = ReportsDocumentRouteImport.update({
+  id: '/reports/document',
+  path: '/reports/document',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportsPdfRoute = ReportsPdfRouteImport.update({
   id: '/reports/pdf',
   path: '/reports/pdf',
@@ -110,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/no-access': typeof AuthNoAccessRoute
   '/set-password': typeof AuthSetPasswordRoute
+  '/documents': typeof AuthedDocumentsRoute
   '/hoa-board': typeof AuthedHoaBoardRoute
   '/logs': typeof AuthedLogsRoute
   '/maintenance': typeof AuthedMaintenanceRoute
@@ -118,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/security': typeof AuthedSecurityRoute
   '/treasury': typeof AuthedTreasuryRoute
   '/api/og': typeof ApiOgRoute
+  '/reports/document': typeof ReportsDocumentRoute
   '/reports/pdf': typeof ReportsPdfRoute
   '/auth/confirm': typeof AuthAuthConfirmRoute
 }
@@ -126,6 +140,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/no-access': typeof AuthNoAccessRoute
   '/set-password': typeof AuthSetPasswordRoute
+  '/documents': typeof AuthedDocumentsRoute
   '/hoa-board': typeof AuthedHoaBoardRoute
   '/logs': typeof AuthedLogsRoute
   '/maintenance': typeof AuthedMaintenanceRoute
@@ -134,6 +149,7 @@ export interface FileRoutesByTo {
   '/security': typeof AuthedSecurityRoute
   '/treasury': typeof AuthedTreasuryRoute
   '/api/og': typeof ApiOgRoute
+  '/reports/document': typeof ReportsDocumentRoute
   '/reports/pdf': typeof ReportsPdfRoute
   '/auth/confirm': typeof AuthAuthConfirmRoute
 }
@@ -144,6 +160,7 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/no-access': typeof AuthNoAccessRoute
   '/_auth/set-password': typeof AuthSetPasswordRoute
+  '/_authed/documents': typeof AuthedDocumentsRoute
   '/_authed/hoa-board': typeof AuthedHoaBoardRoute
   '/_authed/logs': typeof AuthedLogsRoute
   '/_authed/maintenance': typeof AuthedMaintenanceRoute
@@ -152,6 +169,7 @@ export interface FileRoutesById {
   '/_authed/security': typeof AuthedSecurityRoute
   '/_authed/treasury': typeof AuthedTreasuryRoute
   '/api/og': typeof ApiOgRoute
+  '/reports/document': typeof ReportsDocumentRoute
   '/reports/pdf': typeof ReportsPdfRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_auth/auth/confirm': typeof AuthAuthConfirmRoute
@@ -163,6 +181,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/no-access'
     | '/set-password'
+    | '/documents'
     | '/hoa-board'
     | '/logs'
     | '/maintenance'
@@ -171,6 +190,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/treasury'
     | '/api/og'
+    | '/reports/document'
     | '/reports/pdf'
     | '/auth/confirm'
   fileRoutesByTo: FileRoutesByTo
@@ -179,6 +199,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/no-access'
     | '/set-password'
+    | '/documents'
     | '/hoa-board'
     | '/logs'
     | '/maintenance'
@@ -187,6 +208,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/treasury'
     | '/api/og'
+    | '/reports/document'
     | '/reports/pdf'
     | '/auth/confirm'
   id:
@@ -196,6 +218,7 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/no-access'
     | '/_auth/set-password'
+    | '/_authed/documents'
     | '/_authed/hoa-board'
     | '/_authed/logs'
     | '/_authed/maintenance'
@@ -204,6 +227,7 @@ export interface FileRouteTypes {
     | '/_authed/security'
     | '/_authed/treasury'
     | '/api/og'
+    | '/reports/document'
     | '/reports/pdf'
     | '/_authed/'
     | '/_auth/auth/confirm'
@@ -213,6 +237,7 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
   ApiOgRoute: typeof ApiOgRoute
+  ReportsDocumentRoute: typeof ReportsDocumentRoute
   ReportsPdfRoute: typeof ReportsPdfRoute
 }
 
@@ -258,6 +283,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthedIndexRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
+    '/_authed/documents': {
+      id: '/_authed/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof AuthedDocumentsRouteImport
       parentRoute: typeof AuthedRouteRoute
     }
     '/_authed/hoa-board': {
@@ -316,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiOgRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reports/document': {
+      id: '/reports/document'
+      path: '/reports/document'
+      fullPath: '/reports/document'
+      preLoaderRoute: typeof ReportsDocumentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reports/pdf': {
       id: '/reports/pdf'
       path: '/reports/pdf'
@@ -352,6 +391,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 )
 
 interface AuthedRouteRouteChildren {
+  AuthedDocumentsRoute: typeof AuthedDocumentsRoute
   AuthedHoaBoardRoute: typeof AuthedHoaBoardRoute
   AuthedLogsRoute: typeof AuthedLogsRoute
   AuthedMaintenanceRoute: typeof AuthedMaintenanceRoute
@@ -363,6 +403,7 @@ interface AuthedRouteRouteChildren {
 }
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
+  AuthedDocumentsRoute: AuthedDocumentsRoute,
   AuthedHoaBoardRoute: AuthedHoaBoardRoute,
   AuthedLogsRoute: AuthedLogsRoute,
   AuthedMaintenanceRoute: AuthedMaintenanceRoute,
@@ -381,6 +422,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   AuthedRouteRoute: AuthedRouteRouteWithChildren,
   ApiOgRoute: ApiOgRoute,
+  ReportsDocumentRoute: ReportsDocumentRoute,
   ReportsPdfRoute: ReportsPdfRoute,
 }
 export const routeTree = rootRouteImport

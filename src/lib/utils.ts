@@ -76,6 +76,13 @@ export function normalizeString(value: string | null | undefined): string {
     .toLowerCase()
 }
 
+/** "Loma Verde, Coto 404" → "loma-verde-coto-404", for file names. */
+export function slugify(value: string): string {
+  return normalizeString(value)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
 /** "22 Sep 2026, 10:15 a.m." from an ISO timestamp or Date. Empty when missing or invalid. */
 export function formatDate(
   value: string | number | Date | null | undefined,

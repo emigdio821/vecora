@@ -90,6 +90,7 @@ What each section is called on screen. Docs and comments use the English name.
 | - Residents      | "Residentes"         | `?tab=residents`                               |
 | Activity log     | "Historial"          | `/logs` (admin only)                           |
 | Financial report | "Reporte financiero" | sidebar dialog; the PDF is `/reports/pdf`      |
+| Documents        | "Documentos"         | `/documents`; the PDF is `/reports/document`   |
 | Settings         | "Ajustes"            | sidebar dialog                                 |
 | - App            | "Aplicación"         | tab: theme (and language), per device          |
 | - HOA            | "Residencial"        | tab: name, logo, currency (president or admin) |

@@ -1,0 +1,115 @@
+/*
+ * The documents editor (typeset typeset-document), drawn like the PDF it becomes:
+ * src/components/reports/pdf/document.tsx has the same sizes and spacing in points.
+ * Change one, change the other.
+ *
+ * Sizes are in "PDF points" at the editor's scale: the PDF's text is 11pt, so a point
+ * is the editor's text size / 11. Blocks are spaced with margin-block-start only, like
+ * the rest of typeset: the rules below go from general to specific, later ones win, and
+ * the PDF's gapBefore() checks them in reverse order.
+ */
+
+@layer components {
+  .typeset-document {
+    /* 16px on phones so iOS doesn't zoom in on the editor; the text-sm of forms above. */
+    --typeset-size: 16px;
+    --document-pt: calc(var(--typeset-size) / 11);
+    --typeset-leading: 1.5;
+    --typeset-flow: calc(6 * var(--document-pt));
+    /* Same size at every width: typeset's 1.125x for small screens is replaced by the 16px. */
+    font-size: var(--typeset-size);
+
+    @media (min-width: 40rem) {
+      --typeset-size: 14px;
+    }
+  }
+
+  /* Headings: 16/14/12.5/11.5pt over the 11pt text, 12pt above, 6pt below. */
+  .typeset-document :where(h1, h2, h3, h4) {
+    line-height: 1.4;
+    margin-block-start: calc(12 * var(--document-pt));
+  }
+  .typeset-document :where(h1) {
+    font-size: calc(16 * var(--document-pt));
+  }
+  .typeset-document :where(h2) {
+    font-size: calc(14 * var(--document-pt));
+  }
+  .typeset-document :where(h3) {
+    font-size: calc(12.5 * var(--document-pt));
+  }
+  .typeset-document :where(h4) {
+    font-size: calc(11.5 * var(--document-pt));
+  }
+  .typeset-document :where(:is(h1, h2, h3, h4) + *) {
+    margin-block-start: var(--typeset-flow);
+  }
+  .typeset-document :where(:is(h1, h2, h3, h4) + :is(h1, h2, h3, h4)) {
+    margin-block-start: calc(12 * var(--document-pt));
+  }
+
+  /* Lists: an 18pt column for the marker, 2pt between items and inside them, a bullet at every level. */
+  .typeset-document :where(ul, ol) {
+    padding-inline-start: calc(18 * var(--document-pt));
+  }
+  .typeset-document :where(ul) {
+    list-style-type: disc;
+  }
+  .typeset-document :where(li) {
+    margin-block-start: 0;
+    padding-inline-start: 0;
+  }
+  .typeset-document :where(li + li, li > *) {
+    margin-block-start: calc(2 * var(--document-pt));
+  }
+  .typeset-document :where(li)::marker {
+    color: inherit;
+  }
+
+  /* Images (the editor's node view): 10pt around them, more than text gets. */
+  .typeset-document :where(.node-image, .node-image + *) {
+    margin-block-start: calc(10 * var(--document-pt));
+  }
+  .typeset-document :where(.node-image + :is(h1, h2, h3, h4)) {
+    margin-block-start: calc(12 * var(--document-pt));
+  }
+
+  /* The first block of the editor, an item or a quote starts at the top. Last, so it wins. */
+  .typeset-document > :where(:first-child),
+  .typeset-document :where(li > :first-child, blockquote > :first-child) {
+    margin-block-start: 0;
+  }
+
+  /* Quotes: a 3pt bar 10pt from the text, which is muted. */
+  .typeset-document :where(blockquote) {
+    border-inline-start: calc(3 * var(--document-pt)) solid var(--color-neutral-300);
+    padding-inline-start: calc(10 * var(--document-pt));
+    color: var(--color-muted-foreground);
+  }
+  .dark .typeset-document :where(blockquote) {
+    border-inline-start-color: var(--color-neutral-600);
+  }
+
+  /* Links are blue and underlined, like the PDF draws them. */
+  .typeset-document :where(a) {
+    color: var(--color-blue-700);
+    font-weight: inherit;
+    text-decoration-color: currentColor;
+  }
+  .dark .typeset-document :where(a) {
+    color: var(--color-blue-400);
+  }
+
+  /* Struck text keeps its color; the PDF only crosses it out. */
+  .typeset-document :where(del, s) {
+    color: inherit;
+  }
+
+  /* Highlights hug the text, like the PDF's. Light in both themes, so their text stays
+     dark: important, because the editor writes color: inherit on each one. */
+  .typeset-document :where(mark) {
+    padding: 0;
+    border-radius: 0.125em;
+    color: var(--color-neutral-900) !important;
+  }
+}

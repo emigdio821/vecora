@@ -4,7 +4,7 @@ import { FinancialReportDocument, isWholeMonth } from '@/components/reports/pdf/
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { getFinancialReport } from '@/lib/supabase/financial-report'
 import { getLogo, getSettings } from '@/lib/supabase/settings'
-import { normalizeString } from '@/lib/utils'
+import { slugify } from '@/lib/utils'
 import { reportRangeSchema } from '@/lib/validations/reports'
 import { defaultResidentialLabel } from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
@@ -18,9 +18,7 @@ import type { Locale } from '@/paraglide/runtime'
  * for a custom range. Without a residential name it's just "vecora-reporte-2026-08.pdf".
  */
 function fileName(residentialName: string, from: string, to: string, language: Locale): string {
-  const slug = normalizeString(residentialName)
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
+  const slug = slugify(residentialName)
   const dates = isWholeMonth(from, to)
     ? from.slice(0, 7)
     : m.reports_file_name_range({ from, to }, { locale: language })

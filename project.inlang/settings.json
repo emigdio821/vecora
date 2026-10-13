@@ -18,7 +18,8 @@
       "./messages/board/{locale}.json",
       "./messages/logs/{locale}.json",
       "./messages/settings/{locale}.json",
-      "./messages/reports/{locale}.json"
+      "./messages/reports/{locale}.json",
+      "./messages/documents/{locale}.json"
     ]
   }
 }
