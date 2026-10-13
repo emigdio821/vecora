@@ -4,7 +4,13 @@ import { Link, type LinkOptions, linkOptions } from '@tanstack/react-router'
 import { reservationStatus } from '@/components/presidency/reservations/status'
 import { KIND_LABEL as SECURITY_KIND_LABEL } from '@/components/security/kind'
 import { Money } from '@/components/shared/money'
-import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
+import {
+  CARD_LIST_CLASS,
+  CARD_LIST_EMPTY_CLASS,
+  CARD_LIST_PANEL_CLASS,
+  CARD_LIST_ROW_CLASS,
+  CardListSkeleton,
+} from '@/components/shared/skeletons/card-list'
 import {
   Card,
   CardFrame,
@@ -15,7 +21,8 @@ import {
   CardPanel,
 } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { type CurrencyCode, formatDay } from '@/lib/utils'
+import { Skeleton } from '@/components/ui/skeleton'
+import { type CurrencyCode, cn, formatDay } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import { maintenanceRequestsQueryOptions } from '@/tanstack-queries/maintenance'
 import { reservationsQueryOptions } from '@/tanstack-queries/presidency'
@@ -29,6 +36,30 @@ interface PaymentRequest {
   amount: number
   currency: CurrencyCode
   requested_on: string
+}
+
+/** A row's lines: title and section, and the amount (beside them, or below on phones). */
+function PaymentRequestsSkeleton() {
+  return (
+    <CardListSkeleton
+      rows={4}
+      row={
+        <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div className="grid w-1/2 gap-1">
+            <div className="flex h-5 items-center">
+              <Skeleton className="h-3.5 w-full" />
+            </div>
+            <div className="flex h-4 items-center">
+              <Skeleton className="h-3 w-3/4" />
+            </div>
+          </div>
+          <div className="flex h-5 items-center">
+            <Skeleton className="h-3.5 w-20" />
+          </div>
+        </div>
+      }
+    />
+  )
 }
 
 function pendingDescription(pending: number): string {
@@ -46,7 +77,7 @@ export function PaymentRequestsCard() {
   const reservations = useQuery(reservationsQueryOptions())
 
   if (maintenance.isPending || security.isPending || reservations.isPending) {
-    return <CardFrameSkeleton rows={3} />
+    return <PaymentRequestsSkeleton />
   }
 
   if (maintenance.isError || security.isError || reservations.isError) return null
@@ -105,13 +136,13 @@ export function PaymentRequestsCard() {
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel className="p-0">
+        <CardPanel className={CARD_LIST_PANEL_CLASS}>
           {pending.length ? (
-            <ul className="flex max-h-56 flex-col divide-y overflow-y-auto">
+            <ul className={CARD_LIST_CLASS}>
               {pending.map((request) => (
-                <li key={request.key} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
+                <li key={request.key} className={cn(CARD_LIST_ROW_CLASS, 'text-sm')}>
                   <div className="flex min-w-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="grid max-w-full min-w-0 gap-0.5">
+                    <span className="grid max-w-full min-w-0 gap-1">
                       <Link {...request.link} className="truncate font-medium hover:underline">
                         {request.title}
                       </Link>
@@ -127,7 +158,7 @@ export function PaymentRequestsCard() {
               ))}
             </ul>
           ) : (
-            <Empty>
+            <Empty className={CARD_LIST_EMPTY_CLASS}>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <IconReceipt />

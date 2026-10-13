@@ -1,7 +1,13 @@
 import { IconCalendarOff, IconCoins } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
+import {
+  CARD_LIST_CLASS,
+  CARD_LIST_EMPTY_CLASS,
+  CARD_LIST_PANEL_CLASS,
+  CARD_LIST_ROW_CLASS,
+  CardListSkeleton,
+} from '@/components/shared/skeletons/card-list'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -13,7 +19,8 @@ import {
   CardPanel,
 } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { formatMonth } from '@/lib/utils'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn, formatMonth } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { houseFeeStatusQueryOptions } from '@/tanstack-queries/treasury'
@@ -26,6 +33,28 @@ function feeStatusDescription(upToDate: number, total: number): string {
   return m.dashboard_fees_some_up_to_date({ upToDate, total })
 }
 
+/** A row's lines: the house and its badge, then the months. */
+function FeeStatusSkeleton() {
+  return (
+    <CardListSkeleton
+      rows={4}
+      row={
+        <>
+          <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex h-5 w-1/2 items-center">
+              <Skeleton className="h-3.5 w-full" />
+            </div>
+            <Skeleton className="h-4.5 w-20 shrink-0" />
+          </div>
+          <div className="flex h-4 items-center">
+            <Skeleton className="h-3 w-3/4" />
+          </div>
+        </>
+      }
+    />
+  )
+}
+
 /**
  * Who is up to date with the monthly fee in the current period, and who is
  * not: every house missing at least one month so far, with the months owed.
@@ -36,7 +65,7 @@ export function FeeStatusCard() {
   const houses = useQuery(housesPickerQueryOptions())
 
   if (status.isPending) {
-    return <CardFrameSkeleton rows={3} />
+    return <FeeStatusSkeleton />
   }
 
   if (status.isError) return null
@@ -60,9 +89,9 @@ export function FeeStatusCard() {
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel className="p-0">
+        <CardPanel className={CARD_LIST_PANEL_CLASS}>
           {total === 0 ? (
-            <Empty>
+            <Empty className={CARD_LIST_EMPTY_CLASS}>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <IconCalendarOff />
@@ -72,7 +101,7 @@ export function FeeStatusCard() {
               </EmptyHeader>
             </Empty>
           ) : pending.length === 0 ? (
-            <Empty>
+            <Empty className={CARD_LIST_EMPTY_CLASS}>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <IconCoins />
@@ -82,12 +111,12 @@ export function FeeStatusCard() {
               </EmptyHeader>
             </Empty>
           ) : (
-            <ul className="flex max-h-56 flex-col divide-y overflow-y-auto">
+            <ul className={CARD_LIST_CLASS}>
               {pending.map((house) => {
                 const months = house.unpaid_months ?? []
                 const owners = ownersOf(house.property_id)
                 return (
-                  <li key={house.property_id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
+                  <li key={house.property_id} className={cn(CARD_LIST_ROW_CLASS, 'text-sm')}>
                     <div className="flex min-w-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
                       <span className="max-w-full truncate">
                         <Link

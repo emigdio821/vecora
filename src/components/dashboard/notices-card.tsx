@@ -2,7 +2,13 @@ import { IconCalendarMonth, IconConfetti } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { format, parseISO } from 'date-fns'
-import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
+import {
+  CARD_LIST_CLASS,
+  CARD_LIST_EMPTY_CLASS,
+  CARD_LIST_PANEL_CLASS,
+  CARD_LIST_ROW_CLASS,
+  CardListSkeleton,
+} from '@/components/shared/skeletons/card-list'
 import {
   Card,
   CardFrame,
@@ -13,12 +19,32 @@ import {
   CardPanel,
 } from '@/components/ui/card'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useToday } from '@/hooks/use-today'
-import { dateLocale, ISO_DAY } from '@/lib/utils'
+import { cn, dateLocale, ISO_DAY } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import { reservationsQueryOptions } from '@/tanstack-queries/presidency'
 
 const MAX_NOTICES = 5
+
+/** A row's lines: the day, then the area, house and notes. */
+function NoticesSkeleton() {
+  return (
+    <CardListSkeleton
+      rows={3}
+      row={
+        <>
+          <div className="flex h-5 items-center">
+            <Skeleton className="h-3.5 w-2/5" />
+          </div>
+          <div className="flex h-4 items-center">
+            <Skeleton className="h-3 w-3/5" />
+          </div>
+        </>
+      }
+    />
+  )
+}
 
 /**
  * What's coming up in the residential. For now that's only the common area
@@ -29,7 +55,7 @@ export function NoticesCard() {
   const now = useToday()
 
   if (reservations.isPending) {
-    return <CardFrameSkeleton rows={3} />
+    return <NoticesSkeleton />
   }
 
   if (reservations.isError) return null
@@ -52,11 +78,11 @@ export function NoticesCard() {
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel className="p-0">
+        <CardPanel className={CARD_LIST_PANEL_CLASS}>
           {upcoming.length ? (
-            <ul className="flex max-h-56 flex-col divide-y overflow-y-auto">
+            <ul className={CARD_LIST_CLASS}>
               {upcoming.map((reservation) => (
-                <li key={reservation.id} className="grid gap-1 px-6 py-3 text-sm first:pt-6 last:pb-6">
+                <li key={reservation.id} className={cn(CARD_LIST_ROW_CLASS, 'text-sm')}>
                   {/* The search only matches the house; the area filter narrows it to the amenity. */}
                   <Link
                     to="/presidency"
@@ -81,7 +107,7 @@ export function NoticesCard() {
               ))}
             </ul>
           ) : (
-            <Empty>
+            <Empty className={CARD_LIST_EMPTY_CLASS}>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <IconCalendarMonth />
