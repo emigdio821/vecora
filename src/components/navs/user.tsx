@@ -54,7 +54,7 @@ export function NavUser({ user }: NavUserProps) {
                       {getAvatarFallback(user.fullName)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="grid min-w-0 flex-1 gap-1 text-left leading-none">
+                  <div className="grid min-w-0 flex-1 gap-0.5 text-left">
                     <span className="truncate font-medium">{user.fullName}</span>
                     <div className="flex gap-1 overflow-hidden">
                       {user.roles.length ? (
