@@ -18,7 +18,7 @@ export interface CurrentUser {
   mustSetPassword: boolean
   /** Already closed the welcome dialog, on any device. */
   welcomed: boolean
-  /** admin@vecora.com, the app's own account: the one that completes the setup dialog. */
+  /** admin@vecora.com, the app's own account. */
   isMainAdmin: boolean
 }
 

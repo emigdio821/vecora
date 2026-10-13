@@ -16,7 +16,6 @@
   "logs_action_cancelled": "Canceló",
 
   "logs_resident": "Residente",
-  "logs_summary_setup_completed": "Configuración inicial completada",
   "logs_summary_residential_name_changed": "Nombre del residencial cambiado a \"{name}\"",
   "logs_summary_residential_name_reset": "Nombre del residencial restablecido al valor predeterminado",
   "logs_summary_logo_added": "Logo agregado",
@@ -42,7 +41,6 @@
   "logs_field_residential_name": "Nombre del residencial",
   "logs_field_logo": "Logo",
   "logs_field_default_language": "Idioma predeterminado",
-  "logs_field_configured_at": "Configuración inicial",
   "logs_field_currency": "Moneda",
   "logs_field_reserved_on": "Fecha de reserva",
   "logs_field_fee_month": "Mes de la cuota",

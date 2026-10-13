@@ -10,9 +10,7 @@
 --
 --   * Exactly one row, created here: the app only ever updates it.
 --   * Every board member reads it; only the president (or an admin) edits it.
---     Language and currency are the admin's alone (trigger below): the main
---     admin picks them in the setup dialog on the first sign-in, which sets
---     configured_at.
+--     Language and currency are the admin's alone (trigger below).
 --   * default_language is the language of the HOA's data: generated
 --     descriptions, the names of the seeded categories and the report. Each
 --     person can still switch the app's screens to another language; that
@@ -31,7 +29,6 @@ create table public.settings (
   residential_name text not null default '',
   default_language public.app_language not null default 'es',
   currency         public.currency_code not null default 'MXN',
-  configured_at    timestamptz,
   updated_at       timestamptz not null default now(),
   logo_path        text,
 
@@ -43,7 +40,6 @@ comment on table public.settings is 'Single row with the residential''s own deta
 comment on column public.settings.residential_name is 'Shown in the sidebar and reports. Empty means the app falls back to its generic label.';
 comment on column public.settings.default_language is 'Language of the HOA''s data and reports, and of the app for anyone who hasn''t picked their own.';
 comment on column public.settings.currency is 'Currency of new amounts. Changing it never touches existing rows, which keep their own.';
-comment on column public.settings.configured_at is 'When the main admin completed the setup dialog. Null until then, which is what shows the dialog.';
 comment on column public.settings.logo_path is 'File in the "branding" bucket. Null means no logo.';
 
 insert into public.settings default values;
@@ -61,8 +57,8 @@ language plpgsql
 set search_path = ''
 as $$
 begin
-  if (new.default_language, new.currency, new.configured_at)
-       is distinct from (old.default_language, old.currency, old.configured_at)
+  if (new.default_language, new.currency)
+       is distinct from (old.default_language, old.currency)
      and auth.uid() is not null
      and not private.is_admin() then
     raise exception 'only an admin can change the language or the currency' using errcode = '42501';

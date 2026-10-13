@@ -31,18 +31,10 @@
   "settings_logo_hint": "Aparece en los reportes. Es recomendable usar el formato PNG con fondo transparente, con un máximo de 2 MB.",
 
   "settings_save_failed": "No se pudieron guardar los ajustes, intenta nuevamente",
-  "settings_setup_save_failed": "No se pudo guardar la configuración, intenta nuevamente",
   "settings_logo_save_failed": "No se pudo guardar el logo, intenta nuevamente",
   "settings_logo_read_failed": "No se pudo leer la imagen, prueba con otro archivo",
   "settings_logo_upload_failed": "No se pudo subir el logo, intenta nuevamente",
   "settings_generic_save_failed": "No se pudo guardar, intenta nuevamente",
-
-  "settings_setup_title": "Configura tu residencial",
-  "settings_setup_description": "Antes de empezar, elige cómo se llama el residencial, su idioma y su moneda.",
-  "settings_setup_description_single_language": "Antes de empezar, elige cómo se llama el residencial y su moneda.",
-  "settings_residential_name_hint": "Aparece en el menú y en los reportes.",
-  "settings_setup_currency_hint": "Puedes cambiarla después en \"Ajustes\"; lo ya registrado conserva su moneda.",
-  "settings_setup_submit": "Guardar y continuar",
 
   "settings_welcome_payment_requests": "Solicitudes de pago",
   "settings_welcome_ability_residential": "Da de alta las casas y a sus residentes.",

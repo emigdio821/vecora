@@ -31,18 +31,10 @@
   "settings_logo_hint": "Shown on reports. A PNG with a transparent background is recommended, up to 2 MB.",
 
   "settings_save_failed": "Couldn't save the settings, please try again",
-  "settings_setup_save_failed": "Couldn't save the setup, please try again",
   "settings_logo_save_failed": "Couldn't save the logo, please try again",
   "settings_logo_read_failed": "Couldn't read the image, try another file",
   "settings_logo_upload_failed": "Couldn't upload the logo, please try again",
   "settings_generic_save_failed": "Couldn't save, please try again",
-
-  "settings_setup_title": "Set up your HOA",
-  "settings_setup_description": "Before you start, choose the HOA's name, language and currency.",
-  "settings_setup_description_single_language": "Before you start, choose the HOA's name and currency.",
-  "settings_residential_name_hint": "Shown in the menu and on reports.",
-  "settings_setup_currency_hint": "You can change it later in \"Settings\"; existing records keep their currency.",
-  "settings_setup_submit": "Save and continue",
 
   "settings_welcome_payment_requests": "Payment requests",
   "settings_welcome_ability_residential": "Add the houses and their residents.",

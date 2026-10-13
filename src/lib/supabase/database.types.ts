@@ -519,7 +519,6 @@ export type Database = {
       }
       settings: {
         Row: {
-          configured_at: string | null
           currency: Database['public']['Enums']['currency_code']
           default_language: Database['public']['Enums']['app_language']
           id: string
@@ -529,7 +528,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          configured_at?: string | null
           currency?: Database['public']['Enums']['currency_code']
           default_language?: Database['public']['Enums']['app_language']
           id?: string
@@ -539,7 +537,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          configured_at?: string | null
           currency?: Database['public']['Enums']['currency_code']
           default_language?: Database['public']['Enums']['app_language']
           id?: string

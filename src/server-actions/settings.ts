@@ -3,14 +3,7 @@ import sharp from 'sharp'
 import { type ActionResult, postgrestErrorMessage } from '@/lib/action-result'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { createClient } from '@/lib/supabase/server'
-import {
-  LOGO_BUCKET,
-  logoFileSchema,
-  type SettingsInput,
-  settingsSchema,
-  type SetupInput,
-  setupSchema,
-} from '@/lib/validations/settings'
+import { LOGO_BUCKET, logoFileSchema, type SettingsInput, settingsSchema } from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
 
 /** Largest side of the stored logo, in pixels: plenty for the report header. */
@@ -53,39 +46,6 @@ const updateSettingsFn = createServerFn({ method: 'POST' })
   })
 
 export const updateSettings = (input: SettingsInput) => updateSettingsFn({ data: input })
-
-/** The main admin's setup dialog: name, language and currency, then it never opens again. */
-const completeSetupFn = createServerFn({ method: 'POST' })
-  .validator((input: SetupInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult> => {
-    const parsed = setupSchema.safeParse(input)
-    if (!parsed.success) {
-      return { error: m.common_form_invalid() }
-    }
-
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('settings')
-      .update({ ...parsed.data, configured_at: new Date().toISOString() })
-      .eq('singleton', true)
-      .select('id')
-      .maybeSingle()
-
-    if (error) {
-      return {
-        error: postgrestErrorMessage(error, {
-          fallback: m.settings_setup_save_failed(),
-        }),
-      }
-    }
-    if (!data) {
-      return { error: m.common_no_permission() }
-    }
-
-    return { data: undefined }
-  })
-
-export const completeSetup = (input: SetupInput) => completeSetupFn({ data: input })
 
 /**
  * Whatever the president uploads ends up as a light PNG: turned upright,

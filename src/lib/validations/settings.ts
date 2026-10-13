@@ -35,7 +35,7 @@ export const CURRENCY_LABEL: Record<CurrencyCode, string> = {
   },
 }
 
-/** For the setup and settings selects. */
+/** For the settings selects. */
 export const LANGUAGE_ITEMS = LANGUAGES.map((value) => ({ value, label: LANGUAGE_LABEL[value] }))
 export const CURRENCY_ITEMS = CURRENCIES.map((value) => ({
   value,
@@ -58,15 +58,6 @@ export const settingsSchema = z.object({
 })
 
 export type SettingsInput = z.infer<typeof settingsSchema>
-
-/** The main admin's first sign-in: everything the HOA needs before anyone else joins. */
-export const setupSchema = z.object({
-  residential_name: residentialName.min(1, { error: () => m.common_name_required() }),
-  default_language: z.enum(LANGUAGES),
-  currency: z.enum(CURRENCIES),
-})
-
-export type SetupInput = z.infer<typeof setupSchema>
 
 /** Storage bucket for the logo (see the settings_logo migration). */
 export const LOGO_BUCKET = 'branding'

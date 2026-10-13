@@ -103,12 +103,12 @@ begin
   update public.audit_log set occurred_at = t - interval '1 day', txid = -id where txid > 0;
 
   -- -------------------------------------------------------------------------
-  -- admin completes the setup dialog
+  -- admin names the residential and picks its language and currency
   -- -------------------------------------------------------------------------
   perform pg_temp.act_as(u_admin);
 
   update public.settings
-  set residential_name = 'Loma Verde Coto 404', default_language = 'es', currency = 'MXN', configured_at = now();
+  set residential_name = 'Loma Verde Coto 404', default_language = 'es', currency = 'MXN';
   perform pg_temp.mark(t);
   t := t + interval '5 minutes';
 

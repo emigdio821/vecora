@@ -101,7 +101,7 @@ What each section is called on screen. Docs and comments use the English name.
 | --------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `npm run dev`                     | Development server                                                                                     |
 | `npm run db:reset`                | Recreate the local database from migrations + seeds (destroys local data)                              |
-| `npm run db:reset:empty`          | Same, but only the admin account from `seed.sql`: a fresh install, starting at the setup dialog        |
+| `npm run db:reset:empty`          | Same, but only the admin account from `seed.sql`: a fresh install with no data                         |
 | `npm run db:types`                | Regenerate `src/lib/supabase/database.types.ts` from the local schema — run after changing a migration |
 | `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                             |
 | `npm run i18n`                    | Compile `messages/` into `src/paraglide/` (the dev server also does it on its own)                     |

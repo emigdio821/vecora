@@ -190,11 +190,6 @@ function settingsSummary(entry: LogEntryQueryData): string {
   const after = (entry.new_data ?? {}) as RowData
   const changedFields = entry.changed_fields ?? []
 
-  // The main admin's setup dialog fills in the name, language and currency at once.
-  if (changedFields.includes('configured_at')) {
-    return m.logs_summary_setup_completed()
-  }
-
   const changes: string[] = []
 
   if (changedFields.includes('residential_name')) {
@@ -359,9 +354,6 @@ const FIELD_LABEL: Record<string, string> = {
   get default_language() {
     return m.logs_field_default_language()
   },
-  get configured_at() {
-    return m.logs_field_configured_at()
-  },
   get currency() {
     return m.logs_field_currency()
   },
@@ -460,14 +452,7 @@ const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton', 'key'])
 
 const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee', 'default_fee'])
 const DAY_FIELDS = new Set(['occurred_on', 'requested_on', 'reserved_on', 'starts_on', 'ends_on'])
-const TIMESTAMP_FIELDS = new Set([
-  'created_at',
-  'resolved_at',
-  'cancelled_at',
-  'deleted_at',
-  'welcomed_at',
-  'configured_at',
-])
+const TIMESTAMP_FIELDS = new Set(['created_at', 'resolved_at', 'cancelled_at', 'deleted_at', 'welcomed_at'])
 
 /** Enum values don't collide across tables, so one flat map is enough. */
 const ENUM_LABEL: Record<string, string> = {

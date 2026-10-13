@@ -12,21 +12,18 @@ export interface Settings {
   defaultLanguage: AppLanguage
   /** Currency of new amounts; existing rows keep their own. */
   currency: CurrencyCode
-  /** The main admin completed the setup dialog. */
-  isConfigured: boolean
 }
 
 /**
  * The single public.settings row (the authed layout loads it and hands it
  * down). Reports can call this too. A read failure falls back to the
- * defaults so the app still renders with its generic labels (and doesn't
- * reopen the setup dialog).
+ * defaults so the app still renders with its generic labels.
  */
 export async function getSettings(): Promise<Settings> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('settings')
-    .select('residential_name, logo_path, default_language, currency, configured_at')
+    .select('residential_name, logo_path, default_language, currency')
     .maybeSingle()
 
   return {
@@ -34,7 +31,6 @@ export async function getSettings(): Promise<Settings> {
     logoPath: data?.logo_path ?? null,
     defaultLanguage: data?.default_language ?? 'es',
     currency: data?.currency ?? 'MXN',
-    isConfigured: data ? data.configured_at !== null : true,
   }
 }
 

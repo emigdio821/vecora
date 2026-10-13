@@ -16,7 +16,6 @@
   "logs_action_cancelled": "Cancelled",
 
   "logs_resident": "Resident",
-  "logs_summary_setup_completed": "Initial setup completed",
   "logs_summary_residential_name_changed": "Community name changed to \"{name}\"",
   "logs_summary_residential_name_reset": "Community name reset to the default",
   "logs_summary_logo_added": "Logo added",
@@ -42,7 +41,6 @@
   "logs_field_residential_name": "Community name",
   "logs_field_logo": "Logo",
   "logs_field_default_language": "Default language",
-  "logs_field_configured_at": "Initial setup",
   "logs_field_currency": "Currency",
   "logs_field_reserved_on": "Reservation date",
   "logs_field_fee_month": "Fee month",
