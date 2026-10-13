@@ -145,10 +145,6 @@
   "common_request_status_paid": "Paid",
   "common_request_status_rejected": "Rejected",
 
-  "common_table_page_out_of_range": "Page out of range",
-  "common_table_page_missing_before": "Page",
-  "common_table_page_missing_after": "doesn't exist in this table. The last page is",
-  "common_table_go_first_page": "Go to the first page",
   "common_table_showing": "Showing",
   "common_table_of": "of",
   "common_table_results": [

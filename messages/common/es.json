@@ -145,10 +145,6 @@
   "common_request_status_paid": "Pagada",
   "common_request_status_rejected": "Rechazada",
 
-  "common_table_page_out_of_range": "Página fuera de rango",
-  "common_table_page_missing_before": "La página",
-  "common_table_page_missing_after": "no existe en esta tabla. La última página es",
-  "common_table_go_first_page": "Ir a la primera página",
   "common_table_showing": "Mostrando",
   "common_table_of": "de",
   "common_table_results": [

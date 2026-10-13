@@ -1,4 +1,3 @@
-import { IconAlertTriangle } from '@tabler/icons-react'
 import type {
   ColumnDef,
   PaginationState,
@@ -8,17 +7,9 @@ import type {
 } from '@tanstack/react-table'
 import { flexRender, functionalUpdate, useTable } from '@tanstack/react-table'
 import { parseAsIndex, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { CardFrame, CardFrameFooter } from '@/components/ui/card'
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty'
 import {
   Pagination,
   PaginationContent,
@@ -83,6 +74,7 @@ export function DataTable<TData extends RowData>({
   )
   const [pageSize, setPageSize] = useState(initialPageSize)
   const pagination: PaginationState = { pageIndex, pageSize }
+  const clampedFrom = useRef<number | null>(null)
 
   const table = useTable({
     features: dataTableFeatures,
@@ -96,6 +88,7 @@ export function DataTable<TData extends RowData>({
     state: { pagination },
     onPaginationChange: (updater) => {
       const next = functionalUpdate(updater, pagination)
+      clampedFrom.current = null
       if (next.pageSize !== pagination.pageSize) setPageSize(next.pageSize)
       if (next.pageIndex !== pagination.pageIndex) void setPageIndex(next.pageIndex)
     },
@@ -109,6 +102,7 @@ export function DataTable<TData extends RowData>({
   useEffect(() => {
     if (previousFiltersKey.current !== filtersKey) {
       previousFiltersKey.current = filtersKey
+      clampedFrom.current = null
       void setPageIndex(0)
     }
   }, [filtersKey, setPageIndex])
@@ -119,6 +113,16 @@ export function DataTable<TData extends RowData>({
   const isPageOutOfRange = pageCount > 0 && pageIndex >= pageCount
   const isSinglePage = pageCount <= 1
 
+  useLayoutEffect(() => {
+    if (isPageOutOfRange) {
+      clampedFrom.current = clampedFrom.current ?? pageIndex
+      void setPageIndex(pageCount - 1)
+    } else if (clampedFrom.current !== null && clampedFrom.current < pageCount) {
+      void setPageIndex(clampedFrom.current)
+      clampedFrom.current = null
+    }
+  }, [isPageOutOfRange, pageCount, pageIndex, setPageIndex])
+
   const pageRanges = Array.from({ length: pageCount }, (_, i) => ({
     value: i + 1,
     label: `${i * pageSize + 1}-${Math.min((i + 1) * pageSize, rowCount)}`,
@@ -128,169 +132,144 @@ export function DataTable<TData extends RowData>({
     <div className={cn('flex flex-col gap-4', className)}>
       {header?.(table)}
 
-      {isPageOutOfRange ? (
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <IconAlertTriangle />
-            </EmptyMedia>
-            <EmptyTitle>{m.common_table_page_out_of_range()}</EmptyTitle>
-            <EmptyDescription>
-              {m.common_table_page_missing_before()} <span className="font-semibold">{pageIndex + 1}</span>{' '}
-              {m.common_table_page_missing_after()} <span className="font-semibold">{pageCount}</span>.
-            </EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
-            <Button
-              onClick={() => {
-                table.setPageIndex(0)
-              }}
-            >
-              {m.common_table_go_first_page()}
-            </Button>
-          </EmptyContent>
-        </Empty>
-      ) : (
-        <CardFrame className="w-full">
-          <Table variant="card" className="table-fixed">
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow className="hover:bg-transparent" key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} style={{ width: `${header.column.getSize()}px` }}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
+      <CardFrame className="w-full">
+        <Table variant="card" className="table-fixed">
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow className="hover:bg-transparent" key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} style={{ width: `${header.column.getSize()}px` }}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+
+          <TableBody>
+            {isLoading &&
+              Array.from({ length: LOADING_ROWS }, (_, index) => (
+                <TableRow className="hover:bg-transparent" key={index}>
+                  {table.getVisibleLeafColumns().map((column) => (
+                    <TableCell
+                      key={column.id}
+                      // A real checkbox cell narrows itself via `has-[[role=checkbox]]`; the skeleton
+                      // isn't one, so spell that out or the columns shift when the data lands.
+                      className={cn(column.id === 'select' && 'w-px first:pe-0 last:ps-0')}
+                    >
+                      <Skeleton className={LOADING_CELL_CLASS[column.id] ?? 'h-4.5 w-full max-w-32'} />
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
-            </TableHeader>
 
-            <TableBody>
-              {isLoading &&
-                Array.from({ length: LOADING_ROWS }, (_, index) => (
-                  <TableRow className="hover:bg-transparent" key={index}>
-                    {table.getVisibleLeafColumns().map((column) => (
-                      <TableCell
-                        key={column.id}
-                        // A real checkbox cell narrows itself via `has-[[role=checkbox]]`; the skeleton
-                        // isn't one, so spell that out or the columns shift when the data lands.
-                        className={cn(column.id === 'select' && 'w-px first:pe-0 last:ps-0')}
-                      >
-                        <Skeleton className={LOADING_CELL_CLASS[column.id] ?? 'h-4.5 w-full max-w-32'} />
+            {!isLoading &&
+              (rows.length ? (
+                rows.map((row) => (
+                  <TableRow data-state={row.getIsSelected() ? 'selected' : undefined} key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
                   </TableRow>
-                ))}
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell className="h-24 text-center" colSpan={columns.length}>
+                    {emptyMessage}
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
 
-              {!isLoading &&
-                (rows.length ? (
-                  rows.map((row) => (
-                    <TableRow data-state={row.getIsSelected() ? 'selected' : undefined} key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
+        {rowCount > 0 && (
+          <CardFrameFooter className="p-2">
+            {/* min-h keeps the footer height when the buttons are hidden. */}
+            <div className="flex min-h-8 items-center justify-between gap-2">
+              {/* One page: nothing to pick or page through, so plain text and no buttons. */}
+              {isSinglePage ? (
+                <p className="text-sm whitespace-nowrap text-muted-foreground">
+                  {m.common_table_showing()}{' '}
+                  <strong className="font-medium text-foreground">{pageRanges[0]?.label}</strong>{' '}
+                  {m.common_table_of()} <strong className="font-medium text-foreground">{rowCount}</strong>{' '}
+                  {m.common_table_results({ count: rowCount })}
+                </p>
+              ) : (
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  <p className="text-sm text-muted-foreground">{m.common_table_showing()}</p>
+                  <Select
+                    items={pageRanges}
+                    value={pageIndex + 1}
+                    onValueChange={(value) => {
+                      table.setPageIndex((value as number) - 1)
+                    }}
+                  >
+                    <SelectTrigger
+                      size="sm"
+                      className="min-w-none w-fit"
+                      aria-label={m.common_table_select_range()}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectPopup>
+                      {pageRanges.map((range) => (
+                        <SelectItem key={range.value} value={range.value}>
+                          {range.label}
+                        </SelectItem>
                       ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell className="h-24 text-center" colSpan={columns.length}>
-                      {emptyMessage}
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-
-          {rowCount > 0 && (
-            <CardFrameFooter className="p-2">
-              {/* min-h keeps the footer height when the buttons are hidden. */}
-              <div className="flex min-h-8 items-center justify-between gap-2">
-                {/* One page: nothing to pick or page through, so plain text and no buttons. */}
-                {isSinglePage ? (
-                  <p className="text-sm whitespace-nowrap text-muted-foreground">
-                    {m.common_table_showing()}{' '}
-                    <strong className="font-medium text-foreground">{pageRanges[0]?.label}</strong>{' '}
+                    </SelectPopup>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">
                     {m.common_table_of()} <strong className="font-medium text-foreground">{rowCount}</strong>{' '}
                     {m.common_table_results({ count: rowCount })}
                   </p>
-                ) : (
-                  <div className="flex items-center gap-2 whitespace-nowrap">
-                    <p className="text-sm text-muted-foreground">{m.common_table_showing()}</p>
-                    <Select
-                      items={pageRanges}
-                      value={pageIndex + 1}
-                      onValueChange={(value) => {
-                        table.setPageIndex((value as number) - 1)
-                      }}
-                    >
-                      <SelectTrigger
-                        size="sm"
-                        className="min-w-none w-fit"
-                        aria-label={m.common_table_select_range()}
-                      >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectPopup>
-                        {pageRanges.map((range) => (
-                          <SelectItem key={range.value} value={range.value}>
-                            {range.label}
-                          </SelectItem>
-                        ))}
-                      </SelectPopup>
-                    </Select>
-                    <p className="text-sm text-muted-foreground">
-                      {m.common_table_of()}{' '}
-                      <strong className="font-medium text-foreground">{rowCount}</strong>{' '}
-                      {m.common_table_results({ count: rowCount })}
-                    </p>
-                  </div>
-                )}
+                </div>
+              )}
 
-                {!isSinglePage && (
-                  <Pagination className="justify-end">
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious
-                          className="sm:*:[svg]:hidden"
-                          render={
-                            <Button
-                              size="sm"
-                              disabled={!table.getCanPreviousPage()}
-                              onClick={() => {
-                                table.previousPage()
-                              }}
-                              variant="outline"
-                            />
-                          }
-                        />
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationNext
-                          className="sm:*:[svg]:hidden"
-                          render={
-                            <Button
-                              size="sm"
-                              disabled={!table.getCanNextPage()}
-                              onClick={() => {
-                                table.nextPage()
-                              }}
-                              variant="outline"
-                            />
-                          }
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                )}
-              </div>
-            </CardFrameFooter>
-          )}
-        </CardFrame>
-      )}
+              {!isSinglePage && (
+                <Pagination className="justify-end">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        className="sm:*:[svg]:hidden"
+                        render={
+                          <Button
+                            size="sm"
+                            disabled={!table.getCanPreviousPage()}
+                            onClick={() => {
+                              table.previousPage()
+                            }}
+                            variant="outline"
+                          />
+                        }
+                      />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext
+                        className="sm:*:[svg]:hidden"
+                        render={
+                          <Button
+                            size="sm"
+                            disabled={!table.getCanNextPage()}
+                            onClick={() => {
+                              table.nextPage()
+                            }}
+                            variant="outline"
+                          />
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </div>
+          </CardFrameFooter>
+        )}
+      </CardFrame>
     </div>
   )
 }
