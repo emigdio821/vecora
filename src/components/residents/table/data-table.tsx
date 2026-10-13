@@ -4,6 +4,7 @@ import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import type { Tables } from '@/lib/supabase/database.types'
+import { m } from '@/paraglide/messages'
 import { residentsListQueryOptions } from '@/tanstack-queries/residents'
 import { residentsTableColumns } from './columns'
 import { ResidentsDataTableHeader } from './data-table-header'
@@ -31,6 +32,7 @@ export function ResidentsDataTable() {
       columns={columns}
       getRowId={(resident) => resident.id}
       header={(table) => <ResidentsDataTableHeader table={table} isLoading={isLoading} />}
+      emptyMessage={m.residential_residents_empty()}
       isLoading={isLoading}
     />
   )

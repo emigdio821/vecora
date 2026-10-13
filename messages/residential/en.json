@@ -11,6 +11,8 @@
   "residential_updated_masculine": "Updated",
   "residential_notes_hint": "Visible to all members.",
   "residential_restore_failed_reason": "Couldn't restore: {reason}",
+  "residential_houses_empty": "No houses.",
+  "residential_residents_empty": "No residents.",
 
   "residential_field_relationship": "Relationship",
   "residential_relationship_placeholder": "Select a relationship",

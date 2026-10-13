@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
+import { m } from '@/paraglide/messages'
 import { housesListQueryOptions } from '@/tanstack-queries/houses'
 import { housesTableColumns } from './columns'
 import { HousesDataTableHeader } from './data-table-header'
@@ -28,6 +29,7 @@ export function HousesDataTable() {
       getRowId={(house) => house.id}
       initialSorting={[{ id: 'number', desc: false }]}
       header={(table) => <HousesDataTableHeader table={table} isLoading={isLoading} />}
+      emptyMessage={m.residential_houses_empty()}
       isLoading={isLoading}
     />
   )
