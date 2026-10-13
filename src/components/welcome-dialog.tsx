@@ -1,17 +1,18 @@
 import {
   IconBuildingCommunity,
+  IconChartLine,
+  IconClipboardText,
   IconEye,
   IconGavel,
   IconHeartHandshake,
   IconHistory,
-  IconHome,
+  IconInfoCircle,
   IconPigMoney,
   IconReceipt,
   IconReportMoney,
   IconSettings,
   IconTool,
   IconUrgent,
-  IconUser,
   type TablerIcon,
 } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -28,6 +29,7 @@ import {
   ResponsiveDialogTitle,
 } from '@/components/shared/responsive-dialog'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { AppRole } from '@/lib/supabase/current-user'
 import { m } from '@/paraglide/messages'
@@ -224,17 +226,17 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
           <InfoRow icon={IconEye} title={m.settings_welcome_view_all_title()}>
             {m.settings_welcome_view_all_body()}
           </InfoRow>
-          <InfoRow icon={IconHome} title={m.common_section_home()}>
+          <InfoRow icon={IconChartLine} title={m.common_section_home()}>
             {m.settings_welcome_home_body()}
           </InfoRow>
           <InfoRow icon={IconReportMoney} title={m.common_section_financial_report()}>
             {m.settings_welcome_report_body()}
           </InfoRow>
+          <InfoRow icon={IconClipboardText} title={m.common_section_notices()}>
+            {m.settings_welcome_notices_body()}
+          </InfoRow>
           <InfoRow icon={IconHistory} title={m.settings_welcome_logged_title()}>
             {m.settings_welcome_logged_body()}
-          </InfoRow>
-          <InfoRow icon={IconUser} title={m.settings_welcome_revisit_title()}>
-            {m.settings_welcome_revisit_body()}
           </InfoRow>
         </InfoList>
       ),
@@ -251,8 +253,9 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
             <InfoRow icon={IconHeartHandshake} title={m.settings_welcome_invite_title()}>
               {m.settings_welcome_invite_body()}
             </InfoRow>
+            {/* Only an admin can change the currency. */}
             <InfoRow icon={IconSettings} title={m.common_section_settings()}>
-              {m.settings_welcome_settings_body()}
+              {isAdmin ? m.settings_welcome_settings_body_admin() : m.settings_welcome_settings_body()}
             </InfoRow>
           </InfoList>
           <Button
@@ -279,7 +282,18 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
         <ResponsiveDialogDescription>{step.description}</ResponsiveDialogDescription>
       </ResponsiveDialogHeader>
 
-      <ResponsiveDialogPanel>{step.content}</ResponsiveDialogPanel>
+      <ResponsiveDialogPanel>
+        <div className="flex flex-col gap-4">
+          {step.content}
+          {/* Before closing it: where to find it again. */}
+          {isLast && (
+            <Alert variant="info">
+              <IconInfoCircle />
+              <AlertDescription>{m.settings_welcome_revisit()}</AlertDescription>
+            </Alert>
+          )}
+        </div>
+      </ResponsiveDialogPanel>
 
       <ResponsiveDialogFooter>
         <span className="self-center text-sm text-muted-foreground sm:me-auto">
