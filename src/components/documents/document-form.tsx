@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconDownload, IconEye, IconFilePlus, IconSelector } from '@tabler/icons-react'
+import { IconDownload, IconEye, IconFilePlus, IconSelector, IconSparkles } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { addYears, format, parseISO, subYears } from 'date-fns'
 import { useEffect, useId, useState } from 'react'
@@ -21,6 +21,7 @@ import {
   EMPTY_DOCUMENT_CONTENT,
 } from '@/lib/validations/documents'
 import { m } from '@/paraglide/messages'
+import { AiPromptDialog } from './dialog/ai-prompt'
 import { RichTextEditor } from './rich-text-editor'
 
 const DRAFT_KEY = 'vecora-document-draft'
@@ -116,6 +117,7 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
   const dateTriggerId = useId()
   const contentLabelId = useId()
   const [isDateOpen, setDateOpen] = useState(false)
+  const [isAiPromptOpen, setAiPromptOpen] = useState(false)
   const [initialValues] = useState(() => loadDraft() ?? blankDocument(today))
   // Phones without a built-in PDF viewer (Android) would just download it: there, only Download.
   const canPreview = navigator.pdfViewerEnabled
@@ -193,15 +195,89 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
   }
 
   return (
-    <Form
-      className="flex flex-col gap-4 md:min-h-0 md:flex-1"
-      onSubmit={form.handleSubmit((values) => {
-        downloadMutation.mutate(values)
-      })}
-    >
-      <div className="grid gap-4 sm:grid-cols-2">
+    <>
+      <Form
+        className="flex flex-col gap-4 md:min-h-0 md:flex-1"
+        onSubmit={form.handleSubmit((values) => {
+          downloadMutation.mutate(values)
+        })}
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Controller
+            name="header_title"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field
+                name={field.name}
+                invalid={fieldState.invalid}
+                touched={fieldState.isTouched}
+                dirty={fieldState.isDirty}
+              >
+                <FieldLabel>
+                  {m.documents_field_header_title()} <span className="text-destructive">*</span>
+                </FieldLabel>
+                <Input {...field} autoComplete="off" />
+                <FieldDescription>{m.documents_header_title_description()}</FieldDescription>
+                <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="date"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field
+                name={field.name}
+                invalid={fieldState.invalid}
+                touched={fieldState.isTouched}
+                dirty={fieldState.isDirty}
+              >
+                <FieldLabel id={`${dateTriggerId}-label`} htmlFor={dateTriggerId}>
+                  {m.common_field_date()} <span className="text-destructive">*</span>
+                </FieldLabel>
+                <Popover open={isDateOpen} onOpenChange={setDateOpen}>
+                  <PopoverTrigger
+                    id={dateTriggerId}
+                    aria-labelledby={`${dateTriggerId}-label ${dateTriggerId}-value`}
+                    ref={field.ref}
+                    render={
+                      <Button
+                        variant="outline"
+                        aria-invalid={fieldState.invalid}
+                        className="w-full justify-between pr-2"
+                      >
+                        <span id={`${dateTriggerId}-value`} className="truncate font-normal">
+                          {formatDay(field.value)}
+                        </span>
+                        <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
+                      </Button>
+                    }
+                  />
+                  <PopoverPopup className="w-auto p-1">
+                    <Calendar
+                      mode="single"
+                      captionLayout="dropdown"
+                      startMonth={subYears(today, 2)}
+                      endMonth={addYears(today, 1)}
+                      selected={parseISO(field.value)}
+                      defaultMonth={parseISO(field.value)}
+                      onSelect={(date) => {
+                        field.onChange(format(date ?? new Date(), ISO_DAY))
+                        setDateOpen(false)
+                      }}
+                    />
+                  </PopoverPopup>
+                </Popover>
+                <FieldDescription>{m.documents_date_description()}</FieldDescription>
+                <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+              </Field>
+            )}
+          />
+        </div>
+
         <Controller
-          name="header_title"
+          name="title"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field
@@ -211,17 +287,16 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
               dirty={fieldState.isDirty}
             >
               <FieldLabel>
-                {m.documents_field_header_title()} <span className="text-destructive">*</span>
+                {m.documents_field_title()} <span className="text-destructive">*</span>
               </FieldLabel>
               <Input {...field} autoComplete="off" />
-              <FieldDescription>{m.documents_header_title_description()}</FieldDescription>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
             </Field>
           )}
         />
 
         <Controller
-          name="date"
+          name="content"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field
@@ -229,130 +304,76 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
               invalid={fieldState.invalid}
               touched={fieldState.isTouched}
               dirty={fieldState.isDirty}
+              className="md:min-h-0 md:flex-1"
             >
-              <FieldLabel id={`${dateTriggerId}-label`} htmlFor={dateTriggerId}>
-                {m.common_field_date()} <span className="text-destructive">*</span>
-              </FieldLabel>
-              <Popover open={isDateOpen} onOpenChange={setDateOpen}>
-                <PopoverTrigger
-                  id={dateTriggerId}
-                  aria-labelledby={`${dateTriggerId}-label ${dateTriggerId}-value`}
-                  ref={field.ref}
-                  render={
-                    <Button
-                      variant="outline"
-                      aria-invalid={fieldState.invalid}
-                      className="w-full justify-between pr-2"
-                    >
-                      <span id={`${dateTriggerId}-value`} className="truncate font-normal">
-                        {formatDay(field.value)}
-                      </span>
-                      <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
-                    </Button>
-                  }
-                />
-                <PopoverPopup className="w-auto p-1">
-                  <Calendar
-                    mode="single"
-                    captionLayout="dropdown"
-                    startMonth={subYears(today, 2)}
-                    endMonth={addYears(today, 1)}
-                    selected={parseISO(field.value)}
-                    defaultMonth={parseISO(field.value)}
-                    onSelect={(date) => {
-                      field.onChange(format(date ?? new Date(), ISO_DAY))
-                      setDateOpen(false)
-                    }}
-                  />
-                </PopoverPopup>
-              </Popover>
-              <FieldDescription>{m.documents_date_description()}</FieldDescription>
+              <div className="flex w-full items-center justify-between gap-2">
+                {/* Not a <label>: the editor isn't a form control a label can point at. */}
+                <FieldLabel id={contentLabelId} nativeLabel={false} render={<span />}>
+                  {m.documents_field_content()} <span className="text-destructive">*</span>
+                </FieldLabel>
+                {/* Negative margins: the button doesn't make the label's line taller. */}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  className="-my-1.25 sm:-my-1"
+                  onClick={() => {
+                    setAiPromptOpen(true)
+                  }}
+                >
+                  <IconSparkles />
+                  {m.documents_ai_write()}
+                </Button>
+              </div>
+              <RichTextEditor
+                ref={field.ref}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                invalid={fieldState.invalid}
+                labelId={contentLabelId}
+                className="md:max-h-none md:min-h-0 md:flex-1"
+              />
+              <FieldDescription>{m.documents_draft_hint()}</FieldDescription>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
             </Field>
           )}
         />
-      </div>
 
-      <Controller
-        name="title"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field
-            name={field.name}
-            invalid={fieldState.invalid}
-            touched={fieldState.isTouched}
-            dirty={fieldState.isDirty}
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              onStartOver()
+            }}
           >
-            <FieldLabel>
-              {m.documents_field_title()} <span className="text-destructive">*</span>
-            </FieldLabel>
-            <Input {...field} autoComplete="off" />
-            <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
-          </Field>
-        )}
-      />
-
-      <Controller
-        name="content"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field
-            name={field.name}
-            invalid={fieldState.invalid}
-            touched={fieldState.isTouched}
-            dirty={fieldState.isDirty}
-            className="md:min-h-0 md:flex-1"
-          >
-            {/* Not a <label>: the editor isn't a form control a label can point at. */}
-            <FieldLabel id={contentLabelId} nativeLabel={false} render={<span />}>
-              {m.documents_field_content()} <span className="text-destructive">*</span>
-            </FieldLabel>
-            <RichTextEditor
-              ref={field.ref}
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              invalid={fieldState.invalid}
-              labelId={contentLabelId}
-              className="md:max-h-none md:min-h-0 md:flex-1"
-            />
-            <FieldDescription>{m.documents_draft_hint()}</FieldDescription>
-            <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
-          </Field>
-        )}
-      />
-
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            onStartOver()
-          }}
-        >
-          <IconFilePlus className="size-4" />
-          {m.documents_start_over()}
-        </Button>
-        <div className="flex flex-col-reverse gap-2 sm:flex-row">
-          {canPreview && (
-            <Button
-              type="button"
-              variant="outline"
-              loading={previewMutation.isPending}
-              onClick={() => {
-                handlePreview()
-              }}
-            >
-              <IconEye className="size-4" />
-              {m.documents_preview()}
-            </Button>
-          )}
-          <Button type="submit" loading={downloadMutation.isPending}>
-            <IconDownload className="size-4" />
-            {m.reports_download_pdf()}
+            <IconFilePlus className="size-4" />
+            {m.documents_start_over()}
           </Button>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row">
+            {canPreview && (
+              <Button
+                type="button"
+                variant="outline"
+                loading={previewMutation.isPending}
+                onClick={() => {
+                  handlePreview()
+                }}
+              >
+                <IconEye className="size-4" />
+                {m.documents_preview()}
+              </Button>
+            )}
+            <Button type="submit" loading={downloadMutation.isPending}>
+              <IconDownload className="size-4" />
+              {m.reports_download_pdf()}
+            </Button>
+          </div>
         </div>
-      </div>
-    </Form>
+      </Form>
+
+      <AiPromptDialog open={isAiPromptOpen} onOpenChange={setAiPromptOpen} />
+    </>
   )
 }

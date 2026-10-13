@@ -1,6 +1,7 @@
 import FileHandler from '@tiptap/extension-file-handler'
 import Highlight from '@tiptap/extension-highlight'
 import TextAlign from '@tiptap/extension-text-align'
+import { Markdown } from '@tiptap/markdown'
 import { EditorContent, type JSONContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { useImperativeHandle } from 'react'
@@ -8,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { HEADING_LEVELS, isAllowedLink } from '@/lib/validations/documents'
 import { DocumentImage } from './document-image'
 import { IMAGE_FILE_TYPES, insertImages, isOnlyImageHtml } from './editor-images'
+import { MarkdownPaste } from './editor-markdown'
 import { EditorToolbar } from './editor-toolbar'
 
 // Only what the PDF can draw (see documentSchema): pasted code or rules come in as plain text.
@@ -29,6 +31,9 @@ const extensions = [
   // Images too: the same buttons put a selected image on the left, center or right.
   TextAlign.configure({ types: ['heading', 'paragraph', 'image'] }),
   DocumentImage,
+  // A single line break stays one ("Atentamente,⏎La mesa directiva"), as the chat showed it.
+  Markdown.configure({ markedOptions: { breaks: true } }),
+  MarkdownPaste,
   // Pictures pasted (a screenshot) or dropped from the computer.
   FileHandler.configure({
     allowedMimeTypes: IMAGE_FILE_TYPES,

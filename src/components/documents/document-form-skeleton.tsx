@@ -3,7 +3,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 
-/** The editor toolbar's groups, in order: a menu has a chevron, so it's wider than a button. */
+/**
+ * The editor toolbar's groups, in order (editor-toolbar.tsx: change one, change the other).
+ * A menu has a chevron, so it's wider than a button.
+ */
 const TOOLBAR_GROUPS: ('button' | 'menu')[][] = [
   ['button', 'button'],
   ['menu', 'menu', 'button'],
@@ -110,7 +113,11 @@ export function DocumentFormSkeleton() {
       </div>
 
       <div className="flex flex-col gap-2 md:min-h-0 md:flex-1">
-        <LabelSkeleton>{m.documents_field_content()}</LabelSkeleton>
+        <div className="flex items-center justify-between gap-2">
+          <LabelSkeleton>{m.documents_field_content()}</LabelSkeleton>
+          {/* The "write with AI" button, as tall as the label's line like the real one. */}
+          <Skeleton className="-my-1.25 h-7 w-32 rounded-md sm:-my-1 sm:h-6 sm:w-30" />
+        </div>
         <div className="flex max-h-[70vh] w-full flex-col overflow-hidden rounded-lg border border-input bg-background not-dark:bg-clip-padding md:max-h-none md:min-h-0 md:flex-1 dark:bg-input/32">
           <ToolbarSkeleton />
           <ContentSkeleton />

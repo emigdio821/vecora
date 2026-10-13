@@ -57,5 +57,18 @@
 
   "documents_start_over": "Start over",
   "documents_start_over_title": "Start a new document?",
-  "documents_start_over_description": "Everything you wrote in this document will be erased. This can't be undone."
+  "documents_start_over_description": "Everything you wrote in this document will be erased. This can't be undone.",
+
+  "documents_ai_write": "Write with AI",
+  "documents_ai_description": "If you use ChatGPT, Gemini or another assistant, this text tells it how to write the document so it looks right in the PDF.",
+  "documents_ai_step_copy": "Copy the text.",
+  "documents_ai_step_describe": "Paste it in the chat and replace what's in brackets with what you want to say.",
+  "documents_ai_step_paste": "Copy the reply and paste it in Content. The title goes in its own field.",
+  "documents_ai_prompt_label": "Text for the assistant",
+  "documents_ai_copy": "Copy text",
+  "documents_ai_copied": "Text copied",
+  "documents_ai_copy_failed": "Couldn't copy",
+  "documents_ai_copy_failed_description": "Select the text and copy it manually",
+  "documents_ai_unnamed_residential": "our community",
+  "documents_ai_prompt": "I need to write a document for the residents of {residential}. It comes from the HOA board.\n\nWhat I want to say: [describe the document here: a notice, a circular, meeting minutes… what happened or what's going to happen, with dates, amounts and decisions]\n\nInstructions:\n- Write in English, in a formal, clear and friendly tone.\n- Reply with the document's text only, with no introduction or closing comments, and don't put it inside a code block.\n- Don't write the document's title, its date or the community's name: they're already in the header.\n- Format it only with headings (up to four levels), paragraphs, bulleted or numbered lists, bold, italics, strikethrough, quotes and links.\n- Don't use tables, divider lines, emojis or images: the document can't show them.\n- If a detail is missing (a date, an amount, a name), leave it in brackets, like [date], to fill in later."
 }
