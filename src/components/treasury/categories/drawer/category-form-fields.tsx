@@ -1,11 +1,12 @@
 import { Controller, type UseFormReturn } from 'react-hook-form'
+import { Badge } from '@/components/ui/badge'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group'
 import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
 import type { CategoryInput } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
-import { KIND_ITEMS } from '../../kind'
+import { KIND_ITEMS, KIND_LABEL } from '../../kind'
 
 const kindItemClassName = segmentedControlItemVariants({ className: 'grow', state: 'checked' })
 
@@ -26,22 +27,28 @@ export function CategoryFormFields({ form, disabled, lockKind }: CategoryFormFie
         render={({ field }) => (
           <Field name={field.name}>
             <FieldLabel>{m.common_field_type()}</FieldLabel>
-            <RadioGroupPrimitive
-              className={segmentedControlRootClassName}
-              aria-label={m.treasury_transaction_kind()}
-              name={field.name}
-              value={field.value}
-              disabled={disabled || lockKind}
-              onValueChange={(value) => {
-                field.onChange(value)
-              }}
-            >
-              {KIND_ITEMS.map((item) => (
-                <RadioPrimitive.Root key={item.value} className={kindItemClassName} value={item.value}>
-                  {item.label}
-                </RadioPrimitive.Root>
-              ))}
-            </RadioGroupPrimitive>
+            {lockKind ? (
+              <Badge variant="outline" size="lg">
+                {KIND_LABEL[field.value]}
+              </Badge>
+            ) : (
+              <RadioGroupPrimitive
+                className={segmentedControlRootClassName}
+                aria-label={m.treasury_transaction_kind()}
+                name={field.name}
+                value={field.value}
+                disabled={disabled}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                }}
+              >
+                {KIND_ITEMS.map((item) => (
+                  <RadioPrimitive.Root key={item.value} className={kindItemClassName} value={item.value}>
+                    {item.label}
+                  </RadioPrimitive.Root>
+                ))}
+              </RadioGroupPrimitive>
+            )}
             {lockKind && <FieldDescription>{m.treasury_category_kind_locked()}</FieldDescription>}
           </Field>
         )}

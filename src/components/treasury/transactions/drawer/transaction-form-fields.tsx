@@ -4,6 +4,7 @@ import { addYears, format, parseISO, subYears } from 'date-fns'
 import { useId, useMemo, useState } from 'react'
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
 import { HousesPicker } from '@/components/shared/pickers/houses-picker'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -20,7 +21,7 @@ import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONE
 import type { CreateTransactionInput } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { categoriesQueryOptions } from '@/tanstack-queries/treasury'
-import { KIND_ITEMS, PAYMENT_METHOD_ITEMS } from '../../kind'
+import { KIND_ITEMS, KIND_LABEL, PAYMENT_METHOD_ITEMS } from '../../kind'
 
 const kindItemClassName = segmentedControlItemVariants({ className: 'grow', state: 'checked' })
 
@@ -75,24 +76,30 @@ export function TransactionFormFields({
         render={({ field }) => (
           <Field name={field.name}>
             <FieldLabel>{m.common_field_type()}</FieldLabel>
-            <RadioGroupPrimitive
-              className={segmentedControlRootClassName}
-              aria-label={m.treasury_transaction_kind()}
-              name={field.name}
-              value={field.value}
-              disabled={disabled || lockKind}
-              onValueChange={(value) => {
-                field.onChange(value)
-                // Categories belong to one kind, so the pick no longer applies.
-                form.setValue('category_id', '')
-              }}
-            >
-              {KIND_ITEMS.map((item) => (
-                <RadioPrimitive.Root key={item.value} className={kindItemClassName} value={item.value}>
-                  {item.label}
-                </RadioPrimitive.Root>
-              ))}
-            </RadioGroupPrimitive>
+            {lockKind ? (
+              <Badge variant="outline" size="lg">
+                {KIND_LABEL[field.value]}
+              </Badge>
+            ) : (
+              <RadioGroupPrimitive
+                className={segmentedControlRootClassName}
+                aria-label={m.treasury_transaction_kind()}
+                name={field.name}
+                value={field.value}
+                disabled={disabled}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                  // Categories belong to one kind, so the pick no longer applies.
+                  form.setValue('category_id', '')
+                }}
+              >
+                {KIND_ITEMS.map((item) => (
+                  <RadioPrimitive.Root key={item.value} className={kindItemClassName} value={item.value}>
+                    {item.label}
+                  </RadioPrimitive.Root>
+                ))}
+              </RadioGroupPrimitive>
+            )}
           </Field>
         )}
       />
