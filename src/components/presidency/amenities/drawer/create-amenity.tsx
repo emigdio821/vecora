@@ -85,7 +85,7 @@ export function CreateAmenityDrawer({ open, onOpenChange, ...props }: CreateAmen
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.presidency_new_amenity()}</DrawerTitle>
           <DrawerDescription>{m.presidency_create_amenity_description()}</DrawerDescription>

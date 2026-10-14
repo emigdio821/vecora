@@ -90,7 +90,7 @@ export function CreateCategoryDrawer({ open, onOpenChange, ...props }: CreateCat
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.treasury_new_category()}</DrawerTitle>
           <DrawerDescription>{m.treasury_new_category_description()}</DrawerDescription>

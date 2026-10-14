@@ -79,7 +79,7 @@ export function EditCategoryDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.treasury_edit_category()}</DrawerTitle>
           <DrawerDescription>{category.name}</DrawerDescription>

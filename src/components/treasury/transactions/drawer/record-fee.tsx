@@ -187,7 +187,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.treasury_record_fee()}</DrawerTitle>
           <DrawerDescription>{m.treasury_record_fee_description()}</DrawerDescription>

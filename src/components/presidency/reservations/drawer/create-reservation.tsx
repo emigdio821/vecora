@@ -95,7 +95,7 @@ export function CreateReservationDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.presidency_new_reservation()}</DrawerTitle>
           <DrawerDescription>{m.presidency_create_reservation_description()}</DrawerDescription>

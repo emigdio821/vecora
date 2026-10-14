@@ -78,7 +78,7 @@ export function EditPeriodDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.presidency_edit_period_title()}</DrawerTitle>
           <DrawerDescription>{period.name}</DrawerDescription>

@@ -77,7 +77,7 @@ export function EditRequestDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.requests_edit_title()}</DrawerTitle>
           <DrawerDescription>{m.requests_edit_description()}</DrawerDescription>

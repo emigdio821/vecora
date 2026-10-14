@@ -59,7 +59,7 @@ export function ResidentDetailsDrawer({
 
   return (
     <Drawer position="right" open={open} onOpenChange={onOpenChange} {...props}>
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{fullName}</DrawerTitle>
           <DrawerDescription>{m.residential_resident_info()}</DrawerDescription>

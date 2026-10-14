@@ -120,7 +120,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.residential_new_resident()}</DrawerTitle>
           <DrawerDescription>{m.residential_new_resident_description()}</DrawerDescription>

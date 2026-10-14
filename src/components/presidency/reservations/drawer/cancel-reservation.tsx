@@ -111,7 +111,7 @@ export function CancelReservationDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.presidency_cancel_reservation()}</DrawerTitle>
           <DrawerDescription>

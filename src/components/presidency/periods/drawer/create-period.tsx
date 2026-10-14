@@ -109,7 +109,7 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.presidency_new_period()}</DrawerTitle>
           <DrawerDescription>{m.presidency_create_period_description()}</DrawerDescription>

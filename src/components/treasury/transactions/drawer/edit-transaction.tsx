@@ -84,7 +84,7 @@ export function EditTransactionDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.treasury_edit_transaction()}</DrawerTitle>
           <DrawerDescription>{transaction.description}</DrawerDescription>

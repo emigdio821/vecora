@@ -101,7 +101,7 @@ export function PayReservationDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.common_action_record_payment()}</DrawerTitle>
           <DrawerDescription>

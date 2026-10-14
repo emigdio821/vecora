@@ -109,7 +109,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.residential_assign_house()}</DrawerTitle>
           <DrawerDescription>{name}</DrawerDescription>

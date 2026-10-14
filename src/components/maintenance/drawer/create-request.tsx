@@ -102,7 +102,7 @@ export function CreateRequestDrawer({ open, onOpenChange, ...props }: CreateRequ
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.requests_new()}</DrawerTitle>
           <DrawerDescription>{m.requests_maintenance_create_description()}</DrawerDescription>

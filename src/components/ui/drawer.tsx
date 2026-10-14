@@ -140,7 +140,7 @@ export function DrawerPopup({
   children,
   showCloseButton = false,
   position: positionProp,
-  variant: variantProp = 'default',
+  variant: variantProp = 'straight',
   showBar: showBarProp = false,
   portalProps,
   ...props

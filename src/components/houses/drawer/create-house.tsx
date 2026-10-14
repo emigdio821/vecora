@@ -93,7 +93,7 @@ export function CreateHouseDrawer({ open, onOpenChange, ...props }: CreateHouseD
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.residential_new_house()}</DrawerTitle>
           <DrawerDescription>{m.residential_new_house_description()}</DrawerDescription>

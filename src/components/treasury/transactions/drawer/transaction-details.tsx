@@ -36,7 +36,7 @@ export function TransactionDetailsDrawer({
 
   return (
     <Drawer position="right" open={open} onOpenChange={onOpenChange} {...props}>
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{transaction.description}</DrawerTitle>
           <DrawerDescription>{m.treasury_transaction_info()}</DrawerDescription>

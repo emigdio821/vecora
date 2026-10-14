@@ -87,7 +87,7 @@ export function EditResidentDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.residential_edit_resident()}</DrawerTitle>
           <DrawerDescription>

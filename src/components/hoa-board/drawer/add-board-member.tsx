@@ -107,7 +107,7 @@ export function AddBoardMemberDrawer({
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.board_add_member()}</DrawerTitle>
           <DrawerDescription>{m.board_add_member_description()}</DrawerDescription>

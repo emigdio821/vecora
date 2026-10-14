@@ -38,7 +38,7 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
 
   return (
     <Drawer position="right" open={open} onOpenChange={onOpenChange} {...props}>
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{request.title}</DrawerTitle>
           <DrawerDescription>{m.requests_details_description()}</DrawerDescription>

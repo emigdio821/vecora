@@ -83,7 +83,7 @@ export function EditReservationDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.presidency_edit_reservation_title()}</DrawerTitle>
           <DrawerDescription>{reservationSummary(reservation)}</DrawerDescription>

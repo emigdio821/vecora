@@ -81,7 +81,7 @@ export function EditBoardMemberDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.board_edit_roles()}</DrawerTitle>
           <DrawerDescription>{member.full_name}</DrawerDescription>

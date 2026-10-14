@@ -32,7 +32,7 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
 
   return (
     <Drawer position="right" open={open} onOpenChange={onOpenChange} {...props}>
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.common_house_label({ number: house.number })}</DrawerTitle>
           <DrawerDescription>{m.residential_house_info()}</DrawerDescription>

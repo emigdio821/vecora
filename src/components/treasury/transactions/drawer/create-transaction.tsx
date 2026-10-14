@@ -119,7 +119,7 @@ export function CreateTransactionDrawer({
       onOpenChangeComplete={handleOpenChangeComplete}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.treasury_record_transaction()}</DrawerTitle>
           <DrawerDescription>{m.treasury_record_transaction_description()}</DrawerDescription>

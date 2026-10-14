@@ -78,7 +78,7 @@ export function EditAmenityDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.presidency_edit_amenity_title()}</DrawerTitle>
           <DrawerDescription>

@@ -83,7 +83,7 @@ export function EditHouseDrawer({
       }}
       {...props}
     >
-      <DrawerPopup variant="inset">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.residential_edit_house()}</DrawerTitle>
           <DrawerDescription>{m.common_house_label({ number: house.number })}</DrawerDescription>
