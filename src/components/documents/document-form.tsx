@@ -193,8 +193,9 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
     // Checked here, not through handleSubmit: that waits, and browsers block tabs opened after waiting.
     const parsed = documentSchema.safeParse(form.getValues())
     if (!parsed.success) {
-      // Shows the errors and focuses the first one, like a submit.
-      void form.trigger(undefined, { shouldFocus: true })
+      // A submit that does nothing, not form.trigger(): it shows the errors and focuses the
+      // first one, and marks the form submitted, so the errors update as the user types.
+      void form.handleSubmit(() => {})()
       return
     }
 
