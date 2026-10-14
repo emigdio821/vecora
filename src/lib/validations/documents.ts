@@ -205,6 +205,35 @@ const blockquoteSchema = z.object({
   },
 })
 
+/**
+ * A cell holds any blocks, like a list item, and spans one row and one column: the PDF
+ * draws a grid of equal columns. `align` comes with pasted tables; a paragraph's own
+ * alignment wins over it.
+ */
+const tableCellSchema = z.object({
+  type: z.enum(['tableCell', 'tableHeader']),
+  attrs: z
+    .object({
+      colspan: z.literal(1).optional(),
+      rowspan: z.literal(1).optional(),
+      align: z.enum(['left', 'center', 'right']).nullish(),
+    })
+    .optional(),
+  get content() {
+    return z.array(blockSchema)
+  },
+})
+
+const tableRowSchema = z.object({
+  type: z.literal('tableRow'),
+  content: z.array(tableCellSchema),
+})
+
+const tableSchema = z.object({
+  type: z.literal('table'),
+  content: z.array(tableRowSchema),
+})
+
 const blockSchema = z.discriminatedUnion('type', [
   paragraphSchema,
   headingSchema,
@@ -212,6 +241,7 @@ const blockSchema = z.discriminatedUnion('type', [
   orderedListSchema,
   blockquoteSchema,
   imageSchema,
+  tableSchema,
 ])
 
 export const documentContentSchema = z.object({
@@ -224,6 +254,8 @@ export type DocumentBlock = z.infer<typeof blockSchema>
 export type DocumentListItem = z.infer<typeof listItemSchema>
 export type DocumentInline = z.infer<typeof inlineSchema>
 export type DocumentImage = z.infer<typeof imageSchema>
+export type DocumentTable = z.infer<typeof tableSchema>
+export type DocumentTableCell = z.infer<typeof tableCellSchema>
 
 interface ContentTree {
   type: string

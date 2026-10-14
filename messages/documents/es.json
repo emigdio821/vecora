@@ -46,6 +46,16 @@
   "documents_redo": "Rehacer",
   "documents_format_image": "Imagen",
   "documents_image_failed": "No se pudo abrir la imagen. Usa una foto en JPG o PNG.",
+  "documents_format_table": "Tabla",
+  "documents_table_insert": "Insertar tabla",
+  "documents_table_add_row_before": "Agregar fila arriba",
+  "documents_table_add_row_after": "Agregar fila abajo",
+  "documents_table_add_column_before": "Agregar columna a la izquierda",
+  "documents_table_add_column_after": "Agregar columna a la derecha",
+  "documents_table_header_row": "Fila de encabezado",
+  "documents_table_delete_row": "Eliminar fila",
+  "documents_table_delete_column": "Eliminar columna",
+  "documents_table_delete": "Eliminar tabla",
   "documents_draft_too_big": "El documento ya no cabe en este dispositivo: si recargas la página, se perderán los últimos cambios. Quita alguna imagen para que se vuelva a guardar.",
 
   "documents_preview": "Vista previa",
@@ -94,5 +104,5 @@
   "documents_ai_copy_failed": "No se pudo copiar",
   "documents_ai_copy_failed_description": "Selecciona el texto y cópialo manualmente",
   "documents_ai_unnamed_residential": "nuestro residencial",
-  "documents_ai_prompt": "Necesito redactar un documento para los residentes de {residential}. Lo envía la mesa directiva.\n\nLo que quiero comunicar: [describe aquí el documento: un aviso, una minuta, un recordatorio… qué pasó o qué se va a hacer, con fechas, montos y acuerdos]\n\nInstrucciones:\n- Escribe en español de México, con un tono formal, claro y cordial.\n- Responde solo con el texto del documento, sin introducción ni comentarios al final, y no lo pongas dentro de un bloque de código.\n- No escribas el título del documento, su fecha ni el nombre del residencial: ya van en el encabezado.\n- Da formato solo con títulos (hasta cuatro niveles), párrafos, listas con viñetas o numeradas, negritas, cursivas, tachado, citas y enlaces.\n- No uses tablas, líneas separadoras, emojis ni imágenes: el documento no los puede mostrar.\n- Si te falta un dato (una fecha, un monto, un nombre), déjalo entre corchetes, como [fecha], para completarlo después."
+  "documents_ai_prompt": "Necesito redactar un documento para los residentes de {residential}. Lo envía la mesa directiva.\n\nLo que quiero comunicar: [describe aquí el documento: un aviso, una minuta, un recordatorio… qué pasó o qué se va a hacer, con fechas, montos y acuerdos]\n\nInstrucciones:\n- Escribe en español de México, con un tono formal, claro y cordial.\n- Responde solo con el texto del documento, sin introducción ni comentarios al final, y no lo pongas dentro de un bloque de código.\n- No escribas el título del documento, su fecha ni el nombre del residencial: ya van en el encabezado.\n- Da formato solo con títulos (hasta cuatro niveles), párrafos, listas con viñetas o numeradas, negritas, cursivas, tachado, citas, enlaces y tablas sencillas (pocas columnas y solo texto en cada celda).\n- No uses líneas separadoras, emojis ni imágenes: el documento no los puede mostrar.\n- Si te falta un dato (una fecha, un monto, un nombre), déjalo entre corchetes, como [fecha], para completarlo después."
 }

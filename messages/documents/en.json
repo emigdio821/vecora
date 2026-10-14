@@ -46,6 +46,16 @@
   "documents_redo": "Redo",
   "documents_format_image": "Image",
   "documents_image_failed": "The image couldn't be opened. Use a JPG or PNG picture.",
+  "documents_format_table": "Table",
+  "documents_table_insert": "Insert table",
+  "documents_table_add_row_before": "Add row above",
+  "documents_table_add_row_after": "Add row below",
+  "documents_table_add_column_before": "Add column to the left",
+  "documents_table_add_column_after": "Add column to the right",
+  "documents_table_header_row": "Header row",
+  "documents_table_delete_row": "Delete row",
+  "documents_table_delete_column": "Delete column",
+  "documents_table_delete": "Delete table",
   "documents_draft_too_big": "The document no longer fits on this device: reloading the page would lose the latest changes. Remove an image so it's saved again.",
 
   "documents_preview": "Preview",
@@ -94,5 +104,5 @@
   "documents_ai_copy_failed": "Couldn't copy",
   "documents_ai_copy_failed_description": "Select the text and copy it manually",
   "documents_ai_unnamed_residential": "our community",
-  "documents_ai_prompt": "I need to write a document for the residents of {residential}. It comes from the HOA board.\n\nWhat I want to say: [describe the document here: a notice, meeting minutes, a reminder… what happened or what's going to happen, with dates, amounts and decisions]\n\nInstructions:\n- Write in English, in a formal, clear and friendly tone.\n- Reply with the document's text only, with no introduction or closing comments, and don't put it inside a code block.\n- Don't write the document's title, its date or the community's name: they're already in the header.\n- Format it only with headings (up to four levels), paragraphs, bulleted or numbered lists, bold, italics, strikethrough, quotes and links.\n- Don't use tables, divider lines, emojis or images: the document can't show them.\n- If a detail is missing (a date, an amount, a name), leave it in brackets, like [date], to fill in later."
+  "documents_ai_prompt": "I need to write a document for the residents of {residential}. It comes from the HOA board.\n\nWhat I want to say: [describe the document here: a notice, meeting minutes, a reminder… what happened or what's going to happen, with dates, amounts and decisions]\n\nInstructions:\n- Write in English, in a formal, clear and friendly tone.\n- Reply with the document's text only, with no introduction or closing comments, and don't put it inside a code block.\n- Don't write the document's title, its date or the community's name: they're already in the header.\n- Format it only with headings (up to four levels), paragraphs, bulleted or numbered lists, bold, italics, strikethrough, quotes, links and simple tables (a few columns, only text in each cell).\n- Don't use divider lines, emojis or images: the document can't show them.\n- If a detail is missing (a date, an amount, a name), leave it in brackets, like [date], to fill in later."
 }

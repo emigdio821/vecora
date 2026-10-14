@@ -10,6 +10,7 @@ import { HEADING_LEVELS, isAllowedLink } from '@/lib/validations/documents'
 import { DocumentImage } from './document-image'
 import { IMAGE_FILE_TYPES, insertImages, isOnlyImageHtml } from './editor-images'
 import { MarkdownPaste } from './editor-markdown'
+import { tableExtensions } from './editor-table'
 import { EditorToolbar } from './editor-toolbar'
 
 // Only what the PDF can draw (see documentSchema): pasted code or rules come in as plain text.
@@ -31,6 +32,7 @@ const extensions = [
   // Images too: the same buttons put a selected image on the left, center or right.
   TextAlign.configure({ types: ['heading', 'paragraph', 'image'] }),
   DocumentImage,
+  ...tableExtensions,
   // A single line break stays one ("Atentamente,⏎La mesa directiva"), as the chat showed it.
   Markdown.configure({ markedOptions: { breaks: true } }),
   MarkdownPaste,

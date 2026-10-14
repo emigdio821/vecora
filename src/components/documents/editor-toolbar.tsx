@@ -9,6 +9,9 @@ import {
   IconBold,
   IconCheck,
   IconChevronDown,
+  IconColumnInsertLeft,
+  IconColumnInsertRight,
+  IconColumnRemove,
   IconH1,
   IconH2,
   IconH3,
@@ -22,7 +25,14 @@ import {
   IconList,
   IconListNumbers,
   IconPhoto,
+  IconRowInsertBottom,
+  IconRowInsertTop,
+  IconRowRemove,
   IconStrikethrough,
+  IconTable,
+  IconTableOff,
+  IconTablePlus,
+  IconTableRow,
   IconUnderline,
   type TablerIcon,
 } from '@tabler/icons-react'
@@ -387,6 +397,130 @@ function ImageButton({ editor }: { editor: Editor }) {
   )
 }
 
+/** Whether the first row of the table the cursor is in is all header cells, like toggleHeaderRow checks. */
+function hasHeaderRow(editor: Editor): boolean {
+  const { $from } = editor.state.selection
+  for (let depth = $from.depth; depth > 0; depth = depth - 1) {
+    const node = $from.node(depth)
+    if (node.type.name === 'table') {
+      const firstRow = node.firstChild
+      if (!firstRow) {
+        return false
+      }
+      let isAllHeaders = true
+      firstRow.forEach((cell) => {
+        if (cell.type.name !== 'tableHeader') {
+          isAllHeaders = false
+        }
+      })
+      return isAllHeaders
+    }
+  }
+  return false
+}
+
+/** Inserts a table, then edits the one the cursor is in: rows, columns, its header row. */
+function TableMenu({
+  editor,
+  isTable,
+  isHeaderRow,
+}: {
+  editor: Editor
+  isTable: boolean
+  isHeaderRow: boolean
+}) {
+  return (
+    <ToolbarMenu editor={editor} label={m.documents_format_table()} icon={IconTable} isActive={isTable}>
+      <MenuItem
+        // Not inside another table: a table in a cell is hard to read.
+        disabled={isTable}
+        onClick={() => {
+          editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+        }}
+      >
+        <IconTablePlus />
+        {m.documents_table_insert()}
+      </MenuItem>
+      <MenuSeparator />
+      <MenuItem
+        disabled={!isTable}
+        onClick={() => {
+          editor.chain().focus().addRowBefore().run()
+        }}
+      >
+        <IconRowInsertTop />
+        {m.documents_table_add_row_before()}
+      </MenuItem>
+      <MenuItem
+        disabled={!isTable}
+        onClick={() => {
+          editor.chain().focus().addRowAfter().run()
+        }}
+      >
+        <IconRowInsertBottom />
+        {m.documents_table_add_row_after()}
+      </MenuItem>
+      <MenuItem
+        disabled={!isTable}
+        onClick={() => {
+          editor.chain().focus().addColumnBefore().run()
+        }}
+      >
+        <IconColumnInsertLeft />
+        {m.documents_table_add_column_before()}
+      </MenuItem>
+      <MenuItem
+        disabled={!isTable}
+        onClick={() => {
+          editor.chain().focus().addColumnAfter().run()
+        }}
+      >
+        <IconColumnInsertRight />
+        {m.documents_table_add_column_after()}
+      </MenuItem>
+      <MenuSeparator />
+      <MenuItem
+        disabled={!isTable}
+        onClick={() => {
+          editor.chain().focus().toggleHeaderRow().run()
+        }}
+      >
+        <IconTableRow />
+        <span className="flex-1">{m.documents_table_header_row()}</span>
+        {isHeaderRow && <IconCheck />}
+      </MenuItem>
+      <MenuSeparator />
+      <MenuItem
+        disabled={!isTable}
+        onClick={() => {
+          editor.chain().focus().deleteRow().run()
+        }}
+      >
+        <IconRowRemove />
+        {m.documents_table_delete_row()}
+      </MenuItem>
+      <MenuItem
+        disabled={!isTable}
+        onClick={() => {
+          editor.chain().focus().deleteColumn().run()
+        }}
+      >
+        <IconColumnRemove />
+        {m.documents_table_delete_column()}
+      </MenuItem>
+      <MenuItem
+        disabled={!isTable}
+        onClick={() => {
+          editor.chain().focus().deleteTable().run()
+        }}
+      >
+        <IconTableOff />
+        {m.documents_table_delete()}
+      </MenuItem>
+    </ToolbarMenu>
+  )
+}
+
 /** What the alignment buttons show: the selected image's, or the text's. */
 function currentAlignment(editor: Editor): TextAlign {
   if (editor.isActive('image')) {
@@ -398,7 +532,7 @@ function currentAlignment(editor: Editor): TextAlign {
   return picked ?? 'left'
 }
 
-/** Laid out like Tiptap's simple editor: history, blocks, inline formats, alignment, image. */
+/** Laid out like Tiptap's simple editor: history, blocks, inline formats, alignment, image and table. */
 export function EditorToolbar({ editor }: { editor: Editor }) {
   // Re-renders the toolbar only when one of these changes, not on every keystroke.
   const state = useEditorState({
@@ -418,6 +552,8 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
         highlightColor: typeof highlight === 'string' ? highlight : null,
         isLink: current.isActive('link'),
         isImage: current.isActive('image'),
+        isTable: current.isActive('table'),
+        isHeaderRow: hasHeaderRow(current),
         alignment: currentAlignment(current),
         canUndo: current.can().undo(),
         canRedo: current.can().redo(),
@@ -634,6 +770,7 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
 
       <ToolbarGroup>
         <ImageButton editor={editor} />
+        <TableMenu editor={editor} isTable={state.isTable} isHeaderRow={state.isHeaderRow} />
       </ToolbarGroup>
     </Toolbar>
   )

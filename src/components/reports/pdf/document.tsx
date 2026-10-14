@@ -7,6 +7,8 @@ import {
   type DocumentInput,
   type DocumentListItem,
   type DocumentMark,
+  type DocumentTable,
+  type DocumentTableCell,
   type HeadingLevel,
   highlightColor,
   INITIAL_IMAGE_MAX_HEIGHT,
@@ -43,6 +45,22 @@ const styles = StyleSheet.create({
   link: { color: '#1d4ed8', textDecoration: 'underline' },
   // Inside a list or a quote the space is narrower: maxWidth shrinks it, contain keeps its shape.
   image: { maxWidth: '100%', objectFit: 'contain' },
+  // A grid in the quote bar's gray: the table draws the top and left lines, each cell its
+  // right and bottom ones.
+  table: { borderTopWidth: 0.75, borderLeftWidth: 0.75, borderColor: '#d4d4d4' },
+  tableRow: { flexDirection: 'row' },
+  // flexBasis 0: every column the same width, whatever its text, like the editor's.
+  tableCell: {
+    flexGrow: 1,
+    flexBasis: 0,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    borderRightWidth: 0.75,
+    borderBottomWidth: 0.75,
+    borderColor: '#d4d4d4',
+  },
+  // neutral-100; the text inside is bold.
+  tableHeaderCell: { backgroundColor: '#f5f5f5', fontWeight: 600 },
 })
 
 /** Between blocks, like typeset's flow. */
@@ -51,25 +69,29 @@ const BLOCK_GAP = 6
 const HEADING_GAP = 12
 /** Between list items, and between the blocks inside one. */
 const LIST_GAP = 2
-/** Above and below an image. */
-const IMAGE_GAP = 10
+/** Above and below an image or a table. */
+const FIGURE_GAP = 10
 
 type BlockContext = 'flow' | 'listItem'
 
+function isFigure(block: DocumentBlock): boolean {
+  return block.type === 'image' || block.type === 'table'
+}
+
 /**
  * The space above a block, from the one before it: typeset-document's rules, checked
- * from its last (the one that wins) to its first. The first block of the page, an item
- * or a quote starts at the top.
+ * from its last (the one that wins) to its first. The first block of the page, an item,
+ * a quote or a table cell starts at the top.
  */
 function gapBefore(previous: DocumentBlock | undefined, block: DocumentBlock, context: BlockContext): number {
   if (!previous) {
     return 0
   }
-  if (previous.type === 'image' && block.type === 'heading') {
+  if (isFigure(previous) && block.type === 'heading') {
     return HEADING_GAP
   }
-  if (previous.type === 'image' || block.type === 'image') {
-    return IMAGE_GAP
+  if (isFigure(previous) || isFigure(block)) {
+    return FIGURE_GAP
   }
   if (context === 'listItem') {
     return LIST_GAP
@@ -292,7 +314,43 @@ function Block({ block, gap }: BlockProps) {
       )
     case 'image':
       return <DocumentImageBlock image={block} gap={gap} />
+    case 'table':
+      return <TableBlock table={block} gap={gap} />
   }
+}
+
+/** A pasted table can align a whole cell: its paragraphs follow, unless they have their own. */
+function cellBlocks(cell: DocumentTableCell): DocumentBlock[] {
+  const cellAlign = cell.attrs?.align
+  if (!cellAlign) {
+    return cell.content
+  }
+  return cell.content.map((block) => {
+    if (block.type !== 'paragraph' || block.attrs?.textAlign) {
+      return block
+    }
+    return { ...block, attrs: { ...block.attrs, textAlign: cellAlign } }
+  })
+}
+
+function TableBlock({ table, gap }: { table: DocumentTable; gap: number }) {
+  return (
+    <View style={[styles.table, { marginTop: gap }]}>
+      {table.content.map((row, rowIndex) => (
+        // Rows never split across pages.
+        <View key={rowIndex} style={styles.tableRow} wrap={false}>
+          {row.content.map((cell, cellIndex) => (
+            <View
+              key={cellIndex}
+              style={[styles.tableCell, cell.type === 'tableHeader' ? styles.tableHeaderCell : {}]}
+            >
+              <Blocks blocks={cellBlocks(cell)} context="flow" />
+            </View>
+          ))}
+        </View>
+      ))}
+    </View>
+  )
 }
 
 interface ListProps {

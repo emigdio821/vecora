@@ -66,17 +66,58 @@
     color: inherit;
   }
 
-  /* Images (the editor's node view): 10pt around them, more than text gets. */
-  .typeset-document :where(.node-image, .node-image + *) {
+  /* Images and tables (both in the editor's wrappers): 10pt around them, more than text gets. */
+  .typeset-document :where(.node-image, .node-image + *, .tableWrapper, .tableWrapper + *) {
     margin-block-start: calc(10 * var(--document-pt));
   }
-  .typeset-document :where(.node-image + :is(h1, h2, h3, h4)) {
+  .typeset-document :where(:is(.node-image, .tableWrapper) + :is(h1, h2, h3, h4)) {
     margin-block-start: calc(12 * var(--document-pt));
   }
 
-  /* The first block of the editor, an item or a quote starts at the top. Last, so it wins. */
+  /* Tables: a 0.75pt grid in the quote bar's gray, columns of the same width, 4pt by 6pt
+     around each cell's text. Header cells are bold on neutral-100. The wrapper scrolls a
+     table with too many columns to fit. */
+  .typeset-document :where(.tableWrapper) {
+    overflow-x: auto;
+  }
+  .typeset-document :where(table) {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-block-end: 0;
+    margin-block-start: 0;
+  }
+  .typeset-document :where(td, th) {
+    position: relative;
+    padding: calc(4 * var(--document-pt)) calc(6 * var(--document-pt));
+    border: calc(0.75 * var(--document-pt)) solid var(--color-neutral-300);
+    vertical-align: top;
+    text-align: start;
+  }
+  .typeset-document :where(th) {
+    font-weight: 600;
+    background-color: var(--color-neutral-100);
+  }
+  .dark .typeset-document :where(td, th) {
+    border-color: var(--color-neutral-600);
+  }
+  .dark .typeset-document :where(th) {
+    background-color: var(--color-neutral-800);
+  }
+  /* Cells picked by dragging across them, to add or delete rows and columns. */
+  .typeset-document :where(.selectedCell)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-primary);
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  /* The first block of the editor, an item, a quote or a cell starts at the top. Last, so it wins. */
   .typeset-document > :where(:first-child),
-  .typeset-document :where(li > :first-child, blockquote > :first-child) {
+  .typeset-document
+    :where(li > :first-child, blockquote > :first-child, td > :first-child, th > :first-child) {
     margin-block-start: 0;
   }
 

@@ -5,11 +5,13 @@ import { Extension, type JSONContent } from '@tiptap/react'
 const MARKDOWN_LINE = /^(#{1,6} |[-*+] |\d+[.)] |> )/m
 /** Bold or a link, anywhere in the text. */
 const MARKDOWN_INLINE = /\*\*[^*\n]+\*\*|\[[^\]\n]+\]\([^)\s]+\)/
+/** The line under a table's header row: "| --- | :---: |". */
+const MARKDOWN_TABLE = /^[ \t]*\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)+\|?[ \t]*$/m
 /** The whole reply inside a code block, as some assistants answer when asked for a format. */
 const FENCED_REPLY = /^\s*```(?:markdown|md)?[^\S\n]*\n([\s\S]*?)\n```\s*$/
 
 function looksLikeMarkdown(text: string): boolean {
-  return MARKDOWN_LINE.test(text) || MARKDOWN_INLINE.test(text)
+  return MARKDOWN_LINE.test(text) || MARKDOWN_INLINE.test(text) || MARKDOWN_TABLE.test(text)
 }
 
 /**
