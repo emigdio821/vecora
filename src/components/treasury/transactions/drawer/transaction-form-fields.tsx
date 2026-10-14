@@ -227,7 +227,7 @@ export function TransactionFormFields({
                       <span id={`${dateTriggerId}-value`} className="truncate font-normal">
                         {formatDay(field.value)}
                       </span>
-                      <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
+                      <IconSelector className="pointer-events-none size-4" />
                     </Button>
                   }
                 />

@@ -92,7 +92,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse }: PeriodForm
                         <span id={`${dateTriggerId}-${name}-value`} className="truncate font-normal">
                           {formatDay(field.value)}
                         </span>
-                        <IconSelector className="pointer-events-none size-4 text-muted-foreground" />
+                        <IconSelector className="pointer-events-none size-4" />
                       </Button>
                     }
                   />
