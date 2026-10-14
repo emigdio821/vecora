@@ -10,6 +10,7 @@ import {
   Scripts,
   useRouter,
 } from '@tanstack/react-router'
+import { Analytics } from '@vercel/analytics/react'
 import { useState } from 'react'
 import { AppProviders } from '@/components/providers'
 import { Button } from '@/components/ui/button'
@@ -99,6 +100,7 @@ function RootComponent() {
   return (
     <AppProviders>
       <Outlet />
+      <Analytics />
     </AppProviders>
   )
 }

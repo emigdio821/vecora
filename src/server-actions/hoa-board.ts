@@ -65,7 +65,7 @@ async function createInviteLink(
     return { error }
   }
 
-  const origin = getRequestHeader('origin') ?? getRequestUrl({ xForwardedHost: true }).origin
+  const origin = getRequestHeader('origin') || getRequestUrl({ xForwardedHost: true }).origin
   const url = new URL('/auth/confirm', origin)
   url.searchParams.set('token_hash', data.properties.hashed_token)
   url.searchParams.set('type', data.properties.verification_type)
