@@ -53,7 +53,7 @@ export function EntryDetailsDrawer({
 
   return (
     <Drawer position="right" open={open} onOpenChange={onOpenChange} {...props}>
-      <DrawerPopup className="md:max-w-lg">
+      <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{entrySummary(entry)}</DrawerTitle>
           <DrawerDescription>

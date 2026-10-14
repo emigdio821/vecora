@@ -139,7 +139,7 @@ export function DialogFooter({
 export function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props): React.ReactElement {
   return (
     <DialogPrimitive.Title
-      className={cn('font-heading text-xl leading-none font-semibold', className)}
+      className={cn('font-heading text-lg leading-none font-semibold', className)}
       data-slot="dialog-title"
       {...props}
     />

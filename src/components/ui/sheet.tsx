@@ -160,7 +160,7 @@ export function SheetFooter({
 export function SheetTitle({ className, ...props }: SheetPrimitive.Title.Props): React.ReactElement {
   return (
     <SheetPrimitive.Title
-      className={cn('font-heading text-xl leading-none font-semibold', className)}
+      className={cn('font-heading text-lg leading-none font-semibold', className)}
       data-slot="sheet-title"
       {...props}
     />
