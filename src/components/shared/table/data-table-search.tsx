@@ -37,6 +37,7 @@ export function DataTableSearch<TData extends RowData>({
   const [query, setQuery] = useQueryState(param, parseAsString.withDefault(''))
   const isEmpty = table.getCoreRowModel().rows.length === 0
 
+  // Also on load, from a shared link: that keeps the link's page, only typing goes back to page 1.
   useEffect(() => {
     table.getColumn(columnId)?.setFilterValue(query)
   }, [query, columnId, table])
@@ -54,6 +55,7 @@ export function DataTableSearch<TData extends RowData>({
         name={param}
         disabled={isEmpty}
         onChange={(e) => {
+          table.setPageIndex(0)
           void setQuery(e.target.value)
         }}
       />
@@ -69,6 +71,7 @@ export function DataTableSearch<TData extends RowData>({
             aria-label={m.common_clear_search()}
             onClick={() => {
               inputRef.current?.focus()
+              table.setPageIndex(0)
               void setQuery('')
             }}
           >

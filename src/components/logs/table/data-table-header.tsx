@@ -115,6 +115,7 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
               <MenuRadioGroup
                 value={section}
                 onValueChange={(value: SectionFilter) => {
+                  table.setPageIndex(0)
                   void setSection(value)
                 }}
               >
@@ -133,6 +134,7 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
               <MenuRadioGroup
                 value={action}
                 onValueChange={(value: ActionFilter) => {
+                  table.setPageIndex(0)
                   void setAction(value)
                 }}
               >
@@ -151,6 +153,7 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
               <MenuRadioGroup
                 value={identity}
                 onValueChange={(value: string) => {
+                  table.setPageIndex(0)
                   void setIdentity(value)
                 }}
               >
@@ -167,7 +170,13 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
       </div>
 
       <div className="self-end">
-        <RangePicker value={range} onChange={setRange} />
+        <RangePicker
+          value={range}
+          onChange={(next) => {
+            table.setPageIndex(0)
+            setRange(next)
+          }}
+        />
       </div>
     </div>
   )

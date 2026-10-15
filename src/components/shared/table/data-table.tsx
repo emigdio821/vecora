@@ -7,7 +7,7 @@ import type {
 } from '@tanstack/react-table'
 import { flexRender, functionalUpdate, useTable } from '@tanstack/react-table'
 import { parseAsIndex, useQueryState } from 'nuqs'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { CardFrame, CardFrameFooter } from '@/components/ui/card'
 import {
@@ -83,7 +83,8 @@ export function DataTable<TData extends RowData>({
     getRowId,
     enableSortingRemoval: false,
     // Off: the default resets to page 1 every time `data` changes, which
-    // TanStack Query does on every refetch. We reset on filter changes below.
+    // TanStack Query does on every refetch. The search box and the filter
+    // menus go back to page 1 themselves, when the user changes them.
     autoResetPageIndex: false,
     state: { pagination },
     onPaginationChange: (updater) => {
@@ -94,18 +95,6 @@ export function DataTable<TData extends RowData>({
     },
     initialState: { sorting: initialSorting },
   })
-
-  // Back to page 1 when the filters change (but not on first render, so the
-  // URL page survives a refresh).
-  const filtersKey = JSON.stringify(table.state.columnFilters)
-  const previousFiltersKey = useRef(filtersKey)
-  useEffect(() => {
-    if (previousFiltersKey.current !== filtersKey) {
-      previousFiltersKey.current = filtersKey
-      clampedFrom.current = null
-      void setPageIndex(0)
-    }
-  }, [filtersKey, setPageIndex])
 
   const rows = table.getRowModel().rows
   const rowCount = table.getRowCount()

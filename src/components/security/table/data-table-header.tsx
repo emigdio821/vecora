@@ -140,6 +140,7 @@ export function RequestsDataTableHeader({ table, viewer, isLoading }: RequestsDa
                 <MenuRadioGroup
                   value={status}
                   onValueChange={(value: StatusFilter) => {
+                    table.setPageIndex(0)
                     void setStatus(value)
                   }}
                 >
@@ -158,6 +159,7 @@ export function RequestsDataTableHeader({ table, viewer, isLoading }: RequestsDa
                 <MenuRadioGroup
                   value={kind}
                   onValueChange={(value: KindFilter) => {
+                    table.setPageIndex(0)
                     void setKind(value)
                   }}
                 >

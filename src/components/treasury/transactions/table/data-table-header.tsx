@@ -121,6 +121,7 @@ export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDa
                 <MenuRadioGroup
                   value={kind}
                   onValueChange={(value: KindFilter) => {
+                    table.setPageIndex(0)
                     void setKind(value)
                   }}
                 >

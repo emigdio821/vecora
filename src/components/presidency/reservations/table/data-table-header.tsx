@@ -86,6 +86,7 @@ export function ReservationsDataTableHeader({
                   <MenuRadioGroup
                     value={activeAmenity ? amenityId : 'all'}
                     onValueChange={(value: string) => {
+                      table.setPageIndex(0)
                       void setAmenityId(value)
                     }}
                   >
