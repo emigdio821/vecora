@@ -2,12 +2,15 @@ import { useQuery } from '@tanstack/react-query'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
-import { amenitiesQueryOptions } from '@/tanstack-queries/presidency'
+import { type AmenityQueryData, amenitiesQueryOptions } from '@/tanstack-queries/presidency'
 import { amenitiesTableColumns } from './columns'
 import { AmenitiesDataTableHeader } from './data-table-header'
 
+// Same array on every render while loading, so the table doesn't recompute its rows.
+const EMPTY_AMENITIES: AmenityQueryData[] = []
+
 export function AmenitiesDataTable() {
-  const { data: amenities = [], isLoading, error, refetch } = useQuery(amenitiesQueryOptions())
+  const { data: amenities = EMPTY_AMENITIES, isLoading, error, refetch } = useQuery(amenitiesQueryOptions())
 
   if (error) {
     return <TanstackQueryError refetch={refetch} />

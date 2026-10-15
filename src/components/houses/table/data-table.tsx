@@ -4,12 +4,15 @@ import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
-import { housesListQueryOptions } from '@/tanstack-queries/houses'
+import { type HouseQueryData, housesListQueryOptions } from '@/tanstack-queries/houses'
 import { housesTableColumns } from './columns'
 import { HousesDataTableHeader } from './data-table-header'
 
+// Same array on every render while loading, so the table doesn't recompute its rows.
+const EMPTY_HOUSES: HouseQueryData[] = []
+
 export function HousesDataTable() {
-  const { data: houses = [], isLoading, error, refetch } = useQuery(housesListQueryOptions())
+  const { data: houses = EMPTY_HOUSES, isLoading, error, refetch } = useQuery(housesListQueryOptions())
   const canManage = useHasRole('president')
   // Selection only feeds bulk delete, so readers don't get the checkboxes.
   const columns = useMemo(

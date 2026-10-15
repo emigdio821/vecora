@@ -4,12 +4,20 @@ import { useHasRole } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
-import { transactionsListQueryOptions } from '@/tanstack-queries/treasury'
+import { type TransactionQueryData, transactionsListQueryOptions } from '@/tanstack-queries/treasury'
 import { transactionsTableColumns } from './columns'
 import { TransactionsDataTableHeader, useKindFilter } from './data-table-header'
 
+// Same array on every render while loading, so the table doesn't recompute its rows.
+const EMPTY_TRANSACTIONS: TransactionQueryData[] = []
+
 export function TransactionsDataTable() {
-  const { data: transactions = [], isLoading, error, refetch } = useQuery(transactionsListQueryOptions())
+  const {
+    data: transactions = EMPTY_TRANSACTIONS,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery(transactionsListQueryOptions())
   const [kind] = useKindFilter()
   const canManage = useHasRole('treasurer')
   // Selection only feeds bulk delete, so readers don't get the checkboxes.

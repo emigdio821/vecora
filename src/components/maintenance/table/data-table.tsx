@@ -3,7 +3,10 @@ import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
-import { maintenanceRequestsQueryOptions } from '@/tanstack-queries/maintenance'
+import {
+  type MaintenanceRequestQueryData,
+  maintenanceRequestsQueryOptions,
+} from '@/tanstack-queries/maintenance'
 import { type MaintenanceViewer, requestsTableColumns } from './columns'
 import { RequestsDataTableHeader, useStatusFilter } from './data-table-header'
 
@@ -11,8 +14,16 @@ interface RequestsDataTableProps {
   viewer: MaintenanceViewer
 }
 
+// Same array on every render while loading, so the table doesn't recompute its rows.
+const EMPTY_REQUESTS: MaintenanceRequestQueryData[] = []
+
 export function RequestsDataTable({ viewer }: RequestsDataTableProps) {
-  const { data: requests = [], isLoading, error, refetch } = useQuery(maintenanceRequestsQueryOptions())
+  const {
+    data: requests = EMPTY_REQUESTS,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery(maintenanceRequestsQueryOptions())
   const [status] = useStatusFilter()
   const columns = useMemo(() => requestsTableColumns(viewer), [viewer])
 

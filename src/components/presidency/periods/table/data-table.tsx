@@ -3,12 +3,19 @@ import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
-import { periodSummariesQueryOptions, periodsQueryOptions } from '@/tanstack-queries/treasury'
+import {
+  type PeriodQueryData,
+  periodSummariesQueryOptions,
+  periodsQueryOptions,
+} from '@/tanstack-queries/treasury'
 import { type PeriodRow, periodsTableColumns } from './columns'
 import { PeriodsDataTableHeader } from './data-table-header'
 
+// Same array on every render while loading, so the table doesn't recompute its rows.
+const EMPTY_PERIODS: PeriodQueryData[] = []
+
 export function PeriodsDataTable() {
-  const { data: periods = [], isLoading, error, refetch } = useQuery(periodsQueryOptions())
+  const { data: periods = EMPTY_PERIODS, isLoading, error, refetch } = useQuery(periodsQueryOptions())
   // Totals come from a view; the table renders without them and fills in when they land.
   const { data: summaries } = useQuery(periodSummariesQueryOptions())
 

@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
-import { boardMembersQueryOptions } from '@/tanstack-queries/hoa-board'
+import { type BoardMemberQueryData, boardMembersQueryOptions } from '@/tanstack-queries/hoa-board'
 import { type BoardViewer, boardMembersTableColumns } from './columns'
 import { BoardMembersDataTableHeader } from './data-table-header'
 
@@ -11,8 +11,11 @@ interface BoardMembersDataTableProps {
   viewer: BoardViewer
 }
 
+// Same array on every render while loading, so the table doesn't recompute its rows.
+const EMPTY_MEMBERS: BoardMemberQueryData[] = []
+
 export function BoardMembersDataTable({ viewer }: BoardMembersDataTableProps) {
-  const { data: members = [], isLoading, error, refetch } = useQuery(boardMembersQueryOptions())
+  const { data: members = EMPTY_MEMBERS, isLoading, error, refetch } = useQuery(boardMembersQueryOptions())
   const columns = useMemo(() => boardMembersTableColumns(viewer), [viewer])
 
   if (error) {
