@@ -12,10 +12,8 @@ export default defineConfig({
   optimizeDeps: { exclude: ['@resvg/resvg-js'] },
   build: {
     rolldownOptions: {
-      // Libraries ship "use client" for RSC apps; this app doesn't use RSC, so dropping it is fine.
-      onLog(level, log, handler) {
-        if (log.code === 'MODULE_LEVEL_DIRECTIVE') return
-        handler(level, log)
+      checks: {
+        moduleLevelDirective: false,
       },
     },
   },
@@ -30,6 +28,7 @@ export default defineConfig({
       // package.json "imports"; satori's harfbuzzjs loads its wasm from __dirname.
       // The tracer misses those files, hence the full copies (*).
       traceDeps: ['@react-pdf/renderer', 'pdfkit*', 'satori', 'harfbuzzjs*'],
+      compressPublicAssets: { gzip: true, brotli: true },
     }),
     viteReact(),
   ],
