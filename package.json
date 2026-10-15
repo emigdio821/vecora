@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
+    "dev": "vp dev",
+    "build": "vp build",
     "start": "node .output/server/index.mjs",
-    "lint": "oxlint --fix",
-    "format": "oxfmt",
+    "lint": "vp lint --fix",
+    "format": "vp fmt",
     "i18n": "paraglide-js compile --silent",
     "typecheck": "npm run i18n && tsc --noEmit",
     "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
@@ -76,16 +76,17 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "nitro": "^3.0.260903-beta",
-    "oxfmt": "^0.73.0",
-    "oxlint": "^1.88.0",
-    "oxlint-tsgolint": "^7.0.2004",
     "supabase": "^2.120.0",
     "typescript": "^7.0.2",
-    "vite": "^8.3.4"
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.2.0",
+    "vite-plus": "1.2.0"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.2.0"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,mjs,cjs}": "oxlint --no-error-on-unmatched-pattern",
-    "*": "oxfmt --no-error-on-unmatched-pattern"
+    "*.{js,jsx,ts,tsx,mjs,cjs}": "vp lint --no-error-on-unmatched-pattern",
+    "*": "vp fmt --no-error-on-unmatched-pattern"
   },
   "engines": {
     "node": "24.x"
