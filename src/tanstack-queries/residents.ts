@@ -25,16 +25,14 @@ function residentsListQuery() {
 
 export type ResidentQueryData = QueryData<ReturnType<typeof residentsListQuery>>[number]
 
-export function residentsListQueryOptions() {
-  return queryOptions({
-    queryKey: [RESIDENTS_QUERY_KEY],
-    queryFn: async () => {
-      const { data, error } = await residentsListQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const residentsListQueryOptions = queryOptions({
+  queryKey: [RESIDENTS_QUERY_KEY],
+  queryFn: async () => {
+    const { data, error } = await residentsListQuery()
+    if (error) throw error
+    return data
+  },
+})
 
 /**
  * Lightweight list for pickers: identity + which houses each resident is
@@ -58,13 +56,11 @@ function residentsPickerQuery() {
 export type PickerResident = QueryData<ReturnType<typeof residentsPickerQuery>>[number]
 
 /** Shares the `residents` prefix so invalidating the list also refreshes pickers. */
-export function residentsPickerQueryOptions() {
-  return queryOptions({
-    queryKey: [RESIDENTS_QUERY_KEY, 'picker'],
-    queryFn: async () => {
-      const { data, error } = await residentsPickerQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const residentsPickerQueryOptions = queryOptions({
+  queryKey: [RESIDENTS_QUERY_KEY, 'picker'],
+  queryFn: async () => {
+    const { data, error } = await residentsPickerQuery()
+    if (error) throw error
+    return data
+  },
+})

@@ -28,7 +28,7 @@ interface ResidentsPickerProps extends Omit<
 
 /** Pick one resident (`string | null`) or, with `multiple`, several (`string[]`), by id. */
 export function ResidentsPicker({ scope = 'all', excludeIds, ...props }: ResidentsPickerProps) {
-  const { data, isPending, isError } = useQuery(residentsPickerQueryOptions())
+  const { data, isPending, isError } = useQuery(residentsPickerQueryOptions)
 
   // Built from every resident, so chips can still name a selection the list hides.
   const byId = useMemo(() => new Map(data?.map((resident) => [resident.id, resident])), [data])

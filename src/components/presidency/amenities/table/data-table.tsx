@@ -10,7 +10,7 @@ import { AmenitiesDataTableHeader } from './data-table-header'
 const EMPTY_AMENITIES: AmenityQueryData[] = []
 
 export function AmenitiesDataTable() {
-  const { data: amenities = EMPTY_AMENITIES, isLoading, error, refetch } = useQuery(amenitiesQueryOptions())
+  const { data: amenities = EMPTY_AMENITIES, isLoading, error, refetch } = useQuery(amenitiesQueryOptions)
 
   if (error) {
     return <TanstackQueryError refetch={refetch} />

@@ -46,8 +46,8 @@ export function AddBoardMemberDrawer({
   ...props
 }: AddBoardMemberDrawerProps) {
   const queryClient = useQueryClient()
-  const { data: residents } = useQuery(residentsPickerQueryOptions())
-  const { data: members } = useQuery(boardMembersQueryOptions())
+  const { data: residents } = useQuery(residentsPickerQueryOptions)
+  const { data: members } = useQuery(boardMembersQueryOptions)
 
   // Hide who can't be added: already on the board, or no email for the account.
   const excludeIds = useMemo(() => {

@@ -8,8 +8,8 @@ import { reservationsTableColumns } from './columns'
 import { ReservationsDataTableHeader, useAmenityFilter } from './data-table-header'
 
 export function ReservationsDataTable() {
-  const reservations = useQuery(reservationsQueryOptions())
-  const amenities = useQuery(amenitiesQueryOptions())
+  const reservations = useQuery(reservationsQueryOptions)
+  const amenities = useQuery(amenitiesQueryOptions)
   const [amenityId] = useAmenityFilter()
   const isLoading = reservations.isLoading || amenities.isLoading
 

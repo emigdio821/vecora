@@ -27,7 +27,7 @@ export function houseLabel(house: { number: string }) {
 
 /** Pick one house (`string | null`) or, with `multiple`, several (`string[]`), by id. */
 export function HousesPicker({ excludeIds, ...props }: HousesPickerProps) {
-  const { data, isPending, isError } = useQuery(housesPickerQueryOptions())
+  const { data, isPending, isError } = useQuery(housesPickerQueryOptions)
 
   const byId = useMemo(() => new Map(data?.map((house) => [house.id, house])), [data])
   const items = useMemo(

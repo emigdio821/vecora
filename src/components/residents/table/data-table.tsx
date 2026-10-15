@@ -15,12 +15,7 @@ export type Resident = Tables<'residents'>
 const EMPTY_RESIDENTS: ResidentQueryData[] = []
 
 export function ResidentsDataTable() {
-  const {
-    data: residents = EMPTY_RESIDENTS,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery(residentsListQueryOptions())
+  const { data: residents = EMPTY_RESIDENTS, isLoading, error, refetch } = useQuery(residentsListQueryOptions)
   const canManage = useHasRole('president')
   // Selection only feeds bulk delete, so readers don't get the checkboxes.
   const columns = useMemo(

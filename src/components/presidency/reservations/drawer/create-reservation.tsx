@@ -54,10 +54,10 @@ export function CreateReservationDrawer({
     },
     onSuccess: (_data, values) => {
       const amenity = queryClient
-        .getQueryData(amenitiesQueryOptions().queryKey)
+        .getQueryData(amenitiesQueryOptions.queryKey)
         ?.find((a) => a.id === values.amenity_id)
       const house = queryClient
-        .getQueryData(housesPickerQueryOptions().queryKey)
+        .getQueryData(housesPickerQueryOptions.queryKey)
         ?.find((h) => h.id === values.property_id)
 
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })
@@ -111,7 +111,7 @@ export function CreateReservationDrawer({
 function CreateReservationForm({ mutation }: { mutation: CreateMutation }) {
   const today = useToday()
   const currency = useCurrency()
-  const { data: amenities } = useQuery(amenitiesQueryOptions())
+  const { data: amenities } = useQuery(amenitiesQueryOptions)
   // With a single area to book, there's nothing to choose.
   const active = (amenities ?? []).filter((a) => a.is_active)
   const onlyAmenity = active.length === 1 ? active[0] : undefined

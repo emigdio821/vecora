@@ -29,13 +29,11 @@ function boardMembersQuery() {
 
 export type BoardMemberQueryData = QueryData<ReturnType<typeof boardMembersQuery>>[number]
 
-export function boardMembersQueryOptions() {
-  return queryOptions({
-    queryKey: [HOA_BOARD_QUERY_KEY, 'members'],
-    queryFn: async () => {
-      const { data, error } = await boardMembersQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const boardMembersQueryOptions = queryOptions({
+  queryKey: [HOA_BOARD_QUERY_KEY, 'members'],
+  queryFn: async () => {
+    const { data, error } = await boardMembersQuery()
+    if (error) throw error
+    return data
+  },
+})

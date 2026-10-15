@@ -22,16 +22,14 @@ export function reservationCount(amenity: AmenityQueryData) {
   return amenity.amenity_reservations[0]?.count ?? 0
 }
 
-export function amenitiesQueryOptions() {
-  return queryOptions({
-    queryKey: [PRESIDENCY_QUERY_KEY, 'amenities'],
-    queryFn: async () => {
-      const { data, error } = await amenitiesQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const amenitiesQueryOptions = queryOptions({
+  queryKey: [PRESIDENCY_QUERY_KEY, 'amenities'],
+  queryFn: async () => {
+    const { data, error } = await amenitiesQuery()
+    if (error) throw error
+    return data
+  },
+})
 
 /**
  * Every booking, upcoming first. Soft-deleted houses stay attached: the booking did happen.
@@ -53,13 +51,11 @@ function reservationsQuery() {
 
 export type ReservationQueryData = QueryData<ReturnType<typeof reservationsQuery>>[number]
 
-export function reservationsQueryOptions() {
-  return queryOptions({
-    queryKey: [PRESIDENCY_QUERY_KEY, 'reservations'],
-    queryFn: async () => {
-      const { data, error } = await reservationsQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const reservationsQueryOptions = queryOptions({
+  queryKey: [PRESIDENCY_QUERY_KEY, 'reservations'],
+  queryFn: async () => {
+    const { data, error } = await reservationsQuery()
+    if (error) throw error
+    return data
+  },
+})

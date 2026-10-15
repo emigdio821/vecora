@@ -23,7 +23,7 @@ export function RequestsDataTable({ viewer }: RequestsDataTableProps) {
     isLoading,
     error,
     refetch,
-  } = useQuery(maintenanceRequestsQueryOptions())
+  } = useQuery(maintenanceRequestsQueryOptions)
   const [status] = useStatusFilter()
   const columns = useMemo(() => requestsTableColumns(viewer), [viewer])
 

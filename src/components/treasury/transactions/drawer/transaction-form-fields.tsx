@@ -50,7 +50,7 @@ export function TransactionFormFields({
   const [isDateOpen, setDateOpen] = useState(false)
   const dateTriggerId = useId()
   const today = useToday()
-  const { data: categories } = useQuery(categoriesQueryOptions())
+  const { data: categories } = useQuery(categoriesQueryOptions)
   const [kind, paymentMethod, categoryId] = useWatch({
     control: form.control,
     name: ['kind', 'payment_method', 'category_id'],

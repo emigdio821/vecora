@@ -21,13 +21,11 @@ function requestsQuery() {
 
 export type MaintenanceRequestQueryData = QueryData<ReturnType<typeof requestsQuery>>[number]
 
-export function maintenanceRequestsQueryOptions() {
-  return queryOptions({
-    queryKey: [MAINTENANCE_QUERY_KEY, 'requests'],
-    queryFn: async () => {
-      const { data, error } = await requestsQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const maintenanceRequestsQueryOptions = queryOptions({
+  queryKey: [MAINTENANCE_QUERY_KEY, 'requests'],
+  queryFn: async () => {
+    const { data, error } = await requestsQuery()
+    if (error) throw error
+    return data
+  },
+})

@@ -66,7 +66,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
       // Read before invalidating; the picker loaded this list to offer the house.
       const house = values.property_id
         ? queryClient
-            .getQueryData(housesPickerQueryOptions().queryKey)
+            .getQueryData(housesPickerQueryOptions.queryKey)
             ?.find((h) => h.id === values.property_id)
         : undefined
 

@@ -51,7 +51,7 @@ function NoticesSkeleton() {
  * bookings; announcements, if they ever land, join this same list.
  */
 export function NoticesCard() {
-  const reservations = useQuery(reservationsQueryOptions())
+  const reservations = useQuery(reservationsQueryOptions)
   const now = useToday()
 
   if (reservations.isPending) {

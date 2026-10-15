@@ -57,9 +57,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
     },
     onSuccess: (_data, { houseId }) => {
       // Read before invalidating; the picker loaded this list to offer the house.
-      const house = queryClient
-        .getQueryData(housesPickerQueryOptions().queryKey)
-        ?.find((h) => h.id === houseId)
+      const house = queryClient.getQueryData(housesPickerQueryOptions.queryKey)?.find((h) => h.id === houseId)
       // Both sides of the link show it: the house's residents and each resident's houses.
       void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })

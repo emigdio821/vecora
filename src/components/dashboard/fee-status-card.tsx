@@ -64,9 +64,9 @@ function FeeStatusSkeleton() {
  * not: every house missing at least one month so far, with the months owed.
  */
 export function FeeStatusCard() {
-  const status = useQuery(houseFeeStatusQueryOptions())
+  const status = useQuery(houseFeeStatusQueryOptions)
   // Owners come from the picker list, which is already cached by the forms.
-  const houses = useQuery(housesPickerQueryOptions())
+  const houses = useQuery(housesPickerQueryOptions)
 
   if (status.isPending) {
     return <FeeStatusSkeleton />

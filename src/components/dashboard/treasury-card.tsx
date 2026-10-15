@@ -116,8 +116,8 @@ function monthlyTotals(period: PeriodQueryData, movements: PeriodMovementQueryDa
 
 /** Income, expenses and balance of the period that contains today, and how they moved month by month. */
 export function TreasuryCard() {
-  const periods = useQuery(periodsQueryOptions())
-  const summaries = useQuery(periodSummariesQueryOptions())
+  const periods = useQuery(periodsQueryOptions)
+  const summaries = useQuery(periodSummariesQueryOptions)
   const now = useToday()
 
   if (periods.isPending || summaries.isPending) return <TreasuryCardSkeleton />

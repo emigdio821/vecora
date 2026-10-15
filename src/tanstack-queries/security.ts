@@ -21,13 +21,11 @@ function requestsQuery() {
 
 export type SecurityRequestQueryData = QueryData<ReturnType<typeof requestsQuery>>[number]
 
-export function securityRequestsQueryOptions() {
-  return queryOptions({
-    queryKey: [SECURITY_QUERY_KEY, 'requests'],
-    queryFn: async () => {
-      const { data, error } = await requestsQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const securityRequestsQueryOptions = queryOptions({
+  queryKey: [SECURITY_QUERY_KEY, 'requests'],
+  queryFn: async () => {
+    const { data, error } = await requestsQuery()
+    if (error) throw error
+    return data
+  },
+})

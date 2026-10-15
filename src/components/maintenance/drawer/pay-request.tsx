@@ -121,7 +121,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
   const [isDateOpen, setDateOpen] = useState(false)
   const dateTriggerId = useId()
   const today = useToday()
-  const { data: categories } = useQuery(categoriesQueryOptions())
+  const { data: categories } = useQuery(categoriesQueryOptions)
 
   // Expense categories the treasurer can book this under (fee categories are income anyway).
   const categoryItems = useMemo(

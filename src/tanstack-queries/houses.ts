@@ -25,16 +25,14 @@ function housesListQuery() {
 
 export type HouseQueryData = QueryData<ReturnType<typeof housesListQuery>>[number]
 
-export function housesListQueryOptions() {
-  return queryOptions({
-    queryKey: [HOUSES_QUERY_KEY],
-    queryFn: async () => {
-      const { data, error } = await housesListQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const housesListQueryOptions = queryOptions({
+  queryKey: [HOUSES_QUERY_KEY],
+  queryFn: async () => {
+    const { data, error } = await housesListQuery()
+    if (error) throw error
+    return data
+  },
+})
 
 /** Lightweight list for pickers: number + its owners (who the fee is billed to). */
 function housesPickerQuery() {
@@ -54,14 +52,12 @@ function housesPickerQuery() {
 export type PickerHouse = QueryData<ReturnType<typeof housesPickerQuery>>[number]
 
 /** Shares the `houses` prefix so invalidating the list also refreshes pickers. */
-export function housesPickerQueryOptions() {
-  return queryOptions({
-    queryKey: [HOUSES_QUERY_KEY, 'picker'],
-    queryFn: async () => {
-      const { data, error } = await housesPickerQuery()
-      if (error) throw error
-      // Numeric-aware so "2" sorts before "10" (Postgres would sort them as text).
-      return data.sort((a, b) => a.number.localeCompare(b.number, 'es', { numeric: true }))
-    },
-  })
-}
+export const housesPickerQueryOptions = queryOptions({
+  queryKey: [HOUSES_QUERY_KEY, 'picker'],
+  queryFn: async () => {
+    const { data, error } = await housesPickerQuery()
+    if (error) throw error
+    // Numeric-aware so "2" sorts before "10" (Postgres would sort them as text).
+    return data.sort((a, b) => a.number.localeCompare(b.number, 'es', { numeric: true }))
+  },
+})

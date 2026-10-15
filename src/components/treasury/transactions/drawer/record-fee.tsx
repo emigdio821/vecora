@@ -92,7 +92,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
   const [isDateOpen, setDateOpen] = useState(false)
   const dateTriggerId = useId()
   const today = useToday()
-  const { data: periods } = useQuery(periodsQueryOptions())
+  const { data: periods } = useQuery(periodsQueryOptions)
   const home = useCurrency()
   const formatCurrency = useFormatCurrency()
 
@@ -131,7 +131,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
     },
     onSuccess: (summary, values) => {
       const house = queryClient
-        .getQueryData(housesPickerQueryOptions().queryKey)
+        .getQueryData(housesPickerQueryOptions.queryKey)
         ?.find((h) => h.id === values.property_id)
 
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })

@@ -10,12 +10,7 @@ import { CategoriesDataTableHeader } from './data-table-header'
 const EMPTY_CATEGORIES: CategoryQueryData[] = []
 
 export function CategoriesDataTable() {
-  const {
-    data: categories = EMPTY_CATEGORIES,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery(categoriesQueryOptions())
+  const { data: categories = EMPTY_CATEGORIES, isLoading, error, refetch } = useQuery(categoriesQueryOptions)
 
   if (error) {
     return <TanstackQueryError refetch={refetch} />

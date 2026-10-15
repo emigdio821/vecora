@@ -15,7 +15,7 @@ interface BoardMembersDataTableProps {
 const EMPTY_MEMBERS: BoardMemberQueryData[] = []
 
 export function BoardMembersDataTable({ viewer }: BoardMembersDataTableProps) {
-  const { data: members = EMPTY_MEMBERS, isLoading, error, refetch } = useQuery(boardMembersQueryOptions())
+  const { data: members = EMPTY_MEMBERS, isLoading, error, refetch } = useQuery(boardMembersQueryOptions)
   const columns = useMemo(() => boardMembersTableColumns(viewer), [viewer])
 
   if (error) {

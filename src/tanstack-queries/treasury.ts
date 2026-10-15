@@ -26,16 +26,14 @@ function transactionsListQuery() {
 
 export type TransactionQueryData = QueryData<ReturnType<typeof transactionsListQuery>>[number]
 
-export function transactionsListQueryOptions() {
-  return queryOptions({
-    queryKey: [TREASURY_QUERY_KEY, 'transactions'],
-    queryFn: async () => {
-      const { data, error } = await transactionsListQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const transactionsListQueryOptions = queryOptions({
+  queryKey: [TREASURY_QUERY_KEY, 'transactions'],
+  queryFn: async () => {
+    const { data, error } = await transactionsListQuery()
+    if (error) throw error
+    return data
+  },
+})
 
 /**
  * Newest first. `transactions(count)` includes soft-deleted rows on purpose:
@@ -55,16 +53,14 @@ export function transactionCount(row: { transactions: { count: number }[] }) {
   return row.transactions[0]?.count ?? 0
 }
 
-export function periodsQueryOptions() {
-  return queryOptions({
-    queryKey: [TREASURY_QUERY_KEY, 'periods'],
-    queryFn: async () => {
-      const { data, error } = await periodsQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const periodsQueryOptions = queryOptions({
+  queryKey: [TREASURY_QUERY_KEY, 'periods'],
+  queryFn: async () => {
+    const { data, error } = await periodsQuery()
+    if (error) throw error
+    return data
+  },
+})
 
 /**
  * Income / expense / balance per period and currency, computed by the
@@ -79,16 +75,14 @@ function periodSummariesQuery() {
 
 export type PeriodSummaryQueryData = QueryData<ReturnType<typeof periodSummariesQuery>>[number]
 
-export function periodSummariesQueryOptions() {
-  return queryOptions({
-    queryKey: [TREASURY_QUERY_KEY, 'period-summaries'],
-    queryFn: async () => {
-      const { data, error } = await periodSummariesQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const periodSummariesQueryOptions = queryOptions({
+  queryKey: [TREASURY_QUERY_KEY, 'period-summaries'],
+  queryFn: async () => {
+    const { data, error } = await periodSummariesQuery()
+    if (error) throw error
+    return data
+  },
+})
 
 /** Live movements of one period, just what the monthly chart adds up. */
 function periodMovementsQuery(periodId: string) {
@@ -124,17 +118,15 @@ function houseFeeStatusQuery() {
 
 export type HouseFeeStatusQueryData = QueryData<ReturnType<typeof houseFeeStatusQuery>>[number]
 
-export function houseFeeStatusQueryOptions() {
-  return queryOptions({
-    queryKey: [TREASURY_QUERY_KEY, 'fee-status'],
-    queryFn: async () => {
-      const { data, error } = await houseFeeStatusQuery()
-      if (error) throw error
-      // Numeric-aware so "2" sorts before "10" (Postgres would sort them as text).
-      return data.sort((a, b) => (a.number ?? '').localeCompare(b.number ?? '', 'es', { numeric: true }))
-    },
-  })
-}
+export const houseFeeStatusQueryOptions = queryOptions({
+  queryKey: [TREASURY_QUERY_KEY, 'fee-status'],
+  queryFn: async () => {
+    const { data, error } = await houseFeeStatusQuery()
+    if (error) throw error
+    // Numeric-aware so "2" sorts before "10" (Postgres would sort them as text).
+    return data.sort((a, b) => (a.number ?? '').localeCompare(b.number ?? '', 'es', { numeric: true }))
+  },
+})
 
 /** See periodsQuery for why the count includes soft-deleted movements. */
 function categoriesQuery() {
@@ -147,13 +139,11 @@ function categoriesQuery() {
 
 export type CategoryQueryData = QueryData<ReturnType<typeof categoriesQuery>>[number]
 
-export function categoriesQueryOptions() {
-  return queryOptions({
-    queryKey: [TREASURY_QUERY_KEY, 'categories'],
-    queryFn: async () => {
-      const { data, error } = await categoriesQuery()
-      if (error) throw error
-      return data
-    },
-  })
-}
+export const categoriesQueryOptions = queryOptions({
+  queryKey: [TREASURY_QUERY_KEY, 'categories'],
+  queryFn: async () => {
+    const { data, error } = await categoriesQuery()
+    if (error) throw error
+    return data
+  },
+})

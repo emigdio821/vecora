@@ -17,7 +17,7 @@ export function TransactionsDataTable() {
     isLoading,
     error,
     refetch,
-  } = useQuery(transactionsListQueryOptions())
+  } = useQuery(transactionsListQueryOptions)
   const [kind] = useKindFilter()
   const canManage = useHasRole('treasurer')
   // Selection only feeds bulk delete, so readers don't get the checkboxes.

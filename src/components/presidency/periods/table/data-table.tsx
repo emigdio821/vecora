@@ -15,9 +15,9 @@ import { PeriodsDataTableHeader } from './data-table-header'
 const EMPTY_PERIODS: PeriodQueryData[] = []
 
 export function PeriodsDataTable() {
-  const { data: periods = EMPTY_PERIODS, isLoading, error, refetch } = useQuery(periodsQueryOptions())
+  const { data: periods = EMPTY_PERIODS, isLoading, error, refetch } = useQuery(periodsQueryOptions)
   // Totals come from a view; the table renders without them and fills in when they land.
-  const { data: summaries } = useQuery(periodSummariesQueryOptions())
+  const { data: summaries } = useQuery(periodSummariesQueryOptions)
 
   const rows = useMemo<PeriodRow[]>(
     () =>

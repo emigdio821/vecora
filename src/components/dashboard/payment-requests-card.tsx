@@ -76,9 +76,9 @@ function pendingDescription(pending: number): string {
  * Security and Reservations, oldest first. Resolved ones live in each section.
  */
 export function PaymentRequestsCard() {
-  const maintenance = useQuery(maintenanceRequestsQueryOptions())
-  const security = useQuery(securityRequestsQueryOptions())
-  const reservations = useQuery(reservationsQueryOptions())
+  const maintenance = useQuery(maintenanceRequestsQueryOptions)
+  const security = useQuery(securityRequestsQueryOptions)
+  const reservations = useQuery(reservationsQueryOptions)
 
   if (maintenance.isPending || security.isPending || reservations.isPending) {
     return <PaymentRequestsSkeleton />

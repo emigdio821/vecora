@@ -12,7 +12,7 @@ import { HousesDataTableHeader } from './data-table-header'
 const EMPTY_HOUSES: HouseQueryData[] = []
 
 export function HousesDataTable() {
-  const { data: houses = EMPTY_HOUSES, isLoading, error, refetch } = useQuery(housesListQueryOptions())
+  const { data: houses = EMPTY_HOUSES, isLoading, error, refetch } = useQuery(housesListQueryOptions)
   const canManage = useHasRole('president')
   // Selection only feeds bulk delete, so readers don't get the checkboxes.
   const columns = useMemo(
