@@ -1,13 +1,19 @@
 import { ScriptOnce } from '@tanstack/react-router'
-import { createContext, use, useEffect, useState } from 'react'
+import { createContext, use, useSyncExternalStore } from 'react'
 
 export type Theme = 'system' | 'light' | 'dark'
+type ResolvedTheme = 'light' | 'dark'
 
 /** Same key next-themes used, so a saved preference carries over. */
 const STORAGE_KEY = 'theme'
+/** Fired by setTheme in this tab; the other tabs hear about it through `storage`. */
+const THEME_CHANGE_EVENT = 'themechange'
+const DARK_QUERY = '(prefers-color-scheme: dark)'
 
 interface ThemeContextValue {
   theme: Theme
+  /** `theme` with `system` worked out: what the page shows right now. */
+  resolvedTheme: ResolvedTheme
   setTheme: (theme: Theme) => void
 }
 
@@ -17,21 +23,23 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 const applySavedTheme = `(function () {
   try {
     var theme = localStorage.getItem('${STORAGE_KEY}') || 'system'
-    var dark = theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+    var dark = theme === 'dark' || (theme === 'system' && matchMedia('${DARK_QUERY}').matches)
     document.documentElement.classList.toggle('dark', dark)
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
   } catch (e) {}
 })()`
 
 function readSavedTheme(): Theme {
-  if (typeof window === 'undefined') return 'system'
   const saved = localStorage.getItem(STORAGE_KEY)
   return saved === 'light' || saved === 'dark' ? saved : 'system'
 }
 
+function readSystemTheme(): ResolvedTheme {
+  return window.matchMedia(DARK_QUERY).matches ? 'dark' : 'light'
+}
+
 function applyTheme(theme: Theme) {
-  const dark =
-    theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  const dark = theme === 'dark' || (theme === 'system' && readSystemTheme() === 'dark')
   // Switch without every element animating its colors at once.
   const freeze = document.createElement('style')
   freeze.textContent = '*,*::before,*::after{transition:none!important}'
@@ -43,33 +51,55 @@ function applyTheme(theme: Theme) {
   freeze.remove()
 }
 
+/** Saves the per-device preference and applies it, in this tab and the others. */
+export function setTheme(theme: Theme) {
+  localStorage.setItem(STORAGE_KEY, theme)
+  applyTheme(theme)
+  window.dispatchEvent(new Event(THEME_CHANGE_EVENT))
+}
+
+function subscribeToSavedTheme(onChange: () => void) {
+  // Picked in another tab: apply it here too. A null key means storage was cleared.
+  const onStorage = (event: StorageEvent) => {
+    if (event.key !== STORAGE_KEY && event.key !== null) return
+    applyTheme(readSavedTheme())
+    onChange()
+  }
+  window.addEventListener('storage', onStorage)
+  window.addEventListener(THEME_CHANGE_EVENT, onChange)
+  return () => {
+    window.removeEventListener('storage', onStorage)
+    window.removeEventListener(THEME_CHANGE_EVENT, onChange)
+  }
+}
+
+function subscribeToSystemTheme(onChange: () => void) {
+  const media = window.matchMedia(DARK_QUERY)
+  const onMediaChange = () => {
+    if (readSavedTheme() === 'system') applyTheme('system')
+    onChange()
+  }
+  media.addEventListener('change', onMediaChange)
+  return () => {
+    media.removeEventListener('change', onMediaChange)
+  }
+}
+
 /**
  * The per-device theme preference (light, dark or following the system),
  * stored in localStorage and applied as the `dark` class on <html>.
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(readSavedTheme)
+  // The server can't read either one: it renders (and hydration starts) with
+  // the defaults, then React switches to the device's values.
+  const theme = useSyncExternalStore(subscribeToSavedTheme, readSavedTheme, () => 'system' as const)
+  const systemTheme = useSyncExternalStore(subscribeToSystemTheme, readSystemTheme, () => 'light' as const)
 
-  useEffect(() => {
-    if (theme !== 'system') return
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
-    const onChange = () => {
-      applyTheme('system')
-    }
-    media.addEventListener('change', onChange)
-    return () => {
-      media.removeEventListener('change', onChange)
-    }
-  }, [theme])
-
-  function setTheme(next: Theme) {
-    localStorage.setItem(STORAGE_KEY, next)
-    applyTheme(next)
-    setThemeState(next)
-  }
+  let resolvedTheme: ResolvedTheme = systemTheme
+  if (theme !== 'system') resolvedTheme = theme
 
   return (
-    <ThemeContext value={{ theme, setTheme }}>
+    <ThemeContext value={{ theme, resolvedTheme, setTheme }}>
       <ScriptOnce>{applySavedTheme}</ScriptOnce>
       {children}
     </ThemeContext>
