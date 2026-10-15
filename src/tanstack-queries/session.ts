@@ -5,13 +5,12 @@ import { SETTINGS_QUERY_KEY } from './settings'
 export const USER_QUERY_KEY = 'user'
 
 /**
- * The route guards read the user on every navigation; within a minute they
- * reuse it instead of asking the server again. Signing in or out removes it.
+ * The route guards read the user on every navigation, from the cache once
+ * it's there (see routes/__root.tsx). Signing in or out removes it.
  */
 export const currentUserQueryOptions = queryOptions({
   queryKey: [USER_QUERY_KEY],
   queryFn: () => fetchCurrentUser(),
-  staleTime: 60 * 1000,
 })
 
 export const settingsQueryOptions = queryOptions({

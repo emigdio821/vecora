@@ -34,7 +34,7 @@ import { Button } from '@/components/ui/button'
 import type { AppRole } from '@/lib/supabase/current-user'
 import { m } from '@/paraglide/messages'
 import { markWelcomed } from '@/server-actions/profile'
-import { USER_QUERY_KEY } from '@/tanstack-queries/session'
+import { currentUserQueryOptions } from '@/tanstack-queries/session'
 
 interface Ability {
   icon: TablerIcon
@@ -137,8 +137,11 @@ export function FirstVisitWelcomeDialog() {
   const mutation = useMutation({
     mutationFn: markWelcomed,
     onSuccess: () => {
-      // The cached user still says not welcomed; refetch it on the next navigation.
-      void queryClient.invalidateQueries({ queryKey: [USER_QUERY_KEY] })
+      // The cached user still says not welcomed, and the guards never refetch it (static).
+      queryClient.setQueryData(currentUserQueryOptions.queryKey, (cached) => {
+        if (!cached) return cached
+        return { ...cached, welcomed: true }
+      })
     },
   })
 

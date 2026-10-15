@@ -33,10 +33,11 @@ import { currentUserQueryOptions } from '@/tanstack-queries/session'
 import globalsCss from '@/styles/globals.css?url'
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  // Every route guard reads the user from here; the query cache keeps it
-  // from going back to the server on each navigation.
+  // Every route guard reads the user from here. Static: once cached it never
+  // holds up a navigation; signing in or out drops it, and an expired session
+  // surfaces on the next server function instead.
   beforeLoad: async ({ context }) => {
-    const user = await context.queryClient.query(currentUserQueryOptions)
+    const user = await context.queryClient.query({ ...currentUserQueryOptions, staleTime: 'static' })
     return { user }
   },
   head: () => ({
