@@ -44,11 +44,15 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 
   const { sub: id, email, amr } = data.claims
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from('profiles')
     .select('full_name, welcomed_at, is_main_admin, user_roles!user_id ( role )')
     .eq('id', id)
     .maybeSingle()
+
+  // Not "no roles": that would send a board member to /no-access, and the
+  // guards keep the user cached until the next sign-in. The error page retries.
+  if (error) throw error
 
   return {
     id,
