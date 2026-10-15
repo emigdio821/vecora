@@ -1,6 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
 import { type ActionResult, postgrestErrorMessage, UNIQUE_VIOLATION } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { createClient } from '@/lib/supabase/server'
 import {
   type CreateResidentInput,
@@ -22,6 +23,7 @@ function toMessage(error: PostgrestError, fallback: string) {
 }
 
 const createResidentFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: CreateResidentInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = createResidentSchema.safeParse(input)
@@ -57,6 +59,7 @@ const createResidentFn = createServerFn({ method: 'POST' })
 export const createResident = (input: CreateResidentInput) => createResidentFn({ data: input })
 
 const updateResidentFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: UpdateResidentInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ id: string }>> => {
     const parsed = updateResidentSchema.safeParse(input)
@@ -90,6 +93,7 @@ export const updateResident = (id: string, input: UpdateResidentInput) =>
  * UPDATE, it just filters rows out, so a short count means no permission.
  */
 const deleteResidentsFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((ids: string[]) => ids)
   .handler(async ({ data: ids }): Promise<ActionResult<{ deleted: number }>> => {
     const uniqueIds = [...new Set(ids)]
@@ -120,6 +124,7 @@ export const deleteResidents = (ids: string[]) => deleteResidentsFn({ data: ids 
 
 /** Undoes a soft delete. Fails with 23505 if the email was reused meanwhile. */
 const restoreResidentsFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((ids: string[]) => ids)
   .handler(async ({ data: ids }): Promise<ActionResult<{ restored: number }>> => {
     const uniqueIds = [...new Set(ids)]

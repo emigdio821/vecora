@@ -7,6 +7,7 @@ import {
   postgrestErrorMessage,
   UNIQUE_VIOLATION,
 } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { createClient } from '@/lib/supabase/server'
 import { systemCategorySource } from '@/lib/system-categories'
 import { formatMonth } from '@/lib/utils'
@@ -52,6 +53,7 @@ export interface FeePaymentSummary {
 }
 
 const recordFeePaymentFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: RecordFeePaymentInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<FeePaymentSummary>> => {
     const parsed = recordFeePaymentSchema.safeParse(input)
@@ -111,6 +113,7 @@ const recordFeePaymentFn = createServerFn({ method: 'POST' })
 export const recordFeePayment = (input: RecordFeePaymentInput) => recordFeePaymentFn({ data: input })
 
 const createTransactionFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: CreateTransactionInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = createTransactionSchema.safeParse(input)
@@ -185,6 +188,7 @@ const createTransactionFn = createServerFn({ method: 'POST' })
 export const createTransaction = (input: CreateTransactionInput) => createTransactionFn({ data: input })
 
 const updateTransactionFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: UpdateTransactionInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ id: string }>> => {
     const parsed = updateTransactionSchema.safeParse(input)
@@ -291,6 +295,7 @@ export const updateTransaction = (id: string, input: UpdateTransactionInput) =>
  * filters rows out, so a short count means no permission.
  */
 const deleteTransactionsFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((ids: string[]) => ids)
   .handler(async ({ data: ids }): Promise<ActionResult<{ deleted: number }>> => {
     const uniqueIds = [...new Set(ids)]
@@ -324,6 +329,7 @@ export const deleteTransactions = (ids: string[]) => deleteTransactionsFn({ data
  * meanwhile, or 23P01 if its folio went to another receipt.
  */
 const restoreTransactionsFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((ids: string[]) => ids)
   .handler(async ({ data: ids }): Promise<ActionResult<{ restored: number }>> => {
     const uniqueIds = [...new Set(ids)]
@@ -363,6 +369,7 @@ export const restoreTransactions = (ids: string[]) => restoreTransactionsFn({ da
 // ---------------------------------------------------------------------------
 
 const createCategoryFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: CategoryInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = categorySchema.safeParse(input)
@@ -388,6 +395,7 @@ export const createCategory = (input: CategoryInput) => createCategoryFn({ data:
 
 /** Renames a category. Its kind is fixed: movements already point at it. */
 const updateCategoryFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: Pick<CategoryInput, 'name'> }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = categorySchema.pick({ name: true }).safeParse(input)
@@ -418,6 +426,7 @@ export const updateCategory = (id: string, input: Pick<CategoryInput, 'name'>) =
 
 /** Retire / reinstate. Retired categories stay on past movements but leave the pickers. */
 const setCategoryActiveFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; isActive: boolean }) => data)
   .handler(async ({ data: { id, isActive } }): Promise<ActionResult> => {
     const supabase = await createClient()
@@ -447,6 +456,7 @@ export const setCategoryActive = (id: string, isActive: boolean) =>
 
 /** Hard delete; only possible while nothing references the category. */
 const deleteCategoryFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((id: string) => id)
   .handler(async ({ data: id }): Promise<ActionResult> => {
     const supabase = await createClient()
@@ -480,6 +490,7 @@ function periodErrorMessage(error: PostgrestError, fallback: string) {
 }
 
 const createPeriodFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: PeriodInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = periodSchema.safeParse(input)
@@ -500,6 +511,7 @@ const createPeriodFn = createServerFn({ method: 'POST' })
 export const createPeriod = (input: PeriodInput) => createPeriodFn({ data: input })
 
 const updatePeriodFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: PeriodInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = periodSchema.safeParse(input)
@@ -529,6 +541,7 @@ export const updatePeriod = (id: string, input: PeriodInput) => updatePeriodFn({
 
 /** Hard delete; only possible while the period has no movements. */
 const deletePeriodFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((id: string) => id)
   .handler(async ({ data: id }): Promise<ActionResult> => {
     const supabase = await createClient()

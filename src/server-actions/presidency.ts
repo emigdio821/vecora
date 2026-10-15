@@ -7,6 +7,7 @@ import {
   postgrestErrorMessage,
   requestResolutionErrorMessage,
 } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { createClient } from '@/lib/supabase/server'
 import {
   type AmenityInput,
@@ -32,6 +33,7 @@ function toAmenityMessage(error: PostgrestError, fallback: string) {
 }
 
 const createAmenityFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: AmenityInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = amenitySchema.safeParse(input)
@@ -53,6 +55,7 @@ export const createAmenity = (input: AmenityInput) => createAmenityFn({ data: in
 
 /** Past bookings keep their amount; the new fee applies from the next one. */
 const updateAmenityFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: AmenityInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = amenitySchema.safeParse(input)
@@ -82,6 +85,7 @@ export const updateAmenity = (id: string, input: AmenityInput) => updateAmenityF
 
 /** Retire / reinstate. Retired areas keep their bookings but leave the booking form. */
 const setAmenityActiveFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; isActive: boolean }) => data)
   .handler(async ({ data: { id, isActive } }): Promise<ActionResult> => {
     const supabase = await createClient()
@@ -107,6 +111,7 @@ export const setAmenityActive = (id: string, isActive: boolean) =>
 
 /** Hard delete; only possible while the area has no bookings. */
 const deleteAmenityFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((id: string) => id)
   .handler(async ({ data: id }): Promise<ActionResult> => {
     const supabase = await createClient()
@@ -159,6 +164,7 @@ function toResolutionMessage(error: PostgrestError, fallback: string) {
 }
 
 const createReservationFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: ReservationInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = reservationSchema.safeParse(input)
@@ -185,6 +191,7 @@ export const createReservation = (input: ReservationInput) => createReservationF
 
 /** Not once cancelled (RLS). Once paid, the guard trigger keeps the area, house and amount. */
 const updateReservationFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: ReservationInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = reservationSchema.safeParse(input)
@@ -216,6 +223,7 @@ export const updateReservation = (id: string, input: ReservationInput) =>
 
 /** Unpaid bookings only; a paid one is cancelled with cancelReservation. */
 const deleteReservationFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((id: string) => id)
   .handler(async ({ data: id }): Promise<ActionResult> => {
     const supabase = await createClient()
@@ -234,6 +242,7 @@ const deleteReservationFn = createServerFn({ method: 'POST' })
 export const deleteReservation = (id: string) => deleteReservationFn({ data: id })
 
 const payReservationFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: PayReservationInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ transaction_id: string }>> => {
     const parsed = payReservationSchema.safeParse(input)
@@ -263,6 +272,7 @@ export const payReservation = (id: string, input: PayReservationInput) =>
   payReservationFn({ data: { id, input } })
 
 const cancelReservationFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: CancelReservationInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = cancelReservationSchema.safeParse(input)

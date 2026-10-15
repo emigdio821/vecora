@@ -3,6 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeader, getRequestUrl } from '@tanstack/react-start/server'
 import { type ActionResult, postgrestErrorMessage } from '@/lib/action-result'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { type CurrentUser, getCurrentUser } from '@/lib/supabase/current-user'
 import { createClient } from '@/lib/supabase/server'
 import {
@@ -85,6 +86,7 @@ export interface InviteResult {
  * grants the roles, and returns the invite link to hand over.
  */
 const addBoardMemberFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: AddBoardMemberInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<InviteResult>> => {
     const parsed = addBoardMemberSchema.safeParse(input)
@@ -160,6 +162,7 @@ export const addBoardMember = (input: AddBoardMemberInput) => addBoardMemberFn({
 
 /** A fresh link for someone who lost theirs or let it expire. */
 const resendInviteFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((userId: string) => userId)
   .handler(async ({ data: userId }): Promise<ActionResult<InviteResult>> => {
     const manager = await requireBoardManager()
@@ -191,6 +194,7 @@ const resendInviteFn = createServerFn({ method: 'POST' })
 export const resendInvite = (userId: string) => resendInviteFn({ data: userId })
 
 const updateBoardMemberRolesFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { userId: string; input: UpdateBoardMemberRolesInput }) => data)
   .handler(async ({ data: { userId, input } }): Promise<ActionResult> => {
     const parsed = updateBoardMemberRolesSchema.safeParse(input)
@@ -244,6 +248,7 @@ export const updateBoardMemberRoles = (userId: string, input: UpdateBoardMemberR
  * but with no roles they can no longer sign in, and they leave the board list.
  */
 const removeBoardMemberFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((userId: string) => userId)
   .handler(async ({ data: userId }): Promise<ActionResult> => {
     const manager = await requireBoardManager()
@@ -279,6 +284,7 @@ export const removeBoardMember = (userId: string) => removeBoardMemberFn({ data:
 
 /** First sign-in after an invite: the person chooses their password. */
 const setPasswordFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: SetPasswordInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult> => {
     const parsed = setPasswordSchema.safeParse(input)

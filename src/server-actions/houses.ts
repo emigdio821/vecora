@@ -1,6 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
 import { type ActionResult, postgrestErrorMessage, UNIQUE_VIOLATION } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { createClient } from '@/lib/supabase/server'
 import {
   type AssignResidentsInput,
@@ -23,6 +24,7 @@ function toMessage(error: PostgrestError, fallback: string) {
 }
 
 const createHouseFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: CreateHouseInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = createHouseSchema.safeParse(input)
@@ -49,6 +51,7 @@ const createHouseFn = createServerFn({ method: 'POST' })
 export const createHouse = (input: CreateHouseInput) => createHouseFn({ data: input })
 
 const updateHouseFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: UpdateHouseInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ id: string }>> => {
     const parsed = updateHouseSchema.safeParse(input)
@@ -81,6 +84,7 @@ export const updateHouse = (id: string, input: UpdateHouseInput) => updateHouseF
  * UPDATE, it just filters rows out, so a short count means no permission.
  */
 const deleteHousesFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((ids: string[]) => ids)
   .handler(async ({ data: ids }): Promise<ActionResult<{ deleted: number }>> => {
     const uniqueIds = [...new Set(ids)]
@@ -111,6 +115,7 @@ export const deleteHouses = (ids: string[]) => deleteHousesFn({ data: ids })
 
 /** Undoes a soft delete. Fails with 23505 if the number was reused meanwhile. */
 const restoreHousesFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((ids: string[]) => ids)
   .handler(async ({ data: ids }): Promise<ActionResult<{ restored: number }>> => {
     const uniqueIds = [...new Set(ids)]
@@ -147,6 +152,7 @@ export const restoreHouses = (ids: string[]) => restoreHousesFn({ data: ids })
 
 /** Links residents to a house with one relationship for the whole batch. */
 const assignResidentsFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { houseId: string; input: AssignResidentsInput }) => data)
   .handler(async ({ data: { houseId, input } }): Promise<ActionResult<{ assigned: number }>> => {
     const parsed = assignResidentsSchema.safeParse(input)
@@ -180,6 +186,7 @@ export const assignResidents = (houseId: string, input: AssignResidentsInput) =>
 
 /** Removes a resident from a house. The link is history, so this is only for mistakes. */
 const unassignResidentFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { houseId: string; residentId: string }) => data)
   .handler(async ({ data: { houseId, residentId } }): Promise<ActionResult<{ removed: number }>> => {
     const supabase = await createClient()

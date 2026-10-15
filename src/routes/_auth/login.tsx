@@ -13,13 +13,19 @@ import {
 } from '@/components/ui/card'
 import { siteConfig } from '@/lib/config/site'
 import { pageHead } from '@/lib/metadata'
+import { isAppPath } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 
 export const Route = createFileRoute('/_auth/login')({
-  // /auth/confirm sends people here when an invite link is expired or reused.
-  validateSearch: z.object({ error: z.literal('invite').optional().catch(undefined) }),
-  beforeLoad: ({ context }) => {
-    if (context.user) throw redirect({ to: '/' })
+  validateSearch: z.object({
+    // /auth/confirm sends people here when an invite link is expired or reused.
+    error: z.literal('invite').optional().catch(undefined),
+    // The page to go back to after signing in. Only a path in this app, or
+    // a crafted link could send someone to another site right after login.
+    redirect: z.string().refine(isAppPath).optional().catch(undefined),
+  }),
+  beforeLoad: ({ context, search }) => {
+    if (context.user) throw redirect({ href: search.redirect ?? '/' })
   },
   head: () =>
     pageHead({
@@ -30,7 +36,7 @@ export const Route = createFileRoute('/_auth/login')({
 })
 
 function LoginPage() {
-  const { error } = Route.useSearch()
+  const { error, redirect: redirectTo } = Route.useSearch()
   const inviteFailed = error === 'invite'
 
   return (
@@ -48,7 +54,7 @@ function LoginPage() {
               <AlertDescription>{m.auth_invite_invalid_description()}</AlertDescription>
             </Alert>
           )}
-          <LoginForm />
+          <LoginForm redirectTo={redirectTo} />
         </CardPanel>
       </Card>
     </CardFrame>

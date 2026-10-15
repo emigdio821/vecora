@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import sharp from 'sharp'
 import { type ActionResult, postgrestErrorMessage } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { createClient } from '@/lib/supabase/server'
 import { LOGO_BUCKET, logoFileSchema, type SettingsInput, settingsSchema } from '@/lib/validations/settings'
@@ -15,6 +16,7 @@ const LOGO_SIZE = 512
  * refuses them from anyone else.
  */
 const updateSettingsFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: SettingsInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult> => {
     const parsed = settingsSchema.safeParse(input)
@@ -103,6 +105,7 @@ async function setLogoPath(path: string | null): Promise<ActionResult> {
 
 /** President (or admin) uploads the residential's logo. RLS enforces the role. */
 const uploadLogoFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((formData: FormData) => formData)
   .handler(async ({ data: formData }): Promise<ActionResult> => {
     const parsed = logoFileSchema.safeParse(formData.get('logo'))
@@ -146,8 +149,8 @@ const uploadLogoFn = createServerFn({ method: 'POST' })
 
 export const uploadLogo = (formData: FormData) => uploadLogoFn({ data: formData })
 
-const removeLogoFn = createServerFn({ method: 'POST' }).handler((): Promise<ActionResult> =>
-  setLogoPath(null),
-)
+const removeLogoFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .handler((): Promise<ActionResult> => setLogoPath(null))
 
 export const removeLogo = () => removeLogoFn()

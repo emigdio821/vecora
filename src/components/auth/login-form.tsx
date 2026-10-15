@@ -16,7 +16,12 @@ import { getLocale } from '@/paraglide/runtime'
 import { login } from '@/server-actions/auth'
 import { USER_QUERY_KEY } from '@/tanstack-queries/session'
 
-export function LoginForm() {
+interface LoginFormProps {
+  /** Where to go once signed in; already checked with isAppPath by the login route. */
+  redirectTo?: string
+}
+
+export function LoginForm({ redirectTo = '/' }: LoginFormProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
@@ -39,13 +44,14 @@ export function LoginForm() {
 
     // Now in the HOA's language: a full load renders the app in it.
     if (result?.locale && result.locale !== getLocale()) {
-      window.location.replace('/')
+      window.location.replace(redirectTo)
       return
     }
 
     // The cache still holds the signed-out user; the guards must ask again.
     queryClient.removeQueries({ queryKey: [USER_QUERY_KEY] })
-    await navigate({ to: '/', replace: true })
+    // `href`, not `to`: the path may carry its own search params.
+    await navigate({ href: redirectTo, replace: true })
   }
 
   return (

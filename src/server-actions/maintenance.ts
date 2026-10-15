@@ -6,6 +6,7 @@ import {
   postgrestErrorMessage,
   requestResolutionErrorMessage,
 } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { createClient } from '@/lib/supabase/server'
 import { type MaintenanceRequestInput, maintenanceRequestSchema } from '@/lib/validations/maintenance'
 import {
@@ -21,6 +22,7 @@ function toMessage(error: PostgrestError, fallback: string) {
 }
 
 const createMaintenanceRequestFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((input: MaintenanceRequestInput) => input)
   .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
     const parsed = maintenanceRequestSchema.safeParse(input)
@@ -49,6 +51,7 @@ export const createMaintenanceRequest = (input: MaintenanceRequestInput) =>
 
 /** Only while pending: RLS filters out resolved rows, which surfaces as "no permission". */
 const updateMaintenanceRequestFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: MaintenanceRequestInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = maintenanceRequestSchema.safeParse(input)
@@ -77,6 +80,7 @@ export const updateMaintenanceRequest = (id: string, input: MaintenanceRequestIn
   updateMaintenanceRequestFn({ data: { id, input } })
 
 const deleteMaintenanceRequestFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((id: string) => id)
   .handler(async ({ data: id }): Promise<ActionResult> => {
     const supabase = await createClient()
@@ -94,6 +98,7 @@ export const deleteMaintenanceRequest = (id: string) => deleteMaintenanceRequest
 
 /** Records the expense in the ledger and marks the request paid, atomically. */
 const payMaintenanceRequestFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: PayRequestInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult<{ transaction_id: string }>> => {
     const parsed = payRequestSchema.safeParse(input)
@@ -127,6 +132,7 @@ export const payMaintenanceRequest = (id: string, input: PayRequestInput) =>
   payMaintenanceRequestFn({ data: { id, input } })
 
 const rejectMaintenanceRequestFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((data: { id: string; input: RejectRequestInput }) => data)
   .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
     const parsed = rejectRequestSchema.safeParse(input)
@@ -155,6 +161,7 @@ export const rejectMaintenanceRequest = (id: string, input: RejectRequestInput) 
 
 /** Rejected → pending again, so the same request can be fixed and paid. */
 const reopenMaintenanceRequestFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .validator((id: string) => id)
   .handler(async ({ data: id }): Promise<ActionResult> => {
     const supabase = await createClient()

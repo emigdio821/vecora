@@ -83,6 +83,23 @@ export function slugify(value: string): string {
     .replace(/^-|-$/g, '')
 }
 
+/**
+ * A path inside this app ("/treasury?kind=income"), safe to send someone to
+ * after signing in. "//evil.com" and "/\evil.com" start with a slash too, but
+ * browsers read them as another site.
+ */
+export function isAppPath(value: unknown): value is string {
+  if (typeof value !== 'string') return false
+  return value.startsWith('/') && !value.startsWith('//') && !value.startsWith('/\\')
+}
+
+/** /login for a full page load, coming back to the current page after signing in. */
+export function loginHrefForCurrentPage(): string {
+  const here = window.location.pathname + window.location.search
+  if (here === '/') return '/login'
+  return `/login?${new URLSearchParams({ redirect: here })}`
+}
+
 /** "22 Sep 2026, 10:15 a.m." from an ISO timestamp or Date. Empty when missing or invalid. */
 export function formatDate(
   value: string | number | Date | null | undefined,
