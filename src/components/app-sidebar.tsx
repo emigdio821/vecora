@@ -1,7 +1,6 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar'
 import type { CurrentUser } from '@/lib/supabase/current-user'
 import type { Settings } from '@/lib/supabase/settings'
-import { NavAdmin } from './navs/admin'
 import { HeaderNav } from './navs/header'
 import { NavMain } from './navs/main'
 import { NavReports } from './navs/reports'
@@ -20,9 +19,8 @@ export function AppSidebar({ user, settings, ...props }: AppSidebarProps) {
         <HeaderNav settings={settings} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain />
+        <NavMain isAdmin={user.roles.includes('admin')} />
         <NavReports />
-        {user.roles.includes('admin') && <NavAdmin />}
         <NavSettings settings={settings} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

@@ -2,6 +2,7 @@ import {
   IconBuildingCommunity,
   IconGavel,
   IconHeartHandshake,
+  IconHistory,
   IconPigMoney,
   IconTool,
   IconUrgent,
@@ -19,7 +20,11 @@ import {
 } from '../ui/sidebar'
 import { LinkPendingIndicator } from './link-pending-indicator'
 
-export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
+interface NavMainProps extends React.ComponentProps<typeof SidebarGroup> {
+  isAdmin: boolean
+}
+
+export function NavMain({ isAdmin, ...props }: NavMainProps) {
   const pathname = useLocation({ select: (location) => location.pathname })
   const { setOpenMobile } = useSidebar()
 
@@ -123,6 +128,24 @@ export function NavMain({ ...props }: React.ComponentProps<typeof SidebarGroup>)
               }
             />
           </SidebarMenuItem>
+
+          {isAdmin && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={() => {
+                  setOpenMobile(false)
+                }}
+                isActive={pathname === '/logs'}
+                render={
+                  <Link to="/logs">
+                    <IconHistory className="size-4" />
+                    <span>{m.common_section_logs()}</span>
+                    <LinkPendingIndicator to="/logs" />
+                  </Link>
+                }
+              />
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
