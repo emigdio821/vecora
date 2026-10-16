@@ -21,7 +21,7 @@ export function AppSidebar({ user, settings, ...props }: AppSidebarProps) {
       <SidebarContent>
         <NavMain isAdmin={user.roles.includes('admin')} />
         <NavReports />
-        <NavSettings settings={settings} className="mt-auto" />
+        <NavSettings className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

@@ -37,7 +37,7 @@ export const Route = createFileRoute('/_authed')({
 
 function AuthedLayout() {
   const { user } = Route.useRouteContext()
-  // The settings dialogs invalidate this query after saving.
+  // The settings page invalidates this query after saving.
   const { data: settings } = useSuspenseQuery(settingsQueryOptions)
 
   // Reads go from the browser straight to Supabase, past the server functions'

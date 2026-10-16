@@ -18,7 +18,7 @@ interface LanguageMenuProps {
   align?: React.ComponentProps<typeof MenuPopup>['align']
 }
 
-/** For the sign-in pages; once signed in, it's in the settings dialog. */
+/** For the sign-in pages; once signed in, it's in the settings page. */
 export function LanguageMenu({ trigger, align = 'start' }: LanguageMenuProps) {
   return (
     <Menu>

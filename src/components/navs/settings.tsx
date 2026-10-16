@@ -1,7 +1,5 @@
 import { IconSettings } from '@tabler/icons-react'
-import { useState } from 'react'
-import { SettingsDialog } from '@/components/settings/dialog/settings'
-import type { Settings } from '@/lib/supabase/settings'
+import { Link, useLocation } from '@tanstack/react-router'
 import { m } from '@/paraglide/messages'
 import {
   SidebarGroup,
@@ -9,15 +7,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '../ui/sidebar'
+import { LinkPendingIndicator } from './link-pending-indicator'
 
-interface NavSettingsProps extends React.ComponentProps<typeof SidebarGroup> {
-  settings: Settings
-}
-
-/** Open to everyone; the dialog shows the HOA's tab only to president or admin. */
-export function NavSettings({ settings, ...props }: NavSettingsProps) {
-  const [isOpen, setOpen] = useState(false)
+/** Open to everyone; the page shows the HOA's tab only to president or admin. */
+export function NavSettings({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
+  const pathname = useLocation({ select: (location) => location.pathname })
+  const { setOpenMobile } = useSidebar()
 
   return (
     <SidebarGroup {...props}>
@@ -26,17 +23,20 @@ export function NavSettings({ settings, ...props }: NavSettingsProps) {
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => {
-                setOpen(true)
+                setOpenMobile(false)
               }}
-            >
-              <IconSettings className="size-4" />
-              <span>{m.common_section_settings()}</span>
-            </SidebarMenuButton>
+              isActive={pathname === '/settings'}
+              render={
+                <Link to="/settings">
+                  <IconSettings className="size-4" />
+                  <span>{m.common_section_settings()}</span>
+                  <LinkPendingIndicator to="/settings" />
+                </Link>
+              }
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
-
-      <SettingsDialog settings={settings} open={isOpen} onOpenChange={setOpen} />
     </SidebarGroup>
   )
 }

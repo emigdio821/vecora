@@ -23,6 +23,7 @@ import { Route as AuthedMaintenanceRouteImport } from './routes/_authed/maintena
 import { Route as AuthedPresidencyRouteImport } from './routes/_authed/presidency'
 import { Route as AuthedResidentialRouteImport } from './routes/_authed/residential'
 import { Route as AuthedSecurityRouteImport } from './routes/_authed/security'
+import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
 import { Route as AuthedTreasuryRouteImport } from './routes/_authed/treasury'
 import { Route as ApiOgRouteImport } from './routes/api/og'
 import { Route as ReportsDocumentRouteImport } from './routes/reports/document'
@@ -97,6 +98,11 @@ const AuthedSecurityRoute = AuthedSecurityRouteImport.update({
   path: '/security',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
+const AuthedSettingsRoute = AuthedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
 const AuthedTreasuryRoute = AuthedTreasuryRouteImport.update({
   id: '/treasury',
   path: '/treasury',
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/presidency': typeof AuthedPresidencyRoute
   '/residential': typeof AuthedResidentialRoute
   '/security': typeof AuthedSecurityRoute
+  '/settings': typeof AuthedSettingsRoute
   '/treasury': typeof AuthedTreasuryRoute
   '/api/og': typeof ApiOgRoute
   '/reports/document': typeof ReportsDocumentRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/presidency': typeof AuthedPresidencyRoute
   '/residential': typeof AuthedResidentialRoute
   '/security': typeof AuthedSecurityRoute
+  '/settings': typeof AuthedSettingsRoute
   '/treasury': typeof AuthedTreasuryRoute
   '/api/og': typeof ApiOgRoute
   '/reports/document': typeof ReportsDocumentRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/_authed/presidency': typeof AuthedPresidencyRoute
   '/_authed/residential': typeof AuthedResidentialRoute
   '/_authed/security': typeof AuthedSecurityRoute
+  '/_authed/settings': typeof AuthedSettingsRoute
   '/_authed/treasury': typeof AuthedTreasuryRoute
   '/api/og': typeof ApiOgRoute
   '/reports/document': typeof ReportsDocumentRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/presidency'
     | '/residential'
     | '/security'
+    | '/settings'
     | '/treasury'
     | '/api/og'
     | '/reports/document'
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/presidency'
     | '/residential'
     | '/security'
+    | '/settings'
     | '/treasury'
     | '/api/og'
     | '/reports/document'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/_authed/presidency'
     | '/_authed/residential'
     | '/_authed/security'
+    | '/_authed/settings'
     | '/_authed/treasury'
     | '/api/og'
     | '/reports/document'
@@ -353,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSecurityRouteImport
       parentRoute: typeof AuthedRouteRoute
     }
+    '/_authed/settings': {
+      id: '/_authed/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthedSettingsRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
     '/_authed/treasury': {
       id: '/_authed/treasury'
       path: '/treasury'
@@ -418,6 +437,7 @@ interface AuthedRouteRouteChildren {
   AuthedPresidencyRoute: typeof AuthedPresidencyRoute
   AuthedResidentialRoute: typeof AuthedResidentialRoute
   AuthedSecurityRoute: typeof AuthedSecurityRoute
+  AuthedSettingsRoute: typeof AuthedSettingsRoute
   AuthedTreasuryRoute: typeof AuthedTreasuryRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
 }
@@ -431,6 +451,7 @@ const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedPresidencyRoute: AuthedPresidencyRoute,
   AuthedResidentialRoute: AuthedResidentialRoute,
   AuthedSecurityRoute: AuthedSecurityRoute,
+  AuthedSettingsRoute: AuthedSettingsRoute,
   AuthedTreasuryRoute: AuthedTreasuryRoute,
   AuthedIndexRoute: AuthedIndexRoute,
 }

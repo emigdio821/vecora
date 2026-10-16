@@ -1,13 +1,9 @@
+import { IconLanguage, IconPalette } from '@tabler/icons-react'
 import { pickLanguage } from '@/components/language-menu'
-import {
-  ResponsiveDialogClose,
-  ResponsiveDialogFooter,
-  ResponsiveDialogPanel,
-} from '@/components/shared/responsive-dialog'
+import { SettingsCard, SettingsGrid } from '@/components/settings/settings-card'
 import { type Theme, useTheme } from '@/components/theme-provider'
-import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldItem, FieldLabel } from '@/components/ui/field'
-import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset'
+import { Fieldset } from '@/components/ui/fieldset'
 import { Radio, RadioGroup } from '@/components/ui/radio-group'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MULTI_LANGUAGE } from '@/lib/config/i18n'
@@ -37,7 +33,7 @@ const THEMES: Array<{ value: Theme; label: string }> = [
 ]
 
 /**
- * The settings dialog's "Aplicación" tab: preferences of this device, open to
+ * The settings page's "Aplicación" tab: preferences of this device, open to
  * everyone. They apply on pick, so there is nothing to save. Theme picker based
  * on coss particle p-radio-group-6.
  */
@@ -45,10 +41,17 @@ export function AppSettingsPanel() {
   const { theme, setTheme } = useTheme()
 
   return (
-    <>
-      <ResponsiveDialogPanel className="flex flex-col gap-6">
-        <Field className="gap-4" name="theme" render={(fieldProps) => <Fieldset {...fieldProps} />}>
-          <FieldsetLegend className="text-sm font-medium">{m.common_section_appearance()}</FieldsetLegend>
+    <SettingsGrid>
+      <SettingsCard
+        title={m.common_section_appearance()}
+        description={m.settings_app_description()}
+        icon={IconPalette}
+      >
+        <Field
+          className="gap-4"
+          name="theme"
+          render={(fieldProps) => <Fieldset {...fieldProps} aria-label={m.common_section_appearance()} />}
+        >
           <RadioGroup
             className="flex-row flex-wrap gap-4"
             value={theme}
@@ -70,11 +73,17 @@ export function AppSettingsPanel() {
           </RadioGroup>
           <FieldDescription>{m.settings_appearance_description()}</FieldDescription>
         </Field>
+      </SettingsCard>
 
-        {MULTI_LANGUAGE && (
+      {MULTI_LANGUAGE && (
+        <SettingsCard
+          title={m.common_language()}
+          description={m.settings_screen_language_hint()}
+          icon={IconLanguage}
+        >
           <Field name="language">
-            <FieldLabel>{m.common_language()}</FieldLabel>
             <Select
+              aria-label={m.common_language()}
               items={LANGUAGE_ITEMS}
               value={getLocale()}
               onValueChange={(value) => {
@@ -93,17 +102,10 @@ export function AppSettingsPanel() {
                 ))}
               </SelectPopup>
             </Select>
-            <FieldDescription>{m.settings_screen_language_hint()}</FieldDescription>
           </Field>
-        )}
-      </ResponsiveDialogPanel>
-
-      <ResponsiveDialogFooter>
-        <ResponsiveDialogClose render={<Button variant="outline" />}>
-          {m.common_action_done()}
-        </ResponsiveDialogClose>
-      </ResponsiveDialogFooter>
-    </>
+        </SettingsCard>
+      )}
+    </SettingsGrid>
   )
 }
 

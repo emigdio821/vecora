@@ -1,13 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconAlertCircle, IconEye, IconEyeOff } from '@tabler/icons-react'
+import { IconAlertCircle, IconEye, IconEyeOff, IconLock, IconShieldCheck } from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import {
-  ResponsiveDialogClose,
-  ResponsiveDialogFooter,
-  ResponsiveDialogPanel,
-} from '@/components/shared/responsive-dialog'
+import { useCurrentUser } from '@/components/current-user-provider'
+import { SettingsCard, SettingsGrid } from '@/components/settings/settings-card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -20,15 +17,12 @@ import { changePassword } from '@/server-actions/auth'
 
 const FORM_ID = 'account-settings-form'
 
-interface AccountSettingsPanelProps {
-  onSaved: () => void
-}
-
 /**
- * The settings dialog's "Cuenta" tab, only for the main admin: its password.
+ * The settings page's "Cuenta" tab, only for the main admin: its password.
  * Board members change theirs with a new access link from "Mesa directiva".
  */
-export function AccountSettingsPanel({ onSaved }: AccountSettingsPanelProps) {
+export function AccountSettingsPanel() {
+  const user = useCurrentUser()
   const [showCurrent, setShowCurrent] = useState(false)
   const [showNew, setShowNew] = useState(false)
 
@@ -45,7 +39,6 @@ export function AccountSettingsPanel({ onSaved }: AccountSettingsPanelProps) {
     onSuccess: () => {
       toastManager.add({ type: 'success', title: m.auth_password_changed() })
       form.reset()
-      onSaved()
     },
     onError: (error) => {
       form.setError('root', { message: error.message })
@@ -55,8 +48,17 @@ export function AccountSettingsPanel({ onSaved }: AccountSettingsPanelProps) {
   const newType = showNew ? 'text' : 'password'
 
   return (
-    <>
-      <ResponsiveDialogPanel>
+    <SettingsGrid>
+      <SettingsCard
+        title={m.auth_field_password()}
+        description={m.settings_account_description({ email: user.email })}
+        icon={IconLock}
+        footer={
+          <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
+            {m.auth_change_password()}
+          </Button>
+        }
+      >
         <Form
           id={FORM_ID}
           className="flex flex-col gap-4"
@@ -173,16 +175,22 @@ export function AccountSettingsPanel({ onSaved }: AccountSettingsPanelProps) {
             </Alert>
           )}
         </Form>
-      </ResponsiveDialogPanel>
+      </SettingsCard>
 
-      <ResponsiveDialogFooter>
-        <ResponsiveDialogClose render={<Button variant="ghost" />} disabled={mutation.isPending}>
-          {m.common_action_cancel()}
-        </ResponsiveDialogClose>
-        <Button type="submit" form={FORM_ID} disabled={mutation.isPending} loading={mutation.isPending}>
-          {m.auth_change_password()}
-        </Button>
-      </ResponsiveDialogFooter>
-    </>
+      {/* Why this tab exists: the database guards it, see 20260921000000_profiles_and_roles.sql. */}
+      <SettingsCard
+        title={m.settings_main_account_title()}
+        description={m.settings_main_account_description()}
+        icon={IconShieldCheck}
+      >
+        <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-2 text-sm">
+          <dt className="text-muted-foreground">{m.common_field_name()}</dt>
+          <dd className="truncate">{user.fullName}</dd>
+          <dt className="text-muted-foreground">{m.common_field_email()}</dt>
+          <dd className="truncate">{user.email}</dd>
+        </dl>
+        <p className="text-sm text-muted-foreground">{m.settings_main_account_rules()}</p>
+      </SettingsCard>
+    </SettingsGrid>
   )
 }

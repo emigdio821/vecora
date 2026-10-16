@@ -74,28 +74,29 @@ Every role can read every section. The seed also creates 20 houses (A1–D5), 10
 
 What each section is called on screen. Docs and comments use the English name.
 
-| Name             | On screen            | Route / tab                                    |
-| ---------------- | -------------------- | ---------------------------------------------- |
-| Home             | "Inicio"             | `/`                                            |
-| Treasury         | "Tesorería"          | `/treasury`                                    |
-| - Transactions   | "Movimientos"        | `?tab=transactions`                            |
-| - Categories     | "Categorías"         | `?tab=categories`                              |
-| Presidency       | "Presidencia"        | `/presidency`                                  |
-| - Periods        | "Periodos"           | `?tab=periods`                                 |
-| - Reservations   | "Reservaciones"      | `?tab=reservations`                            |
-| - Common areas   | "Áreas comunes"      | `?tab=amenities`                               |
-| Maintenance      | "Mantenimiento"      | `/maintenance`                                 |
-| Security         | "Seguridad"          | `/security`                                    |
-| HOA board        | "Mesa directiva"     | `/hoa-board`                                   |
-| Residential      | "Residencial"        | `/residential`                                 |
-| - Houses         | "Casas"              | `?tab=houses`                                  |
-| - Residents      | "Residentes"         | `?tab=residents`                               |
-| Activity log     | "Historial"          | `/logs` (admin only)                           |
-| Financial report | "Reporte financiero" | sidebar dialog; the PDF is `/reports/pdf`      |
-| Notices          | "Avisos y minutas"   | `/documents`; the PDF is `/reports/document`   |
-| Settings         | "Ajustes"            | sidebar dialog                                 |
-| - App            | "Aplicación"         | tab: theme (and language), per device          |
-| - HOA            | "Residencial"        | tab: name, logo, currency (president or admin) |
+| Name             | On screen            | Route / tab                                           |
+| ---------------- | -------------------- | ----------------------------------------------------- |
+| Home             | "Inicio"             | `/`                                                   |
+| Treasury         | "Tesorería"          | `/treasury`                                           |
+| - Transactions   | "Movimientos"        | `?tab=transactions`                                   |
+| - Categories     | "Categorías"         | `?tab=categories`                                     |
+| Presidency       | "Presidencia"        | `/presidency`                                         |
+| - Periods        | "Periodos"           | `?tab=periods`                                        |
+| - Reservations   | "Reservaciones"      | `?tab=reservations`                                   |
+| - Common areas   | "Áreas comunes"      | `?tab=amenities`                                      |
+| Maintenance      | "Mantenimiento"      | `/maintenance`                                        |
+| Security         | "Seguridad"          | `/security`                                           |
+| HOA board        | "Mesa directiva"     | `/hoa-board`                                          |
+| Residential      | "Residencial"        | `/residential`                                        |
+| - Houses         | "Casas"              | `?tab=houses`                                         |
+| - Residents      | "Residentes"         | `?tab=residents`                                      |
+| Activity log     | "Historial"          | `/logs` (admin only)                                  |
+| Financial report | "Reporte financiero" | `/financial-report`; the PDF is `/reports/pdf`        |
+| Notices          | "Avisos y minutas"   | `/documents`; the PDF is `/reports/document`          |
+| Settings         | "Ajustes"            | `/settings`                                           |
+| - App            | "Aplicación"         | `?tab=app`: theme (and language), per device          |
+| - HOA            | "Residencial"        | `?tab=hoa`: name, logo, currency (president or admin) |
+| - Account        | "Cuenta"             | `?tab=account`: password (main admin only)            |
 
 ## Useful commands
 
