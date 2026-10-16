@@ -1,18 +1,24 @@
--- Bootstrap the first admin account.
+-- Bootstrap the main admin account.
 --
--- Runs automatically on `supabase start` / `supabase db reset` (local).
--- To apply to the hosted project once: `npx supabase db push --include-seed`
+-- Runs on every reset: locally on `npm run db:reset`, on the hosted project
+-- with `npx supabase db reset --linked --yes` (or `npm run db:seed`, which
+-- seeds without wiping). The seeds/ files run too, but skip themselves there.
 --
--- Credentials: admin@vecora.com / admin
--- CHANGE THE PASSWORD right after the first hosted login.
+-- Credentials: admin@vecora.app, password "admin" locally and "admin123" on
+-- hosted. On hosted the account must choose a new password at the first
+-- sign-in: the app allows nothing else until then (profiles.must_change_password).
 --
 -- Idempotent: safe to re-run; does nothing if the user already exists.
 
 do $$
 declare
+  is_local boolean :=
+    coalesce(current_setting('app.settings.jwt_secret', true), '')
+      = 'super-secret-jwt-token-with-at-least-32-characters-long';
+
   admin_id constant uuid := 'a0000000-0000-4000-8000-000000000001';
-  admin_email constant text := 'admin@vecora.com';
-  admin_password constant text := 'admin';
+  admin_email constant text := 'admin@vecora.app';
+  admin_password text := case when is_local then 'admin' else 'admin123' end;
 begin
   if exists (select 1 from auth.users where email = admin_email) then
     raise notice 'seed: % already exists, skipping', admin_email;
@@ -47,6 +53,12 @@ begin
 
   -- The on_auth_user_created trigger has already created the profile, named it
   -- "Vecora Admin" and granted the admin role (see 20260921000000_profiles_and_roles.sql).
+
+  -- Everyone can read the default password in this file: on hosted it's only
+  -- good for choosing a real one.
+  if not is_local then
+    update public.profiles set must_change_password = true where id = admin_id;
+  end if;
 
   raise notice 'seed: created admin %', admin_email;
 end $$;

@@ -282,6 +282,7 @@ export type Database = {
           full_name: string
           id: string
           is_main_admin: boolean
+          must_change_password: boolean
           updated_at: string
           welcomed_at: string | null
         }
@@ -290,6 +291,7 @@ export type Database = {
           full_name?: string
           id: string
           is_main_admin?: boolean
+          must_change_password?: boolean
           updated_at?: string
           welcomed_at?: string | null
         }
@@ -298,6 +300,7 @@ export type Database = {
           full_name?: string
           id?: string
           is_main_admin?: boolean
+          must_change_password?: boolean
           updated_at?: string
           welcomed_at?: string | null
         }

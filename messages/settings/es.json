@@ -9,6 +9,8 @@
 
   "settings_tab_app": "Aplicación",
   "settings_tab_hoa": "Residencial",
+  "settings_tab_account": "Cuenta",
+  "settings_account_description": "La contraseña con la que entras como {email}.",
   "settings_app_description": "Preferencias de este dispositivo; no afectan a los demás.",
   "settings_appearance_description": "\"Sistema\" sigue la configuración de tu dispositivo.",
   "settings_theme_light": "Claro",

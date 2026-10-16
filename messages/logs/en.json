@@ -60,6 +60,7 @@
   "logs_field_created_at": "Recorded on",
   "logs_field_is_main_admin": "Main administrator",
   "logs_field_welcomed_at": "Saw the introduction",
+  "logs_field_must_change_password": "Must change password",
 
   "logs_enum_income": "Income",
   "logs_enum_expense": "Expense",

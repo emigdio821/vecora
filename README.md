@@ -60,7 +60,7 @@ All local accounts use the password **`admin`**. They come from `supabase/seed.s
 
 | Email                    | Role                         | Can write in                                                               |
 | ------------------------ | ---------------------------- | -------------------------------------------------------------------------- |
-| `admin@vecora.com`       | Admin                        | Everything, plus the HOA board and the activity log                        |
+| `admin@vecora.app`       | Admin                        | Everything, plus the HOA board and the activity log                        |
 | `president@vecora.com`   | President (Ana López)        | Residential, Presidency, HOA board                                         |
 | `treasurer@vecora.com`   | Treasurer (Luis Fernández)   | Treasury, periods and reservations in Presidency; pays or rejects requests |
 | `security@vecora.com`    | Security (María García)      | Requests in Security                                                       |
@@ -115,7 +115,7 @@ What each section is called on screen. Docs and comments use the English name.
 
 The app runs on Vercel against a hosted Supabase project.
 
-1. **Push the schema** to the hosted project. Seeds are not pushed, so production starts with no accounts.
+1. **Push the schema** to the hosted project. Seeds are not pushed, so production starts with no accounts until step 4.
 
    ```bash
    npx supabase login
@@ -139,31 +139,31 @@ The app runs on Vercel against a hosted Supabase project.
 
    The `VITE_` values are bundled into the browser code at build time, so redeploy after changing them.
 
-4. **Create the main admin.** Nobody can sign in until an account has a role. In Authentication → Users → **Add user** → **Create new user**, enter `admin@vecora.com` and a strong password, and check **Auto Confirm User**. The database names the account "Vecora Admin" and grants it the admin role on its own.
+4. **Create the main admin** with `npm run db:seed`. Nobody can sign in until an account has a role; this runs `supabase/seed.sql`, which creates `admin@vecora.app` with the default password `admin123`. The test data in `supabase/seeds/` skips itself on hosted.
 
-5. **Deploy** and sign in as the admin. The first sign-in asks for the residential's name and currency (it can't be skipped); then upload the logo in Ajustes → Residencial and add the board members in HOA board.
+5. **Deploy** and sign in as the admin. The app first asks for a new password: everyone can read the default one in the repo, so it's only good for that. Then set the residential's name, logo and currency in Ajustes → Residencial and add the board members in HOA board.
 
 ### The main admin
 
-`admin@vecora.com` is the app's own account, not a resident's. It can't be deleted, lose the admin role, change its email or its name ("Vecora Admin"); the database refuses all four, including from the dashboard. Other admins are residents and are removed in HOA board like anyone else.
+`admin@vecora.app` is the app's own account, not a resident's. It can't be deleted, lose the admin role, change its email or its name ("Vecora Admin"); the database refuses all four, including from the dashboard. Other admins are residents and are removed in HOA board like anyone else.
 
-Nobody receives mail at `vecora.com`, so the dashboard's password reset email won't arrive. Change the password in the SQL Editor instead:
+Nobody receives mail at `vecora.app`, so the dashboard's password reset email won't arrive. Change the password in Ajustes → Cuenta, which only the main admin sees; board members get a new access link in HOA board instead. If the password is lost, set one in the SQL Editor:
 
 ```sql
 update auth.users
 set encrypted_password = extensions.crypt('the-new-password', extensions.gen_salt('bf'))
-where email = 'admin@vecora.com';
+where email = 'admin@vecora.app';
 ```
 
 ### Reset
 
-To wipe the hosted database and re-apply every migration, run `npx supabase db reset --linked --no-seed`. Without `--no-seed` it would also create the local test accounts, all with the password `admin`. A reset can't be undone; `npx supabase db dump --linked --data-only -f backup.sql` saves the data first.
+To wipe the hosted database and re-apply every migration, run `npx supabase db reset --linked`. The seed creates the main admin again with the default password `admin123`, which it has to change at the first sign-in. A reset can't be undone; `npx supabase db dump --linked --data-only -f backup.sql` saves the data first.
 
 ## Project layout
 
 ```
 supabase/migrations/   schema, RLS policies and RPCs (one file per area)
-supabase/seed.sql      local admin account
+supabase/seed.sql      main admin account (local and hosted)
 supabase/seeds/        local-only test data: dev.sql, then periods.sql
 src/routes/_authed/    one route per section (TanStack Router file routes)
 src/routes/_auth/      login, set-password and the auth callbacks

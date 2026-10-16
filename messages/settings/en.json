@@ -9,6 +9,8 @@
 
   "settings_tab_app": "App",
   "settings_tab_hoa": "HOA",
+  "settings_tab_account": "Account",
+  "settings_account_description": "The password you sign in with as {email}.",
   "settings_app_description": "Preferences for this device only; they don't affect anyone else.",
   "settings_appearance_description": "\"System\" follows your device's settings.",
   "settings_theme_light": "Light",

@@ -441,6 +441,9 @@ const FIELD_LABEL: Record<string, string> = {
   get welcomed_at() {
     return m.logs_field_welcomed_at()
   },
+  get must_change_password() {
+    return m.logs_field_must_change_password()
+  },
 }
 
 export function fieldLabel(field: string) {

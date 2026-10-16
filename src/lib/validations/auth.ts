@@ -7,3 +7,21 @@ export const loginSchema = z.object({
 })
 
 export type LoginInput = z.infer<typeof loginSchema>
+
+/** The main admin's password, from Settings. Same rules as a new member's (setPasswordSchema). */
+export const changePasswordSchema = z
+  .object({
+    current: z.string().min(1, { error: () => m.auth_password_required() }),
+    password: z.string().min(8, { error: () => m.board_password_min() }),
+    confirm: z.string(),
+  })
+  .refine((data) => data.password === data.confirm, {
+    path: ['confirm'],
+    error: () => m.board_passwords_mismatch(),
+  })
+  .refine((data) => data.password !== data.current, {
+    path: ['password'],
+    error: () => m.auth_password_same(),
+  })
+
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>

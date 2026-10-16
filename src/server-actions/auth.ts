@@ -2,8 +2,15 @@ import type { EmailOtpType } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie, setCookie } from '@tanstack/react-start/server'
 import { MULTI_LANGUAGE } from '@/lib/config/i18n'
+import { authMiddleware } from '@/lib/supabase/auth-middleware'
+import { getCurrentUser } from '@/lib/supabase/current-user'
 import { createClient } from '@/lib/supabase/server'
-import { type LoginInput, loginSchema } from '@/lib/validations/auth'
+import {
+  type ChangePasswordInput,
+  changePasswordSchema,
+  type LoginInput,
+  loginSchema,
+} from '@/lib/validations/auth'
 import { LANGUAGE_PICKED_COOKIE } from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
 import { cookieMaxAge, cookieName, type Locale } from '@/paraglide/runtime'
@@ -106,3 +113,48 @@ const logoutFn = createServerFn({ method: 'POST' }).handler(async (): Promise<Ac
 })
 
 export const logout = () => logoutFn()
+
+/**
+ * The main admin's password, from Settings. Nobody receives mail at
+ * vecora.app, and the board's access links are for members; this is the only
+ * way to change it without the SQL Editor.
+ */
+const changePasswordFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .validator((input: ChangePasswordInput) => input)
+  .handler(async ({ data: input }): Promise<ActionResult> => {
+    const parsed = changePasswordSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: m.common_form_invalid() }
+    }
+
+    const user = await getCurrentUser()
+    if (!user?.isMainAdmin) {
+      return { error: m.common_no_permission() }
+    }
+
+    const supabase = await createClient()
+
+    // An open session isn't enough: whoever is at the keyboard must know the current one.
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: parsed.data.current,
+    })
+    if (signInError) {
+      return { error: m.auth_current_password_wrong() }
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
+    if (error?.code === 'same_password') {
+      return { error: m.auth_password_same() }
+    }
+    if (error) {
+      return { error: m.board_password_save_failed() }
+    }
+
+    // Every other device signs in again with the new password.
+    const { error: signOutError } = await supabase.auth.signOut({ scope: 'others' })
+    if (signOutError) console.error('signOut others failed', signOutError)
+  })
+
+export const changePassword = (input: ChangePasswordInput) => changePasswordFn({ data: input })

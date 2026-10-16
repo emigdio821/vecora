@@ -36,6 +36,14 @@
   "auth_repeat_password": "Confirm password",
   "auth_save_password": "Save password",
   "auth_password_saved": "Password saved",
+  "auth_change_default_password_title": "Change the default password",
+  "auth_password_same_as_default": "Choose a password other than the default one",
+
+  "auth_current_password": "Current password",
+  "auth_current_password_wrong": "The current password isn't correct",
+  "auth_password_same": "The new password must be different from the current one",
+  "auth_change_password": "Change password",
+  "auth_password_changed": "Password changed",
 
   "auth_confirm_head_title": "Confirm access",
   "auth_confirm_head_description": "You received an access link to {appName}. Open it to create your password.",

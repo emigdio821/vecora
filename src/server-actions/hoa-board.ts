@@ -17,7 +17,7 @@ import {
 } from '@/lib/validations/hoa-board'
 import { m } from '@/paraglide/messages'
 
-// Raised by the guards on the main admin (admin@vecora.com).
+// Raised by the guards on the main admin (admin@vecora.app).
 const MAIN_ADMIN_PROTECTED = 'P0004'
 
 function toMessage(error: PostgrestError, fallback: string) {
@@ -282,7 +282,11 @@ const removeBoardMemberFn = createServerFn({ method: 'POST' })
 
 export const removeBoardMember = (userId: string) => removeBoardMemberFn({ data: userId })
 
-/** First sign-in after an invite: the person chooses their password. */
+/**
+ * First sign-in after an invite: the person chooses their password. Also the
+ * main admin's first hosted sign-in, away from the default password; the
+ * database clears must_change_password once the password changes.
+ */
 const setPasswordFn = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
   .validator((input: SetPasswordInput) => input)
@@ -298,8 +302,12 @@ const setPasswordFn = createServerFn({ method: 'POST' })
     if (!email) return { error: m.common_no_permission() }
 
     const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
-    // Someone resetting who typed the password they already had: it's still theirs, let them in.
-    if (error && error.code !== 'same_password') {
+    if (error?.code === 'same_password') {
+      // Someone resetting who typed the password they already had: it's still
+      // theirs, let them in. Unless it's the default one being replaced.
+      const user = await getCurrentUser()
+      if (user?.mustChangePassword) return { error: m.auth_password_same_as_default() }
+    } else if (error) {
       return { error: m.board_password_save_failed() }
     }
 

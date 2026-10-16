@@ -25,8 +25,9 @@ export const Route = createFileRoute('/_authed')({
     // valid session, so the gate has to live here as well as in login().
     if (user.roles.length === 0) throw redirect({ to: '/no-access' })
 
-    // Arrived through an access link: choose a password before seeing anything else.
-    if (user.mustSetPassword) throw redirect({ to: '/set-password' })
+    // Arrived through an access link, or still on the default password: choose
+    // a password before seeing anything else.
+    if (user.mustSetPassword || user.mustChangePassword) throw redirect({ to: '/set-password' })
 
     return { user }
   },

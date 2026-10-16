@@ -16,9 +16,14 @@ export interface CurrentUser {
    * /set-password; setPassword() swaps them for a normal one.
    */
   mustSetPassword: boolean
+  /**
+   * Still on the default password seed.sql gave it (the hosted main admin).
+   * Sent to /set-password like an access link, until the password changes.
+   */
+  mustChangePassword: boolean
   /** Already closed the welcome dialog, on any device. */
   welcomed: boolean
-  /** admin@vecora.com, the app's own account. */
+  /** admin@vecora.app, the app's own account. */
   isMainAdmin: boolean
 }
 
@@ -46,7 +51,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('full_name, welcomed_at, is_main_admin, user_roles!user_id ( role )')
+    .select('full_name, welcomed_at, is_main_admin, must_change_password, user_roles!user_id ( role )')
     .eq('id', id)
     .maybeSingle()
 
@@ -60,6 +65,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     fullName: profile?.full_name || email?.split('@')[0] || m.common_user_fallback_name(),
     roles: profile?.user_roles.map((r) => r.role) ?? [],
     mustSetPassword: cameFromAccessLink(amr),
+    mustChangePassword: !!profile?.must_change_password,
     welcomed: !!profile?.welcomed_at,
     isMainAdmin: !!profile?.is_main_admin,
   }

@@ -13,14 +13,15 @@ import { pageHead } from '@/lib/metadata'
 import { m } from '@/paraglide/messages'
 
 /**
- * Only stop for a session that came from an access link (see /auth/confirm).
- * The _authed layout sends those sessions here and nowhere else.
+ * Only stop for a session that came from an access link (see /auth/confirm),
+ * or for the main admin still on its default password. The _authed layout
+ * sends those sessions here and nowhere else.
  */
 export const Route = createFileRoute('/_auth/set-password')({
   beforeLoad: ({ context }) => {
     if (!context.user) throw redirect({ to: '/login' })
-    // Already signed in with a password: nothing to do here.
-    if (!context.user.mustSetPassword) throw redirect({ to: '/' })
+    // Already signed in with a password of their own: nothing to do here.
+    if (!context.user.mustSetPassword && !context.user.mustChangePassword) throw redirect({ to: '/' })
     return { user: context.user }
   },
   head: () =>
@@ -38,7 +39,9 @@ function SetPasswordPage() {
   return (
     <CardFrame className="w-full max-w-sm">
       <CardFrameHeader>
-        <CardFrameTitle>{m.auth_set_password_title()}</CardFrameTitle>
+        <CardFrameTitle>
+          {user.mustChangePassword ? m.auth_change_default_password_title() : m.auth_set_password_title()}
+        </CardFrameTitle>
         <CardFrameDescription>
           {m.auth_set_password_for_before()}{' '}
           <strong className="font-medium text-foreground">{user.email}</strong>

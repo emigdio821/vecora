@@ -4,7 +4,7 @@
 -- hosted project even if someone runs `db push --include-seed`.
 --
 -- Test logins (password for all: "admin"), one per role:
---   admin@vecora.com        admin        (account from seed.sql)
+--   admin@vecora.app        admin        (account from seed.sql)
 --   president@vecora.com    president
 --   treasurer@vecora.com    treasurer
 --   security@vecora.com     security

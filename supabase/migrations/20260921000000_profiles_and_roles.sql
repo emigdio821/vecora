@@ -21,14 +21,19 @@
 -- The president joins admin in granting/revoking roles, with one limit: only
 -- an admin can hand out or take away the admin role.
 --
--- The main admin: admin@vecora.com, named "Vecora Admin". It is the app's own
+-- The main admin: admin@vecora.app, named "Vecora Admin". It is the app's own
 -- account, not a resident's, so the board can't take it away: it keeps the
 -- admin role, its name and its email, and it can't be deleted. Other admins
 -- (residents holding the role) are removed as usual.
 --
--- Creating admin@vecora.com (dashboard or seed) is all the setup it needs: the
+-- Creating admin@vecora.app (seed or dashboard) is all the setup it needs: the
 -- signup trigger flags it, names it and grants the role. The guards check the
 -- flag, which the app can't write.
+--
+-- On hosted, seed.sql creates it with a default password and sets
+-- must_change_password; the app then allows nothing but choosing a new one.
+-- The flag clears itself once the password actually changes, however it
+-- changes (the app, or the SQL Editor).
 
 -- ---------------------------------------------------------------------------
 -- private schema: helper functions that must never be exposed via the Data API
@@ -62,14 +67,16 @@ create table public.profiles (
   -- flag lives on the profile rather than in the browser so it follows the user
   -- to every device. Users set it on their own row.
   welcomed_at   timestamptz,
-  is_main_admin boolean not null default false
+  is_main_admin boolean not null default false,
+  must_change_password boolean not null default false
 );
 
 create unique index profiles_one_main_admin on public.profiles (is_main_admin) where is_main_admin;
 
 comment on table public.profiles is 'Public-facing member profile. One row per auth.users row.';
 comment on column public.profiles.welcomed_at is 'When the user closed the welcome dialog; null until then.';
-comment on column public.profiles.is_main_admin is 'The app''s own admin account (admin@vecora.com). Set on signup, read-only for the app.';
+comment on column public.profiles.is_main_admin is 'The app''s own admin account (admin@vecora.app). Set on signup, read-only for the app.';
+comment on column public.profiles.must_change_password is 'Still on a default password (seed.sql on hosted). Read-only for the app; clears when the password changes.';
 
 -- ---------------------------------------------------------------------------
 -- user_roles: a member may hold several roles
@@ -149,7 +156,7 @@ security definer
 set search_path = ''
 as $$
 declare
-  v_is_main boolean := coalesce(lower(new.email) = 'admin@vecora.com', false);
+  v_is_main boolean := coalesce(lower(new.email) = 'admin@vecora.app', false);
 begin
   insert into public.profiles (id, full_name, is_main_admin)
   values (
@@ -170,11 +177,32 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function private.handle_new_user();
 
+-- A new password, from wherever it came: the default one is gone.
+create function private.handle_password_changed()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.profiles
+  set must_change_password = false
+  where id = new.id and must_change_password;
+  return new;
+end;
+$$;
+
+create trigger on_auth_user_password_changed
+  after update of encrypted_password on auth.users
+  for each row
+  when (new.encrypted_password is distinct from old.encrypted_password)
+  execute function private.handle_password_changed();
+
 -- An account that already exists (hosted: created by hand in the dashboard).
 update public.profiles p
 set is_main_admin = true, full_name = 'Vecora Admin'
 from auth.users u
-where u.id = p.id and lower(u.email) = 'admin@vecora.com';
+where u.id = p.id and lower(u.email) = 'admin@vecora.app';
 
 insert into public.user_roles (user_id, role)
 select id, 'admin' from public.profiles where is_main_admin

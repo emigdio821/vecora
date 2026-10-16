@@ -36,6 +36,14 @@
   "auth_repeat_password": "Repite la contraseña",
   "auth_save_password": "Guardar contraseña",
   "auth_password_saved": "Contraseña guardada",
+  "auth_change_default_password_title": "Cambia la contraseña predeterminada",
+  "auth_password_same_as_default": "Elige una contraseña distinta a la predeterminada",
+
+  "auth_current_password": "Contraseña actual",
+  "auth_current_password_wrong": "La contraseña actual no es correcta",
+  "auth_password_same": "La nueva contraseña debe ser distinta a la actual",
+  "auth_change_password": "Cambiar contraseña",
+  "auth_password_changed": "Contraseña cambiada",
 
   "auth_confirm_head_title": "Confirmar acceso",
   "auth_confirm_head_description": "Recibiste un enlace de acceso a {appName}. Ábrelo para crear tu contraseña.",

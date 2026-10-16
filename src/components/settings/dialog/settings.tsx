@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCurrentUser, useHasRole } from '@/components/current-user-provider'
+import { AccountSettingsPanel } from '@/components/settings/dialog/account-settings'
 import { AppSettingsPanel } from '@/components/settings/dialog/app-settings'
 import { type HoaSettingsSave, HoaSettingsPanel } from '@/components/settings/dialog/hoa-settings'
 import {
@@ -17,7 +18,7 @@ import { m } from '@/paraglide/messages'
 import { removeLogo, updateSettings, uploadLogo } from '@/server-actions/settings'
 import { SETTINGS_QUERY_KEY } from '@/tanstack-queries/settings'
 
-type SettingsTab = 'app' | 'hoa'
+type SettingsTab = 'app' | 'hoa' | 'account'
 
 interface SettingsDialogProps {
   settings: Settings
@@ -28,12 +29,20 @@ interface SettingsDialogProps {
 /**
  * Everything configurable: this device's preferences for everyone, and the
  * HOA's details for president or admin (RLS re-checks the role). Without the
- * role there are no tabs, only the device's preferences. A drawer on mobile.
+ * role there are no tabs, only the device's preferences. The main admin also
+ * gets its password. A drawer on mobile.
  */
 export function SettingsDialog({ settings, open, onOpenChange }: SettingsDialogProps) {
   const canEditHoa = useHasRole('president')
+  const user = useCurrentUser()
   const [tab, setTab] = useState<SettingsTab>('app')
   const queryClient = useQueryClient()
+
+  const descriptions: Record<SettingsTab, string> = {
+    app: m.settings_app_description(),
+    hoa: m.settings_dialog_description(),
+    account: m.settings_account_description({ email: user.email }),
+  }
 
   const mutation = useMutation({
     mutationFn: async ({ values, logo }: HoaSettingsSave) => {
@@ -87,12 +96,11 @@ export function SettingsDialog({ settings, open, onOpenChange }: SettingsDialogP
               setTab(value)
             }}
           >
-            <SettingsHeader
-              description={tab === 'app' ? m.settings_app_description() : m.settings_dialog_description()}
-            >
+            <SettingsHeader description={descriptions[tab]}>
               <TabsList className="mt-2">
                 <TabsTab value="app">{m.settings_tab_app()}</TabsTab>
                 <TabsTab value="hoa">{m.settings_tab_hoa()}</TabsTab>
+                {user.isMainAdmin && <TabsTab value="account">{m.settings_tab_account()}</TabsTab>}
               </TabsList>
             </SettingsHeader>
 
@@ -103,6 +111,15 @@ export function SettingsDialog({ settings, open, onOpenChange }: SettingsDialogP
             <TabsPanel value="hoa" keepMounted className="flex min-h-0 flex-col">
               <HoaSettingsPanel settings={settings} mutation={mutation} />
             </TabsPanel>
+            {user.isMainAdmin && (
+              <TabsPanel value="account" className="flex min-h-0 flex-col">
+                <AccountSettingsPanel
+                  onSaved={() => {
+                    onOpenChange(false)
+                  }}
+                />
+              </TabsPanel>
+            )}
           </Tabs>
         ) : (
           <>

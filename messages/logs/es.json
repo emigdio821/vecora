@@ -60,6 +60,7 @@
   "logs_field_created_at": "Fecha de registro",
   "logs_field_is_main_admin": "Administrador principal",
   "logs_field_welcomed_at": "Vio la introducción",
+  "logs_field_must_change_password": "Debe cambiar la contraseña",
 
   "logs_enum_income": "Ingreso",
   "logs_enum_expense": "Egreso",
