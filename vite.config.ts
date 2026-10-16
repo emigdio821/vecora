@@ -6,6 +6,9 @@ import { nitro } from 'nitro/vite'
 import { defineConfig, lazyPlugins } from 'vite-plus'
 
 export default defineConfig({
+  staged: {
+    '*': 'vp check --fix',
+  },
   fmt: {
     ignorePatterns: ['.claude', '.agents', '**/src/routeTree.gen.ts', '**/src/paraglide/**'],
     tabWidth: 2,

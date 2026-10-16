@@ -1,3 +1,2 @@
-# Split the file list into chunks: a big commit otherwise passes every path in
-# one command and Windows rejects it ("The command line is too long").
-lint-staged --max-arg-length 6000
+# The checks live in the `staged` block of vite.config.ts.
+vp staged
