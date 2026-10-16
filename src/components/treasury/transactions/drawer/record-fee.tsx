@@ -1,33 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconAlertCircle, IconSelector } from '@tabler/icons-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  addMonths,
-  addYears,
-  eachMonthOfInterval,
-  format,
-  isAfter,
-  parseISO,
-  setDate,
-  startOfMonth,
-  subMonths,
-  subYears,
-} from 'date-fns'
-import { useId, useMemo, useState } from 'react'
+import { format, isAfter, parseISO, setDate, startOfMonth } from 'date-fns'
+import { Fragment, useId, useMemo, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
+import { PeriodCalendar } from '@/components/shared/period-calendar'
 import { HousesPicker, houseLabel } from '@/components/shared/pickers/houses-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
 import {
   Combobox,
   ComboboxChip,
   ComboboxChips,
   ComboboxChipsInput,
+  ComboboxCollection,
   ComboboxEmpty,
+  ComboboxGroup,
+  ComboboxGroupLabel,
   ComboboxItem,
   ComboboxList,
   ComboboxPopup,
+  ComboboxSeparator,
   ComboboxValue,
 } from '@/components/ui/combobox'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -51,7 +44,7 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { useCurrency, useFormatCurrency } from '@/hooks/use-currency'
-import { useToday } from '@/hooks/use-today'
+import { type FeeMonthGroup, feeMonthsByPeriod, periodFor } from '@/lib/periods'
 import { formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
 import { type RecordFeePaymentInput, recordFeePaymentSchema } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
@@ -61,12 +54,6 @@ import { periodsQueryOptions, TREASURY_QUERY_KEY } from '@/tanstack-queries/trea
 import { PAYMENT_METHOD_ITEMS } from '../../kind'
 
 const FORM_ID = 'record-fee-form'
-
-// A year back (catching up) and a year ahead (paying in advance), as "YYYY-MM-01".
-const MONTH_OPTIONS = eachMonthOfInterval({
-  start: subMonths(startOfMonth(new Date()), 12),
-  end: addMonths(startOfMonth(new Date()), 12),
-}).map((month) => format(month, ISO_DAY))
 
 function defaultValues(): RecordFeePaymentInput {
   return {
@@ -91,10 +78,11 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
   const waiveSwitchId = useId()
   const [isDateOpen, setDateOpen] = useState(false)
   const dateTriggerId = useId()
-  const today = useToday()
   const { data: periods } = useQuery(periodsQueryOptions)
   const home = useCurrency()
   const formatCurrency = useFormatCurrency()
+  // Catching up and paying in advance alike: any month a period covers, newest period first.
+  const monthGroups = useMemo(() => feeMonthsByPeriod(periods ?? []), [periods])
 
   const form = useForm<RecordFeePaymentInput>({
     resolver: zodResolver(recordFeePaymentSchema),
@@ -107,7 +95,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
 
   // Mirror of the RPC's rules, so the treasurer sees the total before saving.
   const preview = useMemo(() => {
-    const period = periods?.find((p) => p.starts_on <= occurredOn && occurredOn <= p.ends_on)
+    const period = periods ? periodFor(periods, occurredOn) : undefined
     if (!period) return null
 
     const paidOn = parseISO(occurredOn)
@@ -240,7 +228,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                   </FieldLabel>
                   <Combobox
                     multiple
-                    items={MONTH_OPTIONS}
+                    items={monthGroups}
                     itemToStringLabel={formatMonth}
                     value={field.value}
                     onValueChange={(value: string[]) => {
@@ -270,12 +258,26 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                       </ComboboxValue>
                     </ComboboxChips>
                     <ComboboxPopup>
-                      <ComboboxEmpty>{m.common_no_results()}</ComboboxEmpty>
+                      <ComboboxEmpty>
+                        {periods?.length === 0 ? m.common_no_periods() : m.common_no_results()}
+                      </ComboboxEmpty>
                       <ComboboxList>
-                        {(month: string) => (
-                          <ComboboxItem key={month} value={month}>
-                            {formatMonth(month)}
-                          </ComboboxItem>
+                        {(group: FeeMonthGroup) => (
+                          <Fragment key={group.value}>
+                            <ComboboxGroup items={group.items}>
+                              <ComboboxGroupLabel>
+                                {m.treasury_period_label({ name: group.value })}
+                              </ComboboxGroupLabel>
+                              <ComboboxCollection>
+                                {(month: string) => (
+                                  <ComboboxItem key={month} value={month}>
+                                    {formatMonth(month)}
+                                  </ComboboxItem>
+                                )}
+                              </ComboboxCollection>
+                            </ComboboxGroup>
+                            <ComboboxSeparator />
+                          </Fragment>
                         )}
                       </ComboboxList>
                     </ComboboxPopup>
@@ -319,15 +321,10 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                         }
                       />
                       <PopoverPopup className="w-auto p-1">
-                        <Calendar
-                          mode="single"
-                          captionLayout="dropdown"
-                          startMonth={subYears(today, 5)}
-                          endMonth={addYears(today, 1)}
-                          selected={parseISO(field.value)}
-                          defaultMonth={parseISO(field.value)}
-                          onSelect={(date) => {
-                            field.onChange(format(date ?? new Date(), ISO_DAY))
+                        <PeriodCalendar
+                          value={field.value}
+                          onChange={(day) => {
+                            field.onChange(day)
                             setDateOpen(false)
                           }}
                         />

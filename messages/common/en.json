@@ -56,6 +56,10 @@
   "common_today": "Today",
   "common_system": "System",
 
+  "common_no_periods": "No periods yet",
+  "common_no_periods_description": "Transactions are recorded within a period. Create one in \"Presidency\" to pick dates.",
+  "common_go_to_periods": "Go to Periods",
+
   "common_error": "Error",
   "common_form_invalid": "Check the form fields",
   "common_no_permission": "You don't have permission to do this",

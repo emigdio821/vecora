@@ -14,6 +14,7 @@
   "reports_preset_last_3_months": "Last 3 months",
   "reports_preset_this_year": "This year",
   "reports_preset_last_year": "Last year",
+  "reports_preset_period": "Period {name}",
   "reports_download_pdf": "Download PDF",
   "reports_downloaded": "Report downloaded",
   "reports_download_failed": "Couldn't generate the report. Reload the page and try again.",

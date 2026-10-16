@@ -9,7 +9,7 @@ import {
   IconTrendingUp,
   type TablerIcon,
 } from '@tabler/icons-react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   endOfMonth,
   endOfYear,
@@ -20,7 +20,7 @@ import {
   subMonths,
   subYears,
 } from 'date-fns'
-import { useId, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { type DayRange, RangePicker, type RangePreset, toRange } from '@/components/shared/range-picker'
 import { Button } from '@/components/ui/button'
 import {
@@ -38,6 +38,7 @@ import { toastManager } from '@/components/ui/toast'
 import { useToday } from '@/hooks/use-today'
 import { formatMonth, ISO_DAY } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
+import { periodsQueryOptions } from '@/tanstack-queries/treasury'
 
 /** How far back the monthly picker goes. */
 const MONTHS_BACK = 24
@@ -212,11 +213,31 @@ export function MonthlyReportCard() {
   )
 }
 
+/** The latest periods get a preset each; older ones are a few clicks away in the calendar. */
+const PERIOD_PRESETS = 3
+
 /** Any range of days, from one day to several years. */
 export function CustomReportCard() {
   const today = useToday()
   const [range, setRange] = useState<DayRange>(() => toRange(startOfMonth(today), today))
   const pickerId = useId()
+  const { data: periods } = useQuery(periodsQueryOptions)
+
+  // Periods that have started, newest first; the current one runs up to today.
+  const presets = useMemo(() => {
+    const todayDay = format(today, ISO_DAY)
+    const periodPresets = (periods ?? [])
+      .filter((period) => period.starts_on <= todayDay)
+      .slice(0, PERIOD_PRESETS)
+      .map((period): RangePreset => ({
+        label: m.reports_preset_period({ name: period.name }),
+        range: (day) => {
+          const end = format(day, ISO_DAY)
+          return { from: period.starts_on, to: period.ends_on < end ? period.ends_on : end }
+        },
+      }))
+    return [...REPORT_PRESETS, ...periodPresets]
+  }, [periods, today])
 
   return (
     <ReportCard
@@ -229,13 +250,7 @@ export function CustomReportCard() {
         <FieldLabel id={`${pickerId}-label`} htmlFor={pickerId}>
           {m.reports_range_label()}
         </FieldLabel>
-        <RangePicker
-          id={pickerId}
-          value={range}
-          onChange={setRange}
-          presets={REPORT_PRESETS}
-          className="w-full"
-        />
+        <RangePicker id={pickerId} value={range} onChange={setRange} presets={presets} className="w-full" />
       </Field>
     </ReportCard>
   )

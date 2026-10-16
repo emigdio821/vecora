@@ -56,6 +56,10 @@
   "common_today": "Hoy",
   "common_system": "Sistema",
 
+  "common_no_periods": "Aún no hay periodos",
+  "common_no_periods_description": "Los movimientos se registran dentro de un periodo. Crea uno en \"Presidencia\" para elegir fechas.",
+  "common_go_to_periods": "Ir a Periodos",
+
   "common_error": "Error",
   "common_form_invalid": "Revisa los campos del formulario",
   "common_no_permission": "No tienes permisos para realizar esta acción",

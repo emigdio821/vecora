@@ -130,6 +130,7 @@ function EditPeriodForm({ period, mutation }: { period: PeriodQueryData; mutatio
             currency={period.currency}
             disabled={isBusy}
             inUse={transactionCount(period) > 0}
+            periodId={period.id}
           />
 
           {form.formState.errors.root && (

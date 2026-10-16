@@ -29,6 +29,10 @@
   "presidency_period_due_day_description": "Fees paid after this day of the month get a late fee. Between 1 and 28.",
   "presidency_period_in_use_title": "This period already has transactions",
   "presidency_period_in_use_description": "Changes to the fee, the late fee or the due day only apply to fees recorded from now on.",
+  "presidency_period_gap_title": "Some dates have no period",
+  "presidency_period_gap_before": "From {from} to {to}, between {name} and this period.",
+  "presidency_period_gap_after": "From {from} to {to}, between this period and {name}.",
+  "presidency_period_gap_description": "No transactions can be recorded on those dates. If that's intended, you can go ahead.",
   "presidency_period_search_hint": "Search by period name, for example \"2026\"",
   "presidency_periods_empty": "No periods. Create one to start recording transactions.",
 

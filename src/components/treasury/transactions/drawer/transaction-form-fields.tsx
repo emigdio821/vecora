@@ -1,12 +1,11 @@
 import { IconSelector } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
-import { addYears, format, parseISO, subYears } from 'date-fns'
 import { useId, useMemo, useState } from 'react'
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
+import { PeriodCalendar } from '@/components/shared/period-calendar'
 import { HousesPicker } from '@/components/shared/pickers/houses-picker'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
@@ -15,9 +14,8 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { useToday } from '@/hooks/use-today'
 import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
-import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import { type CurrencyCode, currencySymbol, formatDay, intlLocale, MONEY_FORMAT } from '@/lib/utils'
 import type { CreateTransactionInput } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { categoriesQueryOptions } from '@/tanstack-queries/treasury'
@@ -49,7 +47,6 @@ export function TransactionFormFields({
 }: TransactionFormFieldsProps) {
   const [isDateOpen, setDateOpen] = useState(false)
   const dateTriggerId = useId()
-  const today = useToday()
   const { data: categories } = useQuery(categoriesQueryOptions)
   const [kind, paymentMethod, categoryId] = useWatch({
     control: form.control,
@@ -232,15 +229,10 @@ export function TransactionFormFields({
                   }
                 />
                 <PopoverPopup className="w-auto p-1">
-                  <Calendar
-                    mode="single"
-                    captionLayout="dropdown"
-                    startMonth={subYears(today, 5)}
-                    endMonth={addYears(today, 1)}
-                    selected={parseISO(field.value)}
-                    defaultMonth={parseISO(field.value)}
-                    onSelect={(date) => {
-                      field.onChange(format(date ?? new Date(), ISO_DAY))
+                  <PeriodCalendar
+                    value={field.value}
+                    onChange={(day) => {
+                      field.onChange(day)
                       setDateOpen(false)
                     }}
                   />

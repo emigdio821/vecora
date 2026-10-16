@@ -29,6 +29,10 @@
   "presidency_period_due_day_description": "Las cuotas pagadas después de este día del mes llevan recargo. Entre 1 y 28.",
   "presidency_period_in_use_title": "Este periodo ya tiene movimientos",
   "presidency_period_in_use_description": "Los cambios en la cuota, el recargo o el día límite solo aplican a las cuotas que se registren a partir de ahora.",
+  "presidency_period_gap_title": "Quedan fechas sin periodo",
+  "presidency_period_gap_before": "Del {from} al {to}, entre {name} y este periodo.",
+  "presidency_period_gap_after": "Del {from} al {to}, entre este periodo y {name}.",
+  "presidency_period_gap_description": "No se podrán registrar movimientos en esas fechas. Si es a propósito, puedes continuar.",
   "presidency_period_search_hint": "Buscar por nombre del periodo, por ejemplo \"2026\"",
   "presidency_periods_empty": "Sin periodos. Crea uno para poder registrar movimientos.",
 

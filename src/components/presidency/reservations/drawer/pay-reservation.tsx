@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconAlertCircle, IconSelector } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import { addYears, format, parseISO, subYears } from 'date-fns'
+import { format } from 'date-fns'
 import { useId, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
+import { PeriodCalendar } from '@/components/shared/period-calendar'
 import { PAYMENT_METHOD_ITEMS } from '@/components/treasury/kind'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
 import {
   Drawer,
@@ -182,15 +182,10 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
                       }
                     />
                     <PopoverPopup className="w-auto p-1">
-                      <Calendar
-                        mode="single"
-                        captionLayout="dropdown"
-                        startMonth={subYears(today, 2)}
-                        endMonth={addYears(today, 1)}
-                        selected={parseISO(field.value)}
-                        defaultMonth={parseISO(field.value)}
-                        onSelect={(date) => {
-                          field.onChange(format(date ?? new Date(), ISO_DAY))
+                      <PeriodCalendar
+                        value={field.value}
+                        onChange={(day) => {
+                          field.onChange(day)
                           setDateOpen(false)
                         }}
                       />
