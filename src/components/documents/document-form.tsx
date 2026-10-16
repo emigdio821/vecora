@@ -7,6 +7,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import { Card, CardFrame, CardFrameFooter, CardFrameHeader, CardPanel } from '@/components/ui/card'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -213,180 +214,192 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
   return (
     <>
       <Form
-        className="flex flex-col gap-4 md:min-h-0 md:flex-1"
+        className="flex flex-col md:min-h-0 md:flex-1"
         onSubmit={form.handleSubmit((values) => {
           downloadMutation.mutate(values)
         })}
       >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Controller
-            name="header_title"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field
-                name={field.name}
-                invalid={fieldState.invalid}
-                touched={fieldState.isTouched}
-                dirty={fieldState.isDirty}
-              >
-                <FieldLabel>
-                  {m.documents_field_header_title()} <span className="text-destructive">*</span>
-                </FieldLabel>
-                <Input {...field} autoComplete="off" />
-                <FieldDescription>{m.documents_header_title_description()}</FieldDescription>
-                <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
-              </Field>
-            )}
-          />
+        {/*
+         * What goes around the text (header, date, title) on the frame; the text itself in
+         * the card. Every level shrinks with the screen, down to the editor, the one that scrolls.
+         */}
+        <CardFrame className="md:min-h-0 md:flex-1">
+          <CardFrameHeader className="flex flex-col items-stretch gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Controller
+                name="header_title"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    name={field.name}
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
+                  >
+                    <FieldLabel>
+                      {m.documents_field_header_title()} <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <Input {...field} autoComplete="off" />
+                    <FieldDescription>{m.documents_header_title_description()}</FieldDescription>
+                    <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
 
-          <Controller
-            name="date"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field
-                name={field.name}
-                invalid={fieldState.invalid}
-                touched={fieldState.isTouched}
-                dirty={fieldState.isDirty}
-              >
-                <FieldLabel id={`${dateTriggerId}-label`} htmlFor={dateTriggerId}>
-                  {m.common_field_date()} <span className="text-destructive">*</span>
-                </FieldLabel>
-                <Popover open={isDateOpen} onOpenChange={setDateOpen}>
-                  <PopoverTrigger
-                    id={dateTriggerId}
-                    aria-labelledby={`${dateTriggerId}-label ${dateTriggerId}-value`}
-                    ref={field.ref}
-                    render={
+              <Controller
+                name="date"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    name={field.name}
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
+                  >
+                    <FieldLabel id={`${dateTriggerId}-label`} htmlFor={dateTriggerId}>
+                      {m.common_field_date()} <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <Popover open={isDateOpen} onOpenChange={setDateOpen}>
+                      <PopoverTrigger
+                        id={dateTriggerId}
+                        aria-labelledby={`${dateTriggerId}-label ${dateTriggerId}-value`}
+                        ref={field.ref}
+                        render={
+                          <Button
+                            variant="outline"
+                            aria-invalid={fieldState.invalid}
+                            className="w-full justify-between pr-2"
+                          >
+                            <span id={`${dateTriggerId}-value`} className="truncate font-normal">
+                              {formatDay(field.value)}
+                            </span>
+                            <IconSelector className="pointer-events-none size-4" />
+                          </Button>
+                        }
+                      />
+                      <PopoverPopup className="w-auto p-1">
+                        <Calendar
+                          mode="single"
+                          captionLayout="dropdown"
+                          startMonth={subYears(today, 2)}
+                          endMonth={addYears(today, 1)}
+                          selected={parseISO(field.value)}
+                          defaultMonth={parseISO(field.value)}
+                          onSelect={(date) => {
+                            field.onChange(format(date ?? new Date(), ISO_DAY))
+                            setDateOpen(false)
+                          }}
+                        />
+                      </PopoverPopup>
+                    </Popover>
+                    <FieldDescription>{m.documents_date_description()}</FieldDescription>
+                    <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
+            </div>
+
+            <Controller
+              name="title"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field
+                  name={field.name}
+                  invalid={fieldState.invalid}
+                  touched={fieldState.isTouched}
+                  dirty={fieldState.isDirty}
+                >
+                  <FieldLabel>
+                    {m.documents_field_title()} <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input {...field} autoComplete="off" />
+                  <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+          </CardFrameHeader>
+
+          <Card className="md:min-h-0 md:flex-1">
+            <CardPanel className="flex flex-col md:min-h-0">
+              <Controller
+                name="content"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    name={field.name}
+                    invalid={fieldState.invalid}
+                    touched={fieldState.isTouched}
+                    dirty={fieldState.isDirty}
+                    className="md:min-h-0 md:flex-1"
+                  >
+                    <div className="flex w-full items-center justify-between gap-2">
+                      {/* Not a <label>: the editor isn't a form control a label can point at. */}
+                      <FieldLabel id={contentLabelId} nativeLabel={false} render={<span />}>
+                        {m.documents_field_content()} <span className="text-destructive">*</span>
+                      </FieldLabel>
+                      {/* Negative margins: the button doesn't make the label's line taller. */}
                       <Button
-                        variant="outline"
-                        aria-invalid={fieldState.invalid}
-                        className="w-full justify-between pr-2"
+                        type="button"
+                        variant="ghost"
+                        size="xs"
+                        className="-my-1.25 sm:-my-1"
+                        onClick={() => {
+                          setAiPromptOpen(true)
+                        }}
                       >
-                        <span id={`${dateTriggerId}-value`} className="truncate font-normal">
-                          {formatDay(field.value)}
-                        </span>
-                        <IconSelector className="pointer-events-none size-4" />
+                        <IconSparkles />
+                        {m.documents_ai_write()}
                       </Button>
-                    }
-                  />
-                  <PopoverPopup className="w-auto p-1">
-                    <Calendar
-                      mode="single"
-                      captionLayout="dropdown"
-                      startMonth={subYears(today, 2)}
-                      endMonth={addYears(today, 1)}
-                      selected={parseISO(field.value)}
-                      defaultMonth={parseISO(field.value)}
-                      onSelect={(date) => {
-                        field.onChange(format(date ?? new Date(), ISO_DAY))
-                        setDateOpen(false)
-                      }}
+                    </div>
+                    <RichTextEditor
+                      ref={field.ref}
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      invalid={fieldState.invalid}
+                      labelId={contentLabelId}
+                      className="md:max-h-none md:min-h-0 md:flex-1"
                     />
-                  </PopoverPopup>
-                </Popover>
-                <FieldDescription>{m.documents_date_description()}</FieldDescription>
-                <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
-              </Field>
-            )}
-          />
-        </div>
+                    <FieldDescription>{m.documents_draft_hint()}</FieldDescription>
+                    <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
+                  </Field>
+                )}
+              />
+            </CardPanel>
+          </Card>
 
-        <Controller
-          name="title"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field
-              name={field.name}
-              invalid={fieldState.invalid}
-              touched={fieldState.isTouched}
-              dirty={fieldState.isDirty}
+          <CardFrameFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                onStartOver()
+              }}
             >
-              <FieldLabel>
-                {m.documents_field_title()} <span className="text-destructive">*</span>
-              </FieldLabel>
-              <Input {...field} autoComplete="off" />
-              <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
-            </Field>
-          )}
-        />
-
-        <Controller
-          name="content"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field
-              name={field.name}
-              invalid={fieldState.invalid}
-              touched={fieldState.isTouched}
-              dirty={fieldState.isDirty}
-              className="md:min-h-0 md:flex-1"
-            >
-              <div className="flex w-full items-center justify-between gap-2">
-                {/* Not a <label>: the editor isn't a form control a label can point at. */}
-                <FieldLabel id={contentLabelId} nativeLabel={false} render={<span />}>
-                  {m.documents_field_content()} <span className="text-destructive">*</span>
-                </FieldLabel>
-                {/* Negative margins: the button doesn't make the label's line taller. */}
+              <IconFilePlus className="size-4" />
+              {m.documents_start_over()}
+            </Button>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row">
+              {canPreview && (
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="xs"
-                  className="-my-1.25 sm:-my-1"
+                  variant="outline"
+                  loading={previewMutation.isPending}
                   onClick={() => {
-                    setAiPromptOpen(true)
+                    handlePreview()
                   }}
                 >
-                  <IconSparkles />
-                  {m.documents_ai_write()}
+                  <IconEye className="size-4" />
+                  {m.documents_preview()}
                 </Button>
-              </div>
-              <RichTextEditor
-                ref={field.ref}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                invalid={fieldState.invalid}
-                labelId={contentLabelId}
-                className="md:max-h-none md:min-h-0 md:flex-1"
-              />
-              <FieldDescription>{m.documents_draft_hint()}</FieldDescription>
-              <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
-            </Field>
-          )}
-        />
-
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              onStartOver()
-            }}
-          >
-            <IconFilePlus className="size-4" />
-            {m.documents_start_over()}
-          </Button>
-          <div className="flex flex-col-reverse gap-2 sm:flex-row">
-            {canPreview && (
-              <Button
-                type="button"
-                variant="outline"
-                loading={previewMutation.isPending}
-                onClick={() => {
-                  handlePreview()
-                }}
-              >
-                <IconEye className="size-4" />
-                {m.documents_preview()}
+              )}
+              <Button type="submit" loading={downloadMutation.isPending}>
+                <IconDownload className="size-4" />
+                {m.reports_download_pdf()}
               </Button>
-            )}
-            <Button type="submit" loading={downloadMutation.isPending}>
-              <IconDownload className="size-4" />
-              {m.reports_download_pdf()}
-            </Button>
-          </div>
-        </div>
+            </div>
+          </CardFrameFooter>
+        </CardFrame>
       </Form>
 
       <AiPromptDialog open={isAiPromptOpen} onOpenChange={setAiPromptOpen} />

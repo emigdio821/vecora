@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import { Card, CardFrame, CardFrameFooter, CardFrameHeader, CardPanel } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
@@ -93,42 +94,48 @@ function ButtonSkeleton({ className }: { className: string }) {
  */
 export function DocumentFormSkeleton() {
   return (
-    <div aria-busy className="flex flex-col gap-4 md:min-h-0 md:flex-1">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <CardFrame aria-busy className="md:min-h-0 md:flex-1">
+      <CardFrameHeader className="flex flex-col items-stretch gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            <LabelSkeleton>{m.documents_field_header_title()}</LabelSkeleton>
+            <InputSkeleton />
+            <DescriptionSkeleton>{m.documents_header_title_description()}</DescriptionSkeleton>
+          </div>
+          <div className="flex flex-col gap-2">
+            <LabelSkeleton>{m.common_field_date()}</LabelSkeleton>
+            <InputSkeleton />
+            <DescriptionSkeleton>{m.documents_date_description()}</DescriptionSkeleton>
+          </div>
+        </div>
+
         <div className="flex flex-col gap-2">
-          <LabelSkeleton>{m.documents_field_header_title()}</LabelSkeleton>
+          <LabelSkeleton>{m.documents_field_title()}</LabelSkeleton>
           <InputSkeleton />
-          <DescriptionSkeleton>{m.documents_header_title_description()}</DescriptionSkeleton>
         </div>
-        <div className="flex flex-col gap-2">
-          <LabelSkeleton>{m.common_field_date()}</LabelSkeleton>
-          <InputSkeleton />
-          <DescriptionSkeleton>{m.documents_date_description()}</DescriptionSkeleton>
-        </div>
-      </div>
+      </CardFrameHeader>
 
-      <div className="flex flex-col gap-2">
-        <LabelSkeleton>{m.documents_field_title()}</LabelSkeleton>
-        <InputSkeleton />
-      </div>
+      <Card className="md:min-h-0 md:flex-1">
+        <CardPanel className="flex flex-col md:min-h-0">
+          <div className="flex flex-col gap-2 md:min-h-0 md:flex-1">
+            <div className="flex items-center justify-between gap-2">
+              <LabelSkeleton>{m.documents_field_content()}</LabelSkeleton>
+              {/* The "write with AI" button, as tall as the label's line like the real one. */}
+              <Skeleton className="-my-1.25 h-7 w-32 rounded-md sm:-my-1 sm:h-6 sm:w-30" />
+            </div>
+            <div className="flex max-h-[70vh] w-full flex-col overflow-hidden rounded-lg border border-input bg-background not-dark:bg-clip-padding md:max-h-none md:min-h-0 md:flex-1 dark:bg-input/32">
+              <ToolbarSkeleton />
+              <ContentSkeleton />
+            </div>
+            <DescriptionSkeleton>{m.documents_draft_hint()}</DescriptionSkeleton>
+          </div>
+        </CardPanel>
+      </Card>
 
-      <div className="flex flex-col gap-2 md:min-h-0 md:flex-1">
-        <div className="flex items-center justify-between gap-2">
-          <LabelSkeleton>{m.documents_field_content()}</LabelSkeleton>
-          {/* The "write with AI" button, as tall as the label's line like the real one. */}
-          <Skeleton className="-my-1.25 h-7 w-32 rounded-md sm:-my-1 sm:h-6 sm:w-30" />
-        </div>
-        <div className="flex max-h-[70vh] w-full flex-col overflow-hidden rounded-lg border border-input bg-background not-dark:bg-clip-padding md:max-h-none md:min-h-0 md:flex-1 dark:bg-input/32">
-          <ToolbarSkeleton />
-          <ContentSkeleton />
-        </div>
-        <DescriptionSkeleton>{m.documents_draft_hint()}</DescriptionSkeleton>
-      </div>
-
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+      <CardFrameFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
         <ButtonSkeleton className="sm:w-42" />
         <ButtonSkeleton className="sm:w-36" />
-      </div>
-    </div>
+      </CardFrameFooter>
+    </CardFrame>
   )
 }
