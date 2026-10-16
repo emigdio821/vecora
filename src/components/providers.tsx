@@ -3,6 +3,7 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { useIsMobile } from '@/hooks/use-media-query'
+import { AccessibilityScript } from './accessibility-preferences'
 import ScreenSizeIndicator from './screen-size-indicator'
 import { ThemeProvider } from './theme-provider'
 import { AnchoredToastProvider, ToastProvider } from './ui/toast'
@@ -14,6 +15,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider>
+      <AccessibilityScript />
       <ToastProvider position={isMobile ? 'top-center' : 'bottom-right'}>
         <AnchoredToastProvider>
           <NuqsAdapter>

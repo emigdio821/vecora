@@ -165,15 +165,41 @@
   }
 }
 
+/* Text size from Ajustes → Aplicación (accessibility-preferences.tsx). Sizes are in rem,
+   so the whole interface grows with it; a percentage keeps the browser's own default. */
+:root[data-text-size='large'] {
+  font-size: 112.5%;
+}
+
+:root[data-text-size='larger'] {
+  font-size: 125%;
+}
+
+/* Reduced motion, asked by the device or picked in Ajustes. Near zero instead of none,
+   so code waiting for an animation or transition to end still hears it. Spinners keep
+   turning: a frozen one reads as stuck. */
 @media (prefers-reduced-motion: reduce) {
-  :where(
-    .animate-toast-success-odd,
-    .animate-toast-success-even,
-    .animate-toast-error-odd,
-    .animate-toast-error-even
-  ) {
-    animation: none;
+  *:not(.animate-spin),
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
   }
+}
+
+:root[data-reduce-motion] *:not(.animate-spin),
+:root[data-reduce-motion] ::before,
+:root[data-reduce-motion] ::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
 }
 
 :root {
