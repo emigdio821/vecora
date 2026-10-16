@@ -1,3 +1,4 @@
+import { Field as FieldPrimitive } from '@base-ui/react/field'
 import { DayPicker, type DropdownProps, useDayPicker } from '@daypicker/react'
 import { IconChevronLeft, IconChevronRight, IconSelector } from '@tabler/icons-react'
 import type { Month } from 'date-fns'
@@ -35,33 +36,37 @@ function CalendarDropdown({
     })) ?? []
 
   return (
-    <Select
-      aria-label={ariaLabel}
-      items={items}
-      value={value?.toString()}
-      onValueChange={(newValue: string | null) => {
-        if (!onChange || !newValue) return
-        // DayPicker expects a <select> change event; only `target.value` is read.
-        onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLSelectElement>)
-      }}
-    >
-      <SelectTrigger className="min-w-none">
-        <SelectValue>
-          {(selected: string | null) =>
-            selected === null
-              ? null
-              : (triggerLabel?.(Number(selected)) ?? items.find((item) => item.value === selected)?.label)
-          }
-        </SelectValue>
-      </SelectTrigger>
-      <SelectPopup aria-label={ariaLabel}>
-        {items.map((item) => (
-          <SelectItem key={item.value} value={item.value} disabled={item.disabled}>
-            {item.label}
-          </SelectItem>
-        ))}
-      </SelectPopup>
-    </Select>
+    // Its own field: inside a picker in a Field, the selects would otherwise take
+    // that field's id and label (context reaches through the popover's portal).
+    <FieldPrimitive.Root className="contents">
+      <Select
+        aria-label={ariaLabel}
+        items={items}
+        value={value?.toString()}
+        onValueChange={(newValue: string | null) => {
+          if (!onChange || !newValue) return
+          // DayPicker expects a <select> change event; only `target.value` is read.
+          onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLSelectElement>)
+        }}
+      >
+        <SelectTrigger className="min-w-none">
+          <SelectValue>
+            {(selected: string | null) =>
+              selected === null
+                ? null
+                : (triggerLabel?.(Number(selected)) ?? items.find((item) => item.value === selected)?.label)
+            }
+          </SelectValue>
+        </SelectTrigger>
+        <SelectPopup aria-label={ariaLabel}>
+          {items.map((item) => (
+            <SelectItem key={item.value} value={item.value} disabled={item.disabled}>
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectPopup>
+      </Select>
+    </FieldPrimitive.Root>
   )
 }
 
