@@ -1,26 +1,27 @@
 import { IconCheck, IconCopy } from '@tabler/icons-react'
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogClose,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogPanel,
-  DialogPopup,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  ResponsiveDialog,
+  ResponsiveDialogClose,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogPanel,
+  ResponsiveDialogPopup,
+  ResponsiveDialogTitle,
+} from '@/components/shared/responsive-dialog'
+import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { m } from '@/paraglide/messages'
 import type { InviteResult } from '@/server-actions/hoa-board'
 
-interface InviteLinkDialogProps extends React.ComponentProps<typeof Dialog> {
+interface InviteLinkDialogProps {
   invite: InviteResult | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  onOpenChangeComplete?: (open: boolean) => void
 }
 
 function whatsappUrl({ phone, full_name, link }: InviteResult) {
@@ -31,8 +32,14 @@ function whatsappUrl({ phone, full_name, link }: InviteResult) {
 /**
  * Hands the one-time invite link to whoever is adding the member. The link is
  * not emailed; the board shares it by WhatsApp or pastes it wherever suits.
+ * A drawer on mobile.
  */
-export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: InviteLinkDialogProps) {
+export function InviteLinkDialog({
+  invite,
+  open,
+  onOpenChange,
+  onOpenChangeComplete,
+}: InviteLinkDialogProps) {
   const [copied, setCopied] = useState(false)
 
   async function copy() {
@@ -51,14 +58,21 @@ export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: Invit
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} disablePointerDismissal {...props}>
-      <DialogPopup>
-        <DialogHeader>
-          <DialogTitle>{m.board_invite_title({ name: invite?.full_name ?? '' })}</DialogTitle>
-          <DialogDescription>{m.board_invite_description()}</DialogDescription>
-        </DialogHeader>
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={onOpenChangeComplete}
+      disablePointerDismissal
+    >
+      <ResponsiveDialogPopup>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>
+            {m.board_invite_title({ name: invite?.full_name ?? '' })}
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>{m.board_invite_description()}</ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
-        <DialogPanel>
+        <ResponsiveDialogPanel>
           <InputGroup>
             <InputGroupInput
               readOnly
@@ -82,10 +96,12 @@ export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: Invit
               </Tooltip>
             </InputGroupAddon>
           </InputGroup>
-        </DialogPanel>
+        </ResponsiveDialogPanel>
 
-        <DialogFooter>
-          <DialogClose render={<Button variant="ghost" />}>{m.common_action_close()}</DialogClose>
+        <ResponsiveDialogFooter>
+          <ResponsiveDialogClose render={<Button variant="ghost" />}>
+            {m.common_action_close()}
+          </ResponsiveDialogClose>
           {invite && (
             <Button
               render={
@@ -100,8 +116,8 @@ export function InviteLinkDialog({ invite, open, onOpenChange, ...props }: Invit
               {m.board_send_whatsapp()}
             </Button>
           )}
-        </DialogFooter>
-      </DialogPopup>
-    </Dialog>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogPopup>
+    </ResponsiveDialog>
   )
 }
