@@ -1,5 +1,5 @@
 import type { DateRange } from '@daypicker/react'
-import { IconCalendar } from '@tabler/icons-react'
+import { IconCalendar, IconSelector } from '@tabler/icons-react'
 import {
   endOfMonth,
   format,
@@ -107,11 +107,11 @@ export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, classN
         if (!nextOpen) setDraftFrom(undefined)
       }}
     >
-      <PopoverTrigger
-        render={<Button variant="outline" className={cn('justify-start font-normal', className)} />}
-      >
+      <PopoverTrigger render={<Button variant="outline" className={cn('pr-2 font-normal', className)} />}>
         <IconCalendar aria-hidden="true" />
-        {label}
+        {/* flex-1: at full width the selector sits on the right edge, like the single-date pickers'. */}
+        <span className="flex-1 truncate text-start">{label}</span>
+        <IconSelector className="pointer-events-none size-4" />
       </PopoverTrigger>
       <PopoverPopup>
         <div className="flex max-sm:flex-col">
