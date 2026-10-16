@@ -7,13 +7,13 @@ import { HousesPicker } from '@/components/shared/pickers/houses-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { Label } from '@/components/ui/label'
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
 import {
@@ -58,7 +58,6 @@ export function ReservationFormFields({
   const amenityId = useWatch({ control: form.control, name: 'amenity_id' })
   const propertyId = useWatch({ control: form.control, name: 'property_id' })
   const amount = useWatch({ control: form.control, name: 'amount' })
-  const feeSwitchId = useId()
 
   // Retired areas leave the list, except the one this booking already has.
   const initialAmenityId = form.formState.defaultValues?.amenity_id
@@ -229,9 +228,8 @@ export function ReservationFormFields({
         )}
       />
 
-      <div className="flex items-start gap-2">
-        <Switch
-          id={feeSwitchId}
+      <Label className="flex items-start gap-2 rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50">
+        <Checkbox
           checked={hasFee}
           onCheckedChange={(checked) => {
             // Off means free; on starts from the area's fee, or empty to force one.
@@ -243,10 +241,10 @@ export function ReservationFormFields({
           disabled={disabled || lockPaidFields}
         />
         <div className="flex flex-col gap-1">
-          <Label htmlFor={feeSwitchId}>{m.presidency_add_fee()}</Label>
+          <p>{m.presidency_add_fee()}</p>
           <p className="text-xs text-muted-foreground">{m.presidency_add_fee_description()}</p>
         </div>
-      </div>
+      </Label>
 
       {hasFee && (
         <Controller

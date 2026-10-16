@@ -1,6 +1,7 @@
 import { IconCalendarOff, IconCoins } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
+import { DashboardCardError } from '@/components/dashboard/card-error'
 import {
   CARD_LIST_CLASS,
   CARD_LIST_EMPTY_CLASS,
@@ -72,7 +73,19 @@ export function FeeStatusCard() {
     return <FeeStatusSkeleton />
   }
 
-  if (status.isError) return null
+  if (status.isError) {
+    return (
+      <DashboardCardError
+        title={m.dashboard_fees_title()}
+        description={m.dashboard_fees_current_period()}
+        icon={IconCoins}
+        panelClassName={PANEL_CLASS}
+        onRetry={() => {
+          void status.refetch()
+        }}
+      />
+    )
+  }
 
   const total = status.data.length
   const pending = status.data.filter((h) => (h.unpaid_months?.length ?? 0) > 0)

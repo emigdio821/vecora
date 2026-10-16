@@ -1,6 +1,7 @@
 import { IconReceipt } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, type LinkOptions, linkOptions } from '@tanstack/react-router'
+import { DashboardCardError } from '@/components/dashboard/card-error'
 import { reservationStatus } from '@/components/presidency/reservations/status'
 import { KIND_LABEL as SECURITY_KIND_LABEL } from '@/components/security/kind'
 import { Money } from '@/components/shared/money'
@@ -84,7 +85,20 @@ export function PaymentRequestsCard() {
     return <PaymentRequestsSkeleton />
   }
 
-  if (maintenance.isError || security.isError || reservations.isError) return null
+  if (maintenance.isError || security.isError || reservations.isError) {
+    return (
+      <DashboardCardError
+        title={m.dashboard_requests_title()}
+        icon={IconReceipt}
+        panelClassName={PANEL_CLASS}
+        onRetry={() => {
+          void maintenance.refetch()
+          void security.refetch()
+          void reservations.refetch()
+        }}
+      />
+    )
+  }
 
   const pending: PaymentRequest[] = [
     ...maintenance.data

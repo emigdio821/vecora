@@ -2,6 +2,7 @@ import { IconCalendarMonth, IconConfetti } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { format, parseISO } from 'date-fns'
+import { DashboardCardError } from '@/components/dashboard/card-error'
 import {
   CARD_LIST_CLASS,
   CARD_LIST_EMPTY_CLASS,
@@ -58,7 +59,19 @@ export function NoticesCard() {
     return <NoticesSkeleton />
   }
 
-  if (reservations.isError) return null
+  if (reservations.isError) {
+    return (
+      <DashboardCardError
+        title={m.common_section_reservations()}
+        description={m.dashboard_notices_upcoming()}
+        icon={IconConfetti}
+        panelClassName={CARD_LIST_PANEL_CLASS}
+        onRetry={() => {
+          void reservations.refetch()
+        }}
+      />
+    )
+  }
 
   const today = format(now, ISO_DAY)
   // The query is newest first; the notices read soonest first. A cancelled

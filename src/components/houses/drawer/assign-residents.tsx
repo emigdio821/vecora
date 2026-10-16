@@ -6,6 +6,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { ResidentsPicker } from '@/components/shared/pickers/residents-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
 import {
   Drawer,
@@ -21,7 +22,6 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { Form } from '@/components/ui/form'
 import { Label } from '@/components/ui/label'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import { toastManager } from '@/components/ui/toast'
 import { type AssignResidentsInput, assignResidentsSchema } from '@/lib/validations/houses'
 import { m } from '@/paraglide/messages'
@@ -150,19 +150,17 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
               )}
             />
 
-            <Label className="flex w-full items-start rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50">
-              <Switch
+            <Label className="flex items-start gap-2 rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50">
+              <Checkbox
                 checked={scope === 'unassigned'}
                 onCheckedChange={(checked) => {
                   setScope(checked ? 'unassigned' : 'all')
                 }}
               />
-              <span className="grid gap-1">
-                <span>{m.residential_only_unassigned()}</span>
-                <span className="text-xs font-normal text-muted-foreground">
-                  {m.residential_only_unassigned_hint()}
-                </span>
-              </span>
+              <div className="flex flex-col gap-1">
+                <p>{m.residential_only_unassigned()}</p>
+                <p className="text-xs text-muted-foreground">{m.residential_only_unassigned_hint()}</p>
+              </div>
             </Label>
 
             <Controller

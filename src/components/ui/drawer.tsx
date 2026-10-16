@@ -282,7 +282,10 @@ export function DrawerFooter({
 export function DrawerTitle({ className, ...props }: DrawerPrimitive.Title.Props): React.ReactElement {
   return (
     <DrawerPrimitive.Title
-      className={cn('font-heading text-lg leading-none font-semibold', className)}
+      className={cn(
+        'font-heading text-lg leading-tight font-semibold text-balance wrap-break-word',
+        className,
+      )}
       data-slot="drawer-title"
       {...props}
     />

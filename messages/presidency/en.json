@@ -87,7 +87,7 @@
   ],
   "presidency_reservation_date_description": "Days when the area is already booked are disabled.",
   "presidency_add_fee": "Add fee",
-  "presidency_add_fee_description": "Turn it on if the reservation has a charge, like the area fee or electricity for bounce houses or inflatables.",
+  "presidency_add_fee_description": "Check it if the reservation has a charge, like the area fee or electricity for bounce houses or inflatables.",
   "presidency_fee": "Fee",
   "presidency_fee_description": "Paid in full when booking. You can write the reason for the charge in \"Notes\".",
   "presidency_reservation_notes_description": "Optional. Reason, schedule, or any agreement with the house.",

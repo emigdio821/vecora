@@ -8,6 +8,7 @@ import { PeriodCalendar } from '@/components/shared/period-calendar'
 import { HousesPicker, houseLabel } from '@/components/shared/pickers/houses-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Combobox,
   ComboboxChip,
@@ -40,7 +41,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { useCurrency, useFormatCurrency } from '@/hooks/use-currency'
@@ -75,7 +75,6 @@ interface RecordFeeDrawerProps extends React.ComponentProps<typeof Drawer> {
 
 export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawerProps) {
   const queryClient = useQueryClient()
-  const waiveSwitchId = useId()
   const [isDateOpen, setDateOpen] = useState(false)
   const dateTriggerId = useId()
   const { data: periods } = useQuery(periodsQueryOptions)
@@ -419,11 +418,9 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                 name="waive_late_fee"
                 control={form.control}
                 render={({ field }) => (
-                  // coss particle p-switch-4.
-                  <Label
-                    className="flex items-center gap-6 rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50"
-                    htmlFor={waiveSwitchId}
-                  >
+                  // coss particle p-checkbox-4.
+                  <Label className="flex items-start gap-2 rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50">
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isBusy} />
                     <div className="flex flex-col gap-1">
                       <p>{m.treasury_waive_late_fee()}</p>
                       <p className="text-xs text-muted-foreground">
@@ -433,13 +430,6 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                         })}
                       </p>
                     </div>
-                    <Switch
-                      id={waiveSwitchId}
-                      className="[--thumb-size:--spacing(4)] sm:[--thumb-size:--spacing(3)]"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={isBusy}
-                    />
                   </Label>
                 )}
               />

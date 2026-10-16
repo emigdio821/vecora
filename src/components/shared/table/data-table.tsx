@@ -168,7 +168,8 @@ export function DataTable<TData extends RowData>({
               ) : (
                 <TableRow>
                   <TableCell className="h-24 text-center" colSpan={columns.length}>
-                    {emptyMessage}
+                    {/* Rows that the search hides aren't an empty section. */}
+                    {table.getCoreRowModel().rows.length > 0 ? m.common_no_results() : emptyMessage}
                   </TableCell>
                 </TableRow>
               ))}

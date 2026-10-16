@@ -71,7 +71,7 @@
   "residential_residents_assigned_description": "{count} residents assigned to house {number}",
   "residential_residents_picker_hint": "People who already live in this house aren't listed.",
   "residential_only_unassigned": "Only residents without a house",
-  "residential_only_unassigned_hint": "Turn it off to include people already assigned to another house.",
+  "residential_only_unassigned_hint": "Uncheck it to include people already assigned to another house.",
   "residential_relationship_applies_to_all": "Applies to all selected residents.",
 
   "residential_new_house": "New house",

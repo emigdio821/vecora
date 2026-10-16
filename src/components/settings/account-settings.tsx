@@ -18,8 +18,8 @@ import { changePassword } from '@/server-actions/auth'
 const FORM_ID = 'account-settings-form'
 
 /**
- * The settings page's "Cuenta" tab, only for the main admin: its password.
- * Board members change theirs with a new access link from "Mesa directiva".
+ * The settings page's Account tab, only for the main admin: its password.
+ * Board members change theirs with a new access link from HOA board.
  */
 export function AccountSettingsPanel() {
   const user = useCurrentUser()

@@ -53,7 +53,11 @@ export const reservationsTableColumns = columnHelper.columns([
     id: 'amenity',
     size: 160,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.presidency_amenity()} />,
-    cell: ({ getValue }) => <span className="block w-0 min-w-full truncate">{getValue()}</span>,
+    cell: ({ getValue }) => (
+      <span className="block w-0 min-w-full truncate" title={getValue()}>
+        {getValue()}
+      </span>
+    ),
   }),
 
   columnHelper.accessor((row) => row.property.number, {
@@ -106,7 +110,11 @@ export const reservationsTableColumns = columnHelper.columns([
     id: 'notes',
     size: 360,
     header: () => m.common_field_notes(),
-    cell: ({ getValue }) => <span className="block w-0 min-w-full truncate">{getValue()}</span>,
+    cell: ({ getValue }) => (
+      <span className="block w-0 min-w-full truncate" title={getValue() ?? undefined}>
+        {getValue()}
+      </span>
+    ),
   }),
 
   columnHelper.display({

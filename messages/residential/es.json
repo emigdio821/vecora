@@ -71,7 +71,7 @@
   "residential_residents_assigned_description": "Se asignaron {count} residentes a la casa {number}",
   "residential_residents_picker_hint": "Quienes ya viven en esta casa no aparecen en la lista.",
   "residential_only_unassigned": "Solo residentes sin casa",
-  "residential_only_unassigned_hint": "Desactívalo para incluir a quienes ya tienen otra casa asignada.",
+  "residential_only_unassigned_hint": "Desmárcalo para incluir a quienes ya tienen otra casa asignada.",
   "residential_relationship_applies_to_all": "Se aplica a todos los residentes seleccionados.",
 
   "residential_new_house": "Nueva casa",

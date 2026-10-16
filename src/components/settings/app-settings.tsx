@@ -1,20 +1,12 @@
 import { IconAccessible, IconLanguage, IconPalette } from '@tabler/icons-react'
-import {
-  setReduceMotion,
-  setTextSize,
-  type TextSize,
-  useReduceMotion,
-  useTextSize,
-} from '@/components/accessibility-preferences'
+import { setTextSize, type TextSize, useTextSize } from '@/components/accessibility-preferences'
 import { pickLanguage } from '@/components/language-menu'
 import { SettingsCard, SettingsGrid } from '@/components/settings/settings-card'
 import { type Theme, useTheme } from '@/components/theme-provider'
 import { Field, FieldDescription, FieldItem, FieldLabel } from '@/components/ui/field'
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset'
-import { Label } from '@/components/ui/label'
 import { Radio, RadioGroup } from '@/components/ui/radio-group'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import { MULTI_LANGUAGE } from '@/lib/config/i18n'
 import { cn } from '@/lib/utils'
 import { LANGUAGE_ITEMS } from '@/lib/validations/settings'
@@ -83,7 +75,6 @@ const TILE_LABEL_CLASS =
 export function AppSettingsPanel() {
   const { theme, setTheme } = useTheme()
   const textSize = useTextSize()
-  const reduceMotion = useReduceMotion()
 
   return (
     <SettingsGrid>
@@ -185,22 +176,6 @@ export function AppSettingsPanel() {
           </RadioGroup>
           <FieldDescription>{m.settings_text_size_description()}</FieldDescription>
         </Field>
-
-        {/* Same row as the residents picker's "only unassigned" switch. */}
-        <Label className="flex w-full items-start rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50">
-          <Switch
-            checked={reduceMotion}
-            onCheckedChange={(checked) => {
-              setReduceMotion(checked)
-            }}
-          />
-          <span className="grid gap-1">
-            <span>{m.settings_reduce_motion()}</span>
-            <span className="text-xs font-normal text-muted-foreground">
-              {m.settings_reduce_motion_description()}
-            </span>
-          </span>
-        </Label>
       </SettingsCard>
     </SettingsGrid>
   )

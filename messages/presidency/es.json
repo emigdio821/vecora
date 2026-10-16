@@ -87,7 +87,7 @@
   ],
   "presidency_reservation_date_description": "Los días en que el área ya está apartada aparecen deshabilitados.",
   "presidency_add_fee": "Agregar tarifa",
-  "presidency_add_fee_description": "Actívalo si la reservación tiene un cobro, como la tarifa del área o el uso de electricidad para brincolines o inflables.",
+  "presidency_add_fee_description": "Márcalo si la reservación tiene un cobro, como la tarifa del área o el uso de electricidad para brincolines o inflables.",
   "presidency_fee": "Tarifa",
   "presidency_fee_description": "Se paga completo al reservar. Puedes anotar el motivo del cobro en \"Notas\".",
   "presidency_reservation_notes_description": "Opcional. Motivo, horario, o cualquier acuerdo con la casa.",

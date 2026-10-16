@@ -57,9 +57,9 @@ export function CollapsibleSection({
 
 export function Detail({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="grid gap-0.5">
+    <div className="grid min-w-0 gap-0.5">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <div className="text-sm font-medium">{children}</div>
+      <div className="text-sm font-medium wrap-break-word">{children}</div>
     </div>
   )
 }

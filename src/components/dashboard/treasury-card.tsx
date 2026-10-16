@@ -14,6 +14,7 @@ import { Link } from '@tanstack/react-router'
 import { curveMonotoneX } from 'd3-shape'
 import { eachMonthOfInterval, format, parseISO } from 'date-fns'
 import { useMemo } from 'react'
+import { DashboardCardError } from '@/components/dashboard/card-error'
 import { Money } from '@/components/shared/money'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import { Button } from '@/components/ui/button'
@@ -77,10 +78,11 @@ const CURVE = d3Curve(curveMonotoneX)
 
 // Lines and areas grow from $0 on first paint and morph when the data changes; the
 // tooltip and crosshair follow the same spring. `initial: 'always'` replays the entrance
-// on the server-rendered chart too. Snaps under reduced motion.
+// on the server-rendered chart too. Damping 26 settles without overshoot, so the lines
+// never pass the real totals. Snaps when the device asks for reduced motion.
 const RENDERER = motion({
   initial: 'always',
-  transition: { type: 'spring', stiffness: 170, damping: 18, mass: 1 },
+  transition: { type: 'spring', stiffness: 170, damping: 26, mass: 1 },
 })
 
 function seriesLabel(series: string) {
@@ -121,7 +123,20 @@ export function TreasuryCard() {
   const now = useToday()
 
   if (periods.isPending || summaries.isPending) return <TreasuryCardSkeleton />
-  if (periods.isError || summaries.isError) return null
+  if (periods.isError || summaries.isError) {
+    return (
+      <DashboardCardError
+        title={m.common_section_treasury()}
+        description={m.dashboard_treasury_summary()}
+        icon={IconChartArea}
+        spacer={<TreasuryCardSkeletonContent />}
+        onRetry={() => {
+          void periods.refetch()
+          void summaries.refetch()
+        }}
+      />
+    )
+  }
 
   const today = format(now, ISO_DAY)
   const period = periods.data.find((p) => p.starts_on <= today && today <= p.ends_on)
@@ -387,7 +402,25 @@ function MonthlyFlowChart({
   }, [rows, currency, formatCurrency])
 
   if (movements.isPending) return <Skeleton style={{ height: CHART_HEIGHT }} />
-  if (movements.isError) return null
+  if (movements.isError) {
+    return (
+      <div
+        style={{ height: CHART_HEIGHT }}
+        className="flex flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground"
+      >
+        {m.common_load_failed_description()}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            void movements.refetch()
+          }}
+        >
+          {m.common_action_retry()}
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <>
