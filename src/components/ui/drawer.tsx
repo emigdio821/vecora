@@ -153,8 +153,8 @@ export function DrawerPopup({
 }): React.ReactElement {
   const { position: contextPosition, isMobileSheet } = useContext(DrawerContext)
   const position = positionProp ?? contextPosition
-  // A side drawer turned bottom sheet looks like the other sheets: edge to edge, with the bar.
-  const variant = isMobileSheet ? 'default' : variantProp
+  // A side drawer turned bottom sheet looks like the responsive dialog's: straight, edge to edge, with the bar.
+  const variant = isMobileSheet ? 'straight' : variantProp
   const showBar = showBarProp || isMobileSheet
 
   return (
