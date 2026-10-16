@@ -34,7 +34,8 @@ export function SettingsCard({ title, description, icon: Icon, children, footer 
       <Card className="flex-1">
         <CardPanel className="flex flex-col gap-4">{children}</CardPanel>
       </Card>
-      {footer && <CardFrameFooter className="flex justify-end gap-2">{footer}</CardFrameFooter>}
+      {/* flex-wrap: with large text, the buttons stack instead of leaving the card. */}
+      {footer && <CardFrameFooter className="flex flex-wrap justify-end gap-2">{footer}</CardFrameFooter>}
     </CardFrame>
   )
 }

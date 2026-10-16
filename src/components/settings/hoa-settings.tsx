@@ -245,10 +245,20 @@ function DetailsCard({ settings }: HoaSettingsPanelProps) {
   )
 }
 
-/** "84 KB", "1.2 MB": enough to tell a file is under the 2 MB limit. */
+/**
+ * "84 KB", "1.9 MB": enough to tell a file is under the 2 MB limit. Rounded
+ * down, so a file just under the limit never reads "2.0 MB".
+ */
 function formatFileSize(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.floor(bytes / 1024))} KB`
+  return `${(Math.floor((bytes / (1024 * 1024)) * 10) / 10).toFixed(1)} MB`
+}
+
+/** "logo final (2).png" → ["logo final (2)", ".png"], so a long name can lose its middle, not its extension. */
+function splitExtension(name: string): [string, string] {
+  const dot = name.lastIndexOf('.')
+  if (dot <= 0) return [name, '']
+  return [name.slice(0, dot), name.slice(dot)]
 }
 
 interface LogoCardProps {
@@ -367,7 +377,7 @@ function LogoCard({ logoPath, residentialName }: LogoCardProps) {
           data-dragging={isDragging || undefined}
           className={cn(
             // Children ignore the pointer, so dragging over them doesn't fire dragleave.
-            'flex h-44 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed p-6 text-center transition-colors outline-none *:pointer-events-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-64',
+            'flex h-44 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed p-6 text-center transition-[background-color,border-color,scale] duration-150 ease-out outline-none *:pointer-events-none focus-visible:ring-2 focus-visible:ring-ring active:not-disabled:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-64',
             previewUrl && !isLoadingImage ? 'bg-white' : 'bg-muted/40 hover:bg-muted/72',
             'data-dragging:border-primary data-dragging:bg-primary/4',
           )}
@@ -394,7 +404,11 @@ function LogoCard({ logoPath, residentialName }: LogoCardProps) {
             <img
               src={previewUrl}
               alt={m.settings_logo_alt()}
-              className={cn('max-h-full max-w-[80%] object-contain', isLoadingImage && 'hidden')}
+              className={cn(
+                // Fades in once shown: @starting-style runs when `hidden` comes off.
+                'max-h-full max-w-[80%] object-contain transition-opacity duration-200 ease-out starting:opacity-0',
+                isLoadingImage && 'hidden',
+              )}
               onLoad={markLoaded}
               onError={markLoaded}
             />
@@ -456,14 +470,27 @@ function LogoCard({ logoPath, residentialName }: LogoCardProps) {
           </Button>
         )}
         {logo && (
-          <span className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-            <Badge variant="warning">{m.settings_logo_unsaved()}</Badge>
-            <span className="truncate">
-              {logo.file.name} · {formatFileSize(logo.file.size)}
+          <span
+            className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground transition-opacity duration-150 ease-out starting:opacity-0"
+            title={logo.file.name}
+          >
+            <Badge variant="warning" className="shrink-0">
+              {m.settings_logo_unsaved()}
+            </Badge>
+            {/* Names differ at the end ("final (2)"): the middle gives way, the extension stays. */}
+            <span className="flex min-w-0">
+              <span className="truncate">{splitExtension(logo.file.name)[0]}</span>
+              <span className="shrink-0 whitespace-nowrap">
+                {splitExtension(logo.file.name)[1]} · {formatFileSize(logo.file.size)}
+              </span>
             </span>
           </span>
         )}
-        {logo === null && <Badge variant="warning">{m.settings_logo_will_be_removed()}</Badge>}
+        {logo === null && (
+          <Badge variant="warning" className="transition-opacity duration-150 ease-out starting:opacity-0">
+            {m.settings_logo_will_be_removed()}
+          </Badge>
+        )}
       </div>
 
       {/* The PDF's page header (reports/pdf/layout.tsx), at the same proportions. */}
@@ -478,11 +505,18 @@ function LogoCard({ logoPath, residentialName }: LogoCardProps) {
             <img
               src={previewUrl}
               alt=""
-              className={cn('h-8 max-w-30 shrink-0 object-contain object-left', isLoadingImage && 'hidden')}
+              className={cn(
+                // 40%: on a narrow card a wide logo shrinks before the name has to break mid-word.
+                'h-8 max-w-[min(7.5rem,40%)] shrink-0 object-contain object-left transition-opacity duration-200 ease-out starting:opacity-0',
+                isLoadingImage && 'hidden',
+              )}
             />
           )}
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">{residentialName}</p>
+          {/* The PDF wraps a long name, so the preview does too, up to two lines. */}
+          <div className="min-w-0 flex-1">
+            <p className="line-clamp-2 text-sm font-semibold wrap-break-word" title={residentialName}>
+              {residentialName}
+            </p>
             <p className="truncate text-xs text-neutral-500">{m.common_section_financial_report()}</p>
           </div>
         </div>

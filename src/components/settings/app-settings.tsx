@@ -63,10 +63,12 @@ export function AppSettingsPanel() {
               <FieldItem key={item.value}>
                 <FieldLabel className="cursor-pointer flex-col">
                   <Radio className="peer sr-only absolute" value={item.value} />
-                  <span className="relative block h-17.5 w-22 overflow-hidden rounded-lg shadow-xs transition-shadow not-peer-data-checked:opacity-80 peer-data-checked:ring-2 peer-data-checked:ring-primary/48 peer-data-checked:ring-offset-1 peer-data-checked:ring-offset-background">
+                  <span className="relative block h-17.5 w-22 overflow-hidden rounded-lg shadow-xs transition-[box-shadow,opacity,scale] duration-150 ease-out not-peer-data-checked:opacity-80 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1 peer-focus-visible:ring-offset-background peer-data-checked:ring-2 peer-data-checked:ring-primary/48 peer-data-checked:ring-offset-1 peer-data-checked:ring-offset-background not-peer-data-checked:hover:opacity-100 active:scale-[0.97]">
                     {THEME_PREVIEW[item.value]}
                   </span>
-                  <span className="not-peer-data-checked:text-muted-foreground/70">{item.label}</span>
+                  <span className="transition-colors duration-150 not-peer-data-checked:text-muted-foreground/70">
+                    {item.label}
+                  </span>
                 </FieldLabel>
               </FieldItem>
             ))}
