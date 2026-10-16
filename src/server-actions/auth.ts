@@ -1,6 +1,7 @@
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie, setCookie } from '@tanstack/react-start/server'
+import { passwordUpdateErrorMessage } from '@/lib/action-result'
 import { MULTI_LANGUAGE } from '@/lib/config/i18n'
 import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { getCurrentUser } from '@/lib/supabase/current-user'
@@ -144,12 +145,16 @@ const changePasswordFn = createServerFn({ method: 'POST' })
       return { error: m.auth_current_password_wrong() }
     }
 
-    const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
+    // current_password too: Auth asks for it when "Require current password when updating" is on.
+    const { error } = await supabase.auth.updateUser({
+      password: parsed.data.password,
+      current_password: parsed.data.current,
+    })
     if (error?.code === 'same_password') {
       return { error: m.auth_password_same() }
     }
     if (error) {
-      return { error: m.board_password_save_failed() }
+      return { error: passwordUpdateErrorMessage(error, m.board_password_save_failed()) }
     }
 
     // Every other device signs in again with the new password.

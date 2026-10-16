@@ -1,4 +1,4 @@
-import type { PostgrestError } from '@supabase/supabase-js'
+import { type AuthError, isAuthWeakPasswordError, type PostgrestError } from '@supabase/supabase-js'
 import { m } from '@/paraglide/messages'
 
 /**
@@ -68,4 +68,20 @@ export function requestResolutionErrorMessage(error: PostgrestError, fallback: s
   }
   if (error.code === NOT_FOUND) return m.common_request_not_found()
   return postgrestErrorMessage(error, { fallback })
+}
+
+/**
+ * Maps a rejected `auth.updateUser({ password })` to a user-facing message.
+ * Hosted Auth applies its dashboard settings, which config.toml doesn't
+ * mirror, so a local test never shows these. `same_password` is left to the
+ * caller: each flow answers it differently.
+ */
+export function passwordUpdateErrorMessage(error: AuthError, fallback: string): string {
+  if (isAuthWeakPasswordError(error)) {
+    if (error.reasons.includes('pwned')) return m.auth_password_pwned()
+    if (error.reasons.includes('characters')) return m.auth_password_weak_characters()
+    if (error.reasons.includes('length')) return m.auth_password_weak_length()
+  }
+  if (error.code === 'reauthentication_needed') return m.auth_password_reauthenticate()
+  return fallback
 }

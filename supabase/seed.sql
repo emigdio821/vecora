@@ -7,6 +7,8 @@
 -- Credentials: admin@vecora.app, password "admin" locally and "admin123" on
 -- hosted. On hosted the account must choose a new password at the first
 -- sign-in: the app allows nothing else until then (profiles.must_change_password).
+-- The app sends "admin123" as the current password for that change: keep it in
+-- sync with HOSTED_DEFAULT_PASSWORD in src/server-actions/hoa-board.ts.
 --
 -- Idempotent: safe to re-run; does nothing if the user already exists.
 

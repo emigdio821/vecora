@@ -1,7 +1,7 @@
 import type { AuthError, PostgrestError, User } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeader, getRequestUrl } from '@tanstack/react-start/server'
-import { type ActionResult, postgrestErrorMessage } from '@/lib/action-result'
+import { type ActionResult, passwordUpdateErrorMessage, postgrestErrorMessage } from '@/lib/action-result'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { type CurrentUser, getCurrentUser } from '@/lib/supabase/current-user'
@@ -19,6 +19,9 @@ import { m } from '@/paraglide/messages'
 
 // Raised by the guards on the main admin (admin@vecora.app).
 const MAIN_ADMIN_PROTECTED = 'P0004'
+
+// The main admin's password on hosted until its first sign-in (seed.sql).
+const HOSTED_DEFAULT_PASSWORD = 'admin123'
 
 function toMessage(error: PostgrestError, fallback: string) {
   if (error.code === MAIN_ADMIN_PROTECTED) {
@@ -301,14 +304,20 @@ const setPasswordFn = createServerFn({ method: 'POST' })
     const email = claims?.claims.email
     if (!email) return { error: m.common_no_permission() }
 
-    const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
+    // Hosted Auth asks for the current password ("Require current password when
+    // updating"), except in an access-link session. The main admin's first sign-in
+    // is a regular one, still on seed.sql's default: the flag clears on any change.
+    const user = await getCurrentUser()
+    const { error } = await supabase.auth.updateUser({
+      password: parsed.data.password,
+      current_password: user?.mustChangePassword ? HOSTED_DEFAULT_PASSWORD : undefined,
+    })
     if (error?.code === 'same_password') {
       // Someone resetting who typed the password they already had: it's still
       // theirs, let them in. Unless it's the default one being replaced.
-      const user = await getCurrentUser()
       if (user?.mustChangePassword) return { error: m.auth_password_same_as_default() }
     } else if (error) {
-      return { error: m.board_password_save_failed() }
+      return { error: passwordUpdateErrorMessage(error, m.board_password_save_failed()) }
     }
 
     // The link session stays marked as such (see CurrentUser.mustSetPassword), so

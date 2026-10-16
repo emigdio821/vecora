@@ -44,7 +44,10 @@
   "auth_password_same": "La nueva contraseña debe ser distinta a la actual",
   "auth_change_password": "Cambiar contraseña",
   "auth_password_changed": "Contraseña cambiada",
-
+  "auth_password_weak_length": "La contraseña es muy corta. Usa una más larga.",
+  "auth_password_weak_characters": "La contraseña necesita más variedad: usa mayúsculas, minúsculas, números y símbolos.",
+  "auth_password_pwned": "Esta contraseña aparece en filtraciones de datos conocidas. Elige otra.",
+  "auth_password_reauthenticate": "Por seguridad, cierra sesión, vuelve a entrar e intenta de nuevo.",
   "auth_confirm_head_title": "Confirmar acceso",
   "auth_confirm_head_description": "Recibiste un enlace de acceso a {appName}. Ábrelo para crear tu contraseña.",
   "auth_confirm_session_title": "Ya hay una sesión iniciada",

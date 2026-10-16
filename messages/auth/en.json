@@ -44,7 +44,10 @@
   "auth_password_same": "The new password must be different from the current one",
   "auth_change_password": "Change password",
   "auth_password_changed": "Password changed",
-
+  "auth_password_weak_length": "The password is too short. Use a longer one.",
+  "auth_password_weak_characters": "The password needs more variety: use uppercase, lowercase, numbers and symbols.",
+  "auth_password_pwned": "This password appears in known data breaches. Choose another one.",
+  "auth_password_reauthenticate": "For security, sign out, sign back in and try again.",
   "auth_confirm_head_title": "Confirm access",
   "auth_confirm_head_description": "You received an access link to {appName}. Open it to create your password.",
   "auth_confirm_session_title": "Someone is already signed in",
