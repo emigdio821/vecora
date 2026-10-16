@@ -7,12 +7,13 @@
   "board_you": "Tú",
   "board_roles": "Roles",
 
-  "board_role_description_admin": "Todo, incluyendo administrar la mesa directiva y otros administradores, y ver el \"Historial\" de cambios.",
-  "board_role_description_president": "\"Residencial\" (casas y residentes), \"Presidencia\" (periodos y áreas comunes), \"Mesa directiva\" y los \"Ajustes\" del residencial.",
-  "board_role_description_treasurer": "\"Tesorería\" (movimientos, cuotas y categorías), los periodos de \"Presidencia\" y pagar o rechazar las solicitudes de \"Mantenimiento\" y \"Seguridad\".",
-  "board_role_description_security": "Envía solicitudes de pago en \"Seguridad\" y puede editarlas mientras estén pendientes. Solo lectura en las demás secciones.",
-  "board_role_description_maintenance": "Envía solicitudes de pago en \"Mantenimiento\" y puede editarlas mientras estén pendientes. Solo lectura en las demás secciones.",
+  "board_role_description_admin": "Acceso total, incluida la mesa directiva y el historial de cambios.",
+  "board_role_description_president": "Administra Residencial, Presidencia, Mesa directiva y Ajustes.",
+  "board_role_description_treasurer": "Tesorería y periodos de Presidencia; paga o rechaza solicitudes de Mantenimiento y Seguridad.",
+  "board_role_description_security": "Envía y edita solicitudes de pago pendientes en Seguridad. Solo lectura en lo demás.",
+  "board_role_description_maintenance": "Envía y edita solicitudes de pago pendientes en Mantenimiento. Solo lectura en lo demás.",
   "board_roles_hint": "Una persona puede tener más de un rol.",
+  "board_search_roles": "Buscar roles",
 
   "board_add_member": "Agregar integrante",
   "board_add_member_description": "Se creará una cuenta para el residente y recibirás un enlace para compartirle. Con él podrá entrar a Vecora y crear su contraseña.",

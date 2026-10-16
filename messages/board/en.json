@@ -7,12 +7,13 @@
   "board_you": "You",
   "board_roles": "Roles",
 
-  "board_role_description_admin": "Everything, including managing the HOA board and other administrators, and viewing the \"Activity log\" of changes.",
-  "board_role_description_president": "\"Residential\" (houses and residents), \"Presidency\" (periods and common areas), \"HOA board\" and the HOA's \"Settings\".",
-  "board_role_description_treasurer": "\"Treasury\" (transactions, fees and categories), the \"Presidency\" periods, and paying or rejecting \"Maintenance\" and \"Security\" requests.",
-  "board_role_description_security": "Sends payment requests in \"Security\" and can edit them while they're pending. Read-only in the other sections.",
-  "board_role_description_maintenance": "Sends payment requests in \"Maintenance\" and can edit them while they're pending. Read-only in the other sections.",
+  "board_role_description_admin": "Full access, including the HOA board and the activity log.",
+  "board_role_description_president": "Manages Residential, Presidency, HOA board and Settings.",
+  "board_role_description_treasurer": "Treasury and Presidency periods; pays or rejects Maintenance and Security requests.",
+  "board_role_description_security": "Sends and edits pending payment requests in Security. Read-only elsewhere.",
+  "board_role_description_maintenance": "Sends and edits pending payment requests in Maintenance. Read-only elsewhere.",
   "board_roles_hint": "A person can have more than one role.",
+  "board_search_roles": "Search roles",
 
   "board_add_member": "Add member",
   "board_add_member_description": "An account will be created for the resident and you'll get a link to share with them. With it, they can sign in to Vecora and create their password.",

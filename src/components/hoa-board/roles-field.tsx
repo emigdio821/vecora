@@ -1,8 +1,16 @@
 import { Controller, type FieldValues, type Path, type UseFormReturn } from 'react-hook-form'
-import { Checkbox } from '@/components/ui/checkbox'
-import { CheckboxGroup } from '@/components/ui/checkbox-group'
-import { Field, FieldDescription, FieldError, FieldItem, FieldLabel } from '@/components/ui/field'
-import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset'
+import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxEmpty,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxValue,
+} from '@/components/ui/combobox'
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { getRoleLabel } from '@/lib/utils'
 import { APP_ROLES, type AppRole } from '@/lib/validations/hoa-board'
 import { m } from '@/paraglide/messages'
@@ -33,7 +41,7 @@ interface RolesFieldProps<T extends FieldValues> {
   canGrantAdmin: boolean
 }
 
-/** Multi-select of board positions; one checkbox per app role. */
+/** Multi-select of board positions: chips for the chosen roles, each role's description in the list. */
 export function RolesField<T extends FieldValues>({
   form,
   name,
@@ -52,33 +60,55 @@ export function RolesField<T extends FieldValues>({
           invalid={fieldState.invalid}
           touched={fieldState.isTouched}
           dirty={fieldState.isDirty}
-          render={(props) => <Fieldset {...props} />}
         >
-          <FieldsetLegend className="text-sm font-medium">
+          <FieldLabel>
             {m.board_roles()} <span className="text-destructive">*</span>
-          </FieldsetLegend>
-          <CheckboxGroup
-            className="gap-2"
-            value={field.value as string[]}
+          </FieldLabel>
+          <Combobox
+            multiple
+            items={roles}
+            itemToStringLabel={getRoleLabel}
+            autoHighlight
+            value={field.value as AppRole[]}
             onValueChange={(value) => {
               field.onChange(value)
             }}
+            inputRef={field.ref}
             disabled={disabled}
           >
-            {roles.map((role) => (
-              <FieldItem key={role} className="w-full">
-                <FieldLabel className="flex w-full items-start rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50">
-                  <Checkbox value={role} />
-                  <span className="grid gap-1">
-                    <span>{getRoleLabel(role)}</span>
-                    <span className="text-xs font-normal text-muted-foreground">
-                      {ROLE_DESCRIPTION[role]}
-                    </span>
-                  </span>
-                </FieldLabel>
-              </FieldItem>
-            ))}
-          </CheckboxGroup>
+            <ComboboxChips>
+              <ComboboxValue>
+                {(value: AppRole[]) => (
+                  <>
+                    {value.map((role) => (
+                      <ComboboxChip
+                        key={role}
+                        aria-label={getRoleLabel(role)}
+                        removeProps={{ 'aria-label': m.common_action_remove() }}
+                      >
+                        {getRoleLabel(role)}
+                      </ComboboxChip>
+                    ))}
+                    <ComboboxChipsInput placeholder={value.length > 0 ? undefined : m.board_search_roles()} />
+                  </>
+                )}
+              </ComboboxValue>
+            </ComboboxChips>
+            {/* As wide as the field: the descriptions wrap instead of stretching the list. */}
+            <ComboboxPopup className="w-(--anchor-width)">
+              <ComboboxEmpty>{m.common_no_results()}</ComboboxEmpty>
+              <ComboboxList>
+                {(role: AppRole) => (
+                  <ComboboxItem key={role} value={role}>
+                    <div className="grid gap-0.5">
+                      <span>{getRoleLabel(role)}</span>
+                      <span className="text-xs text-muted-foreground">{ROLE_DESCRIPTION[role]}</span>
+                    </div>
+                  </ComboboxItem>
+                )}
+              </ComboboxList>
+            </ComboboxPopup>
+          </Combobox>
           <FieldDescription>{m.board_roles_hint()}</FieldDescription>
           <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
         </Field>
