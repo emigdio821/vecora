@@ -20,7 +20,7 @@ import {
   subMonths,
   subYears,
 } from 'date-fns'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { type DayRange, RangePicker, type RangePreset, toRange } from '@/components/shared/range-picker'
 import { Button } from '@/components/ui/button'
 import {
@@ -216,6 +216,7 @@ export function MonthlyReportCard() {
 export function CustomReportCard() {
   const today = useToday()
   const [range, setRange] = useState<DayRange>(() => toRange(startOfMonth(today), today))
+  const pickerId = useId()
 
   return (
     <ReportCard
@@ -225,8 +226,16 @@ export function CustomReportCard() {
       range={range}
     >
       <Field className="min-w-0 @md:flex-1">
-        <FieldLabel>{m.reports_range_label()}</FieldLabel>
-        <RangePicker value={range} onChange={setRange} presets={REPORT_PRESETS} className="w-full" />
+        <FieldLabel id={`${pickerId}-label`} htmlFor={pickerId}>
+          {m.reports_range_label()}
+        </FieldLabel>
+        <RangePicker
+          id={pickerId}
+          value={range}
+          onChange={setRange}
+          presets={REPORT_PRESETS}
+          className="w-full"
+        />
       </Field>
     </ReportCard>
   )

@@ -36,6 +36,7 @@ interface RangePickerProps {
   presets?: RangePreset[]
   /** For the trigger button, e.g. "w-full" to line up with other fields. */
   className?: string
+  id?: string
 }
 
 export function toRange(from: Date, to: Date): DayRange {
@@ -79,7 +80,7 @@ const DEFAULT_PRESETS: RangePreset[] = [
  * Which days to show. The first click starts a new range and the second one
  * finishes it, in either order; only then does `onChange` fire.
  */
-export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, className }: RangePickerProps) {
+export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, className, id }: RangePickerProps) {
   const today = useToday()
   const [isOpen, setOpen] = useState(false)
   const [month, setMonth] = useState(() => parseISO(value.from))
@@ -107,10 +108,16 @@ export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, classN
         if (!nextOpen) setDraftFrom(undefined)
       }}
     >
-      <PopoverTrigger render={<Button variant="outline" className={cn('pr-2 font-normal', className)} />}>
+      <PopoverTrigger
+        id={id}
+        aria-labelledby={id ? `${id}-label ${id}-value` : undefined}
+        render={<Button variant="outline" className={cn('pr-2 font-normal', className)} />}
+      >
         <IconCalendar aria-hidden="true" />
         {/* flex-1: at full width the selector sits on the right edge, like the single-date pickers'. */}
-        <span className="flex-1 truncate text-start">{label}</span>
+        <span id={id ? `${id}-value` : undefined} className="flex-1 truncate text-start">
+          {label}
+        </span>
         <IconSelector className="pointer-events-none size-4" />
       </PopoverTrigger>
       <PopoverPopup>
