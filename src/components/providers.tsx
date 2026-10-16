@@ -1,4 +1,6 @@
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { useIsMobile } from '@/hooks/use-media-query'
 import ScreenSizeIndicator from './screen-size-indicator'
@@ -20,7 +22,15 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         </AnchoredToastProvider>
       </ToastProvider>
       <ScreenSizeIndicator disabled />
-      <ReactQueryDevtools />
+      {import.meta.env.DEV && (
+        <TanStackDevtools
+          config={{ position: 'bottom-right' }}
+          plugins={[
+            { name: 'TanStack Query', render: <ReactQueryDevtoolsPanel /> },
+            { name: 'TanStack Router', render: <TanStackRouterDevtoolsPanel /> },
+          ]}
+        />
+      )}
     </ThemeProvider>
   )
 }
