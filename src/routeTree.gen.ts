@@ -16,6 +16,7 @@ import { Route as AuthNoAccessRouteImport } from './routes/_auth/no-access'
 import { Route as AuthSetPasswordRouteImport } from './routes/_auth/set-password'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
 import { Route as AuthedDocumentsRouteImport } from './routes/_authed/documents'
+import { Route as AuthedFinancialReportRouteImport } from './routes/_authed/financial-report'
 import { Route as AuthedHoaBoardRouteImport } from './routes/_authed/hoa-board'
 import { Route as AuthedLogsRouteImport } from './routes/_authed/logs'
 import { Route as AuthedMaintenanceRouteImport } from './routes/_authed/maintenance'
@@ -59,6 +60,11 @@ const AuthedIndexRoute = AuthedIndexRouteImport.update({
 const AuthedDocumentsRoute = AuthedDocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+const AuthedFinancialReportRoute = AuthedFinancialReportRouteImport.update({
+  id: '/financial-report',
+  path: '/financial-report',
   getParentRoute: () => AuthedRouteRoute,
 } as any)
 const AuthedHoaBoardRoute = AuthedHoaBoardRouteImport.update({
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/no-access': typeof AuthNoAccessRoute
   '/set-password': typeof AuthSetPasswordRoute
   '/documents': typeof AuthedDocumentsRoute
+  '/financial-report': typeof AuthedFinancialReportRoute
   '/hoa-board': typeof AuthedHoaBoardRoute
   '/logs': typeof AuthedLogsRoute
   '/maintenance': typeof AuthedMaintenanceRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/no-access': typeof AuthNoAccessRoute
   '/set-password': typeof AuthSetPasswordRoute
   '/documents': typeof AuthedDocumentsRoute
+  '/financial-report': typeof AuthedFinancialReportRoute
   '/hoa-board': typeof AuthedHoaBoardRoute
   '/logs': typeof AuthedLogsRoute
   '/maintenance': typeof AuthedMaintenanceRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/_auth/no-access': typeof AuthNoAccessRoute
   '/_auth/set-password': typeof AuthSetPasswordRoute
   '/_authed/documents': typeof AuthedDocumentsRoute
+  '/_authed/financial-report': typeof AuthedFinancialReportRoute
   '/_authed/hoa-board': typeof AuthedHoaBoardRoute
   '/_authed/logs': typeof AuthedLogsRoute
   '/_authed/maintenance': typeof AuthedMaintenanceRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/set-password'
     | '/documents'
+    | '/financial-report'
     | '/hoa-board'
     | '/logs'
     | '/maintenance'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/set-password'
     | '/documents'
+    | '/financial-report'
     | '/hoa-board'
     | '/logs'
     | '/maintenance'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/_auth/no-access'
     | '/_auth/set-password'
     | '/_authed/documents'
+    | '/_authed/financial-report'
     | '/_authed/hoa-board'
     | '/_authed/logs'
     | '/_authed/maintenance'
@@ -290,6 +302,13 @@ declare module '@tanstack/react-router' {
       path: '/documents'
       fullPath: '/documents'
       preLoaderRoute: typeof AuthedDocumentsRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
+    '/_authed/financial-report': {
+      id: '/_authed/financial-report'
+      path: '/financial-report'
+      fullPath: '/financial-report'
+      preLoaderRoute: typeof AuthedFinancialReportRouteImport
       parentRoute: typeof AuthedRouteRoute
     }
     '/_authed/hoa-board': {
@@ -392,6 +411,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 interface AuthedRouteRouteChildren {
   AuthedDocumentsRoute: typeof AuthedDocumentsRoute
+  AuthedFinancialReportRoute: typeof AuthedFinancialReportRoute
   AuthedHoaBoardRoute: typeof AuthedHoaBoardRoute
   AuthedLogsRoute: typeof AuthedLogsRoute
   AuthedMaintenanceRoute: typeof AuthedMaintenanceRoute
@@ -404,6 +424,7 @@ interface AuthedRouteRouteChildren {
 
 const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
   AuthedDocumentsRoute: AuthedDocumentsRoute,
+  AuthedFinancialReportRoute: AuthedFinancialReportRoute,
   AuthedHoaBoardRoute: AuthedHoaBoardRoute,
   AuthedLogsRoute: AuthedLogsRoute,
   AuthedMaintenanceRoute: AuthedMaintenanceRoute,

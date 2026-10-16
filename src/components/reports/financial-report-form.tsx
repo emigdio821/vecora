@@ -12,17 +12,8 @@ import {
 } from 'date-fns'
 import { useState } from 'react'
 import { type DayRange, RangePicker, type RangePreset, toRange } from '@/components/shared/range-picker'
-import {
-  ResponsiveDialog,
-  ResponsiveDialogClose,
-  ResponsiveDialogDescription,
-  ResponsiveDialogFooter,
-  ResponsiveDialogHeader,
-  ResponsiveDialogPanel,
-  ResponsiveDialogPopup,
-  ResponsiveDialogTitle,
-} from '@/components/shared/responsive-dialog'
 import { Button } from '@/components/ui/button'
+import { Card, CardFooter, CardPanel } from '@/components/ui/card'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
@@ -109,16 +100,8 @@ async function downloadReport(range: DayRange) {
 
 type ReportTab = 'monthly' | 'custom'
 
-interface FinancialReportDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
-
-/**
- * One month, or any range of days. The choices survive closing, so a second
- * download is one click. A drawer on mobile.
- */
-export function FinancialReportDialog({ open, onOpenChange }: FinancialReportDialogProps) {
+/** One month, or any range of days. The choices stay after a download, so another one is one click. */
+export function FinancialReportForm() {
   const today = useToday()
   const [tab, setTab] = useState<ReportTab>('monthly')
   const [months] = useState(() => monthItems(today))
@@ -129,96 +112,73 @@ export function FinancialReportDialog({ open, onOpenChange }: FinancialReportDia
     mutationFn: downloadReport,
     onSuccess: () => {
       toastManager.add({ type: 'success', title: m.reports_downloaded() })
-      onOpenChange(false)
     },
     onError: (error) => {
       toastManager.add({ type: 'error', title: m.common_error(), description: error.message })
     },
   })
 
-  // Still busy after a download, until the dialog has closed and reset the mutation.
-  const isBusy = mutation.isPending || mutation.isSuccess
-
   return (
-    <ResponsiveDialog
-      open={open}
-      onOpenChange={onOpenChange}
-      onOpenChangeComplete={(isOpen) => {
-        // Clears `success`, which keeps the buttons busy while the dialog closes.
-        if (!isOpen) {
-          mutation.reset()
-        }
-      }}
-    >
-      <ResponsiveDialogPopup>
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>{m.common_section_financial_report()}</ResponsiveDialogTitle>
-          <ResponsiveDialogDescription>{m.reports_dialog_description()}</ResponsiveDialogDescription>
-        </ResponsiveDialogHeader>
+    <Card className="w-full max-w-md">
+      <CardPanel>
+        <Tabs
+          value={tab}
+          onValueChange={(value: ReportTab) => {
+            setTab(value)
+          }}
+        >
+          <TabsList>
+            <TabsTab value="monthly">{m.reports_tab_monthly()}</TabsTab>
+            <TabsTab value="custom">{m.reports_tab_custom()}</TabsTab>
+          </TabsList>
 
-        <ResponsiveDialogPanel>
-          <Tabs
-            value={tab}
-            onValueChange={(value: ReportTab) => {
-              setTab(value)
-            }}
-          >
-            <TabsList>
-              <TabsTab value="monthly">{m.reports_tab_monthly()}</TabsTab>
-              <TabsTab value="custom">{m.reports_tab_custom()}</TabsTab>
-            </TabsList>
+          <TabsPanel value="monthly">
+            <Field>
+              <FieldLabel>{m.reports_month_label()}</FieldLabel>
+              <Select
+                items={months}
+                value={month}
+                onValueChange={(value) => {
+                  if (value) setMonth(value)
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectPopup>
+                  {months.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectPopup>
+              </Select>
+              <FieldDescription>{m.reports_month_description()}</FieldDescription>
+            </Field>
+          </TabsPanel>
 
-            <TabsPanel value="monthly">
-              <Field>
-                <FieldLabel>{m.reports_month_label()}</FieldLabel>
-                <Select
-                  items={months}
-                  value={month}
-                  onValueChange={(value) => {
-                    if (value) setMonth(value)
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectPopup>
-                    {months.map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                  </SelectPopup>
-                </Select>
-                <FieldDescription>{m.reports_month_description()}</FieldDescription>
-              </Field>
-            </TabsPanel>
+          <TabsPanel value="custom">
+            <Field>
+              <FieldLabel>{m.reports_range_label()}</FieldLabel>
+              <RangePicker value={range} onChange={setRange} presets={REPORT_PRESETS} className="w-full" />
+              <FieldDescription>{m.reports_range_description()}</FieldDescription>
+            </Field>
+          </TabsPanel>
+        </Tabs>
+      </CardPanel>
 
-            <TabsPanel value="custom">
-              <Field>
-                <FieldLabel>{m.reports_range_label()}</FieldLabel>
-                <RangePicker value={range} onChange={setRange} presets={REPORT_PRESETS} className="w-full" />
-                <FieldDescription>{m.reports_range_description()}</FieldDescription>
-              </Field>
-            </TabsPanel>
-          </Tabs>
-        </ResponsiveDialogPanel>
-
-        <ResponsiveDialogFooter>
-          <ResponsiveDialogClose render={<Button variant="ghost" />} disabled={isBusy}>
-            {m.common_action_cancel()}
-          </ResponsiveDialogClose>
-          <Button
-            loading={isBusy}
-            disabled={isBusy}
-            onClick={() => {
-              mutation.mutate(tab === 'monthly' ? monthRange(parseISO(month)) : range)
-            }}
-          >
-            <IconDownload />
-            {m.reports_download_pdf()}
-          </Button>
-        </ResponsiveDialogFooter>
-      </ResponsiveDialogPopup>
-    </ResponsiveDialog>
+      <CardFooter className="justify-end">
+        <Button
+          loading={mutation.isPending}
+          disabled={mutation.isPending}
+          onClick={() => {
+            mutation.mutate(tab === 'monthly' ? monthRange(parseISO(month)) : range)
+          }}
+        >
+          <IconDownload />
+          {m.reports_download_pdf()}
+        </Button>
+      </CardFooter>
+    </Card>
   )
 }

@@ -1,7 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
 
-  "reports_dialog_description": "PDF con ingresos, egresos, saldo y casas con cuotas pendientes.",
+  "reports_page_description": "PDF con ingresos, egresos, saldo y casas con cuotas pendientes.",
   "reports_tab_monthly": "Mensual",
   "reports_tab_custom": "Manual",
   "reports_month_label": "Mes",

@@ -1,7 +1,7 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
 
-  "reports_dialog_description": "PDF with income, expenses, balance and houses with pending fees.",
+  "reports_page_description": "PDF with income, expenses, balance and houses with pending fees.",
   "reports_tab_monthly": "Monthly",
   "reports_tab_custom": "Custom",
   "reports_month_label": "Month",

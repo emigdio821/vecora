@@ -1,7 +1,5 @@
 import { IconClipboardText, IconReportMoney } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
-import { useState } from 'react'
-import { FinancialReportDialog } from '@/components/reports/dialog/financial-report'
 import { m } from '@/paraglide/messages'
 import {
   SidebarGroup,
@@ -18,7 +16,6 @@ import { LinkPendingIndicator } from './link-pending-indicator'
 export function NavReports({ ...props }: React.ComponentProps<typeof SidebarGroup>) {
   const pathname = useLocation({ select: (location) => location.pathname })
   const { setOpenMobile } = useSidebar()
-  const [open, setOpen] = useState(false)
 
   return (
     <SidebarGroup {...props}>
@@ -29,12 +26,17 @@ export function NavReports({ ...props }: React.ComponentProps<typeof SidebarGrou
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => {
-                setOpen(true)
+                setOpenMobile(false)
               }}
-            >
-              <IconReportMoney className="size-4" />
-              <span>{m.common_section_financial_report()}</span>
-            </SidebarMenuButton>
+              isActive={pathname === '/financial-report'}
+              render={
+                <Link to="/financial-report">
+                  <IconReportMoney className="size-4" />
+                  <span>{m.common_section_financial_report()}</span>
+                  <LinkPendingIndicator to="/financial-report" />
+                </Link>
+              }
+            />
           </SidebarMenuItem>
 
           <SidebarMenuItem>
@@ -54,8 +56,6 @@ export function NavReports({ ...props }: React.ComponentProps<typeof SidebarGrou
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
-
-      <FinancialReportDialog open={open} onOpenChange={setOpen} />
     </SidebarGroup>
   )
 }
