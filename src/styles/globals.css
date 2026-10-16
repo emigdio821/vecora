@@ -165,6 +165,15 @@
   }
 }
 
+/* scroll-fade is off for now: Firefox has no scroll-driven animations yet, so its
+   fallback fades both edges for good, even when nothing scrolls. Delete this rule to
+   bring the fade back once it does. Dialog, drawer and sheet headers have a border instead. */
+.scroll-fade {
+  -webkit-mask-image: none;
+  mask-image: none;
+  animation: none;
+}
+
 /* Text size from Ajustes → Aplicación (accessibility-preferences.tsx). Sizes are in rem,
    so the whole interface grows with it; a percentage keeps the browser's own default. */
 :root[data-text-size='large'] {

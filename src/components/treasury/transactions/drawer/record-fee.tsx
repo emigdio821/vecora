@@ -419,15 +419,13 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                 name="waive_late_fee"
                 control={form.control}
                 render={({ field }) => (
-                  <div className="flex items-start gap-2">
-                    <Switch
-                      id={waiveSwitchId}
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={isBusy}
-                    />
+                  // coss particle p-switch-4.
+                  <Label
+                    className="flex items-center gap-6 rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50"
+                    htmlFor={waiveSwitchId}
+                  >
                     <div className="flex flex-col gap-1">
-                      <Label htmlFor={waiveSwitchId}>{m.treasury_waive_late_fee()}</Label>
+                      <p>{m.treasury_waive_late_fee()}</p>
                       <p className="text-xs text-muted-foreground">
                         {m.treasury_waive_late_fee_description({
                           count: preview.lateMonths,
@@ -435,7 +433,14 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                         })}
                       </p>
                     </div>
-                  </div>
+                    <Switch
+                      id={waiveSwitchId}
+                      className="[--thumb-size:--spacing(4)] sm:[--thumb-size:--spacing(3)]"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isBusy}
+                    />
+                  </Label>
                 )}
               />
             )}
