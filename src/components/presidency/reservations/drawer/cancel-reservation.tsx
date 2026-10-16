@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { IconAlertCircle, IconSelector } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useId, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { PeriodCalendar } from '@/components/shared/period-calendar'
 import { PAYMENT_METHOD_ITEMS } from '@/components/treasury/kind'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -115,7 +117,11 @@ export function CancelReservationDrawer({
         <DrawerHeader>
           <DrawerTitle>{m.presidency_cancel_reservation()}</DrawerTitle>
           <DrawerDescription>
-            {m.presidency_cancel_reservation_description({ summary, amount: formatCurrency(paid, currency) })}
+            <ParaglideMessage
+              markup={messageMarkup}
+              message={m.presidency_cancel_reservation_description}
+              inputs={{ summary, amount: formatCurrency(paid, currency) }}
+            />
           </DrawerDescription>
         </DrawerHeader>
 
@@ -334,7 +340,12 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                   >
                     <FieldLabel>{m.common_field_notes()}</FieldLabel>
                     <Textarea {...field} rows={3} className="max-h-40" disabled={isBusy} />
-                    <FieldDescription>{m.presidency_refund_notes_description()}</FieldDescription>
+                    <FieldDescription>
+                      <ParaglideMessage
+                        markup={messageMarkup}
+                        message={m.presidency_refund_notes_description}
+                      />
+                    </FieldDescription>
                     <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                   </Field>
                 )}

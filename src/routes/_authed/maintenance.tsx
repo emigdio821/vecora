@@ -1,6 +1,8 @@
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { RequestsDataTable } from '@/components/maintenance/table/data-table'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { pageTitle } from '@/lib/metadata'
 import { m } from '@/paraglide/messages'
 
@@ -26,7 +28,9 @@ function MaintenancePage() {
     <>
       <div className="flex flex-col gap-1">
         <h1 className="font-heading text-base font-semibold">{m.common_section_maintenance()}</h1>
-        <p className="text-sm text-muted-foreground">{m.requests_maintenance_page_description()}</p>
+        <p className="text-sm text-muted-foreground">
+          <ParaglideMessage markup={messageMarkup} message={m.requests_maintenance_page_description} />
+        </p>
       </div>
 
       <RequestsDataTable viewer={viewer} />

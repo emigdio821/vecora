@@ -1,3 +1,4 @@
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { IconCalendarOff, IconChartArea } from '@tabler/icons-react'
 import { areaY, d3Curve, defineChart, lineY } from '@tanstack/charts'
 import { crosshair } from '@tanstack/charts/crosshair'
@@ -15,6 +16,7 @@ import { curveMonotoneX } from 'd3-shape'
 import { eachMonthOfInterval, format, parseISO } from 'date-fns'
 import { useMemo } from 'react'
 import { DashboardCardError } from '@/components/dashboard/card-error'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { Money } from '@/components/shared/money'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
 import { Button } from '@/components/ui/button'
@@ -168,7 +170,12 @@ export function TreasuryCard() {
                   <IconCalendarOff />
                 </EmptyMedia>
                 <EmptyTitle>{m.dashboard_no_current_period()}</EmptyTitle>
-                <EmptyDescription>{m.dashboard_treasury_no_period_description()}</EmptyDescription>
+                <EmptyDescription>
+                  <ParaglideMessage
+                    markup={messageMarkup}
+                    message={m.dashboard_treasury_no_period_description}
+                  />
+                </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
                 <Button variant="outline" render={<Link to="/presidency" search={{ tab: 'periods' }} />}>

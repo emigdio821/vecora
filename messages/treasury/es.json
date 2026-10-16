@@ -37,7 +37,7 @@
   "treasury_categories_empty": "Sin categorías.",
 
   "treasury_record_transaction": "Registrar movimiento",
-  "treasury_record_transaction_description": "Cualquier ingreso o egreso que no sea una cuota de mantenimiento. Las cuotas se registran con \"Registrar cuota\".",
+  "treasury_record_transaction_description": "Cualquier ingreso o egreso que no sea una cuota de mantenimiento. Las cuotas se registran con {#b}Registrar cuota{/b}.",
   "treasury_income_recorded": "Ingreso registrado",
   "treasury_expense_recorded": "Egreso registrado",
   "treasury_edit_transaction": "Editar movimiento",

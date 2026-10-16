@@ -1,8 +1,10 @@
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { IconAlertTriangle, IconSelector } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { addYears, format, parseISO, startOfToday } from 'date-fns'
 import { useId, useMemo, useState } from 'react'
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { HousesPicker } from '@/components/shared/pickers/houses-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -280,7 +282,9 @@ export function ReservationFormFields({
                   <InputGroupText>{currency}</InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
-              <FieldDescription>{m.presidency_fee_description()}</FieldDescription>
+              <FieldDescription>
+                <ParaglideMessage markup={messageMarkup} message={m.presidency_fee_description} />
+              </FieldDescription>
               <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
             </Field>
           )}

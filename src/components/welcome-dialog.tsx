@@ -1,3 +1,4 @@
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import {
   IconBuildingCommunity,
   IconChartLine,
@@ -17,8 +18,9 @@ import {
 } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import { useCurrentUser } from '@/components/current-user-provider'
+import { messageMarkup } from '@/components/shared/message-markup'
 import {
   ResponsiveDialog,
   ResponsiveDialogDescription,
@@ -39,7 +41,7 @@ import { currentUserQueryOptions } from '@/tanstack-queries/session'
 interface Ability {
   icon: TablerIcon
   title: string
-  description: string
+  description: ReactNode
   roles: AppRole[]
 }
 
@@ -91,7 +93,7 @@ const ABILITIES: Ability[] = [
       return m.settings_welcome_payment_requests()
     },
     get description() {
-      return m.settings_welcome_ability_payment_requests()
+      return <ParaglideMessage markup={messageMarkup} message={m.settings_welcome_ability_payment_requests} />
     },
     roles: ['treasurer'],
   },
@@ -101,7 +103,7 @@ const ABILITIES: Ability[] = [
       return m.common_section_maintenance()
     },
     get description() {
-      return m.settings_welcome_ability_maintenance()
+      return <ParaglideMessage markup={messageMarkup} message={m.settings_welcome_ability_maintenance} />
     },
     roles: ['maintenance'],
   },
@@ -111,7 +113,7 @@ const ABILITIES: Ability[] = [
       return m.common_section_security()
     },
     get description() {
-      return m.settings_welcome_ability_security()
+      return <ParaglideMessage markup={messageMarkup} message={m.settings_welcome_ability_security} />
     },
     roles: ['security'],
   },
@@ -254,7 +256,7 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
         <div className="flex flex-col gap-4">
           <InfoList>
             <InfoRow icon={IconHeartHandshake} title={m.settings_welcome_invite_title()}>
-              {m.settings_welcome_invite_body()}
+              <ParaglideMessage markup={messageMarkup} message={m.settings_welcome_invite_body} />
             </InfoRow>
             {/* Only an admin can change the currency. */}
             <InfoRow icon={IconSettings} title={m.common_section_settings()}>
@@ -292,7 +294,9 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
           {isLast && (
             <Alert variant="info">
               <IconInfoCircle />
-              <AlertDescription>{m.settings_welcome_revisit()}</AlertDescription>
+              <AlertDescription>
+                <ParaglideMessage markup={messageMarkup} message={m.settings_welcome_revisit} />
+              </AlertDescription>
             </Alert>
           )}
         </div>

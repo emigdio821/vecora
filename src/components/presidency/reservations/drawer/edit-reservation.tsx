@@ -1,7 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { IconAlertCircle, IconInfoCircle } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -136,7 +138,12 @@ function EditReservationForm({
             <Alert variant="info">
               <IconInfoCircle />
               <AlertTitle>{m.presidency_reservation_paid_title()}</AlertTitle>
-              <AlertDescription>{m.presidency_reservation_paid_description()}</AlertDescription>
+              <AlertDescription>
+                <ParaglideMessage
+                  markup={messageMarkup}
+                  message={m.presidency_reservation_paid_description}
+                />
+              </AlertDescription>
             </Alert>
           )}
 

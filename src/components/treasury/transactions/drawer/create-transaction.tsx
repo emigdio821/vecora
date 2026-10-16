@@ -1,8 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -122,7 +124,9 @@ export function CreateTransactionDrawer({
       <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.treasury_record_transaction()}</DrawerTitle>
-          <DrawerDescription>{m.treasury_record_transaction_description()}</DrawerDescription>
+          <DrawerDescription>
+            <ParaglideMessage markup={messageMarkup} message={m.treasury_record_transaction_description} />
+          </DrawerDescription>
         </DrawerHeader>
 
         <DrawerPanel>

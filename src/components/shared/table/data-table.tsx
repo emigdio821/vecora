@@ -7,7 +7,7 @@ import type {
 } from '@tanstack/react-table'
 import { flexRender, functionalUpdate, useTable } from '@tanstack/react-table'
 import { parseAsIndex, useQueryState } from 'nuqs'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { type ReactNode, useLayoutEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { CardFrame, CardFrameFooter } from '@/components/ui/card'
 import {
@@ -40,7 +40,7 @@ interface DataTableProps<TData extends RowData> {
    * Required when two tables share a route.
    */
   tableId?: string
-  emptyMessage?: string
+  emptyMessage?: ReactNode
   /** Skeleton rows in the body while the header and column titles stay usable. */
   isLoading?: boolean
   className?: string

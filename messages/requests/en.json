@@ -1,8 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
 
-  "requests_maintenance_page_description": "Maintenance jobs and purchases. Each record is a payment request that \"Treasury\" marks as paid or rejected.",
-  "requests_security_page_description": "Security expenses: cameras, guards, access and equipment. Each record is a payment request that \"Treasury\" marks as paid or rejected.",
+  "requests_maintenance_page_description": "Maintenance jobs and purchases. Each record is a payment request that {#b}Treasury{/b} marks as paid or rejected.",
+  "requests_security_page_description": "Security expenses: cameras, guards, access and equipment. Each record is a payment request that {#b}Treasury{/b} marks as paid or rejected.",
 
   "requests_new": "New request",
   "requests_empty": "No requests.",
@@ -48,7 +48,7 @@
   "requests_reason_description": "Explain why it won't be paid, for example: missing receipt.",
   "requests_reject_success": "Request rejected",
 
-  "requests_pay_description": "{title} - {amount}. It will be recorded as an expense in \"Treasury\" and the request will move to \"Paid\".",
+  "requests_pay_description": "{title} - {amount}. It will be recorded as an expense in {#b}Treasury{/b} and the request will move to {#b}Paid{/b}.",
   "requests_pay_success_title": "Payment recorded",
   "requests_pay_success_description": "{title} - {amount} is now in \"Treasury\"",
   "requests_pay_category_label": "Expense category",
@@ -56,7 +56,7 @@
   "requests_payment_date": "Payment date",
   "requests_transfer_reference_label": "Transfer reference",
   "requests_transfer_reference_description": "Bank tracking key or reference number.",
-  "requests_pay_notes_description": "Optional. Saved on the \"Treasury\" transaction.",
+  "requests_pay_notes_description": "Optional. Saved on the {#b}Treasury{/b} transaction.",
 
   "requests_details_description": "Request details",
   "requests_section_request": "Request",

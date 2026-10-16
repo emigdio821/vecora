@@ -18,7 +18,7 @@
   "board_add_member": "Agregar integrante",
   "board_add_member_description": "Se creará una cuenta para el residente y recibirás un enlace para compartirle. Con él podrá entrar a Vecora y crear su contraseña.",
   "board_field_resident": "Residente",
-  "board_resident_hint": "Solo aparecen residentes con correo registrado que aún no son parte de la mesa. Si falta alguien, agrega su correo en la sección \"Residencial\" primero.",
+  "board_resident_hint": "Solo aparecen residentes con correo registrado que aún no son parte de la mesa. Si falta alguien, agrega su correo en la sección {#b}Residencial{/b} primero.",
   "board_add_submit": "Agregar y generar enlace",
 
   "board_edit_roles": "Editar roles",

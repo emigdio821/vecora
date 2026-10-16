@@ -1,8 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { ResidentsPicker } from '@/components/shared/pickers/residents-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -141,7 +143,9 @@ export function AddBoardMemberDrawer({
                     excludeIds={excludeIds}
                     disabled={isBusy}
                   />
-                  <FieldDescription>{m.board_resident_hint()}</FieldDescription>
+                  <FieldDescription>
+                    <ParaglideMessage markup={messageMarkup} message={m.board_resident_hint} />
+                  </FieldDescription>
                   <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
                 </Field>
               )}

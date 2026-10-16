@@ -1,8 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
 
-  "requests_maintenance_page_description": "Trabajos y compras de mantenimiento. Cada registro es una solicitud de pago que \"Tesorería\" marca como pagada o rechazada.",
-  "requests_security_page_description": "Gastos de seguridad: cámaras, guardias, accesos y equipo. Cada registro es una solicitud de pago que \"Tesorería\" marca como pagada o rechazada.",
+  "requests_maintenance_page_description": "Trabajos y compras de mantenimiento. Cada registro es una solicitud de pago que {#b}Tesorería{/b} marca como pagada o rechazada.",
+  "requests_security_page_description": "Gastos de seguridad: cámaras, guardias, accesos y equipo. Cada registro es una solicitud de pago que {#b}Tesorería{/b} marca como pagada o rechazada.",
 
   "requests_new": "Nueva solicitud",
   "requests_empty": "Sin solicitudes.",
@@ -48,7 +48,7 @@
   "requests_reason_description": "Explica por qué no se pagará, por ejemplo: falta comprobante.",
   "requests_reject_success": "Solicitud rechazada",
 
-  "requests_pay_description": "{title} - {amount}. Se registrará como egreso en \"Tesorería\" y la solicitud pasará a \"Pagada\".",
+  "requests_pay_description": "{title} - {amount}. Se registrará como egreso en {#b}Tesorería{/b} y la solicitud pasará a {#b}Pagada{/b}.",
   "requests_pay_success_title": "Pago registrado",
   "requests_pay_success_description": "{title} - {amount} ya está en \"Tesorería\"",
   "requests_pay_category_label": "Categoría del egreso",
@@ -56,7 +56,7 @@
   "requests_payment_date": "Fecha del pago",
   "requests_transfer_reference_label": "Referencia de la transferencia",
   "requests_transfer_reference_description": "Clave de rastreo o número de referencia del banco.",
-  "requests_pay_notes_description": "Opcional. Se guardan en el movimiento de \"Tesorería\".",
+  "requests_pay_notes_description": "Opcional. Se guardan en el movimiento de {#b}Tesorería{/b}.",
 
   "requests_details_description": "Información de la solicitud",
   "requests_section_request": "Solicitud",

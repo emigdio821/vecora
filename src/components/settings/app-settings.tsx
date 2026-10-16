@@ -1,7 +1,9 @@
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { IconAccessible, IconLanguage, IconPalette } from '@tabler/icons-react'
 import { setTextSize, type TextSize, useTextSize } from '@/components/accessibility-preferences'
 import { pickLanguage } from '@/components/language-menu'
 import { SettingsCard, SettingsGrid } from '@/components/settings/settings-card'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { type Theme, useTheme } from '@/components/theme-provider'
 import { Field, FieldDescription, FieldItem, FieldLabel } from '@/components/ui/field'
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset'
@@ -105,7 +107,9 @@ export function AppSettingsPanel() {
               </FieldItem>
             ))}
           </RadioGroup>
-          <FieldDescription>{m.settings_appearance_description()}</FieldDescription>
+          <FieldDescription>
+            <ParaglideMessage markup={messageMarkup} message={m.settings_appearance_description} />
+          </FieldDescription>
         </Field>
       </SettingsCard>
 

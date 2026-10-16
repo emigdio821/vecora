@@ -1,6 +1,8 @@
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
 import { amenitiesQueryOptions, reservationsQueryOptions } from '@/tanstack-queries/presidency'
@@ -43,9 +45,11 @@ export function ReservationsDataTable() {
         <ReservationsDataTableHeader table={table} amenities={amenities.data ?? []} isLoading={isLoading} />
       )}
       emptyMessage={
-        amenities.data?.length === 0
-          ? m.presidency_reservations_empty_no_amenities()
-          : m.presidency_reservations_empty()
+        amenities.data?.length === 0 ? (
+          <ParaglideMessage markup={messageMarkup} message={m.presidency_reservations_empty_no_amenities} />
+        ) : (
+          m.presidency_reservations_empty()
+        )
       }
       isLoading={isLoading}
     />

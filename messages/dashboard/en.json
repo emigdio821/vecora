@@ -3,7 +3,7 @@
   "dashboard_no_current_period": "No current period",
 
   "dashboard_treasury_summary": "Period summary",
-  "dashboard_treasury_no_period_description": "No period covers today's date. Create one in \"Presidency\" to see the summary.",
+  "dashboard_treasury_no_period_description": "No period covers today's date. Create one in {#b}Presidency{/b} to see the summary.",
   "dashboard_treasury_go_to_periods": "Go to Periods",
   "dashboard_treasury_period_name": "Period {name}",
   "dashboard_treasury_other_currency": "In {code}: income {income}, expenses {expense}, balance {balance}",

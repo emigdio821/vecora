@@ -1,7 +1,9 @@
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { IconCalendarOff } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { addYears, format, parseISO, subYears } from 'date-fns'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
@@ -41,7 +43,9 @@ export function PeriodCalendar({ value, onChange }: PeriodCalendarProps) {
             <IconCalendarOff />
           </EmptyMedia>
           <EmptyTitle>{m.common_no_periods()}</EmptyTitle>
-          <EmptyDescription>{m.common_no_periods_description()}</EmptyDescription>
+          <EmptyDescription>
+            <ParaglideMessage markup={messageMarkup} message={m.common_no_periods_description} />
+          </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
           <Button size="sm" variant="outline" render={<Link to="/presidency" search={{ tab: 'periods' }} />}>

@@ -1,4 +1,6 @@
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { Controller, type UseFormReturn } from 'react-hook-form'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
@@ -34,7 +36,9 @@ export function AmenityFormFields({ form, disabled }: AmenityFormFieldsProps) {
               {m.common_field_name()} <span className="text-destructive">*</span>
             </FieldLabel>
             <Input {...field} autoComplete="off" disabled={disabled} />
-            <FieldDescription>{m.presidency_amenity_name_description()}</FieldDescription>
+            <FieldDescription>
+              <ParaglideMessage markup={messageMarkup} message={m.presidency_amenity_name_description} />
+            </FieldDescription>
             <FieldError match={!!fieldState.error}>{fieldState.error?.message}</FieldError>
           </Field>
         )}

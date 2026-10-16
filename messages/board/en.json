@@ -18,7 +18,7 @@
   "board_add_member": "Add member",
   "board_add_member_description": "An account will be created for the resident and you'll get a link to share with them. With it, they can sign in to Vecora and create their password.",
   "board_field_resident": "Resident",
-  "board_resident_hint": "Only residents with an email on file who aren't on the board yet are listed. If someone's missing, add their email in the \"Residential\" section first.",
+  "board_resident_hint": "Only residents with an email on file who aren't on the board yet are listed. If someone's missing, add their email in the {#b}Residential{/b} section first.",
   "board_add_submit": "Add and create link",
 
   "board_edit_roles": "Edit roles",

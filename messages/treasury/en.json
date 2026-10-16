@@ -37,7 +37,7 @@
   "treasury_categories_empty": "No categories.",
 
   "treasury_record_transaction": "Record transaction",
-  "treasury_record_transaction_description": "Any income or expense that isn't a maintenance fee. Fees are recorded with \"Record fee\".",
+  "treasury_record_transaction_description": "Any income or expense that isn't a maintenance fee. Fees are recorded with {#b}Record fee{/b}.",
   "treasury_income_recorded": "Income recorded",
   "treasury_expense_recorded": "Expense recorded",
   "treasury_edit_transaction": "Edit transaction",
