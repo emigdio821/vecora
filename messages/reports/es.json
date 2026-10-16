@@ -2,8 +2,8 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
 
   "reports_page_description": "PDF con ingresos, egresos, saldo y casas con cuotas pendientes.",
-  "reports_tab_monthly": "Mensual",
-  "reports_tab_custom": "Manual",
+  "reports_monthly_title": "Reporte mensual",
+  "reports_custom_title": "Otras fechas",
   "reports_month_label": "Mes",
   "reports_month_in_progress": "{month} (en curso)",
   "reports_month_description": "Del día 1 al último día del mes.",
@@ -18,6 +18,17 @@
   "reports_downloaded": "Reporte descargado",
   "reports_download_failed": "No se pudo generar el reporte. Recarga la página e inténtalo de nuevo.",
   "reports_default_file_name": "reporte.pdf",
+
+  "reports_contents_title": "Qué incluye",
+  "reports_contents_description": "Con el logo y el nombre del residencial, listo para compartir con los residentes.",
+  "reports_contents_summary_title": "Resumen",
+  "reports_contents_summary_description": "Saldo inicial, ingresos, egresos y saldo final de las fechas elegidas.",
+  "reports_contents_income_title": "Ingresos por categoría",
+  "reports_contents_income_description": "Lo que entró, con el total y el número de movimientos de cada categoría.",
+  "reports_contents_expense_title": "Egresos por categoría",
+  "reports_contents_expense_description": "Lo que salió, con el total y el número de movimientos de cada categoría.",
+  "reports_contents_fees_title": "Cuotas de mantenimiento",
+  "reports_contents_fees_description": "Cuántas casas están al corriente y qué meses debe cada una de las demás.",
 
   "reports_sign_in_required": "Inicia sesión para descargar el reporte",
   "reports_invalid_dates": "Fechas inválidas",

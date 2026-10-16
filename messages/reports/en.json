@@ -2,8 +2,8 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
 
   "reports_page_description": "PDF with income, expenses, balance and houses with pending fees.",
-  "reports_tab_monthly": "Monthly",
-  "reports_tab_custom": "Custom",
+  "reports_monthly_title": "Monthly report",
+  "reports_custom_title": "Custom dates",
   "reports_month_label": "Month",
   "reports_month_in_progress": "{month} (in progress)",
   "reports_month_description": "From the 1st to the last day of the month.",
@@ -18,6 +18,17 @@
   "reports_downloaded": "Report downloaded",
   "reports_download_failed": "Couldn't generate the report. Reload the page and try again.",
   "reports_default_file_name": "report.pdf",
+
+  "reports_contents_title": "What's included",
+  "reports_contents_description": "With the community's logo and name, ready to share with the residents.",
+  "reports_contents_summary_title": "Summary",
+  "reports_contents_summary_description": "Opening balance, income, expenses and closing balance for the chosen dates.",
+  "reports_contents_income_title": "Income by category",
+  "reports_contents_income_description": "What came in, with each category's total and number of transactions.",
+  "reports_contents_expense_title": "Expenses by category",
+  "reports_contents_expense_description": "What went out, with each category's total and number of transactions.",
+  "reports_contents_fees_title": "Maintenance fees",
+  "reports_contents_fees_description": "How many houses are up to date, and which months each of the others owes.",
 
   "reports_sign_in_required": "Sign in to download the report",
   "reports_invalid_dates": "Invalid dates",

@@ -1,5 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { FinancialReportForm } from '@/components/reports/financial-report-form'
+import {
+  CustomReportCard,
+  MonthlyReportCard,
+  ReportContentsCard,
+} from '@/components/reports/financial-report-cards'
 import { pageTitle } from '@/lib/metadata'
 import { m } from '@/paraglide/messages'
 
@@ -17,7 +21,12 @@ function FinancialReportPage() {
         <p className="text-sm text-muted-foreground">{m.reports_page_description()}</p>
       </div>
 
-      <FinancialReportForm />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <MonthlyReportCard />
+        <CustomReportCard />
+      </div>
+
+      <ReportContentsCard />
     </>
   )
 }
