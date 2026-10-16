@@ -68,6 +68,8 @@ All local accounts use the password **`admin`**. They come from `supabase/seed.s
 
 Every role can read every section. The seed also creates 20 houses (A1–D5), 10 residents, the current year's period with a few payments, two common areas with bookings, requests in every status, and 45 days of activity in the activity log.
 
+`supabase/seeds/periods.sql` adds the period scenarios around the current year: the two previous years as back-to-back periods with a year of fees and expenses each, no period next year (a gap), and a future period the year after with no movements yet. For the "no periods" state, run `npm run db:reset:empty`.
+
 ## Sections
 
 What each section is called on screen. Docs and comments use the English name.
@@ -162,7 +164,7 @@ To wipe the hosted database and re-apply every migration, run `npx supabase db r
 ```
 supabase/migrations/   schema, RLS policies and RPCs (one file per area)
 supabase/seed.sql      local admin account
-supabase/seeds/dev.sql local-only test data
+supabase/seeds/        local-only test data: dev.sql, then periods.sql
 src/routes/_authed/    one route per section (TanStack Router file routes)
 src/routes/_auth/      login, set-password and the auth callbacks
 src/components/        UI per section (table/, drawer/, dialog/) + shared/ and ui/
