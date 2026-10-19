@@ -6,6 +6,7 @@ import { format } from 'date-fns'
 import { useEffect, useId, useMemo, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { messageMarkup } from '@/components/shared/message-markup'
+import { NoPeriodAlert, useIsPeriodMissing } from '@/components/shared/no-period-alert'
 import { PeriodCalendar } from '@/components/shared/period-calendar'
 import { PAYMENT_METHOD_ITEMS } from '@/components/treasury/kind'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -149,6 +150,8 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
     },
   })
   const paymentMethod = useWatch({ control: form.control, name: 'payment_method' })
+  const occurredOn = useWatch({ control: form.control, name: 'occurred_on' })
+  const isPeriodMissing = useIsPeriodMissing(occurredOn)
 
   // Preselect DEFAULT_CATEGORY_NAME once categories arrive, unless the treasurer already chose.
   const defaultCategoryId = categoryItems.find((c) => c.label === DEFAULT_CATEGORY_NAME)?.value
@@ -338,6 +341,8 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
             )}
           />
 
+          {isPeriodMissing && <NoPeriodAlert />}
+
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
@@ -352,7 +357,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
         <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.common_action_cancel()}
         </DrawerClose>
-        <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
+        <Button type="submit" form={FORM_ID} disabled={isBusy || isPeriodMissing} loading={isBusy}>
           {m.common_action_record_payment()}
         </Button>
       </DrawerFooter>

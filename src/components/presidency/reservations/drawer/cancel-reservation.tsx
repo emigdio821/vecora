@@ -6,6 +6,7 @@ import { format } from 'date-fns'
 import { useId, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { messageMarkup } from '@/components/shared/message-markup'
+import { NoPeriodAlert, useIsPeriodMissing } from '@/components/shared/no-period-alert'
 import { PeriodCalendar } from '@/components/shared/period-calendar'
 import { PAYMENT_METHOD_ITEMS } from '@/components/treasury/kind'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -161,7 +162,10 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
   })
   const refundAmount = useWatch({ control: form.control, name: 'refund_amount' })
   const paymentMethod = useWatch({ control: form.control, name: 'payment_method' })
+  const occurredOn = useWatch({ control: form.control, name: 'occurred_on' })
   const hasRefund = refundAmount > 0
+  // Only the refund is a movement; cancelling without one needs no period.
+  const isPeriodMissing = useIsPeriodMissing(occurredOn) && hasRefund
 
   // Still busy after a cancellation, until the drawer has closed and reset the mutation.
   const isBusy = mutation.isPending || mutation.isSuccess
@@ -353,6 +357,8 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
             </>
           )}
 
+          {isPeriodMissing && <NoPeriodAlert />}
+
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
@@ -367,7 +373,13 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
         <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.presidency_go_back()}
         </DrawerClose>
-        <Button type="submit" form={FORM_ID} variant="destructive" disabled={isBusy} loading={isBusy}>
+        <Button
+          type="submit"
+          form={FORM_ID}
+          variant="destructive"
+          disabled={isBusy || isPeriodMissing}
+          loading={isBusy}
+        >
           {m.presidency_cancel_reservation()}
         </Button>
       </DrawerFooter>

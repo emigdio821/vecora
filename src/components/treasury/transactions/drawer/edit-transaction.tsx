@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconAlertCircle, IconInfoCircle } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
+import { NoPeriodAlert, useIsPeriodMissing } from '@/components/shared/no-period-alert'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -124,6 +125,8 @@ function EditTransactionForm({
     resolver: zodResolver(updateTransactionSchema),
     defaultValues: toFormValues(transaction),
   })
+  const occurredOn = useWatch({ control: form.control, name: 'occurred_on' })
+  const isPeriodMissing = useIsPeriodMissing(occurredOn)
   // Fee, late-fee and reservation rows come from their RPCs (category key is set).
   const { key } = transaction.category
   const isFee = key !== null
@@ -162,6 +165,8 @@ function EditTransactionForm({
             lockFeeFields={isFee}
           />
 
+          {isPeriodMissing && <NoPeriodAlert />}
+
           {form.formState.errors.root && (
             <Alert variant="error">
               <IconAlertCircle />
@@ -176,7 +181,7 @@ function EditTransactionForm({
         <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
           {m.common_action_cancel()}
         </DrawerClose>
-        <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
+        <Button type="submit" form={FORM_ID} disabled={isBusy || isPeriodMissing} loading={isBusy}>
           {m.common_action_save()}
         </Button>
       </DrawerFooter>

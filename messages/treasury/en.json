@@ -148,8 +148,6 @@
   ],
   "treasury_waived": "(waived)",
   "treasury_total_to_receive": "Total to collect",
-  "treasury_no_period": "No period",
-  "treasury_no_period_description": "No period covers the payment date. Create the period before recording fees.",
   "treasury_fee_recorded": "Fee recorded",
   "treasury_months_count": [
     {

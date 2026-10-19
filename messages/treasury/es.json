@@ -148,8 +148,6 @@
   ],
   "treasury_waived": "(condonado)",
   "treasury_total_to_receive": "Total a recibir",
-  "treasury_no_period": "Sin periodo",
-  "treasury_no_period_description": "Ningún periodo cubre la fecha de pago. Crea el periodo antes de registrar cuotas.",
   "treasury_fee_recorded": "Cuota registrada",
   "treasury_months_count": [
     {

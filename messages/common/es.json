@@ -59,6 +59,8 @@
   "common_no_periods": "Aún no hay periodos",
   "common_no_periods_description": "Los movimientos se registran dentro de un periodo. Crea uno en {#b}Presidencia{/b} para elegir fechas.",
   "common_go_to_periods": "Ir a Periodos",
+  "common_no_period": "Sin periodo",
+  "common_no_period_description": "Ningún periodo cubre la fecha elegida. Créalo en {#b}Presidencia{/b} o elige otra fecha.",
 
   "common_error": "Error",
   "common_form_invalid": "Revisa los campos del formulario",

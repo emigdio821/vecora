@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format, isAfter, parseISO, setDate, startOfMonth } from 'date-fns'
 import { Fragment, useId, useMemo, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
+import { NoPeriodAlert } from '@/components/shared/no-period-alert'
 import { PeriodCalendar } from '@/components/shared/period-calendar'
 import { HousesPicker, houseLabel } from '@/components/shared/pickers/houses-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -487,13 +488,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                 </AlertDescription>
               </Alert>
             ) : (
-              periods && (
-                <Alert variant="warning">
-                  <IconAlertCircle />
-                  <AlertTitle>{m.treasury_no_period()}</AlertTitle>
-                  <AlertDescription>{m.treasury_no_period_description()}</AlertDescription>
-                </Alert>
-              )
+              periods && <NoPeriodAlert />
             )}
 
             {form.formState.errors.root && (

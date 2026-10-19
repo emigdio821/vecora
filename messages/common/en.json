@@ -59,6 +59,8 @@
   "common_no_periods": "No periods yet",
   "common_no_periods_description": "Transactions are recorded within a period. Create one in {#b}Presidency{/b} to pick dates.",
   "common_go_to_periods": "Go to Periods",
+  "common_no_period": "No period",
+  "common_no_period_description": "No period covers the chosen date. Create it in {#b}Presidency{/b} or pick another date.",
 
   "common_error": "Error",
   "common_form_invalid": "Check the form fields",

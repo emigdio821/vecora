@@ -3,8 +3,9 @@ import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { messageMarkup } from '@/components/shared/message-markup'
+import { NoPeriodAlert, useIsPeriodMissing } from '@/components/shared/no-period-alert'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import type { DrawerPrimitive } from '@/components/ui/drawer'
@@ -71,6 +72,8 @@ export function CreateTransactionDrawer({
     resolver: zodResolver(createTransactionSchema),
     defaultValues: defaultValues(defaultKind),
   })
+  const occurredOn = useWatch({ control: form.control, name: 'occurred_on' })
+  const isPeriodMissing = useIsPeriodMissing(occurredOn)
 
   const mutation = useMutation({
     mutationFn: async (values: CreateTransactionInput) => {
@@ -137,6 +140,8 @@ export function CreateTransactionDrawer({
           >
             <TransactionFormFields form={form} currency={currency} disabled={isBusy} />
 
+            {isPeriodMissing && <NoPeriodAlert />}
+
             {form.formState.errors.root && (
               <Alert variant="error">
                 <IconAlertCircle />
@@ -151,7 +156,7 @@ export function CreateTransactionDrawer({
           <DrawerClose render={<Button variant="ghost" />} disabled={isBusy}>
             {m.common_action_cancel()}
           </DrawerClose>
-          <Button type="submit" form={FORM_ID} disabled={isBusy} loading={isBusy}>
+          <Button type="submit" form={FORM_ID} disabled={isBusy || isPeriodMissing} loading={isBusy}>
             {m.treasury_record()}
           </Button>
         </DrawerFooter>
