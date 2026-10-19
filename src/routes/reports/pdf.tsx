@@ -66,6 +66,7 @@ async function GET(request: Request) {
   const pdf = await renderToBuffer(
     <FinancialReportDocument
       report={report}
+      includeAdvance={searchParams.get('advance') !== '0'}
       residentialName={residentialName}
       currency={settings.currency}
       language={settings.defaultLanguage}

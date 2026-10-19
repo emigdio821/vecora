@@ -439,6 +439,10 @@ grant execute on function public.record_fee_payment to authenticated;
 --     months of the range that fall inside a period and have already started.
 --     A month counts as paid only if the payment was recorded by the end of
 --     the range, so a past report reads the same no matter when it's pulled.
+--   * Fees paid ahead (fee_status.advance): per house, the fee months after
+--     the range's last month whose payment was recorded by the end of the
+--     range. The money still counts in the range where it was received
+--     (occurred_on), not in the months it covers.
 --   * Houses are identified by number only; the report is meant to be shared.
 create function public.financial_report(p_from date, p_to date)
 returns jsonb
@@ -518,6 +522,18 @@ begin
       ) paid on true
       where pr.deleted_at is null
       group by pr.id, pr.number
+    ),
+    -- fee months after the range, already paid by its end
+    advance as (
+      select pr.number, array_agg(distinct t.fee_month order by t.fee_month) as months
+      from public.transactions t
+      join public.properties pr on pr.id = t.property_id
+      where t.category_id = (select id from public.transaction_categories where key = 'fee')
+        and t.deleted_at is null
+        and t.occurred_on <= p_to
+        and t.fee_month > date_trunc('month', p_to)
+        and pr.deleted_at is null
+      group by pr.id, pr.number
     )
     select jsonb_build_object(
       'from', p_from,
@@ -550,6 +566,11 @@ begin
                            order by hs.number)
           from house_status hs
           where hs.unpaid <> '{}'
+        ), '[]'::jsonb),
+        'advance', coalesce((
+          select jsonb_agg(jsonb_build_object('house', a.number, 'months', to_jsonb(a.months))
+                           order by a.number)
+          from advance a
         ), '[]'::jsonb)
       )
     )
@@ -557,7 +578,7 @@ begin
 end;
 $$;
 
-comment on function public.financial_report is 'Report for a date range: balances and totals by category per currency, and fee status per house.';
+comment on function public.financial_report is 'Report for a date range: balances and totals by category per currency, fee status per house, and fees paid ahead.';
 
 revoke execute on function public.financial_report(date, date) from public, anon;
 grant execute on function public.financial_report(date, date) to authenticated;

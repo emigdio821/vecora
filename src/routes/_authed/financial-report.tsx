@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 import {
   CustomReportCard,
   MonthlyReportCard,
@@ -14,6 +15,8 @@ export const Route = createFileRoute('/_authed/financial-report')({
 })
 
 function FinancialReportPage() {
+  const [includeAdvance, setIncludeAdvance] = useState(true)
+
   return (
     <>
       <div className="flex flex-col gap-1">
@@ -22,11 +25,11 @@ function FinancialReportPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <MonthlyReportCard />
-        <CustomReportCard />
+        <MonthlyReportCard includeAdvance={includeAdvance} />
+        <CustomReportCard includeAdvance={includeAdvance} />
       </div>
 
-      <ReportContentsCard />
+      <ReportContentsCard includeAdvance={includeAdvance} onIncludeAdvanceChange={setIncludeAdvance} />
     </>
   )
 }

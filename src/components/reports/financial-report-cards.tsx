@@ -1,3 +1,4 @@
+import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import {
   IconCalendarEvent,
   IconCalendarMonth,
@@ -21,6 +22,7 @@ import {
   subYears,
 } from 'date-fns'
 import { useId, useMemo, useState } from 'react'
+import { messageMarkup } from '@/components/shared/message-markup'
 import { type DayRange, RangePicker, type RangePreset, toRange } from '@/components/shared/range-picker'
 import { Button } from '@/components/ui/button'
 import {
@@ -32,7 +34,9 @@ import {
   CardFrameTitle,
   CardPanel,
 } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
+import { Label } from '@/components/ui/label'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toastManager } from '@/components/ui/toast'
 import { useToday } from '@/hooks/use-today'
@@ -94,8 +98,11 @@ const REPORT_PRESETS: RangePreset[] = [
  * The route answers with the PDF as an attachment. Going through fetch (not a
  * plain link) lets us show a spinner and turn failures into a toast.
  */
-async function downloadReport(range: DayRange) {
-  const response = await fetch(`/reports/pdf?${new URLSearchParams({ from: range.from, to: range.to })}`)
+async function downloadReport({ range, includeAdvance }: { range: DayRange; includeAdvance: boolean }) {
+  const params = new URLSearchParams({ from: range.from, to: range.to })
+  // The route includes them unless told otherwise.
+  if (!includeAdvance) params.set('advance', '0')
+  const response = await fetch(`/reports/pdf?${params}`)
   // Signed out, the proxy redirects to the login page, which is a 200 in HTML.
   const isPdf = response.headers.get('Content-Type') === 'application/pdf'
   if (!response.ok || !isPdf) {
@@ -117,7 +124,7 @@ async function downloadReport(range: DayRange) {
 }
 
 /** Each card has its own, so only the one clicked shows as busy. */
-function DownloadReportButton({ range }: { range: DayRange }) {
+function DownloadReportButton({ range, includeAdvance }: { range: DayRange; includeAdvance: boolean }) {
   const mutation = useMutation({
     mutationFn: downloadReport,
     onSuccess: () => {
@@ -133,7 +140,7 @@ function DownloadReportButton({ range }: { range: DayRange }) {
       loading={mutation.isPending}
       disabled={mutation.isPending}
       onClick={() => {
-        mutation.mutate(range)
+        mutation.mutate({ range, includeAdvance })
       }}
     >
       <IconDownload />
@@ -149,9 +156,10 @@ interface ReportCardProps {
   /** The date field; the download button goes next to it. */
   children: React.ReactNode
   range: DayRange
+  includeAdvance: boolean
 }
 
-function ReportCard({ title, description, icon: Icon, children, range }: ReportCardProps) {
+function ReportCard({ title, description, icon: Icon, children, range, includeAdvance }: ReportCardProps) {
   return (
     <CardFrame className="w-full">
       <CardFrameHeader>
@@ -168,15 +176,20 @@ function ReportCard({ title, description, icon: Icon, children, range }: ReportC
       <Card className="@container flex-1">
         <CardPanel className="flex flex-col gap-3 @md:flex-row @md:items-end">
           {children}
-          <DownloadReportButton range={range} />
+          <DownloadReportButton range={range} includeAdvance={includeAdvance} />
         </CardPanel>
       </Card>
     </CardFrame>
   )
 }
 
+/** Options of the PDF, picked once in the contents card and used by every download button. */
+interface ReportOptions {
+  includeAdvance: boolean
+}
+
 /** A whole month; last month by default, the one usually reported. */
-export function MonthlyReportCard() {
+export function MonthlyReportCard({ includeAdvance }: ReportOptions) {
   const today = useToday()
   const [months] = useState(() => monthItems(today))
   const [month, setMonth] = useState(() => format(startOfMonth(subMonths(today, 1)), ISO_DAY))
@@ -187,6 +200,7 @@ export function MonthlyReportCard() {
       description={m.reports_month_description()}
       icon={IconCalendarMonth}
       range={monthRange(parseISO(month))}
+      includeAdvance={includeAdvance}
     >
       <Field className="min-w-0 @md:flex-1">
         <FieldLabel>{m.reports_month_label()}</FieldLabel>
@@ -217,7 +231,7 @@ export function MonthlyReportCard() {
 const PERIOD_PRESETS = 3
 
 /** Any range of days, from one day to several years. */
-export function CustomReportCard() {
+export function CustomReportCard({ includeAdvance }: ReportOptions) {
   const today = useToday()
   const [range, setRange] = useState<DayRange>(() => toRange(startOfMonth(today), today))
   const pickerId = useId()
@@ -245,6 +259,7 @@ export function CustomReportCard() {
       description={m.reports_range_description()}
       icon={IconCalendarEvent}
       range={range}
+      includeAdvance={includeAdvance}
     >
       <Field className="min-w-0 @md:flex-1">
         <FieldLabel id={`${pickerId}-label`} htmlFor={pickerId}>
@@ -280,8 +295,12 @@ const REPORT_CONTENTS: { icon: TablerIcon; title: () => string; description: () 
   },
 ]
 
+interface ReportContentsCardProps extends ReportOptions {
+  onIncludeAdvanceChange: (includeAdvance: boolean) => void
+}
+
 /** What the PDF has, so it's clear before downloading which dates are worth it. */
-export function ReportContentsCard() {
+export function ReportContentsCard({ includeAdvance, onIncludeAdvanceChange }: ReportContentsCardProps) {
   return (
     <CardFrame className="w-full">
       <CardFrameHeader>
@@ -292,7 +311,7 @@ export function ReportContentsCard() {
         </CardFrameAction>
       </CardFrameHeader>
       <Card>
-        <CardPanel>
+        <CardPanel className="flex flex-col gap-6">
           <ul className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {REPORT_CONTENTS.map((item) => (
               <li key={item.title()} className="flex gap-3">
@@ -306,6 +325,21 @@ export function ReportContentsCard() {
               </li>
             ))}
           </ul>
+
+          <Label className="flex items-start gap-2 rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50">
+            <Checkbox
+              checked={includeAdvance}
+              onCheckedChange={(checked) => {
+                onIncludeAdvanceChange(checked)
+              }}
+            />
+            <div className="flex flex-col gap-1">
+              <p>{m.reports_include_advance()}</p>
+              <p className="text-xs text-muted-foreground">
+                <ParaglideMessage markup={messageMarkup} message={m.reports_include_advance_description} />
+              </p>
+            </div>
+          </Label>
         </CardPanel>
       </Card>
     </CardFrame>

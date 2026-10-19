@@ -29,7 +29,9 @@
   "reports_contents_expense_title": "Expenses by category",
   "reports_contents_expense_description": "What went out, with each category's total and number of transactions.",
   "reports_contents_fees_title": "Maintenance fees",
-  "reports_contents_fees_description": "How many houses are up to date, and which months each of the others owes.",
+  "reports_contents_fees_description": "How many houses are up to date, which months each of the others owes, and which paid in advance.",
+  "reports_include_advance": "Include advance payments",
+  "reports_include_advance_description": "Adds the houses that already paid fees for future months to {#b}Maintenance fees{/b}. Applies to both reports.",
 
   "reports_sign_in_required": "Sign in to download the report",
   "reports_invalid_dates": "Invalid dates",
@@ -61,9 +63,12 @@
   ],
   "reports_pdf_column_months": "Months",
   "reports_pdf_column_unpaid": "Unpaid",
+  "reports_pdf_column_paid": "Paid",
   "reports_pdf_all_up_to_date": "All houses are up to date.",
   "reports_pdf_no_fees": "No fees due in this date range.",
-  "reports_pdf_dates_note": "Income and expenses are counted by the date they happened. A fee counts as paid if its payment was recorded on or before {date}.",
+  "reports_pdf_advance_title": "Paid in advance",
+  "reports_pdf_advance_hint": "Houses that already paid fees for future months. That money only shows in the income of the month it was received.",
+  "reports_pdf_dates_note": "This report only includes money that came in or went out from {from} to {to}, by the date of each transaction. A fee counts as paid if its payment was recorded on or before {to}.",
   "reports_pdf_generated": "Generated on {date} by {name}",
   "reports_pdf_page": "Page {page} of {total}"
 }

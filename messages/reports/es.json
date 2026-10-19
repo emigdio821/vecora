@@ -29,7 +29,9 @@
   "reports_contents_expense_title": "Egresos por categoría",
   "reports_contents_expense_description": "Lo que salió, con el total y el número de movimientos de cada categoría.",
   "reports_contents_fees_title": "Cuotas de mantenimiento",
-  "reports_contents_fees_description": "Cuántas casas están al corriente y qué meses debe cada una de las demás.",
+  "reports_contents_fees_description": "Cuántas casas están al corriente, qué meses debe cada una de las demás y cuáles pagaron por adelantado.",
+  "reports_include_advance": "Incluir pagos por adelantado",
+  "reports_include_advance_description": "Agrega a {#b}Cuotas de mantenimiento{/b} las casas que ya pagaron cuotas de meses futuros. Se aplica a los dos reportes.",
 
   "reports_sign_in_required": "Inicia sesión para descargar el reporte",
   "reports_invalid_dates": "Fechas inválidas",
@@ -61,9 +63,12 @@
   ],
   "reports_pdf_column_months": "Meses",
   "reports_pdf_column_unpaid": "Sin pagar",
+  "reports_pdf_column_paid": "Pagados",
   "reports_pdf_all_up_to_date": "Todas las casas están al corriente.",
   "reports_pdf_no_fees": "No hay cuotas por cobrar en estas fechas.",
-  "reports_pdf_dates_note": "Ingresos y egresos se cuentan por la fecha en que ocurrieron. Una cuota cuenta como pagada si su pago se registró a más tardar el {date}.",
+  "reports_pdf_advance_title": "Pagos por adelantado",
+  "reports_pdf_advance_hint": "Casas que ya pagaron cuotas de meses futuros. Ese dinero aparece solo en los ingresos del mes en que se recibió.",
+  "reports_pdf_dates_note": "Este reporte solo incluye el dinero que entró o salió del {from} al {to}, según la fecha de cada movimiento. Una cuota cuenta como pagada si su pago se registró a más tardar el {to}.",
   "reports_pdf_generated": "Generado el {date} por {name}",
   "reports_pdf_page": "Página {page} de {total}"
 }

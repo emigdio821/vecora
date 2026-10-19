@@ -30,6 +30,8 @@ export interface FinancialReport {
     houses: number
     up_to_date: number
     pending: { house: string; months: string[] }[]
+    /** Fee months after the range, already paid by its end. */
+    advance: { house: string; months: string[] }[]
   }
 }
 

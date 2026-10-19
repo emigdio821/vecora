@@ -21,6 +21,8 @@ const styles = StyleSheet.create({
   section: { marginBottom: 18 },
   sectionTitle: { fontSize: 11, fontWeight: 600, marginBottom: 6 },
   sectionHint: { fontSize: 8, color: COLOR.muted, marginBottom: 6 },
+  subsection: { marginTop: 12 },
+  subsectionTitle: { fontSize: 9, fontWeight: 600, marginBottom: 4 },
   summary: { flexDirection: 'row', gap: 8 },
   summaryBox: {
     flex: 1,
@@ -129,7 +131,7 @@ function byHouse(a: string, b: string): number {
 }
 
 type Category = CurrencyTotals['categories'][number]
-type PendingHouse = FinancialReport['fee_status']['pending'][number]
+type HouseMonths = FinancialReport['fee_status']['pending'][number]
 
 function categoryColumns(money: (value: number) => string, language: Locale): Column<Category>[] {
   const locale = { locale: language }
@@ -172,7 +174,8 @@ function monthRuns(months: string[], language: Locale): string {
     .join(', ')
 }
 
-function pendingColumns(language: Locale): Column<PendingHouse>[] {
+/** House, month count and the months as runs; `monthsLabel` names what the months are. */
+function houseMonthsColumns(monthsLabel: string, language: Locale): Column<HouseMonths>[] {
   const locale = { locale: language }
   return [
     { label: m.common_field_house({}, locale), width: 56, value: (p) => p.house },
@@ -182,12 +185,15 @@ function pendingColumns(language: Locale): Column<PendingHouse>[] {
       align: 'right',
       value: (p) => String(p.months.length),
     },
-    { label: m.reports_pdf_column_unpaid({}, locale), value: (p) => monthRuns(p.months, language) },
+    // Right-aligned: left-aligned, the count ran into the first month ("1 Septiembre").
+    { label: monthsLabel, align: 'right', value: (p) => monthRuns(p.months, language) },
   ]
 }
 
 interface FinancialReportDocumentProps {
   report: FinancialReport
+  /** The houses that paid fees ahead, under the fees section. */
+  includeAdvance: boolean
   residentialName: string
   /** The HOA's current one; amounts in any other carry their code. */
   currency: CurrencyCode
@@ -201,6 +207,7 @@ interface FinancialReportDocumentProps {
 
 export function FinancialReportDocument({
   report,
+  includeAdvance,
   residentialName,
   currency,
   language,
@@ -213,6 +220,7 @@ export function FinancialReportDocument({
   const isMultiCurrency = report.currencies.length > 1
   const { fee_status: fees } = report
   const pending = [...fees.pending].sort((a, b) => byHouse(a.house, b.house))
+  const advance = [...fees.advance].sort((a, b) => byHouse(a.house, b.house))
 
   return (
     <Document
@@ -257,7 +265,7 @@ export function FinancialReportDocument({
                 )}
               </Text>
               <Table
-                columns={pendingColumns(language)}
+                columns={houseMonthsColumns(m.reports_pdf_column_unpaid({}, locale), language)}
                 rows={pending}
                 emptyText={m.reports_pdf_all_up_to_date({}, locale)}
                 repeatHeader
@@ -266,10 +274,27 @@ export function FinancialReportDocument({
           ) : (
             <Text style={styles.empty}>{m.reports_pdf_no_fees({}, locale)}</Text>
           )}
+
+          {/* Left out when unchecked on the page, or when no house paid ahead. */}
+          {includeAdvance && advance.length > 0 && (
+            <View style={styles.subsection}>
+              <Text style={styles.subsectionTitle}>{m.reports_pdf_advance_title({}, locale)}</Text>
+              <Text style={styles.sectionHint}>{m.reports_pdf_advance_hint({}, locale)}</Text>
+              <Table
+                columns={houseMonthsColumns(m.reports_pdf_column_paid({}, locale), language)}
+                rows={advance}
+                emptyText=""
+                repeatHeader
+              />
+            </View>
+          )}
         </View>
 
         <Text style={styles.note}>
-          {m.reports_pdf_dates_note({ date: formatDay(report.to, language) }, locale)}
+          {m.reports_pdf_dates_note(
+            { from: formatDay(report.from, language), to: formatDay(report.to, language) },
+            locale,
+          )}
         </Text>
 
         <PageFooter generatedBy={generatedBy} generatedAt={generatedAt} language={language} />
