@@ -20,7 +20,8 @@ import { toastManager } from '@/components/ui/toast'
 import { type PeriodInput, periodSchema } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { updatePeriod } from '@/server-actions/treasury'
-import { type PeriodQueryData, transactionCount, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
+import { type PeriodQueryData, PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
+import { transactionCount, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { PeriodFormFields } from './period-form-fields'
 
 const FORM_ID = 'edit-period-form'
@@ -48,7 +49,8 @@ export function EditPeriodDrawer({
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: (_data, values) => {
-      // Movements embed the period name, so their list needs a refresh too.
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'periods'] })
+      // Treasury's summaries and fee status are per period, and movements embed its name.
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
       toastManager.add({ type: 'success', title: m.presidency_period_updated(), description: values.name })
       onOpenChange(false)

@@ -5,6 +5,30 @@ import { createClient } from '@/lib/supabase/client'
 export const PRESIDENCY_QUERY_KEY = 'presidency'
 
 /**
+ * Newest first. `transactions(count)` includes soft-deleted rows on purpose:
+ * the ledger is never purged, so any row at all blocks a hard delete.
+ * Treasury reads them too (summaries, fees, the record drawers), and every
+ * movement saved changes a count, so its mutations invalidate this as well.
+ */
+function periodsQuery() {
+  return createClient()
+    .from('periods')
+    .select('id, name, starts_on, ends_on, monthly_fee, late_fee, due_day, currency, transactions(count)')
+    .order('starts_on', { ascending: false })
+}
+
+export type PeriodQueryData = QueryData<ReturnType<typeof periodsQuery>>[number]
+
+export const periodsQueryOptions = queryOptions({
+  queryKey: [PRESIDENCY_QUERY_KEY, 'periods'],
+  queryFn: async () => {
+    const { data, error } = await periodsQuery()
+    if (error) throw error
+    return data
+  },
+})
+
+/**
  * Every common area, by name, retired ones included: their bookings still
  * name them. `amenity_reservations(count)` decides whether one can be deleted.
  */

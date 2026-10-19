@@ -35,6 +35,7 @@ import { formatDay, ISO_DAY } from '@/lib/utils'
 import { type PayRequestInput, payRequestSchema } from '@/lib/validations/requests'
 import { m } from '@/paraglide/messages'
 import { paySecurityRequest } from '@/server-actions/security'
+import { PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
 import { SECURITY_QUERY_KEY, type SecurityRequestQueryData } from '@/tanstack-queries/security'
 import { categoriesQueryOptions, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 
@@ -71,8 +72,9 @@ export function PayRequestDrawer({
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [SECURITY_QUERY_KEY] })
-      // The expense now exists in the ledger.
+      // The expense now exists in the ledger, and its period counts it.
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'periods'] })
       toastManager.add({
         type: 'success',
         title: m.requests_pay_success_title(),

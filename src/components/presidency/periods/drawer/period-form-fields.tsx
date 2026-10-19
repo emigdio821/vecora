@@ -16,7 +16,7 @@ import { adjacentGaps } from '@/lib/periods'
 import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
 import type { PeriodInput } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
-import { periodsQueryOptions } from '@/tanstack-queries/treasury'
+import { periodsQueryOptions } from '@/tanstack-queries/presidency'
 
 interface PeriodFormFieldsProps {
   form: UseFormReturn<PeriodInput>

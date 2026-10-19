@@ -18,7 +18,7 @@ import { useToday } from '@/hooks/use-today'
 import { periodFor } from '@/lib/periods'
 import { ISO_DAY } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
-import { periodsQueryOptions } from '@/tanstack-queries/treasury'
+import { periodsQueryOptions } from '@/tanstack-queries/presidency'
 
 interface PeriodCalendarProps {
   /** "YYYY-MM-DD" */

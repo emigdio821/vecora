@@ -13,7 +13,8 @@ import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { m } from '@/paraglide/messages'
 import { deletePeriod } from '@/server-actions/treasury'
-import { type PeriodQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
+import { type PeriodQueryData, PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
+import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 
 interface DeletePeriodAlertDialogProps extends Omit<ResponsiveAlertDialogProps, 'children'> {
   period: PeriodQueryData
@@ -37,6 +38,8 @@ export function DeletePeriodAlertDialog({
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'periods'] })
+      // Treasury's summaries and fee status are per period.
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
       toastManager.add({ type: 'success', title: m.presidency_period_deleted(), description: period.name })
       onOpenChange(false)

@@ -5,7 +5,7 @@ import { messageMarkup } from '@/components/shared/message-markup'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { periodFor } from '@/lib/periods'
 import { m } from '@/paraglide/messages'
-import { periodsQueryOptions } from '@/tanstack-queries/treasury'
+import { periodsQueryOptions } from '@/tanstack-queries/presidency'
 
 /**
  * No period covers `day` ("YYYY-MM-DD"), so saving a movement on it would fail.

@@ -42,7 +42,7 @@ import { toastManager } from '@/components/ui/toast'
 import { useToday } from '@/hooks/use-today'
 import { formatMonth, ISO_DAY } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
-import { periodsQueryOptions } from '@/tanstack-queries/treasury'
+import { periodsQueryOptions } from '@/tanstack-queries/presidency'
 
 /** How far back the monthly picker goes. */
 const MONTHS_BACK = 24

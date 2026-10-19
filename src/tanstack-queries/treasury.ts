@@ -35,32 +35,10 @@ export const transactionsListQueryOptions = queryOptions({
   },
 })
 
-/**
- * Newest first. `transactions(count)` includes soft-deleted rows on purpose:
- * the ledger is never purged, so any row at all blocks a hard delete.
- */
-function periodsQuery() {
-  return createClient()
-    .from('periods')
-    .select('id, name, starts_on, ends_on, monthly_fee, late_fee, due_day, currency, transactions(count)')
-    .order('starts_on', { ascending: false })
-}
-
-export type PeriodQueryData = QueryData<ReturnType<typeof periodsQuery>>[number]
-
 /** Reads the `transactions(count)` embed of a period or category row. */
 export function transactionCount(row: { transactions: { count: number }[] }) {
   return row.transactions[0]?.count ?? 0
 }
-
-export const periodsQueryOptions = queryOptions({
-  queryKey: [TREASURY_QUERY_KEY, 'periods'],
-  queryFn: async () => {
-    const { data, error } = await periodsQuery()
-    if (error) throw error
-    return data
-  },
-})
 
 /**
  * Income / expense / balance per period and currency, computed by the
@@ -128,7 +106,7 @@ export const houseFeeStatusQueryOptions = queryOptions({
   },
 })
 
-/** See periodsQuery for why the count includes soft-deleted movements. */
+/** See periodsQuery (tanstack-queries/presidency) for why the count includes soft-deleted movements. */
 function categoriesQuery() {
   return createClient()
     .from('transaction_categories')

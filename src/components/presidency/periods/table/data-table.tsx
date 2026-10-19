@@ -3,11 +3,8 @@ import { useMemo } from 'react'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
-import {
-  type PeriodQueryData,
-  periodSummariesQueryOptions,
-  periodsQueryOptions,
-} from '@/tanstack-queries/treasury'
+import { type PeriodQueryData, periodsQueryOptions } from '@/tanstack-queries/presidency'
+import { periodSummariesQueryOptions } from '@/tanstack-queries/treasury'
 import { type PeriodRow, periodsTableColumns } from './columns'
 import { PeriodsDataTableHeader } from './data-table-header'
 

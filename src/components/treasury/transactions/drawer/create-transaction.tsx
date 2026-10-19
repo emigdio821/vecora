@@ -30,6 +30,7 @@ import {
 } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { createTransaction } from '@/server-actions/treasury'
+import { PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
 import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { TransactionFormFields } from './transaction-form-fields'
 
@@ -83,6 +84,8 @@ export function CreateTransactionDrawer({
     },
     onSuccess: (_data, values) => {
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
+      // Each period counts its movements; any at all blocks deleting it.
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'periods'] })
       toastManager.add({
         type: 'success',
         title: values.kind === 'income' ? m.treasury_income_recorded() : m.treasury_expense_recorded(),

@@ -36,6 +36,7 @@ import { type PayRequestInput, payRequestSchema } from '@/lib/validations/reques
 import { m } from '@/paraglide/messages'
 import { payMaintenanceRequest } from '@/server-actions/maintenance'
 import { MAINTENANCE_QUERY_KEY, type MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
+import { PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
 import { categoriesQueryOptions, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 
 const FORM_ID = 'pay-request-form'
@@ -71,8 +72,9 @@ export function PayRequestDrawer({
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [MAINTENANCE_QUERY_KEY] })
-      // The expense now exists in the ledger.
+      // The expense now exists in the ledger, and its period counts it.
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'periods'] })
       toastManager.add({
         type: 'success',
         title: m.requests_pay_success_title(),

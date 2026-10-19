@@ -5,7 +5,7 @@ import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
 import { m } from '@/paraglide/messages'
-import type { PeriodQueryData } from '@/tanstack-queries/treasury'
+import type { PeriodQueryData } from '@/tanstack-queries/presidency'
 import { CreatePeriodDrawer } from '../drawer/create-period'
 import type { PeriodRow } from './columns'
 

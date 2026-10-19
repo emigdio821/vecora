@@ -23,7 +23,8 @@ import { type CurrencyCode, ISO_DAY } from '@/lib/utils'
 import { type PeriodInput, periodSchema } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { createPeriod } from '@/server-actions/treasury'
-import { type PeriodQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
+import { type PeriodQueryData, PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
+import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { PeriodFormFields } from './period-form-fields'
 
 const FORM_ID = 'create-period-form'
@@ -71,6 +72,8 @@ export function CreatePeriodDrawer({ open, onOpenChange, latest, ...props }: Cre
       return result.data
     },
     onSuccess: (_data, values) => {
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'periods'] })
+      // Treasury's summaries and fee status are per period.
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
       toastManager.add({ type: 'success', title: m.presidency_period_created(), description: values.name })
       onOpenChange(false)

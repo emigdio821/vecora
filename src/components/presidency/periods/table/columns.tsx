@@ -6,7 +6,8 @@ import { DataTableSortableHeader } from '@/components/shared/table/sortable-head
 import { Badge } from '@/components/ui/badge'
 import { cn, formatDay, ISO_DAY, normalizeString } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
-import type { PeriodQueryData, PeriodSummaryQueryData } from '@/tanstack-queries/treasury'
+import type { PeriodQueryData } from '@/tanstack-queries/presidency'
+import type { PeriodSummaryQueryData } from '@/tanstack-queries/treasury'
 import { PeriodsTableActions } from './actions'
 
 /**

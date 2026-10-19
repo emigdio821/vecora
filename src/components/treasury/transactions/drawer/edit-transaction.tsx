@@ -23,6 +23,7 @@ import { systemCategorySource } from '@/lib/system-categories'
 import { type UpdateTransactionInput, updateTransactionSchema } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { updateTransaction } from '@/server-actions/treasury'
+import { PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
 import { type TransactionQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { TransactionFormFields } from './transaction-form-fields'
 
@@ -53,6 +54,8 @@ export function EditTransactionDrawer({
     },
     onSuccess: (_data, values) => {
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
+      // The date can move it to another period, and each period counts its movements.
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'periods'] })
       toastManager.add({
         type: 'success',
         title: m.treasury_transaction_updated(),

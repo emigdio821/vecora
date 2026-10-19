@@ -51,7 +51,8 @@ import { type RecordFeePaymentInput, recordFeePaymentSchema } from '@/lib/valida
 import { m } from '@/paraglide/messages'
 import { recordFeePayment } from '@/server-actions/treasury'
 import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
-import { periodsQueryOptions, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
+import { PRESIDENCY_QUERY_KEY, periodsQueryOptions } from '@/tanstack-queries/presidency'
+import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { PAYMENT_METHOD_ITEMS } from '../../kind'
 
 const FORM_ID = 'record-fee-form'
@@ -123,6 +124,8 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
         ?.find((h) => h.id === values.property_id)
 
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
+      // Each period counts its movements; any at all blocks deleting it.
+      void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'periods'] })
 
       const description = {
         house: house ? houseLabel(house) : m.common_field_house(),
