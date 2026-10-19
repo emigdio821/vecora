@@ -139,10 +139,13 @@ function EditReservationForm({
               <IconInfoCircle />
               <AlertTitle>{m.presidency_reservation_paid_title()}</AlertTitle>
               <AlertDescription>
-                <ParaglideMessage
-                  markup={messageMarkup}
-                  message={m.presidency_reservation_paid_description}
-                />
+                {/* One paragraph: the description is a flex column, which would stack each part. */}
+                <p>
+                  <ParaglideMessage
+                    markup={messageMarkup}
+                    message={m.presidency_reservation_paid_description}
+                  />
+                </p>
               </AlertDescription>
             </Alert>
           )}

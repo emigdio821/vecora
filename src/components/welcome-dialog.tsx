@@ -295,7 +295,10 @@ function WelcomeSteps({ onDone, onLeave }: { onDone: () => void; onLeave: () => 
             <Alert variant="info">
               <IconInfoCircle />
               <AlertDescription>
-                <ParaglideMessage markup={messageMarkup} message={m.settings_welcome_revisit} />
+                {/* One paragraph: the description is a flex column, which would stack each part. */}
+                <p>
+                  <ParaglideMessage markup={messageMarkup} message={m.settings_welcome_revisit} />
+                </p>
               </AlertDescription>
             </Alert>
           )}
