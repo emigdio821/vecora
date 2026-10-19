@@ -1,5 +1,5 @@
 import { ParaglideMessage } from '@inlang/paraglide-js-react'
-import { IconCalendarOff, IconChartArea } from '@tabler/icons-react'
+import { IconCalendarOff, IconChartArea, IconChartAreaLine } from '@tabler/icons-react'
 import { areaY, d3Curve, defineChart, lineY } from '@tanstack/charts'
 import { crosshair } from '@tanstack/charts/crosshair'
 import { decorative } from '@tanstack/charts/mark/decorative'
@@ -14,11 +14,12 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { curveMonotoneX } from 'd3-shape'
 import { eachMonthOfInterval, format, parseISO } from 'date-fns'
-import { useMemo } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import { DashboardCardError } from '@/components/dashboard/card-error'
 import { messageMarkup } from '@/components/shared/message-markup'
 import { Money } from '@/components/shared/money'
 import { CardFrameSkeleton } from '@/components/shared/skeletons/card-frame'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -37,9 +38,11 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty'
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
+import { periodFor } from '@/lib/periods'
 import { type CurrencyCode, cn, dateLocale, ISO_DAY, intlLocale } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import { type PeriodQueryData, periodsQueryOptions } from '@/tanstack-queries/presidency'
@@ -97,11 +100,13 @@ function monthDate(month: string) {
 /**
  * From the period's first month through today (or the last movement, if one
  * is dated later). Months without movements stay in as zeros so the axis has
- * no gaps.
+ * no gaps. A period that hasn't started yet shows all of its months.
  */
 function monthlyTotals(period: PeriodQueryData, movements: PeriodMovementQueryData[], today: string) {
   const last = movements.reduce((max, m) => (m.occurred_on > max ? m.occurred_on : max), today)
-  const end = last < period.ends_on ? last : period.ends_on
+  const shownThrough = last < period.ends_on ? last : period.ends_on
+  // Before the period starts, today would end the axis ahead of its first month.
+  const end = shownThrough < period.starts_on ? period.ends_on : shownThrough
   const totals = new Map<string, MonthTotals>(
     eachMonthOfInterval({ start: parseISO(period.starts_on), end: parseISO(end) }).map((d) => {
       const month = format(d, 'yyyy-MM')
@@ -117,11 +122,16 @@ function monthlyTotals(period: PeriodQueryData, movements: PeriodMovementQueryDa
   return [...totals.values()]
 }
 
-/** Income, expenses and balance of the period that contains today, and how they moved month by month. */
+/**
+ * Income, expenses and balance of a period, and how they moved month by month.
+ * The period that contains today, unless the board picks another one.
+ */
 export function TreasuryCard() {
   const periods = useQuery(periodsQueryOptions)
   const summaries = useQuery(periodSummariesQueryOptions)
   const now = useToday()
+  // null until the board picks one: the card follows the current period.
+  const [pickedId, setPickedId] = useState<string | null>(null)
 
   if (periods.isPending || summaries.isPending) return <TreasuryCardSkeleton />
   if (periods.isError || summaries.isError) {
@@ -140,11 +150,24 @@ export function TreasuryCard() {
   }
 
   const today = format(now, ISO_DAY)
-  const period = periods.data.find((p) => p.starts_on <= today && today <= p.ends_on)
+  const current = periodFor(periods.data, today)
+  // Back to the current one if the picked period was deleted meanwhile.
+  const period = periods.data.find((p) => p.id === pickedId) ?? current
   // The period's own currency first, then any other it has movements in.
   const periodSummaries = summaries.data
     .filter((s) => s.period_id === period?.id)
     .sort((a, b) => Number(b.currency === period?.currency) - Number(a.currency === period?.currency))
+
+  // Only when picking would change something: there's a period besides the one shown.
+  const hasOtherPeriods = periods.data.some((p) => p.id !== period?.id)
+  const picker = hasOtherPeriods ? (
+    <PeriodPicker
+      periods={periods.data}
+      value={period?.id ?? null}
+      currentId={current?.id}
+      onValueChange={setPickedId}
+    />
+  ) : null
 
   if (!period || periodSummaries.length === 0) {
     return (
@@ -152,9 +175,7 @@ export function TreasuryCard() {
         <CardFrameHeader>
           <CardFrameTitle>{m.common_section_treasury()}</CardFrameTitle>
           <CardFrameDescription>{m.dashboard_treasury_summary()}</CardFrameDescription>
-          <CardFrameAction className="text-muted-foreground">
-            <IconChartArea />
-          </CardFrameAction>
+          <TreasuryCardAction picker={picker} />
         </CardFrameHeader>
         <Card>
           {/* The skeleton's totals and chart, unseen, hold the space; the empty state sits
@@ -188,7 +209,67 @@ export function TreasuryCard() {
     )
   }
 
-  return <PeriodTreasury period={period} summaries={periodSummaries} today={today} />
+  return <PeriodTreasury period={period} summaries={periodSummaries} today={today} picker={picker} />
+}
+
+/** The period picker when there is one; otherwise the section's icon. */
+function TreasuryCardAction({ picker }: { picker: ReactNode }) {
+  if (picker) {
+    return <CardFrameAction>{picker}</CardFrameAction>
+  }
+
+  return (
+    <CardFrameAction className="text-muted-foreground">
+      <IconChartArea />
+    </CardFrameAction>
+  )
+}
+
+/** Newest first, as the periods come; the one that contains today is marked. */
+function PeriodPicker({
+  periods,
+  value,
+  currentId,
+  onValueChange,
+}: {
+  periods: PeriodQueryData[]
+  value: string | null
+  currentId: string | undefined
+  onValueChange: (id: string) => void
+}) {
+  const items = periods.map((p) => ({ value: p.id, label: p.name }))
+
+  return (
+    <Select
+      items={items}
+      value={value}
+      onValueChange={(id) => {
+        if (id) onValueChange(id)
+      }}
+    >
+      <SelectTrigger
+        size="sm"
+        className="w-auto max-w-48 min-w-28"
+        aria-label={m.dashboard_treasury_period_picker()}
+      >
+        <SelectValue placeholder={m.dashboard_treasury_period_picker_placeholder()} />
+      </SelectTrigger>
+      <SelectPopup align="end">
+        {periods.map((p) => (
+          <SelectItem key={p.id} value={p.id}>
+            <span className="flex items-center gap-2">
+              {p.name}
+              {p.id === currentId && (
+                <Badge variant="info" size="sm">
+                  {m.dashboard_treasury_period_current()}
+                </Badge>
+              )}
+            </span>
+          </SelectItem>
+        ))}
+      </SelectPopup>
+    </Select>
+  )
 }
 
 /** Same layout as PeriodTreasury (totals, then the chart), so nothing moves when the data lands. */
@@ -228,10 +309,12 @@ function PeriodTreasury({
   period,
   summaries,
   today,
+  picker,
 }: {
   period: PeriodQueryData
   summaries: PeriodSummaryQueryData[]
   today: string
+  picker: ReactNode
 }) {
   const [summary, ...others] = summaries
   const currency = summary.currency ?? period.currency
@@ -243,9 +326,7 @@ function PeriodTreasury({
       <CardFrameHeader>
         <CardFrameTitle>{m.common_section_treasury()}</CardFrameTitle>
         <CardFrameDescription>{m.dashboard_treasury_period_name({ name: period.name })}</CardFrameDescription>
-        <CardFrameAction className="text-muted-foreground">
-          <IconChartArea />
-        </CardFrameAction>
+        <TreasuryCardAction picker={picker} />
       </CardFrameHeader>
       <Card>
         <CardPanel className="grid min-w-0 gap-6">
@@ -425,6 +506,32 @@ function MonthlyFlowChart({
           {m.common_action_retry()}
         </Button>
       </div>
+    )
+  }
+
+  // A new period, say: a flat line at $0 would look like the chart failed to draw.
+  // At least the chart's height; on phones the wrapped text needs more.
+  if (!movements.data.some((m) => m.currency === currency)) {
+    return (
+      <Empty style={{ minHeight: CHART_HEIGHT }} className="py-0 md:py-0">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <IconChartAreaLine />
+          </EmptyMedia>
+          <EmptyTitle>{m.dashboard_treasury_no_movements()}</EmptyTitle>
+          <EmptyDescription>
+            <ParaglideMessage
+              markup={messageMarkup}
+              message={m.dashboard_treasury_no_movements_description}
+            />
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button variant="outline" render={<Link to="/treasury" />}>
+            {m.dashboard_treasury_go_to_treasury()}
+          </Button>
+        </EmptyContent>
+      </Empty>
     )
   }
 
