@@ -16,7 +16,7 @@
 -- Deletion: properties and residents are soft-deleted (deleted_at / deleted_by)
 -- so an accidental delete can be undone. Nobody hard-deletes through the API;
 -- a nightly pg_cron job purges rows soft-deleted more than 6 months ago, but
--- only if nothing references them (see purge_soft_deleted, next to the ledger).
+-- only if nothing references them (see purge_soft_deleted, in the last migration).
 -- Deleting is for mistakes only (a typo duplicate, a test row). A resident who
 -- moves out is *not* deleted: the row is a permanent fact, and time-bound data
 -- (who lived where, who sat on the board) lives in dated link tables.

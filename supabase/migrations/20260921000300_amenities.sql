@@ -58,10 +58,12 @@ create trigger amenities_set_updated_at
 -- ---------------------------------------------------------------------------
 -- amenity_reservations
 -- ---------------------------------------------------------------------------
+-- Bookings are history, cancelled ones included: restrict, so the purge keeps a
+-- house that has any.
 create table public.amenity_reservations (
   id           uuid primary key default gen_random_uuid(),
   amenity_id   uuid not null references public.amenities (id) on delete restrict,
-  property_id  uuid not null references public.properties (id) on delete cascade,
+  property_id  uuid not null references public.properties (id) on delete restrict,
   reserved_on  date not null,
   amount       numeric(12,2) not null,
   currency     public.currency_code not null,

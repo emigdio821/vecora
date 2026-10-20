@@ -1,5 +1,6 @@
--- Settings (the residential's own details and logo) and the audit log. Last,
--- because the audit log attaches its trigger to every app table.
+-- Settings (the residential's own details and logo), the audit log and the
+-- nightly purge. Last, because the audit log attaches its trigger to every app
+-- table and the purge checks every table that references the registry.
 
 -- ---------------------------------------------------------------------------
 -- settings: one row for the whole deployment
@@ -321,3 +322,53 @@ alter table public.audit_log enable row level security;
 create policy "audit_log: admins can read"
   on public.audit_log for select to authenticated
   using ((select private.is_admin()));
+
+-- ---------------------------------------------------------------------------
+-- purge: hard-delete registry rows soft-deleted more than 6 months ago (nightly)
+-- ---------------------------------------------------------------------------
+-- Runs as postgres (table owner), so it bypasses RLS. Its deletes are audited
+-- with no identity.
+--
+-- Only *unreferenced* rows are purged. A resident or property that appears in
+-- any history table (property_residents, the ledger, bookings...) is kept
+-- forever, hidden, so questions like "who owned 2B in 2024?" or "who was
+-- president in 2024?" stay answerable. Add a `not exists` per new history
+-- table; the FKs are `on delete restrict` as a second line of defense, so a
+-- missing check makes the whole purge fail instead of losing history.
+create function private.purge_soft_deleted()
+returns void
+language sql
+set search_path = ''
+as $$
+  delete from public.residents r
+  where r.deleted_at < now() - interval '6 months'
+    and not exists (
+      select 1 from public.property_residents pr where pr.resident_id = r.id
+    );
+
+  delete from public.properties p
+  where p.deleted_at < now() - interval '6 months'
+    and not exists (
+      select 1 from public.property_residents pr where pr.property_id = p.id
+    )
+    and not exists (
+      select 1 from public.transactions t where t.property_id = p.id
+    )
+    and not exists (
+      select 1 from public.amenity_reservations ar where ar.property_id = p.id
+    );
+$$;
+
+revoke execute on function private.purge_soft_deleted() from public, anon, authenticated;
+
+-- https://supabase.com/docs/guides/cron/install
+create extension if not exists pg_cron with schema pg_catalog;
+grant usage on schema cron to postgres;
+grant all privileges on all tables in schema cron to postgres;
+
+-- 03:00 UTC daily
+select cron.schedule(
+  'purge-soft-deleted-registry',
+  '0 3 * * *',
+  $$ select private.purge_soft_deleted() $$
+);
