@@ -38,12 +38,28 @@ export function NavMain({ isAdmin, ...props }: NavMainProps) {
               onClick={() => {
                 setOpenMobile(false)
               }}
-              isActive={pathname === '/treasury'}
+              isActive={pathname === '/residential'}
               render={
-                <Link to="/treasury">
-                  <IconPigMoney className="size-4" />
-                  <span>{m.common_section_treasury()}</span>
-                  <LinkPendingIndicator to="/treasury" />
+                <Link to="/residential">
+                  <IconBuildingCommunity className="size-4" />
+                  <span>{m.common_section_residential()}</span>
+                  <LinkPendingIndicator to="/residential" />
+                </Link>
+              }
+            />
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => {
+                setOpenMobile(false)
+              }}
+              isActive={pathname === '/hoa-board'}
+              render={
+                <Link to="/hoa-board">
+                  <IconHeartHandshake className="size-4" />
+                  <span>{m.common_section_hoa_board()}</span>
+                  <LinkPendingIndicator to="/hoa-board" />
                 </Link>
               }
             />
@@ -60,6 +76,22 @@ export function NavMain({ isAdmin, ...props }: NavMainProps) {
                   <IconGavel className="size-4" />
                   <span>{m.common_section_presidency()}</span>
                   <LinkPendingIndicator to="/presidency" />
+                </Link>
+              }
+            />
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => {
+                setOpenMobile(false)
+              }}
+              isActive={pathname === '/treasury'}
+              render={
+                <Link to="/treasury">
+                  <IconPigMoney className="size-4" />
+                  <span>{m.common_section_treasury()}</span>
+                  <LinkPendingIndicator to="/treasury" />
                 </Link>
               }
             />
@@ -92,38 +124,6 @@ export function NavMain({ isAdmin, ...props }: NavMainProps) {
                   <IconUrgent className="size-4" />
                   <span>{m.common_section_security()}</span>
                   <LinkPendingIndicator to="/security" />
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => {
-                setOpenMobile(false)
-              }}
-              isActive={pathname === '/hoa-board'}
-              render={
-                <Link to="/hoa-board">
-                  <IconHeartHandshake className="size-4" />
-                  <span>{m.common_section_hoa_board()}</span>
-                  <LinkPendingIndicator to="/hoa-board" />
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => {
-                setOpenMobile(false)
-              }}
-              isActive={pathname === '/residential'}
-              render={
-                <Link to="/residential">
-                  <IconBuildingCommunity className="size-4" />
-                  <span>{m.common_section_residential()}</span>
-                  <LinkPendingIndicator to="/residential" />
                 </Link>
               }
             />
