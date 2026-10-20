@@ -165,13 +165,14 @@
   }
 }
 
-/* scroll-fade is off for now: Firefox has no scroll-driven animations yet, so its
-   fallback fades both edges for good, even when nothing scrolls. Delete this rule to
-   bring the fade back once it does. Dialog, drawer and sheet headers have a border instead. */
-.scroll-fade {
-  -webkit-mask-image: none;
-  mask-image: none;
-  animation: none;
+/* shadcn's scroll-fade (shadcn/tailwind.css) follows the scroll with scroll-driven
+   animations. Without them (Firefox for now) its fallback fades both edges for good, even
+   when nothing scrolls, so there it's off. Unlayered, so it wins over the utility. */
+@supports not (animation-timeline: scroll()) {
+  .scroll-fade {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }
 
 /* Text size from Settings → App (accessibility-preferences.tsx). Sizes are in rem,
