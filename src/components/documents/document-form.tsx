@@ -119,14 +119,43 @@ async function downloadDocument(document: DocumentInput) {
   }, 1000)
 }
 
-async function previewDocument({ document, tab }: { document: DocumentInput; tab: Window }) {
+/** How long the preview's file stays openable: the tab's viewer has read it by then. */
+const PREVIEW_URL_LIFETIME = 60_000
+/** Well within PREVIEW_URL_LIFETIME, so its button never opens a freed file. */
+const PREVIEW_READY_TOAST_TIMEOUT = 30_000
+
+/** The PDF as an address a tab can open. */
+async function generatePreview(document: DocumentInput): Promise<string> {
   const { blob } = await generateDocument(document)
   const url = URL.createObjectURL(blob)
-  tab.location.href = url
-  // The tab's viewer has read it by then; a reload there would need it again, though.
   setTimeout(() => {
     URL.revokeObjectURL(url)
-  }, 60_000)
+  }, PREVIEW_URL_LIFETIME)
+  return url
+}
+
+/**
+ * Browsers only let a page open a tab for a few seconds after a click (Safari, barely at
+ * all), and a long document takes longer than that. Blocked, the toast offers a button
+ * instead: a new click, which always can.
+ */
+function openPreview(url: string) {
+  const tab = window.open(url, '_blank')
+  if (tab) {
+    return
+  }
+  const toastId = toastManager.add({
+    type: 'success',
+    title: m.documents_preview_ready(),
+    timeout: PREVIEW_READY_TOAST_TIMEOUT,
+    actionProps: {
+      children: m.documents_preview_open(),
+      onClick: () => {
+        toastManager.close(toastId)
+        window.open(url, '_blank')
+      },
+    },
+  })
 }
 
 interface DocumentFormProps {
@@ -195,45 +224,43 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
   })
 
   const previewMutation = useMutation({
-    mutationFn: previewDocument,
-    onError: (error, variables) => {
-      variables.tab.close()
+    mutationFn: generatePreview,
+    onMutate: () => {
+      // Up until the PDF is ready, however long that takes.
+      const toastId = toastManager.add({
+        type: 'loading',
+        title: m.documents_preview_generating(),
+        timeout: 0,
+      })
+      return { toastId }
+    },
+    onSuccess: (url, _document, { toastId }) => {
+      toastManager.close(toastId)
+      openPreview(url)
+    },
+    onError: (error, _document, context) => {
+      if (context) {
+        toastManager.close(context.toastId)
+      }
       toastManager.add({ type: 'error', title: m.common_error(), description: error.message })
     },
   })
 
-  function handlePreview() {
-    // Checked here, not through handleSubmit: that waits, and browsers block tabs opened after waiting.
-    const parsed = documentSchema.safeParse(form.getValues())
-    if (!parsed.success) {
-      // A submit that does nothing, not form.trigger(): it shows the errors and focuses the
-      // first one, and marks the form submitted, so the errors update as the user types.
-      void form.handleSubmit(() => {})()
-      return
-    }
+  // Through handleSubmit, like the download: it shows the errors and focuses the first
+  // one, and marks the form submitted, so the errors update as the user types.
 
-    const tab = window.open('', '_blank')
-    if (!tab) {
-      // The browser blocked the tab anyway: hand over the file instead.
-      downloadMutation.mutate(parsed.data)
-      return
-    }
-    tab.document.title = m.documents_preview()
-    tab.document.body.textContent = m.documents_preview_generating()
-    previewMutation.mutate({ document: parsed.data, tab })
+  function handlePreview() {
+    void form.handleSubmit((values) => {
+      previewMutation.mutate(values)
+    })()
   }
 
   function handleSaveTemplate() {
     // A template is a document someone can download as it is: the same checks as the PDF.
-    const parsed = documentSchema.safeParse(form.getValues())
-    if (!parsed.success) {
-      void form.handleSubmit(() => {})()
-      return
-    }
-
-    const { header_title, title, content } = parsed.data
-    setTemplateSource({ header_title, title, content })
-    setSaveTemplateOpen(true)
+    void form.handleSubmit(({ header_title, title, content }) => {
+      setTemplateSource({ header_title, title, content })
+      setSaveTemplateOpen(true)
+    })()
   }
 
   return (

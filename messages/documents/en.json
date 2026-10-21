@@ -64,6 +64,8 @@
 
   "documents_preview": "Preview",
   "documents_preview_generating": "Generating the preview...",
+  "documents_preview_ready": "The preview is ready",
+  "documents_preview_open": "Open",
   "documents_downloaded": "Document downloaded",
   "documents_generate_failed": "The document couldn't be generated. Reload the page and try again.",
   "documents_too_long": "The document is too big. Remove some images or split it in two and try again.",

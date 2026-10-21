@@ -64,6 +64,8 @@
 
   "documents_preview": "Vista previa",
   "documents_preview_generating": "Generando la vista previa...",
+  "documents_preview_ready": "La vista previa está lista",
+  "documents_preview_open": "Abrir",
   "documents_downloaded": "Documento descargado",
   "documents_generate_failed": "No se pudo generar el documento. Recarga la página e inténtalo de nuevo.",
   "documents_too_long": "El documento es demasiado grande. Quita algunas imágenes o divídelo en dos e inténtalo de nuevo.",
