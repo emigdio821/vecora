@@ -14,18 +14,68 @@ import type { Locale } from '@/paraglide/runtime'
 // Inter, like the app. The app's variable woff2 would render every weight as
 // regular here, so this uses the static woff files, bundled as data URLs;
 // react-pdf embeds just the glyphs the document uses.
-Font.register({
-  family: 'Inter',
-  fonts: [
-    { src: interRegularUrl, fontWeight: 400 },
-    { src: interItalicUrl, fontWeight: 400, fontStyle: 'italic' },
-    { src: interSemiBoldUrl, fontWeight: 600 },
-    { src: interSemiBoldItalicUrl, fontWeight: 600, fontStyle: 'italic' },
-  ],
-})
+const FONT_FAMILY = 'Inter'
+const FONT_FACES = [
+  { src: interRegularUrl, fontWeight: 400, fontStyle: 'normal' },
+  { src: interItalicUrl, fontWeight: 400, fontStyle: 'italic' },
+  { src: interSemiBoldUrl, fontWeight: 600, fontStyle: 'normal' },
+  { src: interSemiBoldItalicUrl, fontWeight: 600, fontStyle: 'italic' },
+] as const
+
+Font.register({ family: FONT_FAMILY, fonts: [...FONT_FACES] })
 
 // The built-in hyphenation is English ("mantenimien-to"); wrap whole words.
 Font.registerHyphenationCallback((word) => [word])
+
+/** The part of a fontkit font the fix below touches. */
+interface GlyphCache {
+  getGlyph: (id: number, codePoints?: number[]) => { codePoints: number[] }
+}
+
+/**
+ * fontkit keeps each glyph with the characters it was first asked for. Embedding a
+ * composite glyph (":" or "…" are built from ".", "á" from "a") asks for its parts with
+ * none, and react-pdf keeps one font per face for the life of the server: once a PDF
+ * embedded a semibold ":" before any semibold ".", every later one mapped "." to no
+ * character, and the letter before it went missing ("1. Registro" printed ". Registro").
+ * A glyph asked for with its characters gets them back.
+ */
+function keepGlyphCharacters(font: GlyphCache) {
+  const getGlyph = font.getGlyph.bind(font)
+  font.getGlyph = (id, codePoints = []) => {
+    const glyph = getGlyph(id, codePoints)
+    if (glyph.codePoints.length === 0 && codePoints.length > 0) {
+      glyph.codePoints = codePoints
+    }
+    return glyph
+  }
+}
+
+let fontsReady: Promise<void> | null = null
+
+/** Loads the fonts, with the fix above, before the first PDF. Await it before rendering one. */
+export function preparePdfFonts(): Promise<void> {
+  if (fontsReady === null) {
+    fontsReady = Promise.all(
+      FONT_FACES.map(async (face) => {
+        const descriptor = { fontFamily: FONT_FAMILY, fontWeight: face.fontWeight, fontStyle: face.fontStyle }
+        await Font.load(descriptor)
+        const font = Font.getFont(descriptor).data as unknown as GlyphCache | null
+        if (font) {
+          keepGlyphCharacters(font)
+        }
+      }),
+    ).then(
+      () => undefined,
+      (error: unknown) => {
+        // Tried again with the next PDF instead of failing every one after it.
+        fontsReady = null
+        throw error
+      },
+    )
+  }
+  return fontsReady
+}
 
 export const COLOR = {
   text: '#111827',

@@ -1,6 +1,7 @@
 import { renderToBuffer } from '@react-pdf/renderer'
 import { createFileRoute } from '@tanstack/react-router'
 import { DocumentPdf } from '@/components/reports/pdf/document'
+import { preparePdfFonts } from '@/components/reports/pdf/layout'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { getLogo, getSettings } from '@/lib/supabase/settings'
 import { slugify } from '@/lib/utils'
@@ -66,6 +67,7 @@ async function POST(request: Request) {
 
   let pdf: Buffer
   try {
+    await preparePdfFonts()
     pdf = await renderToBuffer(
       <DocumentPdf
         document={parsed.data}

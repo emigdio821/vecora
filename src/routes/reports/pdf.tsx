@@ -1,6 +1,7 @@
 import { renderToBuffer } from '@react-pdf/renderer'
 import { createFileRoute } from '@tanstack/react-router'
 import { FinancialReportDocument, isWholeMonth } from '@/components/reports/pdf/financial-report'
+import { preparePdfFonts } from '@/components/reports/pdf/layout'
 import { getCurrentUser } from '@/lib/supabase/current-user'
 import { getFinancialReport } from '@/lib/supabase/financial-report'
 import { getLogo, getSettings } from '@/lib/supabase/settings'
@@ -63,6 +64,7 @@ async function GET(request: Request) {
   const generatedBy = user.isMainAdmin
     ? m.common_role_admin({}, { locale: settings.defaultLanguage })
     : user.fullName
+  await preparePdfFonts()
   const pdf = await renderToBuffer(
     <FinancialReportDocument
       report={report}
