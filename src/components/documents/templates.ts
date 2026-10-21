@@ -37,6 +37,14 @@ export const DOCUMENT_TEMPLATES: DocumentTemplate[] = [
     content: (locale) => m.documents_template_meeting_call_content({}, { locale }),
   },
   {
+    id: 'proxy',
+    name: () => m.documents_template_proxy_name(),
+    description: () => m.documents_template_proxy_description(),
+    headerTitle: (locale) => m.documents_template_proxy_header({}, { locale }),
+    title: (locale) => m.documents_template_proxy_title({}, { locale }),
+    content: (locale) => m.documents_template_proxy_content({}, { locale }),
+  },
+  {
     id: 'minutes',
     name: () => m.documents_template_minutes_name(),
     description: () => m.documents_template_minutes_description(),
@@ -51,6 +59,22 @@ export const DOCUMENT_TEMPLATES: DocumentTemplate[] = [
     headerTitle: (locale) => m.documents_template_fee_reminder_header({}, { locale }),
     title: (locale) => m.documents_template_fee_reminder_title({}, { locale }),
     content: (locale) => m.documents_template_fee_reminder_content({}, { locale }),
+  },
+  {
+    id: 'board-report',
+    name: () => m.documents_template_board_report_name(),
+    description: () => m.documents_template_board_report_description(),
+    headerTitle: (locale) => m.documents_template_board_report_header({}, { locale }),
+    title: (locale) => m.documents_template_board_report_title({}, { locale }),
+    content: (locale) => m.documents_template_board_report_content({}, { locale }),
+  },
+  {
+    id: 'amenity-rules',
+    name: () => m.documents_template_amenity_rules_name(),
+    description: () => m.documents_template_amenity_rules_description(),
+    headerTitle: (locale) => m.documents_template_amenity_rules_header({}, { locale }),
+    title: (locale) => m.documents_template_amenity_rules_title({}, { locale }),
+    content: (locale) => m.documents_template_amenity_rules_content({}, { locale }),
   },
 ]
 
