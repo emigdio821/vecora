@@ -239,27 +239,33 @@ function textAlign(align: TextAlign | null | undefined): TextAlign {
 
 /** About 13 lines: always fits on one page. */
 const SHORT_QUOTE_LENGTH = 1200
+/** About 6 lines: moved whole, it leaves at most that much space at the bottom of a page. */
+const SHORT_LIST_ITEM_LENGTH = 600
 
-interface QuoteTree {
+interface BlockTree {
   type: string
   text?: string
-  content?: QuoteTree[]
+  content?: BlockTree[]
 }
 
-/** The characters of text in a quote, lists inside it included; Infinity with an image. */
-function quoteLength(node: QuoteTree): number {
+/** The characters of text in a block, lists inside it included; Infinity with an image. */
+function textLength(node: BlockTree): number {
   if (node.type === 'image') {
     return Number.POSITIVE_INFINITY
   }
   let length = node.text?.length ?? 0
   for (const child of node.content ?? []) {
-    length = length + quoteLength(child)
+    length = length + textLength(child)
   }
   return length
 }
 
-function isShortQuote(block: QuoteTree): boolean {
-  return quoteLength(block) <= SHORT_QUOTE_LENGTH
+function isShortQuote(block: BlockTree): boolean {
+  return textLength(block) <= SHORT_QUOTE_LENGTH
+}
+
+function isShortListItem(item: BlockTree): boolean {
+  return textLength(item) <= SHORT_LIST_ITEM_LENGTH
 }
 
 interface BlockProps {
@@ -363,7 +369,13 @@ function List({ items, marker, gap }: ListProps) {
   return (
     <View style={{ marginTop: gap }}>
       {items.map((item, index) => (
-        <View key={index} style={[styles.listItem, { marginTop: index === 0 ? 0 : LIST_GAP }]}>
+        // A short one moves to the next page whole: split, its marker could stay at the bottom
+        // of a page while its text moved on. A long one has to split, like a long quote.
+        <View
+          key={index}
+          style={[styles.listItem, { marginTop: index === 0 ? 0 : LIST_GAP }]}
+          wrap={!isShortListItem(item)}
+        >
           <Text style={styles.listMarker}>{marker(index)}</Text>
           <View style={styles.listBody}>
             <Blocks blocks={item.content} context="listItem" />
