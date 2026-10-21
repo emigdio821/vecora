@@ -74,7 +74,8 @@
     margin-block-start: calc(12 * var(--document-pt));
   }
 
-  /* Tables: a 0.75pt grid in the quote bar's gray, columns of the same width, 4pt by 6pt
+  /* Tables: a 0.75pt grid in the quote bar's gray, columns of the same width (or by their
+     text, below), 4pt by 6pt
      around each cell's text. Header cells are bold on neutral-100. The wrapper scrolls a
      table with too many columns to fit. */
   .typeset-document :where(.tableWrapper) {
@@ -86,6 +87,10 @@
     border-collapse: collapse;
     border-block-end: 0;
     margin-block-start: 0;
+  }
+  /* Columns by their text, like the PDF's contentColumnShares: the browser sizes them. */
+  .typeset-document :where(table[data-column-widths='content']) {
+    table-layout: auto;
   }
   .typeset-document :where(td, th) {
     position: relative;

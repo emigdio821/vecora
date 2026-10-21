@@ -4,6 +4,7 @@ import {
   IconColumnInsertLeft,
   IconColumnInsertRight,
   IconColumnRemove,
+  IconColumns,
   IconRowInsertBottom,
   IconRowInsertTop,
   IconRowRemove,
@@ -21,6 +22,7 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { ToolbarButton } from '@/components/ui/toolbar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import type { ColumnWidths } from '@/lib/validations/documents'
 import { m } from '@/paraglide/messages'
 import { keepEditorFocus, returnFocusToEditor, ToolbarMenu } from './editor-toolbar-controls'
 
@@ -64,6 +66,11 @@ export function hasHeaderColumn(editor: Editor): boolean {
     }
   })
   return isAllHeaders
+}
+
+/** Whether the columns of the table the cursor is in are as wide as their text, not all the same. */
+export function hasContentColumnWidths(editor: Editor): boolean {
+  return currentTable(editor)?.attrs.columnWidths === 'content'
 }
 
 /**
@@ -200,13 +207,14 @@ interface TableMenuProps {
   isTable: boolean
   isHeaderRow: boolean
   isHeaderColumn: boolean
+  isContentWidths: boolean
 }
 
 /**
  * Outside a table, inserts one; inside, edits it: rows, columns and its headers.
  * No table inside another: a table in a cell is hard to read.
  */
-export function TableMenu({ editor, isTable, isHeaderRow, isHeaderColumn }: TableMenuProps) {
+export function TableMenu({ editor, isTable, isHeaderRow, isHeaderColumn, isContentWidths }: TableMenuProps) {
   if (!isTable) {
     return <TableInsertPopover editor={editor} />
   }
@@ -263,6 +271,16 @@ export function TableMenu({ editor, isTable, isHeaderRow, isHeaderColumn }: Tabl
         <IconTableColumn />
         <span className="flex-1">{m.documents_table_header_column()}</span>
         {isHeaderColumn && <IconCheck />}
+      </MenuItem>
+      <MenuItem
+        onClick={() => {
+          const columnWidths: ColumnWidths = isContentWidths ? 'equal' : 'content'
+          editor.chain().focus().updateAttributes('table', { columnWidths }).run()
+        }}
+      >
+        <IconColumns />
+        <span className="flex-1">{m.documents_table_content_widths()}</span>
+        {isContentWidths && <IconCheck />}
       </MenuItem>
       <MenuSeparator />
       <MenuItem

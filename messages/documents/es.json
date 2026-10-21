@@ -56,6 +56,7 @@
   "documents_table_add_column_after": "Agregar columna a la derecha",
   "documents_table_header_row": "Fila de encabezado",
   "documents_table_header_column": "Columna de encabezado",
+  "documents_table_content_widths": "Columnas según su contenido",
   "documents_table_delete_row": "Eliminar fila",
   "documents_table_delete_column": "Eliminar columna",
   "documents_table_delete": "Eliminar tabla",

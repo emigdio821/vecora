@@ -41,7 +41,7 @@ import {
 import { m } from '@/paraglide/messages'
 import { IMAGE_FILE_TYPES, insertImages } from './editor-images'
 import { LinkPopover } from './editor-link-popover'
-import { hasHeaderColumn, hasHeaderRow, TableMenu } from './editor-table-menu'
+import { hasContentColumnWidths, hasHeaderColumn, hasHeaderRow, TableMenu } from './editor-table-menu'
 import { FormatToggle, HistoryButton, keepEditorFocus, ToolbarMenu } from './editor-toolbar-controls'
 
 const HEADING_ICON: Record<HeadingLevel, TablerIcon> = {
@@ -136,6 +136,7 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
         isTable: current.isActive('table'),
         isHeaderRow: hasHeaderRow(current),
         isHeaderColumn: hasHeaderColumn(current),
+        isContentWidths: hasContentColumnWidths(current),
         alignment: currentAlignment(current),
         canUndo: current.can().undo(),
         canRedo: current.can().redo(),
@@ -357,6 +358,7 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
           isTable={state.isTable}
           isHeaderRow={state.isHeaderRow}
           isHeaderColumn={state.isHeaderColumn}
+          isContentWidths={state.isContentWidths}
         />
       </ToolbarGroup>
     </Toolbar>

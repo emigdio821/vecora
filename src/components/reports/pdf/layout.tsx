@@ -77,6 +77,22 @@ export function preparePdfFonts(): Promise<void> {
   return fontsReady
 }
 
+/** The part of a fontkit font measureText uses. */
+interface TextMeasure {
+  unitsPerEm: number
+  layout: (text: string) => { advanceWidth: number }
+}
+
+/** How wide a line of text prints in Inter, in points. The fonts must be ready (preparePdfFonts). */
+export function measureText(text: string, fontWeight: 400 | 600, fontSize: number): number {
+  const descriptor = { fontFamily: FONT_FAMILY, fontWeight, fontStyle: 'normal' as const }
+  const font = Font.getFont(descriptor).data as unknown as TextMeasure | null
+  if (!font) {
+    return 0
+  }
+  return (font.layout(text).advanceWidth / font.unitsPerEm) * fontSize
+}
+
 export const COLOR = {
   text: '#111827',
   muted: '#6b7280',

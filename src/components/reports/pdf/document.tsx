@@ -19,6 +19,7 @@ import {
 } from '@/lib/validations/documents'
 import type { Locale } from '@/paraglide/runtime'
 import { layoutStyles, PageFooter, PageHeader } from './layout'
+import { contentColumnWidths } from './table-widths'
 
 // Rendered on the server by /reports/document, from the editor's JSON (already
 // checked against documentSchema). Only react-pdf primitives here.
@@ -49,7 +50,8 @@ const styles = StyleSheet.create({
   // right and bottom ones.
   table: { borderTopWidth: 0.75, borderLeftWidth: 0.75, borderColor: '#d4d4d4' },
   tableRow: { flexDirection: 'row' },
-  // flexBasis 0: every column the same width, whatever its text, like the editor's.
+  // flexBasis 0: every column the same width, whatever its text, like the editor's
+  // (unless they go by their text: see TableBlock).
   tableCell: {
     flexGrow: 1,
     flexBasis: 0,
@@ -340,6 +342,10 @@ function cellBlocks(cell: DocumentTableCell): DocumentBlock[] {
 }
 
 function TableBlock({ table, gap }: { table: DocumentTable; gap: number }) {
+  // By their text, each column grows by its width: in a list or a quote the table is
+  // narrower than the page, and the columns keep their proportions.
+  const widths = table.attrs?.columnWidths === 'content' ? contentColumnWidths(table) : null
+
   return (
     <View style={[styles.table, { marginTop: gap }]}>
       {table.content.map((row, rowIndex) => (
@@ -348,7 +354,11 @@ function TableBlock({ table, gap }: { table: DocumentTable; gap: number }) {
           {row.content.map((cell, cellIndex) => (
             <View
               key={cellIndex}
-              style={[styles.tableCell, cell.type === 'tableHeader' ? styles.tableHeaderCell : {}]}
+              style={[
+                styles.tableCell,
+                widths ? { flexGrow: widths[cellIndex] } : {},
+                cell.type === 'tableHeader' ? styles.tableHeaderCell : {},
+              ]}
             >
               <Blocks blocks={cellBlocks(cell)} context="flow" />
             </View>

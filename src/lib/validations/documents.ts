@@ -207,8 +207,7 @@ const blockquoteSchema = z.object({
 
 /**
  * A cell holds any blocks, like a list item, and spans one row and one column: the PDF
- * draws a grid of equal columns. `align` comes with pasted tables; a paragraph's own
- * alignment wins over it.
+ * draws a grid. `align` comes with pasted tables; a paragraph's own alignment wins over it.
  */
 const tableCellSchema = z.object({
   type: z.enum(['tableCell', 'tableHeader']),
@@ -229,8 +228,13 @@ const tableRowSchema = z.object({
   content: z.array(tableCellSchema),
 })
 
+/** All columns the same width, or each as wide as its text asks (see contentColumnShares). */
+export const COLUMN_WIDTHS = ['equal', 'content'] as const
+export type ColumnWidths = (typeof COLUMN_WIDTHS)[number]
+
 const tableSchema = z.object({
   type: z.literal('table'),
+  attrs: z.object({ columnWidths: z.enum(COLUMN_WIDTHS).nullish() }).optional(),
   content: z.array(tableRowSchema),
 })
 
