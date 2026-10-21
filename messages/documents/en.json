@@ -96,7 +96,7 @@
   "documents_template_fee_reminder_title": "Maintenance fee payment reminder",
   "documents_template_fee_reminder_content": "Dear residents,\n\nThis is a reminder that the maintenance fee for **[month]** is **[amount]** and is due on **[due date]**.\n\n## How to pay\n\n- **Bank transfer:** [bank], account [number], to [account holder].\n- **Reference:** your house number.\n- **Cash:** with [person], [days and hours].\n\nAfter the due date, a late fee of **[amount or percentage]** will apply.\n\nIf you've already paid, thank you, and please disregard this notice.\n\nSincerely,\nThe HOA board",
 
-  "documents_ai_write": "Write with AI",
+  "documents_ai_write": "Text for your AI",
   "documents_ai_description": "If you use ChatGPT, Gemini or another assistant, this text tells it how to write the document so it looks right in the PDF.",
   "documents_ai_step_copy": "Copy the text.",
   "documents_ai_step_describe": "Paste it in the chat and replace what's in brackets with what you want to say.",

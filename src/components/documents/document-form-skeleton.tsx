@@ -120,7 +120,7 @@ export function DocumentFormSkeleton() {
           <div className="flex flex-col gap-2 md:min-h-0 md:flex-1">
             <div className="flex items-center justify-between gap-2">
               <LabelSkeleton>{m.documents_field_content()}</LabelSkeleton>
-              {/* The "write with AI" button, as tall as the label's line like the real one. */}
+              {/* The "text for your AI" button, as tall as the label's line like the real one. */}
               <Skeleton className="-my-1.25 h-7 w-32 rounded-md sm:-my-1 sm:h-6 sm:w-30" />
             </div>
             <div className="flex max-h-[70vh] w-full flex-col overflow-hidden rounded-lg border border-input bg-background not-dark:bg-clip-padding md:max-h-none md:min-h-0 md:flex-1 dark:bg-input/32">

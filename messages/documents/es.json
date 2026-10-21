@@ -96,7 +96,7 @@
   "documents_template_fee_reminder_title": "Recordatorio de pago de la cuota de mantenimiento",
   "documents_template_fee_reminder_content": "Estimados residentes:\n\nLes recordamos que la cuota de mantenimiento de **[mes]** es de **[monto]** y vence el **[fecha límite]**.\n\n## Cómo pagar\n\n- **Transferencia:** [banco], cuenta [número], CLABE [número], a nombre de [titular].\n- **Referencia:** el número de su casa.\n- **En efectivo:** con [persona], [días y horario].\n\nDespués de la fecha límite se aplicará un recargo de **[monto o porcentaje]**.\n\nSi ya realizaron su pago, se lo agradecemos y les pedimos ignorar este aviso.\n\nAtentamente,\nLa mesa directiva",
 
-  "documents_ai_write": "Redactar con IA",
+  "documents_ai_write": "Texto para tu IA",
   "documents_ai_description": "Si usas ChatGPT, Gemini u otro asistente, este texto le explica cómo escribir el documento para que se vea bien en el PDF.",
   "documents_ai_step_copy": "Copia el texto.",
   "documents_ai_step_describe": "Pégalo en el chat y cambia lo que está entre corchetes por lo que quieres comunicar.",
