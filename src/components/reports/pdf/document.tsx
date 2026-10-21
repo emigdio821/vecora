@@ -26,6 +26,10 @@ import { contentColumnWidths } from './table-widths'
 
 // The editor draws the same (src/styles/typeset-document.css, in "PDF points"): change
 // one, change the other. Larger than the financial report's tables: read like a letter.
+
+/** A table's lines. */
+const TABLE_LINE = 0.75
+
 const styles = StyleSheet.create({
   title: { fontSize: 20, fontWeight: 600, marginBottom: 12 },
   paragraph: { fontSize: 11, lineHeight: 1.5 },
@@ -46,21 +50,16 @@ const styles = StyleSheet.create({
   link: { color: '#1d4ed8', textDecoration: 'underline' },
   // Inside a list or a quote the space is narrower: maxWidth shrinks it, contain keeps its shape.
   image: { maxWidth: '100%', objectFit: 'contain' },
-  // A grid in the quote bar's gray: the table draws the top and left lines, each cell its
-  // right and bottom ones.
-  table: { borderTopWidth: 0.75, borderLeftWidth: 0.75, borderColor: '#d4d4d4' },
-  tableRow: { flexDirection: 'row' },
+  // A grid in the quote bar's gray, drawn by the rows: each one a whole box, pulled up onto
+  // the line of the one above (TABLE_LINE), so the part of a table on each page closes on
+  // its own. The table itself draws nothing: the part a page break leaves on the first
+  // page reaches down to the footer, past its last row.
+  tableRow: { flexDirection: 'row', borderWidth: TABLE_LINE, borderColor: '#d4d4d4' },
   // flexBasis 0: every column the same width, whatever its text, like the editor's
-  // (unless they go by their text: see TableBlock).
-  tableCell: {
-    flexGrow: 1,
-    flexBasis: 0,
-    paddingVertical: 4,
-    paddingHorizontal: 6,
-    borderRightWidth: 0.75,
-    borderBottomWidth: 0.75,
-    borderColor: '#d4d4d4',
-  },
+  // (unless they go by their text: see TableBlock). Each one after the first draws the
+  // line between it and the one before.
+  tableCell: { flexGrow: 1, flexBasis: 0, paddingVertical: 4, paddingHorizontal: 6 },
+  tableCellDivider: { borderLeftWidth: TABLE_LINE, borderColor: '#d4d4d4' },
   // neutral-100; the text inside is bold.
   tableHeaderCell: { backgroundColor: '#f5f5f5', fontWeight: 600 },
 })
@@ -347,15 +346,20 @@ function TableBlock({ table, gap }: { table: DocumentTable; gap: number }) {
   const widths = table.attrs?.columnWidths === 'content' ? contentColumnWidths(table) : null
 
   return (
-    <View style={[styles.table, { marginTop: gap }]}>
+    <View style={{ marginTop: gap }}>
       {table.content.map((row, rowIndex) => (
         // Rows never split across pages.
-        <View key={rowIndex} style={styles.tableRow} wrap={false}>
+        <View
+          key={rowIndex}
+          style={[styles.tableRow, { marginTop: rowIndex === 0 ? 0 : -TABLE_LINE }]}
+          wrap={false}
+        >
           {row.content.map((cell, cellIndex) => (
             <View
               key={cellIndex}
               style={[
                 styles.tableCell,
+                cellIndex === 0 ? {} : styles.tableCellDivider,
                 widths ? { flexGrow: widths[cellIndex] } : {},
                 cell.type === 'tableHeader' ? styles.tableHeaderCell : {},
               ]}
