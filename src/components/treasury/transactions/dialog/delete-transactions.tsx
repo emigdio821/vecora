@@ -5,6 +5,7 @@ import {
   ResponsiveAlertDialogDescription,
   ResponsiveAlertDialogFooter,
   ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogPanel,
   ResponsiveAlertDialogPopup,
   type ResponsiveAlertDialogProps,
   ResponsiveAlertDialogTitle,
@@ -170,17 +171,19 @@ export function DeleteTransactionsAlertDialog({
           <ResponsiveAlertDialogDescription>{description}</ResponsiveAlertDialogDescription>
         </ResponsiveAlertDialogHeader>
 
-        <ul className="max-h-48 scroll-fade overflow-y-auto px-6 pb-4 text-sm">
-          {transactions.map((transaction) => (
-            <li key={transaction.id} className="flex justify-between gap-4">
-              <span className="truncate">{transaction.description}</span>
-              <span className="shrink-0 tabular-nums">
-                {transaction.kind === 'income' ? '+' : '−'}
-                {formatCurrency(transaction.amount, transaction.currency)}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <ResponsiveAlertDialogPanel className="max-h-56 text-sm">
+          <ul>
+            {transactions.map((transaction) => (
+              <li key={transaction.id} className="flex justify-between gap-4">
+                <span className="truncate">{transaction.description}</span>
+                <span className="shrink-0 tabular-nums">
+                  {transaction.kind === 'income' ? '+' : '−'}
+                  {formatCurrency(transaction.amount, transaction.currency)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </ResponsiveAlertDialogPanel>
 
         <ResponsiveAlertDialogFooter>
           <ResponsiveAlertDialogClose render={<Button variant="ghost" />} disabled={isBusy}>

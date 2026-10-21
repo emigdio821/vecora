@@ -75,8 +75,32 @@ export function AlertDialogPopup({
 export function AlertDialogHeader({ className, ...props }: React.ComponentProps<'div'>): React.ReactElement {
   return (
     <div
-      className={cn('flex flex-col gap-2 p-6 text-center max-sm:pb-4 sm:text-left', className)}
+      className={cn(
+        'flex flex-col gap-2 p-6 text-center in-[[data-slot=alert-dialog-popup]:has([data-slot=alert-dialog-panel])]:border-b in-[[data-slot=alert-dialog-popup]:has([data-slot=alert-dialog-panel])]:pb-3 max-sm:pb-4 sm:text-left',
+        className,
+      )}
       data-slot="alert-dialog-header"
+      {...props}
+    />
+  )
+}
+
+/** Content between the header and the footer that may scroll, like DialogPanel; one element, so a max height caps the scroll. */
+export function AlertDialogPanel({
+  className,
+  scrollFade = true,
+  ...props
+}: React.ComponentProps<'div'> & {
+  scrollFade?: boolean
+}): React.ReactElement {
+  return (
+    <div
+      className={cn(
+        'min-h-0 overflow-y-auto overscroll-contain p-6 in-[[data-slot=alert-dialog-popup]:has([data-slot=alert-dialog-footer]:not(.border-t))]:pb-1 in-[[data-slot=alert-dialog-popup]:has([data-slot=alert-dialog-header])]:pt-4',
+        scrollFade && 'scroll-fade',
+        className,
+      )}
+      data-slot="alert-dialog-panel"
       {...props}
     />
   )

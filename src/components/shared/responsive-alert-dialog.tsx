@@ -5,6 +5,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogPanel,
   AlertDialogPopup,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
@@ -14,10 +15,12 @@ import {
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
+  DrawerPanel,
   DrawerPopup,
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { useIsMobile } from '@/hooks/use-media-query'
+import { cn } from '@/lib/utils'
 
 // An AlertDialog on desktop and a bottom Drawer on mobile, like ResponsiveDialog:
 // opened from another drawer, it stacks on it. The Drawer keeps what makes it an
@@ -69,6 +72,22 @@ export function ResponsiveAlertDialogDescription(props: PartProps) {
   ) : (
     <AlertDialogDescription {...props} />
   )
+}
+
+/** A list or other content under the header, which then gets a border. Scrolls itself, so a max height caps it. */
+export function ResponsiveAlertDialogPanel({ className, ...props }: PartProps) {
+  if (useContext(IsDrawerContext)) {
+    // Not the drawer's own scroll wrapper: that one takes no class, so nothing could cap it.
+    return (
+      <DrawerPanel
+        scrollable={false}
+        className={cn('min-h-0 scroll-fade touch-auto overflow-y-auto overscroll-contain', className)}
+        {...props}
+      />
+    )
+  }
+
+  return <AlertDialogPanel className={className} {...props} />
 }
 
 export function ResponsiveAlertDialogFooter(props: PartProps) {

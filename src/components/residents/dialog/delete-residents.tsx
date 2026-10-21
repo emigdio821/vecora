@@ -5,6 +5,7 @@ import {
   ResponsiveAlertDialogDescription,
   ResponsiveAlertDialogFooter,
   ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogPanel,
   ResponsiveAlertDialogPopup,
   type ResponsiveAlertDialogProps,
   ResponsiveAlertDialogTitle,
@@ -158,13 +159,15 @@ export function DeleteResidentsAlertDialog({
         </ResponsiveAlertDialogHeader>
 
         {!isSingle && (
-          <ul className="max-h-48 scroll-fade overflow-y-auto px-6 pb-4 text-sm">
-            {residents.map((resident) => (
-              <li key={resident.id} className="truncate">
-                {resident.first_name} {resident.last_name}
-              </li>
-            ))}
-          </ul>
+          <ResponsiveAlertDialogPanel className="max-h-56 text-sm">
+            <ul>
+              {residents.map((resident) => (
+                <li key={resident.id} className="truncate">
+                  {resident.first_name} {resident.last_name}
+                </li>
+              ))}
+            </ul>
+          </ResponsiveAlertDialogPanel>
         )}
 
         <ResponsiveAlertDialogFooter>
