@@ -228,7 +228,7 @@ const tableRowSchema = z.object({
   content: z.array(tableCellSchema),
 })
 
-/** All columns the same width, or each as wide as its text asks (see contentColumnShares). */
+/** All columns the same width, or each as wide as its text asks (see contentColumnWidths). */
 export const COLUMN_WIDTHS = ['equal', 'content'] as const
 export type ColumnWidths = (typeof COLUMN_WIDTHS)[number]
 
@@ -301,3 +301,38 @@ export const documentSchema = z.object({
 })
 
 export type DocumentInput = z.infer<typeof documentSchema>
+
+export const TEMPLATE_NAME_MAX = 80
+export const TEMPLATE_DESCRIPTION_MAX = 200
+/** Characters of JSON: a few shrunk photos (about 300 KB each) and the text. */
+export const TEMPLATE_CONTENT_MAX_LENGTH = 2_000_000
+
+/** What the menu shows of a saved template; the only part that can change after saving it. */
+export const templateDetailsSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { error: () => m.documents_template_name_required() })
+    .max(TEMPLATE_NAME_MAX, { error: () => m.documents_template_name_too_long({ max: TEMPLATE_NAME_MAX }) }),
+  description: z
+    .string()
+    .trim()
+    .max(TEMPLATE_DESCRIPTION_MAX, {
+      error: () => m.documents_template_description_too_long({ max: TEMPLATE_DESCRIPTION_MAX }),
+    }),
+})
+
+export type TemplateDetailsInput = z.infer<typeof templateDetailsSchema>
+
+/** A document saved as a template: everything but its date, which is the day it's used. */
+export const documentTemplateSchema = z.object({
+  details: templateDetailsSchema,
+  header_title: documentSchema.shape.header_title,
+  title: documentSchema.shape.title,
+  content: documentSchema.shape.content.refine(
+    (content) => JSON.stringify(content).length <= TEMPLATE_CONTENT_MAX_LENGTH,
+    { error: () => m.documents_template_too_big() },
+  ),
+})
+
+export type DocumentTemplateInput = z.infer<typeof documentTemplateSchema>

@@ -12,6 +12,7 @@ export type Database = {
           name: string
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           default_fee?: number
@@ -45,6 +46,7 @@ export type Database = {
           reserved_on: string
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           amenity_id: string
           amount: number
@@ -126,6 +128,7 @@ export type Database = {
           table_name: string
           txid: number
         }
+        ComputedFields: never
         Insert: {
           changed_fields?: string[] | null
           id?: never
@@ -164,6 +167,51 @@ export type Database = {
           },
         ]
       }
+      document_templates: {
+        Row: {
+          content: NonNullable<Json>
+          created_at: string
+          created_by: string | null
+          description: string
+          header_title: string
+          id: string
+          name: string
+          title: string
+          updated_at: string
+        }
+        ComputedFields: never
+        Insert: {
+          content: NonNullable<Json>
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          header_title: string
+          id?: string
+          name: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: NonNullable<Json>
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          header_title?: string
+          id?: string
+          name?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'document_templates_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       maintenance_requests: {
         Row: {
           amount: number
@@ -181,6 +229,7 @@ export type Database = {
           transaction_id: string | null
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           amount: number
           created_at?: string
@@ -250,6 +299,7 @@ export type Database = {
           starts_on: string
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           currency?: Database['public']['Enums']['currency_code']
@@ -286,6 +336,7 @@ export type Database = {
           updated_at: string
           welcomed_at: string | null
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           full_name?: string
@@ -316,6 +367,7 @@ export type Database = {
           number: string
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           deleted_at?: string | null
@@ -351,6 +403,7 @@ export type Database = {
           relationship: Database['public']['Enums']['residency_relationship']
           resident_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           property_id: string
@@ -401,6 +454,7 @@ export type Database = {
           profile_id: string | null
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           deleted_at?: string | null
@@ -462,6 +516,7 @@ export type Database = {
           transaction_id: string | null
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           amount: number
           created_at?: string
@@ -530,6 +585,7 @@ export type Database = {
           singleton: boolean
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           currency?: Database['public']['Enums']['currency_code']
           default_language?: Database['public']['Enums']['app_language']
@@ -560,6 +616,7 @@ export type Database = {
           name: string
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           id?: string
@@ -603,6 +660,7 @@ export type Database = {
           reference: string | null
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           amenity_reservation_id?: string | null
           amount: number
@@ -720,6 +778,7 @@ export type Database = {
           role: Database['public']['Enums']['app_role']
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           granted_by?: string | null
@@ -760,6 +819,7 @@ export type Database = {
           property_id: string | null
           unpaid_months: string[] | null
         }
+        ComputedFields: never
         Relationships: []
       }
       treasury_period_summary: {
@@ -770,6 +830,7 @@ export type Database = {
           total_expense: number | null
           total_income: number | null
         }
+        ComputedFields: never
         Relationships: []
       }
     }

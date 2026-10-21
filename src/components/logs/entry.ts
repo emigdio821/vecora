@@ -58,6 +58,9 @@ export const SECTION_LABEL: Record<string, string> = {
   get property_residents() {
     return m.logs_section_property_residents()
   },
+  get document_templates() {
+    return m.logs_section_document_templates()
+  },
   get settings() {
     return m.common_section_settings()
   },
@@ -345,6 +348,9 @@ const FIELD_LABEL: Record<string, string> = {
   get relationship() {
     return m.logs_field_relationship()
   },
+  get header_title() {
+    return m.documents_field_header_title()
+  },
   get residential_name() {
     return m.logs_field_residential_name()
   },
@@ -446,7 +452,20 @@ const FIELD_LABEL: Record<string, string> = {
   },
 }
 
-export function fieldLabel(field: string) {
+/** Columns that mean something else in one table than in the rest. */
+const TABLE_FIELD_LABEL: Record<string, Record<string, () => string>> = {
+  // Elsewhere a description or a title is a movement's or a request's concept.
+  document_templates: {
+    description: () => m.documents_template_field_description(),
+    title: () => m.documents_field_title(),
+  },
+}
+
+export function fieldLabel(field: string, tableName: string) {
+  const tableLabel = TABLE_FIELD_LABEL[tableName]?.[field]
+  if (tableLabel) {
+    return tableLabel()
+  }
   return FIELD_LABEL[field] ?? field
 }
 

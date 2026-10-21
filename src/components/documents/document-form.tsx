@@ -1,5 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconDownload, IconEye, IconFilePlus, IconSelector, IconSparkles } from '@tabler/icons-react'
+import {
+  IconDeviceFloppy,
+  IconDownload,
+  IconEye,
+  IconFilePlus,
+  IconSelector,
+  IconSparkles,
+} from '@tabler/icons-react'
 import { useMutation } from '@tanstack/react-query'
 import { addYears, format, parseISO, subYears } from 'date-fns'
 import { useEffect, useId, useState } from 'react'
@@ -17,6 +24,7 @@ import { useToday } from '@/hooks/use-today'
 import { formatDay, ISO_DAY } from '@/lib/utils'
 import {
   type DocumentInput,
+  type DocumentTemplateInput,
   documentContentSchema,
   documentSchema,
   EMPTY_DOCUMENT_CONTENT,
@@ -24,6 +32,7 @@ import {
 } from '@/lib/validations/documents'
 import { m } from '@/paraglide/messages'
 import { AiPromptDialog } from './dialog/ai-prompt'
+import { SaveTemplateDialog } from './dialog/template-details'
 import { RichTextEditor } from './rich-text-editor'
 
 const DRAFT_KEY = 'vecora-document-draft'
@@ -134,6 +143,9 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
   const contentLabelId = useId()
   const [isDateOpen, setDateOpen] = useState(false)
   const [isAiPromptOpen, setAiPromptOpen] = useState(false)
+  const [isSaveTemplateOpen, setSaveTemplateOpen] = useState(false)
+  // The document as it was when "Save as template" was pressed; typing on doesn't change it.
+  const [templateSource, setTemplateSource] = useState<Omit<DocumentTemplateInput, 'details'> | null>(null)
   const [initialValues] = useState(() => loadDraft() ?? blankDocument(today))
   // Phones without a built-in PDF viewer (Android) would just download it: there, only Download.
   const canPreview = navigator.pdfViewerEnabled
@@ -209,6 +221,19 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
     tab.document.title = m.documents_preview()
     tab.document.body.textContent = m.documents_preview_generating()
     previewMutation.mutate({ document: parsed.data, tab })
+  }
+
+  function handleSaveTemplate() {
+    // A template is a document someone can download as it is: the same checks as the PDF.
+    const parsed = documentSchema.safeParse(form.getValues())
+    if (!parsed.success) {
+      void form.handleSubmit(() => {})()
+      return
+    }
+
+    const { header_title, title, content } = parsed.data
+    setTemplateSource({ header_title, title, content })
+    setSaveTemplateOpen(true)
   }
 
   return (
@@ -369,16 +394,28 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
           </Card>
 
           <CardFrameFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                onStartOver()
-              }}
-            >
-              <IconFilePlus className="size-4" />
-              {m.documents_start_over()}
-            </Button>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  onStartOver()
+                }}
+              >
+                <IconFilePlus className="size-4" />
+                {m.documents_start_over()}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  handleSaveTemplate()
+                }}
+              >
+                <IconDeviceFloppy className="size-4" />
+                {m.documents_template_save()}
+              </Button>
+            </div>
             <div className="flex flex-col-reverse gap-2 sm:flex-row">
               {canPreview && (
                 <Button
@@ -403,6 +440,11 @@ export function DocumentForm({ onStartOver }: DocumentFormProps) {
       </Form>
 
       <AiPromptDialog open={isAiPromptOpen} onOpenChange={setAiPromptOpen} />
+      <SaveTemplateDialog
+        document={templateSource}
+        open={isSaveTemplateOpen}
+        onOpenChange={setSaveTemplateOpen}
+      />
     </>
   )
 }

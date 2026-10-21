@@ -5,6 +5,7 @@
   "logs_section_transaction_categories": "Transaction categories",
   "logs_section_profiles": "Login accounts",
   "logs_section_property_residents": "Houses and residents",
+  "logs_section_document_templates": "Document templates",
 
   "logs_action_created": "Created",
   "logs_action_updated": "Edited",

@@ -86,7 +86,7 @@ export function EntryDetailsDrawer({
               <dl className="grid gap-3">
                 {changes.map(({ field, before, after }) => (
                   <div key={field} className="grid gap-0.5">
-                    <dt className="text-xs text-muted-foreground">{fieldLabel(field)}</dt>
+                    <dt className="text-xs text-muted-foreground">{fieldLabel(field, entry.table_name)}</dt>
                     <dd className="text-sm font-medium">
                       {isUpdate ? (
                         <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">

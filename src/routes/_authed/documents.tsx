@@ -1,13 +1,18 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { ClientOnly, createFileRoute } from '@tanstack/react-router'
+import { format } from 'date-fns'
 import { useState } from 'react'
 import { StartOverAlertDialog } from '@/components/documents/dialog/start-over'
 import { clearDraft, DocumentForm, hasWrittenDraft, saveDraft } from '@/components/documents/document-form'
 import { DocumentFormSkeleton } from '@/components/documents/document-form-skeleton'
 import { TemplateMenu } from '@/components/documents/template-menu'
-import { type DocumentTemplate, templateDocument } from '@/components/documents/templates'
+import { templateDocument } from '@/components/documents/templates'
+import { toastManager } from '@/components/ui/toast'
 import { pageTitle } from '@/lib/metadata'
+import { ISO_DAY } from '@/lib/utils'
+import type { DocumentInput } from '@/lib/validations/documents'
 import { m } from '@/paraglide/messages'
+import { templateDocumentQueryOptions } from '@/tanstack-queries/documents'
 import { settingsQueryOptions } from '@/tanstack-queries/session'
 
 export const Route = createFileRoute('/_authed/documents')({
@@ -15,18 +20,35 @@ export const Route = createFileRoute('/_authed/documents')({
   component: DocumentsPage,
 })
 
+interface PendingTemplate {
+  name: string
+  document: DocumentInput
+}
+
 function DocumentsPage() {
+  const { user } = Route.useRouteContext()
   const { data: settings } = useSuspenseQuery(settingsQueryOptions)
+  const queryClient = useQueryClient()
   // Bumped to remount the form, which loads the draft again: empty, or a template's.
   const [formKey, setFormKey] = useState(0)
   const [isStartOverOpen, setStartOverOpen] = useState(false)
   // What the confirmation replaces the document with; null for a blank one.
-  const [pendingTemplate, setPendingTemplate] = useState<DocumentTemplate | null>(null)
+  const [pendingTemplate, setPendingTemplate] = useState<PendingTemplate | null>(null)
 
-  function startFromTemplate(template: DocumentTemplate) {
-    // In the HOA's language, like the PDF it becomes.
-    saveDraft(templateDocument(template, settings.defaultLanguage, new Date()))
-    setFormKey(formKey + 1)
+  function startFrom(document: DocumentInput) {
+    saveDraft(document)
+    // A saved template arrives after a fetch: by then the key may have moved on.
+    setFormKey((key) => key + 1)
+  }
+
+  function offerTemplate(template: PendingTemplate) {
+    // Nothing written yet: nothing to lose, so no question.
+    if (!hasWrittenDraft()) {
+      startFrom(template.document)
+      return
+    }
+    setPendingTemplate(template)
+    setStartOverOpen(true)
   }
 
   return (
@@ -43,14 +65,26 @@ function DocumentsPage() {
             <p className="text-sm text-muted-foreground">{m.documents_page_description()}</p>
           </div>
           <TemplateMenu
+            viewer={{ id: user.id, isAdmin: user.roles.includes('admin') }}
             onSelect={(template) => {
-              // Nothing written yet: nothing to lose, so no question.
-              if (!hasWrittenDraft()) {
-                startFromTemplate(template)
-                return
-              }
-              setPendingTemplate(template)
-              setStartOverOpen(true)
+              offerTemplate({
+                name: template.name(),
+                // In the HOA's language, like the PDF it becomes.
+                document: templateDocument(template, settings.defaultLanguage, new Date()),
+              })
+            }}
+            onSelectSaved={(template) => {
+              queryClient.fetchQuery(templateDocumentQueryOptions(template.id)).then(
+                (saved) => {
+                  offerTemplate({
+                    name: template.name,
+                    document: { ...saved, date: format(new Date(), ISO_DAY) },
+                  })
+                },
+                () => {
+                  toastManager.add({ type: 'error', title: m.documents_template_load_failed() })
+                },
+              )
             }}
           />
         </div>
@@ -69,13 +103,13 @@ function DocumentsPage() {
       <StartOverAlertDialog
         open={isStartOverOpen}
         onOpenChange={setStartOverOpen}
-        templateName={pendingTemplate === null ? null : pendingTemplate.name()}
+        templateName={pendingTemplate === null ? null : pendingTemplate.name}
         onConfirm={() => {
           if (pendingTemplate === null) {
             clearDraft()
             setFormKey(formKey + 1)
           } else {
-            startFromTemplate(pendingTemplate)
+            startFrom(pendingTemplate.document)
           }
           setStartOverOpen(false)
         }}

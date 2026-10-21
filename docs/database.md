@@ -2,8 +2,7 @@
 
 Reference for the Postgres schema behind Vecora: every table and column, who can write what, and
 what gets deleted (and when). The source of truth is `supabase/migrations/`; this document follows
-it as of the six `20260921*` migrations. When a migration changes, update the matching section
-here.
+it as of the migrations below. When a migration changes, update the matching section here.
 
 | Migration                                     | Contents                                                                    |
 | --------------------------------------------- | --------------------------------------------------------------------------- |
@@ -13,6 +12,7 @@ here.
 | `20260921000300_amenities.sql`                | `amenities`, `amenity_reservations`, payment/cancel RPCs                    |
 | `20260921000400_requests.sql`                 | `maintenance_requests`, `security_requests`, resolve RPCs                   |
 | `20260921000500_settings_and_audit_log.sql`   | `settings`, `branding` bucket, `audit_log`, **nightly purge**               |
+| `20261021000000_document_templates.sql`       | `document_templates` and its audit trigger                                  |
 
 ## Contents
 
@@ -25,6 +25,7 @@ here.
 - [Treasury: periods, transaction_categories, transactions](#treasury)
 - [Common areas: amenities, amenity_reservations](#common-areas)
 - [Payment requests: maintenance_requests, security_requests](#payment-requests)
+- [Documents: document_templates](#documents)
 - [Settings and logo](#settings-and-logo)
 - [Audit log](#audit-log)
 - [Functions (RPCs)](#functions-rpcs)
@@ -83,6 +84,7 @@ later migration means moving it (or a `create or replace` there).
 | `amenity_reservations`         | Hard, or **cancelled**           | Board deletes unpaid, uncancelled ones. Paid ones can't be deleted, only cancelled (treasurer RPC), which keeps the row                                                                                                             | No; a booking keeps its house           |
 | `maintenance_requests`         | Hard                             | Maintenance role, pending rows only. Paid / rejected rows are history                                                                                                                                                               | No                                      |
 | `security_requests`            | Hard                             | Security role, pending rows only                                                                                                                                                                                                    | No                                      |
+| `document_templates`           | Hard                             | Whoever saved it, or an admin. Documents already made from it are unaffected (nothing links them)                                                                                                                                   | n/a                                     |
 | `settings`                     | Never                            | One row, created by the migration; no INSERT/DELETE grant                                                                                                                                                                           | n/a                                     |
 | `audit_log`                    | Never                            | Append-only; no UPDATE/DELETE policies                                                                                                                                                                                              | **Never**                               |
 | `storage.objects` (`branding`) | Hard                             | The app deletes the previous logo after the settings row points at the new one                                                                                                                                                      | n/a                                     |
@@ -132,15 +134,16 @@ later migration means moving it (or a `create or replace` there).
 - `private.has_role(r)` and `private.is_admin()` are `security definer`, so they can read
   `user_roles` from inside its own policies.
 
-| Section               | Tables                                                                   | Writers                               |
-| --------------------- | ------------------------------------------------------------------------ | ------------------------------------- |
-| Board                 | `user_roles`                                                             | Admin; president (not the admin role) |
-| Presidency            | `properties`, `residents`, `property_residents`, `amenities`, `settings` | President                             |
-| Presidency + Treasury | `periods`, `amenity_reservations`                                        | President, treasurer                  |
-| Treasury              | `transaction_categories`, `transactions`                                 | Treasurer                             |
-| Maintenance           | `maintenance_requests` (pending rows)                                    | Maintenance                           |
-| Security              | `security_requests` (pending rows)                                       | Security                              |
-| Admin                 | `audit_log` (read only), `settings.default_language` / `currency`        | Admin                                 |
+| Section               | Tables                                                                   | Writers                                                                       |
+| --------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| Board                 | `user_roles`                                                             | Admin; president (not the admin role)                                         |
+| Presidency            | `properties`, `residents`, `property_residents`, `amenities`, `settings` | President                                                                     |
+| Presidency + Treasury | `periods`, `amenity_reservations`                                        | President, treasurer                                                          |
+| Treasury              | `transaction_categories`, `transactions`                                 | Treasurer                                                                     |
+| Maintenance           | `maintenance_requests` (pending rows)                                    | Maintenance                                                                   |
+| Security              | `security_requests` (pending rows)                                       | Security                                                                      |
+| Documents             | `document_templates`                                                     | Any board member saves; whoever saved one (or an admin) renames or deletes it |
+| Admin                 | `audit_log` (read only), `settings.default_language` / `currency`        | Admin                                                                         |
 
 ## Enums
 
@@ -455,6 +458,37 @@ pending ──pay──▶ paid       (expense recorded and linked; final)
 
 ---
 
+## Documents
+
+Documents themselves aren't stored: the editor keeps the draft in the browser and
+`/reports/document` turns it into a PDF. Only the templates the board saves live here; the
+built-in ones are in the app (`src/components/documents/templates.ts`).
+
+### `document_templates`
+
+| Column         | Type          | Null | Default             | Notes                                                                                                                                                               |
+| -------------- | ------------- | ---- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`           | `uuid`        | no   | `gen_random_uuid()` | PK                                                                                                                                                                  |
+| `name`         | `text`        | no   |                     | Trimmed, 1-80. Unique, ignoring case (`document_templates_name_key`)                                                                                                |
+| `description`  | `text`        | no   | `''`                | Trimmed, up to 200                                                                                                                                                  |
+| `header_title` | `text`        | no   |                     | 1-60, like the editor's header                                                                                                                                      |
+| `title`        | `text`        | no   |                     | 1-150, like the editor's title                                                                                                                                      |
+| `content`      | `jsonb`       | no   |                     | The editor's (Tiptap) JSON, checked by the app against `documentContentSchema`. Up to 2.5 MB as text (the app allows 2,000,000 characters); images travel inside it |
+| `created_by`   | `uuid`        | yes  | `auth.uid()`        | FK `profiles(id)` on delete set null                                                                                                                                |
+| `created_at`   | `timestamptz` | no   | `now()`             |                                                                                                                                                                     |
+| `updated_at`   | `timestamptz` | no   | `now()`             |                                                                                                                                                                     |
+
+- **Fixed once saved**: `authenticated` can only update `name` and `description` (column grant).
+  To change the document, save a new template and delete the old one.
+- **RLS**: everyone reads; any board member (any role) inserts, always with `created_by` set to
+  themselves; whoever saved it, or an admin, updates and deletes.
+- **Audit**: `private.audit_document_template()`, not `private.audit()`: the same rows, labeled by
+  `name`, but without `content` (megabytes with images, and the activity log loads `old_data` /
+  `new_data` for every entry it lists).
+- Index: `created_by`.
+
+---
+
 ## Settings and logo
 
 ### `settings`
@@ -494,7 +528,9 @@ Written by the `private.audit()` trigger, attached as `<table>_audit` to: `prope
 `residents`, `property_residents`, `periods`, `transactions`, `transaction_categories`,
 `amenities`, `amenity_reservations`, `maintenance_requests`, `security_requests`, `profiles`,
 `user_roles`, `settings`. A new app table needs adding to that list (and to the label `case` in
-`private.audit()`).
+`private.audit()`). `document_templates` has its own trigger, `private.audit_document_template()`,
+which writes the same rows without the template's content (see
+[`document_templates`](#document_templates)).
 
 | Column           | Type              | Null | Default                | Notes                                                                                                                                         |
 | ---------------- | ----------------- | ---- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -543,7 +579,7 @@ Private helpers (not callable from the API): `has_role`, `is_admin`, `set_update
 `set_deleted_by`, `keep_currency`, `current_currency`, `check_resident_email`, `handle_new_user`,
 `handle_password_changed`, `protect_main_admin_*`, `guard_paid_amenity_reservation`,
 `guard_settings_admin_fields`, `amenity_reservation_day` / `_label`, `audit`, `audit_refs`,
-`purge_soft_deleted`.
+`audit_document_template`, `purge_soft_deleted`.
 
 ## Error codes
 
