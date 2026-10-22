@@ -24,6 +24,7 @@
   "logs_summary_logo_removed": "Logo eliminado",
   "logs_summary_currency_changed": "Moneda cambiada a {currency}",
   "logs_summary_language_changed": "Idioma predeterminado cambiado a {language}",
+  "logs_summary_password_changed": "Contraseña cambiada",
 
   "logs_field_number": "Número",
   "logs_field_first_name": "Nombre",
@@ -92,6 +93,7 @@
   "logs_value_empty": "Vacío",
   "logs_changed_to": "cambió a",
   "logs_no_data": "Sin datos que mostrar.",
+  "logs_password_not_kept": "Se cambió. El registro nunca guarda contraseñas.",
   "logs_related_title": "Hecho al mismo tiempo",
   "logs_related_description": "Otros cambios que se guardaron junto con este. Por ejemplo, al pagar una solicitud también se registra su movimiento."
 }

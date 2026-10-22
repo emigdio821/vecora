@@ -156,8 +156,14 @@ create policy "branding: president can delete"
 --   * `txid` groups the rows written by one statement or RPC (e.g. paying a
 --     request = one transaction insert + one request update).
 --   * No-op updates are not recorded: only updated_at changed, or only
---     welcomed_at (closing the welcome dialog is bookkeeping, not something
---     the activity log should list).
+--     welcomed_at or must_change_password (closing the welcome dialog, or
+--     the default password being set and then replaced, is bookkeeping, not
+--     something the activity log should list).
+--   * Neither is the main admin's own setup: the signup trigger creating its
+--     profile and admin role. That's the app installing itself, before anyone
+--     on the board has done anything.
+--   * Password changes are recorded on the account's profile, except the
+--     first password (private.audit_password_changed, below).
 --
 -- Access: admins read; nobody writes through the API. The trigger function is
 -- security definer and owned by postgres, so its inserts bypass RLS. There are
@@ -251,10 +257,22 @@ begin
   if tg_op in ('INSERT', 'UPDATE') then v_new := to_jsonb(new); end if;
   v_row := coalesce(v_new, v_old);
 
+  -- The main admin's profile and role, created by the signup trigger (no user signed in).
+  -- Its profile is inserted first, so it's already there when the role is.
+  if tg_op = 'INSERT' and auth.uid() is null and (
+    (tg_table_name = 'profiles' and (v_new ->> 'is_main_admin')::boolean)
+    or (tg_table_name = 'user_roles' and exists (
+      select 1 from public.profiles p where p.id = (v_new ->> 'user_id')::uuid and p.is_main_admin
+    ))
+  ) then
+    return null;
+  end if;
+
   if tg_op = 'UPDATE' then
     select array_agg(n.key order by n.key) into v_changed
     from jsonb_each(v_new) n
-    where n.key not in ('updated_at', 'welcomed_at') and n.value is distinct from v_old -> n.key;
+    where n.key not in ('updated_at', 'welcomed_at', 'must_change_password')
+      and n.value is distinct from v_old -> n.key;
 
     -- nothing but bookkeeping columns moved: not worth a row
     if v_changed is null then return null; end if;
@@ -314,8 +332,54 @@ $$;
 revoke all on table public.audit_log from anon, authenticated;
 grant select on table public.audit_log to authenticated;
 
+-- Password changes happen in auth.users, which isn't audited (its row holds the
+-- password hash, never copied here). This writes the entry on the account's
+-- profile instead, with "password" as the changed field. Not the first
+-- password: the main admin's forced change away from the default, or an
+-- invited member choosing theirs. That's setup, like creating the account.
+--
+-- Auth writes the new password on its own connection, with no user signed in.
+-- In the app only the account itself can change it, so it's the identity.
+create function private.audit_password_changed()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_profile jsonb;
+begin
+  select to_jsonb(p) into v_profile from public.profiles p where p.id = new.id;
+
+  -- No profile: not an app account.
+  if v_profile is null then return null; end if;
+
+  if coalesce(old.encrypted_password, '') = ''
+     or (v_profile ->> 'must_change_password')::boolean then
+    return null;
+  end if;
+
+  insert into public.audit_log
+    (identity_id, table_name, operation, row_id, label, old_data, new_data, changed_fields)
+  values
+    (new.id, 'profiles', 'update', new.id, coalesce(v_profile ->> 'full_name', ''),
+     v_profile, v_profile, array['password']);
+
+  return null;
+end;
+$$;
+
+-- Triggers on the same event fire in name order: this one goes before
+-- on_auth_user_password_changed, which clears must_change_password.
+create trigger on_auth_user_password_audit
+  after update of encrypted_password on auth.users
+  for each row
+  when (new.encrypted_password is distinct from old.encrypted_password)
+  execute function private.audit_password_changed();
+
 revoke execute on function private.audit_refs(jsonb) from public, anon, authenticated;
 revoke execute on function private.audit() from public, anon, authenticated;
+revoke execute on function private.audit_password_changed() from public, anon, authenticated;
 
 alter table public.audit_log enable row level security;
 

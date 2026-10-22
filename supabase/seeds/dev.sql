@@ -98,10 +98,6 @@ begin
     return;
   end if;
 
-  -- seed.sql already logged the admin account's creation (as "Sistema") with
-  -- today's time; move it to the start of the story
-  update public.audit_log set occurred_at = t - interval '1 day', txid = -id where txid > 0;
-
   -- -------------------------------------------------------------------------
   -- admin names the residential and picks its language and currency
   -- -------------------------------------------------------------------------

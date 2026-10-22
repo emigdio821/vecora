@@ -21,6 +21,7 @@ import {
   entryAction,
   entryChanges,
   entrySummary,
+  type FieldChange,
   fieldLabel,
   identityName,
   sectionLabel,
@@ -37,6 +38,26 @@ interface EntryDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
 function changesTitle(entry: LogEntryQueryData) {
   if (entry.operation === 'update') return m.logs_changes_updated()
   return entry.operation === 'insert' ? m.logs_changes_inserted() : m.logs_changes_deleted()
+}
+
+/** Before → after on an update; on create/delete, the one value there is. */
+function ChangeValue({ change, isUpdate }: { change: FieldChange; isUpdate: boolean }) {
+  const { before, after, note } = change
+  if (note) {
+    return <Muted>{note}</Muted>
+  }
+  if (!isUpdate) {
+    return <span className="whitespace-pre-wrap">{after || before}</span>
+  }
+  return (
+    <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+      <span className="whitespace-pre-wrap text-muted-foreground line-through">
+        {before || <Muted>{m.logs_value_empty()}</Muted>}
+      </span>
+      <IconArrowRight aria-label={m.logs_changed_to()} className="size-3.5 shrink-0 text-muted-foreground" />
+      <span className="whitespace-pre-wrap">{after || <Muted>{m.logs_value_empty()}</Muted>}</span>
+    </span>
+  )
 }
 
 /** Read-only: the log can't be changed from the app. */
@@ -84,26 +105,13 @@ export function EntryDetailsDrawer({
           <CollapsibleSection icon={<IconList />} title={changesTitle(entry)} count={changes.length}>
             {changes.length ? (
               <dl className="grid gap-3">
-                {changes.map(({ field, before, after }) => (
-                  <div key={field} className="grid gap-0.5">
-                    <dt className="text-xs text-muted-foreground">{fieldLabel(field, entry.table_name)}</dt>
+                {changes.map((change) => (
+                  <div key={change.field} className="grid gap-0.5">
+                    <dt className="text-xs text-muted-foreground">
+                      {fieldLabel(change.field, entry.table_name)}
+                    </dt>
                     <dd className="text-sm font-medium">
-                      {isUpdate ? (
-                        <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                          <span className="whitespace-pre-wrap text-muted-foreground line-through">
-                            {before || <Muted>{m.logs_value_empty()}</Muted>}
-                          </span>
-                          <IconArrowRight
-                            aria-label={m.logs_changed_to()}
-                            className="size-3.5 shrink-0 text-muted-foreground"
-                          />
-                          <span className="whitespace-pre-wrap">
-                            {after || <Muted>{m.logs_value_empty()}</Muted>}
-                          </span>
-                        </span>
-                      ) : (
-                        <span className="whitespace-pre-wrap">{after || before}</span>
-                      )}
+                      <ChangeValue change={change} isUpdate={isUpdate} />
                     </dd>
                   </div>
                 ))}

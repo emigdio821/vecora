@@ -263,6 +263,12 @@ export function entrySummary(entry: LogEntryQueryData): string {
       return m.common_house_label({ number: label })
     case 'user_roles':
       return `${enumLabel(row.role) ?? asText(row.role)} - ${label}`
+    case 'profiles':
+      // Written by its own trigger, on the account's profile (see entryChanges).
+      if (entry.changed_fields?.includes('password')) {
+        return `${label} - ${m.logs_summary_password_changed()}`
+      }
+      return label
     case 'settings':
       return settingsSummary(entry)
     default:
@@ -450,6 +456,9 @@ const FIELD_LABEL: Record<string, string> = {
   get must_change_password() {
     return m.logs_field_must_change_password()
   },
+  get password() {
+    return m.auth_field_password()
+  },
 }
 
 /** Columns that mean something else in one table than in the rest. */
@@ -547,6 +556,8 @@ export interface FieldChange {
   field: string
   before: string
   after: string
+  /** Shown instead of before and after, for a change whose values the log doesn't keep. */
+  note?: string
 }
 
 /**
@@ -564,10 +575,16 @@ export function entryChanges(entry: LogEntryQueryData): FieldChange[] {
 
   return fields
     .filter((field) => !HIDDEN_FIELDS.has(field))
-    .map((field) => ({
-      field,
-      before: formatFieldValue(entry, field, before[field]),
-      after: formatFieldValue(entry, field, after[field]),
-    }))
-    .filter((change) => change.before || change.after)
+    .map((field) => {
+      // A password change names the field, never the password.
+      if (field === 'password') {
+        return { field, before: '', after: '', note: m.logs_password_not_kept() }
+      }
+      return {
+        field,
+        before: formatFieldValue(entry, field, before[field]),
+        after: formatFieldValue(entry, field, after[field]),
+      }
+    })
+    .filter((change) => change.before || change.after || change.note)
 }

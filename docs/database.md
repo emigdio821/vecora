@@ -173,15 +173,15 @@ One row per `auth.users` row, created by the `on_auth_user_created` trigger
 (`private.handle_new_user`). Personal data (phone, house) lives in `residents`; a profile is the
 account only.
 
-| Column                 | Type          | Null | Default | Notes                                                                                                                                      |
-| ---------------------- | ------------- | ---- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `id`                   | `uuid`        | no   |         | PK, FK `auth.users(id)` **on delete cascade**                                                                                              |
-| `full_name`            | `text`        | no   | `''`    | Taken from the signup metadata `full_name`                                                                                                 |
-| `created_at`           | `timestamptz` | no   | `now()` |                                                                                                                                            |
-| `updated_at`           | `timestamptz` | no   | `now()` | Trigger-maintained                                                                                                                         |
-| `welcomed_at`          | `timestamptz` | yes  |         | When the user closed the welcome dialog. On the profile so it follows the user across devices. Not audited when it's the only change       |
-| `is_main_admin`        | `boolean`     | no   | `false` | The app's own account (`admin@vecora.app`). Set on signup; at most one row (`profiles_one_main_admin`). The app can't write it             |
-| `must_change_password` | `boolean`     | no   | `false` | Still on a default password (hosted seed). Cleared by `on_auth_user_password_changed` however the password changes. The app can't write it |
+| Column                 | Type          | Null | Default | Notes                                                                                                                                                                             |
+| ---------------------- | ------------- | ---- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                   | `uuid`        | no   |         | PK, FK `auth.users(id)` **on delete cascade**                                                                                                                                     |
+| `full_name`            | `text`        | no   | `''`    | Taken from the signup metadata `full_name`                                                                                                                                        |
+| `created_at`           | `timestamptz` | no   | `now()` |                                                                                                                                                                                   |
+| `updated_at`           | `timestamptz` | no   | `now()` | Trigger-maintained                                                                                                                                                                |
+| `welcomed_at`          | `timestamptz` | yes  |         | When the user closed the welcome dialog. On the profile so it follows the user across devices. Not audited when it's the only change                                              |
+| `is_main_admin`        | `boolean`     | no   | `false` | The app's own account (`admin@vecora.app`). Set on signup; at most one row (`profiles_one_main_admin`). The app can't write it                                                    |
+| `must_change_password` | `boolean`     | no   | `false` | Still on a default password (hosted seed). Cleared by `on_auth_user_password_changed` however the password changes. The app can't write it. Not audited when it's the only change |
 
 - **Column grants**: `authenticated` can only update `full_name` and `welcomed_at`. A new column
   the app should edit needs adding to that grant.
@@ -543,11 +543,19 @@ which writes the same rows without the template's content (see
 | `label`          | `text`            | no   |                        | Display name of the row, frozen at write time (house number, person name, description, title...)                                              |
 | `old_data`       | `jsonb`           | yes  |                        | Full row before (update, delete)                                                                                                              |
 | `new_data`       | `jsonb`           | yes  |                        | Full row after (insert, update)                                                                                                               |
-| `changed_fields` | `text[]`          | yes  |                        | Update only: columns that changed, excluding `updated_at` and `welcomed_at`                                                                   |
+| `changed_fields` | `text[]`          | yes  |                        | Update only: columns that changed, excluding `updated_at`, `welcomed_at` and `must_change_password`                                           |
 | `refs`           | `jsonb`           | no   | `'{}'`                 | FK id → display name for every `*_id` / `*_by` column, frozen at write time, so entries stay readable after the target is deleted or purged   |
 | `txid`           | `bigint`          | no   | `pg_current_xact_id()` | Groups rows written by one action (e.g. paying a request = one transaction insert + one request update)                                       |
 
-- Updates where only `updated_at` and/or `welcomed_at` changed aren't recorded.
+- Updates where only `updated_at`, `welcomed_at` and/or `must_change_password` changed aren't
+  recorded.
+- Neither is the main admin's own setup: the signup trigger inserting its profile and admin role,
+  with no user signed in. Other accounts' profiles are recorded as usual.
+- Password changes are recorded by `private.audit_password_changed()`, on `auth.users` as
+  `on_auth_user_password_audit`: an update on the account's profile with `changed_fields` =
+  `{password}`, `identity_id` the account itself, and the profile (never the hash) as
+  `old_data`/`new_data`. Except the first password: the main admin's forced change away from the
+  default, or an invited member choosing theirs.
 - Indexes: `(occurred_at desc, id desc)`, `(table_name, row_id)`, `identity_id`.
 - **Access**: admins read. Nobody writes through the API: the trigger is `security definer`, and
   there are no insert/update/delete policies, so the log is append-only from the app.
@@ -579,7 +587,7 @@ Private helpers (not callable from the API): `has_role`, `is_admin`, `set_update
 `set_deleted_by`, `keep_currency`, `current_currency`, `check_resident_email`, `handle_new_user`,
 `handle_password_changed`, `protect_main_admin_*`, `guard_paid_amenity_reservation`,
 `guard_settings_admin_fields`, `amenity_reservation_day` / `_label`, `audit`, `audit_refs`,
-`audit_document_template`, `purge_soft_deleted`.
+`audit_document_template`, `audit_password_changed`, `purge_soft_deleted`.
 
 ## Error codes
 
