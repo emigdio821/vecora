@@ -1,13 +1,23 @@
 import { IconChevronDown, type TablerIcon } from '@tabler/icons-react'
 import type { Editor } from '@tiptap/react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Menu, MenuPopup, MenuTrigger } from '@/components/ui/menu'
-import { Toggle } from '@/components/ui/toggle'
+import { toggleVariants } from '@/components/ui/toggle'
 import { ToolbarButton } from '@/components/ui/toolbar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 /** Menu and popover buttons look pressed, like the toggles, while their format is on. */
 export const ACTIVE_TRIGGER_CLASS = 'data-active:bg-input/64 data-active:text-accent-foreground'
+
+/**
+ * Buttons that can be disabled are ToolbarButtons of their own, styled like a Button or a
+ * Toggle, not rendering one. Rendering one, the toolbar hands it a React `disabled`, and
+ * React then drops the mouse moves a tooltip's delay waits for: no tooltip on hover. It
+ * keeps them focusable instead (never `:disabled`), so they're dimmed by data-disabled.
+ */
+const DISABLED_CLASS =
+  'data-disabled:cursor-default data-disabled:opacity-64 data-disabled:hover:bg-transparent'
 
 /**
  * A click on a toolbar button would move focus (and the selection) out of the
@@ -38,20 +48,18 @@ export function FormatToggle({ label, icon: Icon, pressed, disabled, onToggle }:
       <TooltipTrigger
         render={
           <ToolbarButton
+            type="button"
             aria-label={label}
+            aria-pressed={pressed}
+            data-pressed={pressed ? '' : undefined}
             disabled={disabled}
+            className={cn(toggleVariants({ size: 'sm' }), DISABLED_CLASS)}
             onMouseDown={(event) => {
               keepEditorFocus(event)
             }}
-            render={
-              <Toggle
-                size="sm"
-                pressed={pressed}
-                onPressedChange={() => {
-                  onToggle()
-                }}
-              />
-            }
+            onClick={() => {
+              onToggle()
+            }}
           />
         }
       >
@@ -75,15 +83,16 @@ export function HistoryButton({ label, icon: Icon, disabled, onClick }: HistoryB
       <TooltipTrigger
         render={
           <ToolbarButton
+            type="button"
             aria-label={label}
             disabled={disabled}
+            className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), DISABLED_CLASS)}
             onMouseDown={(event) => {
               keepEditorFocus(event)
             }}
             onClick={() => {
               onClick()
             }}
-            render={<Button type="button" variant="ghost" size="icon-sm" />}
           />
         }
       >
