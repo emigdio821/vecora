@@ -108,7 +108,7 @@ export const reservationsTableColumns = columnHelper.columns([
 
   columnHelper.accessor('notes', {
     id: 'notes',
-    size: 360,
+    size: 300,
     header: () => m.common_field_notes(),
     cell: ({ getValue }) => (
       <span className="block w-0 min-w-full truncate" title={getValue() ?? undefined}>
