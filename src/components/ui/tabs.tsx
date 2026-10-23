@@ -2,38 +2,21 @@ import { Tabs as TabsPrimitive } from '@base-ui/react/tabs'
 import * as React from 'react'
 import {
   type SegmentedControlSize,
+  segmentedControlIndicatorSurfaceClassName,
   segmentedControlItemLayoutClassName,
   segmentedControlItemSizeClassNames,
-} from '@/lib/segmented-control'
+} from '@/components/ui/segmented-control'
 import { cn } from '@/lib/utils'
 
 type TabsVariant = 'default' | 'underline'
 type TabsSize = SegmentedControlSize
 
-interface TabsListContextValue {
-  size: TabsSize
-  variant: TabsVariant
-}
-
-const TabsListContext: React.Context<TabsListContextValue> = React.createContext<TabsListContextValue>({
-  size: 'default',
-  variant: 'default',
-})
-
-// The active tab paints its own state, like the segmented control, so switching
-// is instant: there's no indicator sliding between tabs.
-const activeTabClassNames: Record<TabsVariant, string> = {
-  default:
-    'data-active:bg-background data-active:shadow-sm/5 data-active:hover:bg-background dark:data-active:bg-input dark:data-active:hover:bg-input',
-  // A bar on the list's edge: past the list's 1-unit padding, 1px out.
-  underline:
-    'data-active:after:absolute data-active:after:bg-primary data-[orientation=horizontal]:data-active:after:inset-x-0 data-[orientation=horizontal]:data-active:after:-bottom-[calc(--spacing(1)+1px)] data-[orientation=horizontal]:data-active:after:h-0.5 data-[orientation=vertical]:data-active:after:inset-y-0 data-[orientation=vertical]:data-active:after:-start-[calc(--spacing(1)+1px)] data-[orientation=vertical]:data-active:after:w-0.5',
-}
+const TabsListContext: React.Context<TabsSize> = React.createContext<TabsSize>('default')
 
 export function Tabs({ className, ...props }: TabsPrimitive.Root.Props): React.ReactElement {
   return (
     <TabsPrimitive.Root
-      className={cn('flex flex-col gap-4 data-[orientation=vertical]:flex-row', className)}
+      className={cn('flex flex-col gap-2 data-[orientation=vertical]:flex-row', className)}
       data-slot="tabs"
       {...props}
     />
@@ -50,13 +33,10 @@ export function TabsList({
   size?: TabsSize
   variant?: TabsVariant
 }): React.ReactElement {
-  const context = React.useMemo(() => ({ size, variant }), [size, variant])
-
   return (
     <TabsPrimitive.List
       className={cn(
-        'relative flex w-fit items-center justify-center-safe gap-x-0.5 text-muted-foreground',
-        'max-w-full overflow-x-auto',
+        'relative z-0 flex w-fit items-center justify-center gap-x-0.5 text-muted-foreground',
         'data-[orientation=vertical]:flex-col',
         variant === 'default'
           ? 'rounded-lg bg-muted p-0.5 text-muted-foreground/72'
@@ -67,7 +47,16 @@ export function TabsList({
       data-slot="tabs-list"
       {...props}
     >
-      <TabsListContext.Provider value={context}>{children}</TabsListContext.Provider>
+      <TabsListContext.Provider value={size}>{children}</TabsListContext.Provider>
+      <TabsPrimitive.Indicator
+        className={cn(
+          'absolute bottom-0 left-0 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) -translate-y-(--active-tab-bottom) transition-[width,translate] duration-200 ease-in-out motion-reduce:transition-none',
+          variant === 'underline'
+            ? 'z-10 bg-primary data-[orientation=horizontal]:h-0.5 data-[orientation=horizontal]:translate-y-px data-[orientation=vertical]:w-0.5 data-[orientation=vertical]:-translate-x-px'
+            : cn('-z-1', segmentedControlIndicatorSurfaceClassName),
+        )}
+        data-slot="tab-indicator"
+      />
     </TabsPrimitive.List>
   )
 }
@@ -79,16 +68,15 @@ export function TabsTab({
 }: TabsPrimitive.Tab.Props & {
   size?: TabsSize
 }): React.ReactElement {
-  const { size: contextSize, variant } = React.useContext(TabsListContext)
+  const contextSize: TabsSize = React.useContext(TabsListContext)
   const resolvedSize: TabsSize = size ?? contextSize
 
   return (
     <TabsPrimitive.Tab
       className={cn(
-        'relative flex shrink-0 grow cursor-pointer items-center justify-center rounded-md border border-transparent text-base font-medium whitespace-nowrap outline-none hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring data-[orientation=vertical]:w-full data-[orientation=vertical]:justify-start sm:text-sm data-disabled:pointer-events-none data-disabled:opacity-64 data-active:text-foreground data-active:hover:text-foreground',
+        'relative flex shrink-0 grow cursor-pointer items-center justify-center rounded-md border border-transparent text-base font-medium whitespace-nowrap transition-[color,background-color,box-shadow] outline-none not-data-active:hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring data-[orientation=vertical]:w-full data-[orientation=vertical]:justify-start sm:text-sm data-disabled:pointer-events-none data-disabled:opacity-64 data-active:text-foreground',
         segmentedControlItemLayoutClassName,
         segmentedControlItemSizeClassNames[resolvedSize],
-        activeTabClassNames[variant],
         className,
       )}
       data-size={resolvedSize}

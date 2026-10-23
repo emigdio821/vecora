@@ -12,16 +12,14 @@ import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/inp
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group'
+import { SegmentedControl, SegmentedControlItem } from '@/components/ui/segmented-control'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
 import { type CurrencyCode, currencySymbol, formatDay, intlLocale, MONEY_FORMAT } from '@/lib/utils'
 import type { CreateTransactionInput } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { categoriesQueryOptions } from '@/tanstack-queries/treasury'
 import { KIND_ITEMS, KIND_LABEL, PAYMENT_METHOD_ITEMS } from '../../kind'
-
-const kindItemClassName = segmentedControlItemVariants({ className: 'grow', state: 'checked' })
 
 interface TransactionFormFieldsProps {
   form: UseFormReturn<CreateTransactionInput>
@@ -78,24 +76,31 @@ export function TransactionFormFields({
                 {KIND_LABEL[field.value]}
               </Badge>
             ) : (
-              <RadioGroupPrimitive
-                className={segmentedControlRootClassName}
+              <SegmentedControl
                 aria-label={m.treasury_transaction_kind()}
-                name={field.name}
-                value={field.value}
-                disabled={disabled}
-                onValueChange={(value) => {
-                  field.onChange(value)
-                  // Categories belong to one kind, so the pick no longer applies.
-                  form.setValue('category_id', '')
-                }}
+                render={
+                  <RadioGroupPrimitive
+                    name={field.name}
+                    value={field.value}
+                    disabled={disabled}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                      // Categories belong to one kind, so the pick no longer applies.
+                      form.setValue('category_id', '')
+                    }}
+                  />
+                }
               >
                 {KIND_ITEMS.map((item) => (
-                  <RadioPrimitive.Root key={item.value} className={kindItemClassName} value={item.value}>
+                  <SegmentedControlItem
+                    key={item.value}
+                    className="grow"
+                    render={<RadioPrimitive.Root value={item.value} />}
+                  >
                     {item.label}
-                  </RadioPrimitive.Root>
+                  </SegmentedControlItem>
                 ))}
-              </RadioGroupPrimitive>
+              </SegmentedControl>
             )}
           </Field>
         )}

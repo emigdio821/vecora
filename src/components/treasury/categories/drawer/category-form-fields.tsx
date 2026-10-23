@@ -3,12 +3,10 @@ import { Badge } from '@/components/ui/badge'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group'
-import { segmentedControlItemVariants, segmentedControlRootClassName } from '@/lib/segmented-control'
+import { SegmentedControl, SegmentedControlItem } from '@/components/ui/segmented-control'
 import type { CategoryInput } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { KIND_ITEMS, KIND_LABEL } from '../../kind'
-
-const kindItemClassName = segmentedControlItemVariants({ className: 'grow', state: 'checked' })
 
 interface CategoryFormFieldsProps {
   form: UseFormReturn<CategoryInput>
@@ -32,22 +30,29 @@ export function CategoryFormFields({ form, disabled, lockKind }: CategoryFormFie
                 {KIND_LABEL[field.value]}
               </Badge>
             ) : (
-              <RadioGroupPrimitive
-                className={segmentedControlRootClassName}
+              <SegmentedControl
                 aria-label={m.treasury_transaction_kind()}
-                name={field.name}
-                value={field.value}
-                disabled={disabled}
-                onValueChange={(value) => {
-                  field.onChange(value)
-                }}
+                render={
+                  <RadioGroupPrimitive
+                    name={field.name}
+                    value={field.value}
+                    disabled={disabled}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                    }}
+                  />
+                }
               >
                 {KIND_ITEMS.map((item) => (
-                  <RadioPrimitive.Root key={item.value} className={kindItemClassName} value={item.value}>
+                  <SegmentedControlItem
+                    key={item.value}
+                    className="grow"
+                    render={<RadioPrimitive.Root value={item.value} />}
+                  >
                     {item.label}
-                  </RadioPrimitive.Root>
+                  </SegmentedControlItem>
                 ))}
-              </RadioGroupPrimitive>
+              </SegmentedControl>
             )}
             {lockKind && <FieldDescription>{m.treasury_category_kind_locked()}</FieldDescription>}
           </Field>
