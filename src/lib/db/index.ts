@@ -4,6 +4,7 @@ import { sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 import { serverEnv } from '@/lib/config/env.server'
+import { relations } from '@/lib/db/relations'
 
 // node-postgres over Neon's pooled URL, as Neon recommends on Vercel: the pool
 // lives as long as the function instance, and attachDatabasePool lets Vercel
@@ -15,7 +16,8 @@ import { serverEnv } from '@/lib/config/env.server'
 const pool = new Pool({ connectionString: serverEnv.DATABASE_AUTHENTICATED_URL })
 attachDatabasePool(pool)
 
-export const db = drizzle({ client: pool })
+// The relations carry the tables too, so db.query.<table> is typed with `with:` joins.
+export const db = drizzle({ client: pool, relations })
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 

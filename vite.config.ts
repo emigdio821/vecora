@@ -33,6 +33,8 @@ export default defineConfig({
       '.agents',
       '**/src/components/ui/**',
       '**/src/lib/supabase/database.types.ts',
+      '**/src/lib/db/schema.ts',
+      '**/src/lib/db/relations.ts',
       '**/src/routeTree.gen.ts',
       '**/src/paraglide/**',
     ],

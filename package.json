@@ -17,6 +17,7 @@
     "db:seed": "supabase db push --linked --include-seed",
     "db:neon:load": "node scripts/neon/load-dev.ts",
     "db:neon:app-role": "node scripts/neon/app-role.ts",
+    "db:schema": "node scripts/neon/pull-schema.ts && vp fmt src/lib/db/schema.ts src/lib/db/relations.ts",
     "prepare": "husky"
   },
   "dependencies": {

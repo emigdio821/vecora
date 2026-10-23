@@ -112,6 +112,7 @@ What each section is called on screen. Docs and comments use the English name.
 | `npm run db:reset:empty`          | Same, but only the admin account from `seed.sql`: a fresh install with no data                                                                                           |
 | `npm run db:neon:load`            | Load the migrations + seeds into the (empty) Neon branch in `.env.local`, through `scripts/neon/supabase-compat.sql`; start over with `neon branches reset dev --parent` |
 | `npm run db:neon:app-role`        | Create the app's role on that branch (after a load, or again after a reset); the first time, it writes `DATABASE_AUTHENTICATED_URL` to `.env.local`                      |
+| `npm run db:schema`               | Regenerate the Drizzle schema (`src/lib/db/schema.ts`, `relations.ts`) from the Neon branch in `.env.local`; run after changing a migration                              |
 | `npm run db:types`                | Regenerate `src/lib/supabase/database.types.ts` from the local schema — run after changing a migration                                                                   |
 | `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                                                                                               |
 | `npm run i18n`                    | Compile `messages/` into `src/paraglide/` (the dev server also does it on its own)                                                                                       |
