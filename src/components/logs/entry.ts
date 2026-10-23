@@ -517,6 +517,9 @@ const ENUM_LABEL: Record<string, string> = {
   get family() {
     return m.common_relationship_family()
   },
+  get unconfirmed() {
+    return m.common_relationship_unconfirmed()
+  },
   get cameras() {
     return m.logs_enum_cameras()
   },

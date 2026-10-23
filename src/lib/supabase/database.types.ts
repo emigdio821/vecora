@@ -814,9 +814,9 @@ export type Database = {
         Row: {
           months_due: number | null
           months_paid: number | null
-          number: string | null
-          period_id: string | null
-          property_id: string | null
+          number: string
+          period_id: string
+          property_id: string
           unpaid_months: string[] | null
         }
         ComputedFields: never
@@ -826,7 +826,7 @@ export type Database = {
         Row: {
           balance: number | null
           currency: Database['public']['Enums']['currency_code'] | null
-          period_id: string | null
+          period_id: string
           total_expense: number | null
           total_income: number | null
         }
@@ -923,7 +923,7 @@ export type Database = {
       currency_code: 'MXN' | 'USD'
       payment_method: 'cash' | 'transfer'
       request_status: 'pending' | 'paid' | 'rejected'
-      residency_relationship: 'owner' | 'tenant' | 'family'
+      residency_relationship: 'owner' | 'tenant' | 'family' | 'unconfirmed'
       security_request_kind: 'cameras' | 'guards' | 'access' | 'equipment' | 'other'
       transaction_kind: 'income' | 'expense'
     }
@@ -1047,7 +1047,7 @@ export const Constants = {
       currency_code: ['MXN', 'USD'],
       payment_method: ['cash', 'transfer'],
       request_status: ['pending', 'paid', 'rejected'],
-      residency_relationship: ['owner', 'tenant', 'family'],
+      residency_relationship: ['owner', 'tenant', 'family', 'unconfirmed'],
       security_request_kind: ['cameras', 'guards', 'access', 'equipment', 'other'],
       transaction_kind: ['income', 'expense'],
     },

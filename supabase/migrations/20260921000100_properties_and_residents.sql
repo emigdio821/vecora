@@ -6,6 +6,7 @@
 --   * property_residents links people to units, many-to-many, with a
 --     relationship: owner, tenant or family. A person can own several units;
 --     a unit can have several owners (a couple) plus tenants and family.
+--     unconfirmed is for someone known to be at the unit, not yet as what.
 --   * A resident may optionally be linked to an app account (profiles) so the
 --     signed-in user can be matched to their registry entry. Most residents
 --     will never log in, so this is nullable.
@@ -152,7 +153,7 @@ create trigger residents_check_email
 -- ---------------------------------------------------------------------------
 -- property_residents: who is attached to which unit, and how
 -- ---------------------------------------------------------------------------
-create type public.residency_relationship as enum ('owner', 'tenant', 'family');
+create type public.residency_relationship as enum ('owner', 'tenant', 'family', 'unconfirmed');
 
 -- Links are history ("who lived where, when"), so they must outlive any hard
 -- delete of their endpoints: restrict, not cascade. The purge job skips

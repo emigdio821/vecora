@@ -1,10 +1,12 @@
 import { createColumnHelper } from '@tanstack/react-table'
+import { RELATIONSHIP_LABEL, sortByRelationship } from '@/components/houses/relationship'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { normalizeString } from '@/lib/utils'
+import type { Relationship } from '@/lib/validations/houses'
 import { m } from '@/paraglide/messages'
 import type { ResidentQueryData } from '@/tanstack-queries/residents'
 import { ResidentsTableActions } from './actions'
@@ -12,27 +14,10 @@ import { ResidentNameCell } from './resident-name-cell'
 
 const columnHelper = createColumnHelper<DataTableFeatures, ResidentQueryData>()
 
-type Relationship = ResidentQueryData['property_residents'][number]['relationship']
-
-const RELATIONSHIP_LABEL: Record<Relationship, string> = {
-  get owner() {
-    return m.common_relationship_owner()
-  },
-  get tenant() {
-    return m.common_relationship_tenant()
-  },
-  get family() {
-    return m.common_relationship_family()
-  },
-}
-
 /** Highest-ranking relationship a resident has across their properties. */
 function primaryRelationship(resident: ResidentQueryData): Relationship | null {
-  const relationships = resident.property_residents.map((pr) => pr.relationship)
-  if (relationships.includes('owner')) return 'owner'
-  if (relationships.includes('tenant')) return 'tenant'
-  if (relationships.includes('family')) return 'family'
-  return null
+  const [first] = sortByRelationship(resident.property_residents)
+  return first ? first.relationship : null
 }
 
 export const residentsTableColumns = columnHelper.columns([

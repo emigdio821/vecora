@@ -8,6 +8,7 @@ import {
 } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useHasRole } from '@/components/current-user-provider'
+import { RELATIONSHIP_LABEL } from '@/components/houses/relationship'
 import { CollapsibleSection, Detail, Muted, Timestamp } from '@/components/shared/details'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { Badge } from '@/components/ui/badge'
@@ -25,20 +26,6 @@ import {
 import { m } from '@/paraglide/messages'
 import type { ResidentQueryData } from '@/tanstack-queries/residents'
 import { EditResidentDrawer } from './edit-resident'
-
-type Relationship = ResidentQueryData['property_residents'][number]['relationship']
-
-const RELATIONSHIP_LABEL: Record<Relationship, string> = {
-  get owner() {
-    return m.common_relationship_owner()
-  },
-  get tenant() {
-    return m.common_relationship_tenant()
-  },
-  get family() {
-    return m.common_relationship_family()
-  },
-}
 
 interface ResidentDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
   resident: ResidentQueryData

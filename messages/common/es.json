@@ -105,6 +105,7 @@
   "common_relationship_owner": "Propietario",
   "common_relationship_tenant": "Inquilino",
   "common_relationship_family": "Familiar",
+  "common_relationship_unconfirmed": "Sin confirmar",
 
   "common_go_home": "Ir al inicio",
   "common_not_found_title": "Página no encontrada",

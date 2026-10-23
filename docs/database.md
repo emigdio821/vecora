@@ -150,7 +150,7 @@ later migration means moving it (or a `create or replace` there).
 | Enum                     | Values                                                       |
 | ------------------------ | ------------------------------------------------------------ |
 | `app_role`               | `admin`, `president`, `treasurer`, `security`, `maintenance` |
-| `residency_relationship` | `owner`, `tenant`, `family`                                  |
+| `residency_relationship` | `owner`, `tenant`, `family`, `unconfirmed`                   |
 | `transaction_kind`       | `income`, `expense`                                          |
 | `payment_method`         | `cash`, `transfer`                                           |
 | `currency_code`          | `MXN`, `USD` (add with `alter type ... add value`)           |
@@ -246,12 +246,12 @@ for mistakes (a duplicate, a test row).
 Who is attached to which house, and how. Many-to-many: a person can own several houses, and a house
 can have several owners plus tenants and family.
 
-| Column         | Type                     | Null | Default | Notes                                      |
-| -------------- | ------------------------ | ---- | ------- | ------------------------------------------ |
-| `property_id`  | `uuid`                   | no   |         | FK `properties(id)` **on delete restrict** |
-| `resident_id`  | `uuid`                   | no   |         | FK `residents(id)` **on delete restrict**  |
-| `relationship` | `residency_relationship` | no   |         | owner / tenant / family                    |
-| `created_at`   | `timestamptz`            | no   | `now()` |                                            |
+| Column         | Type                     | Null | Default | Notes                                                                      |
+| -------------- | ------------------------ | ---- | ------- | -------------------------------------------------------------------------- |
+| `property_id`  | `uuid`                   | no   |         | FK `properties(id)` **on delete restrict**                                 |
+| `resident_id`  | `uuid`                   | no   |         | FK `residents(id)` **on delete restrict**                                  |
+| `relationship` | `residency_relationship` | no   |         | owner / tenant / family / unconfirmed (known to be there, not yet as what) |
+| `created_at`   | `timestamptz`            | no   | `now()` |                                                                            |
 
 - PK `(property_id, resident_id)`; index on `resident_id`.
 - Hard-deleted on unlink. A link row keeps both ends from being purged.
