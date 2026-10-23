@@ -1,118 +1,69 @@
 ---
 name: coss
-description: Helps implement coss UI components correctly. Use when building UIs with coss primitives and patterns (buttons, dialogs, selects, forms, menus, tabs, segmented controls, inputs, toasts, etc.), migrating from shadcn/Radix to coss/Base UI, composing trigger-based overlays, or troubleshooting coss component behavior. Covers imports, accessibility, Tailwind styling, and common pitfalls.
-compatibility: Requires Tailwind CSS v4 and @base-ui/react. Designed for React projects using the coss component registry.
-license: MIT
-metadata:
-  author: cosscom
+description: Build with coss.com (transactional and marketing email, SMS, webhooks, Hooks and Risk) through its SDKs and API. Use when adding coss.com to a project or changing code that uses it, when the user mentions coss.com, the `coss` package or COSS_API_KEY, or asks to send email or SMS, receive webhooks or check sign-ups with coss.com.
 ---
 
-# coss ui
+# Building with coss.com
 
-coss ui is a component library built on Base UI with a shadcn-like developer experience plus a large particle catalog.
+coss.com is one API key and one SDK for email, SMS, Hooks (webhooks your app sends to its own
+users) and Risk (sign-up, login and payment risk decisions). Its docs are written for agents too:
+read them instead of guessing field names, error codes or webhook payloads.
 
-## What this skill is for
+## Read the docs first
 
-Use this skill to:
+- https://coss.com/llms.txt opens with a short brief and lists every docs page.
+- Every docs page is Markdown at its URL plus `.md`, e.g. https://coss.com/docs/email/sending.md.
+  API reference pages (`https://coss.com/docs/api-reference/<resource>/<operation>.md`) give the
+  method and URL, every parameter and body field, the responses and errors, and examples in
+  TypeScript, HTTP, Python, Go, Ruby, PHP, Java and .NET.
+- With the coss MCP server connected, `search_docs` finds the page and `read_docs` reads it.
 
-- pick the right coss primitive(s) for a UI task
-- write correct coss usage code (imports, composition, props)
-- avoid common migration mistakes from shadcn/Radix assumptions
-- reference particle examples to produce practical, production-like patterns
+## Get a development key
 
-## Source of truth
+Run `npx coss-cli init` in the project's directory, and tell the user to expect a browser window:
+it opens the coss.com dashboard, where they sign in and approve a key for this project (it waits up
+to 5 minutes). The key is written to `.env.local` (Next.js) or `.env` as `COSS_API_KEY`, and the
+`coss` package is installed in JavaScript projects. If the env file already has `COSS_API_KEY`,
+it's kept: check it starts with `coss_test_` (a `coss_live_` key delivers for real; `--force`
+replaces it). Where no browser can open (over SSH, in a container or a cloud sandbox) the command
+prints a link and waits for a code typed into the terminal: ask the user to run it themselves.
+`--agents` also adds a short coss.com section to the project's AGENTS.md for later sessions.
 
-- coss components docs: `apps/ui/content/docs/components/*.mdx`
-  - `https://github.com/cosscom/coss/tree/main/apps/ui/content/docs/components`
-- coss particle examples: `apps/ui/registry/default/particles/p-*.tsx`
-  - `https://github.com/cosscom/coss/tree/main/apps/ui/registry/default/particles`
-- coss particles catalog: `https://coss.com/ui/particles`
-- docs map for agents: `https://coss.com/ui/llms.txt`
+Develop and test only with this key. Development keys (`coss_test_…`) work with every API and
+record every email and SMS with their events and webhooks, but deliver nothing; the simulator
+addresses (`bounce@simulator.amazonses.com`, `complaint@simulator.amazonses.com`, …) and numbers
+produce failures to test against (https://coss.com/docs/environments.md). Never ask for a live key
+(`coss_live_…`) to try something: going live (a verified domain, a registered number, a production
+key) is the user's step, in the dashboard.
 
-## Out of scope
+## Write the code
 
-- Maintaining coss monorepo internals/build pipelines.
-- Editing registry internals unless explicitly requested.
+- TypeScript: `import { Coss } from "coss"`; `new Coss()` reads `COSS_API_KEY`. Create the client
+  in server code only; the key must never reach a browser bundle.
+- Every SDK method returns `{ data, error }` and never throws for API or network failures. Check
+  `error` (`type`, `code`, `message`, `issues` for validation errors) on every call.
+- Retries are automatic, with an `Idempotency-Key` on every POST; pass your own
+  (`{ idempotencyKey }`) when a retry of your own code could send twice.
+- Other languages (Python `cosscom`, Go, Ruby, PHP, Java, .NET):
+  https://coss.com/docs/sdks.md. Nodemailer, Better Auth, Auth.js, Laravel, Rails and Django:
+  https://coss.com/docs/integrations.md. Anything that speaks SMTP:
+  https://coss.com/docs/email/smtp.md.
 
-## Principles for agent output
+## Webhooks
 
-1. Use existing primitives and particles first before inventing custom markup.
-2. Prefer composition over custom behavior reimplementation.
-3. Follow coss naming and APIs from docs exactly.
-4. Keep examples accessible and production-realistic.
-5. Prefer concise code that mirrors coss docs/particles conventions.
-6. Assume Tailwind CSS v4 conventions in coss examples and setup guidance.
+- Verify every request with `verifyWebhook(rawBody, headers, secret)` from `coss` before using
+  it: pass the raw body as received; it throws on a bad signature
+  (https://coss.com/docs/sdk/webhooks.md). Event types and payloads:
+  https://coss.com/docs/webhooks.md.
+- Handlers must be idempotent (the `webhook-id` header is the event's id) and not depend on
+  ordering (use `data.occurred_at`).
+- To test locally: `npx coss-cli login` once (the user approves it like `init`), then
+  `npx coss-cli listen --forward-to localhost:3000/<path>` forwards the environment's events to
+  the handler, signed with a secret it prints (put it in the env file as the handler's secret),
+  and `npx coss-cli trigger <event type>` sends a sample event.
 
-## Critical usage rules
+## Check what happened
 
-Always apply before returning coss code:
-
-- Do not invent coss APIs. Verify against component docs first.
-- For trigger-based primitives (Dialog, Menu, Select, Popover, Tooltip), follow each primitive's documented trigger/content hierarchy and composition API; do not mix patterns across components.
-- Preserve accessibility labels and error semantics.
-- Consult primitive-specific guides for component invariants and edge cases.
-- For manual install guidance, include all required dependencies and local component files referenced by imports.
-- Prefer styled coss exports first; use `*Primitive` exports only when custom composition/styling requires it.
-
-Rule references (read on demand when the task touches these areas):
-
-- `./references/rules/styling.md` — Tailwind tokens, icon conventions, data-slot selectors
-- `./references/rules/forms.md` — Field composition, validation, input patterns
-- `./references/rules/composition.md` — Trigger/popup hierarchies, grouped controls
-- `./references/rules/migration.md` — shadcn/Radix to coss/Base UI migration patterns
-- `./references/segmented-control.md` — choose Radio Group, links, Toggle Group, or Tabs before applying segmented-control styling
-- `./references/portal-props.md` — optional `portalProps` on composed popups and toast providers (`keepMounted`, `container`, which surfaces support it)
-
-## Component discovery
-
-All 54 primitives have dedicated reference guides at `./references/primitives/<name>.md`. To find the right one for a task, consult the component registry index:
-
-- `./references/component-registry.md`
-
-## Usage workflow
-
-1. Identify user intent (single primitive, composed flow, form flow, overlay flow, feedback flow).
-2. Consult `references/component-registry.md` to identify candidate primitives.
-3. Select primitives from coss docs first; avoid custom fallback unless needed.
-4. Check at least one particle example for practical composition patterns. Particle files live at `apps/ui/registry/default/particles/p-<name>-<N>.tsx` (e.g. `p-dialog-1.tsx`).
-5. Write minimal code using documented imports/props.
-6. Self-check accessibility and composition invariants.
-
-## Installation reference
-
-See `./references/cli.md` for full install/discovery workflow.
-
-Quick CLI pattern:
-
-```bash
-npx shadcn@latest add @coss/<component>
-```
-
-Quick manual pattern:
-
-- install dependencies listed in the component docs page
-- copy required component file(s)
-- update imports to match the target app alias setup
-
-## Primitive Guidance
-
-Every primitive has a reference guide at `./references/primitives/<name>.md` with imports, minimal patterns, inline code examples, pitfalls, and particle references. Use the component registry to find the right file.
-
-High-risk primitives (read these guides first -- they have the most composition gotchas):
-
-- `./references/primitives/dialog.md` — modal overlays, form-in-dialog, responsive dialog/drawer
-- `./references/primitives/menu.md` — dropdown actions, checkbox/radio items, submenus
-- `./references/primitives/context-menu.md` — right-click/long-press menus at the pointer
-- `./references/primitives/select.md` — items-first pattern, multiple, object values, groups
-- `./references/primitives/form.md` — Field composition, validation, submission
-- `./references/primitives/input-group.md` — addons, DOM order invariant, textarea layouts
-- `./references/primitives/toast.md` — toastManager (not Sonner), anchored toasts, providers
-
-## Output Checklist
-
-Before returning code:
-
-- imports and props match coss docs
-- composition structure is valid for selected primitive(s)
-- accessibility and explicit control types (`button`, `input`, etc.) are present
-- migration-sensitive flows are verified (type/lint, keyboard/a11y behavior, and SSR-sensitive primitives like Select/Command)
+- `npx coss-cli logs tail` follows the environment's API requests and events.
+- `npx coss-cli emails diagnose <email id>` (or `--to <address>`) explains a delivery.
+- The MCP server's `diagnose_email`, `diagnose_sms` and `search_logs` answer the same questions.
