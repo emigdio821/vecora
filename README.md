@@ -31,12 +31,16 @@ You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
    npx supabase status
    ```
 
-   | Variable              | Value                                                            |
-   | --------------------- | ---------------------------------------------------------------- |
-   | `VITE_SUPABASE_URL`   | `API_URL` from `supabase status` (`http://127.0.0.1:54321`)      |
-   | `VITE_SUPABASE_KEY`   | `PUBLISHABLE_KEY` from `supabase status`                         |
-   | `VITE_SITE_URL`       | `http://localhost:3000`                                          |
-   | `SUPABASE_SECRET_KEY` | `SECRET_KEY` from `supabase status` (server-only, never `VITE_`) |
+   | Variable                | Value                                                            |
+   | ----------------------- | ---------------------------------------------------------------- |
+   | `VITE_SUPABASE_URL`     | `API_URL` from `supabase status` (`http://127.0.0.1:54321`)      |
+   | `VITE_SUPABASE_KEY`     | `PUBLISHABLE_KEY` from `supabase status`                         |
+   | `VITE_SITE_URL`         | `http://localhost:3000`                                          |
+   | `SUPABASE_SECRET_KEY`   | `SECRET_KEY` from `supabase status` (server-only, never `VITE_`) |
+   | `DATABASE_URL`          | Pooled connection string of your Neon `dev` branch               |
+   | `DATABASE_URL_UNPOOLED` | Direct connection string of the same branch (for drizzle-kit)    |
+   | `BETTER_AUTH_SECRET`    | Output of `openssl rand -base64 32`                              |
+   | `AWS_*` (four of them)  | Object storage of the `dev` branch, from `neon env pull`         |
 
    The app checks them on start and stops with the name of any that's missing or invalid.
 
@@ -131,12 +135,15 @@ The app runs on Vercel against a hosted Supabase project.
 
 3. **Set the environment variables** in Vercel, from Project Settings → API Keys in the Supabase dashboard:
 
-   | Variable              | Value                                                   |
-   | --------------------- | ------------------------------------------------------- |
-   | `VITE_SUPABASE_URL`   | `https://<project-ref>.supabase.co`                     |
-   | `VITE_SUPABASE_KEY`   | A publishable key                                       |
-   | `VITE_SITE_URL`       | The app's URL, e.g. `https://vecora.vercel.app`         |
-   | `SUPABASE_SECRET_KEY` | A secret key (server-only, needed to add board members) |
+   | Variable               | Value                                                   |
+   | ---------------------- | ------------------------------------------------------- |
+   | `VITE_SUPABASE_URL`    | `https://<project-ref>.supabase.co`                     |
+   | `VITE_SUPABASE_KEY`    | A publishable key                                       |
+   | `VITE_SITE_URL`        | The app's URL, e.g. `https://vecora.vercel.app`         |
+   | `SUPABASE_SECRET_KEY`  | A secret key (server-only, needed to add board members) |
+   | `DATABASE_URL`         | Pooled connection string of the Neon production branch  |
+   | `BETTER_AUTH_SECRET`   | Its own `openssl rand -base64 32`, never the local one  |
+   | `AWS_*` (four of them) | Object storage of the Neon production branch            |
 
    The `VITE_` values are bundled into the browser code at build time, so redeploy after changing them.
 

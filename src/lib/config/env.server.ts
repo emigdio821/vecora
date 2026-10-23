@@ -4,6 +4,15 @@ import { z } from 'zod'
 const serverEnvSchema = z.object({
   /** Service-role key, for the Auth Admin API (adding and removing board members). */
   SUPABASE_SECRET_KEY: z.string().min(1),
+  /** Neon's pooled connection string, for the app's queries (Drizzle). */
+  DATABASE_URL: z.url(),
+  /** Signs Better Auth's session cookies and tokens. At least 32 characters. */
+  BETTER_AUTH_SECRET: z.string().min(32),
+  /** Neon Object Storage (S3-compatible) of the same branch, for the HOA logo. */
+  AWS_ENDPOINT_URL_S3: z.url(),
+  AWS_REGION: z.string().min(1),
+  AWS_ACCESS_KEY_ID: z.string().min(1),
+  AWS_SECRET_ACCESS_KEY: z.string().min(1),
 })
 
 const parsed = serverEnvSchema.safeParse(process.env)
