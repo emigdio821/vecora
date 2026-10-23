@@ -1,7 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconAlertCircle } from '@tabler/icons-react'
 import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from '@tanstack/react-router'
 import { Controller, useForm } from 'react-hook-form'
+import { useCurrentUser } from '@/components/current-user-provider'
 import { PhoneInput } from '@/components/shared/phone-input'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -24,7 +26,9 @@ import { toastManager } from '@/components/ui/toast'
 import { type UpdateResidentInput, updateResidentSchema } from '@/lib/validations/residents'
 import { m } from '@/paraglide/messages'
 import { updateResident } from '@/server-actions/residents'
+import { HOA_BOARD_QUERY_KEY } from '@/tanstack-queries/hoa-board'
 import { RESIDENTS_QUERY_KEY, type ResidentQueryData } from '@/tanstack-queries/residents'
+import { currentUserQueryOptions } from '@/tanstack-queries/session'
 import { ResidentHouses } from './resident-houses'
 
 const FORM_ID = 'edit-resident-form'
@@ -45,6 +49,8 @@ export function EditResidentDrawer({
   ...props
 }: EditResidentDrawerProps) {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const user = useCurrentUser()
 
   const mutation = useMutation({
     mutationFn: async (values: UpdateResidentInput) => {
@@ -53,6 +59,18 @@ export function EditResidentDrawer({
     },
     onSuccess: (_data, values) => {
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
+      // A board member's account name follows the resident's (a trigger in the database).
+      if (resident.profile) {
+        void queryClient.invalidateQueries({ queryKey: [HOA_BOARD_QUERY_KEY] })
+      }
+      // Renamed themselves: the sidebar reads the cached user, which the guards never refetch.
+      if (resident.profile?.id === user.id) {
+        queryClient.setQueryData(currentUserQueryOptions.queryKey, (cached) => {
+          if (!cached) return cached
+          return { ...cached, fullName: `${values.first_name} ${values.last_name}` }
+        })
+        void router.invalidate()
+      }
       toastManager.add({
         type: 'success',
         title: m.residential_resident_updated(),

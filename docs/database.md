@@ -14,6 +14,7 @@ it as of the migrations below. When a migration changes, update the matching sec
 | `20260921000500_settings_and_audit_log.sql`   | `settings`, `branding` bucket, `audit_log`, **nightly purge**               |
 | `20261021000000_document_templates.sql`       | `document_templates` and its audit trigger                                  |
 | `20261023000000_audit_account_activation.sql` | Activity log records an invited member's first password                     |
+| `20261023010000_sync_board_member_names.sql`  | A board member's account name follows their resident record                 |
 
 ## Contents
 
@@ -177,7 +178,7 @@ account only.
 | Column                 | Type          | Null | Default | Notes                                                                                                                                                                             |
 | ---------------------- | ------------- | ---- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `id`                   | `uuid`        | no   |         | PK, FK `auth.users(id)` **on delete cascade**                                                                                                                                     |
-| `full_name`            | `text`        | no   | `''`    | Taken from the signup metadata `full_name`                                                                                                                                        |
+| `full_name`            | `text`        | no   | `''`    | Taken from the signup metadata `full_name`. Then follows the linked resident's first and last name (`residents_sync_profile_name`); the app never writes it                       |
 | `created_at`           | `timestamptz` | no   | `now()` |                                                                                                                                                                                   |
 | `updated_at`           | `timestamptz` | no   | `now()` | Trigger-maintained                                                                                                                                                                |
 | `welcomed_at`          | `timestamptz` | yes  |         | When the user closed the welcome dialog. On the profile so it follows the user across devices. Not audited when it's the only change                                              |
@@ -586,7 +587,7 @@ Every RPC that writes to the ledger needs a period covering `occurred_on` (`P000
 a reference for transfers (`22023`).
 
 Private helpers (not callable from the API): `has_role`, `is_admin`, `set_updated_at`,
-`set_deleted_by`, `keep_currency`, `current_currency`, `check_resident_email`, `handle_new_user`,
+`set_deleted_by`, `keep_currency`, `current_currency`, `check_resident_email`, `sync_profile_name`, `handle_new_user`,
 `handle_password_changed`, `protect_main_admin_*`, `guard_paid_amenity_reservation`,
 `guard_settings_admin_fields`, `amenity_reservation_day` / `_label`, `audit`, `audit_refs`,
 `audit_document_template`, `audit_password_changed`, `purge_soft_deleted`.
