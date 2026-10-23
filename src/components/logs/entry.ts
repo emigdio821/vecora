@@ -268,6 +268,10 @@ export function entrySummary(entry: LogEntryQueryData): string {
       if (entry.changed_fields?.includes('password')) {
         return `${label} - ${m.logs_summary_password_changed()}`
       }
+      // An invited member's first password: they've just got in.
+      if (entry.changed_fields?.includes('password_set')) {
+        return `${label} - ${m.logs_summary_account_activated()}`
+      }
       return label
     case 'settings':
       return settingsSummary(entry)
@@ -459,6 +463,9 @@ const FIELD_LABEL: Record<string, string> = {
   get password() {
     return m.auth_field_password()
   },
+  get password_set() {
+    return m.auth_field_password()
+  },
 }
 
 /** Columns that mean something else in one table than in the rest. */
@@ -585,6 +592,9 @@ export function entryChanges(entry: LogEntryQueryData): FieldChange[] {
       // A password change names the field, never the password.
       if (field === 'password') {
         return { field, before: '', after: '', note: m.logs_password_not_kept() }
+      }
+      if (field === 'password_set') {
+        return { field, before: '', after: '', note: m.logs_password_set_not_kept() }
       }
       return {
         field,

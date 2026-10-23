@@ -13,6 +13,7 @@ it as of the migrations below. When a migration changes, update the matching sec
 | `20260921000400_requests.sql`                 | `maintenance_requests`, `security_requests`, resolve RPCs                   |
 | `20260921000500_settings_and_audit_log.sql`   | `settings`, `branding` bucket, `audit_log`, **nightly purge**               |
 | `20261021000000_document_templates.sql`       | `document_templates` and its audit trigger                                  |
+| `20261023000000_audit_account_activation.sql` | Activity log records an invited member's first password                     |
 
 ## Contents
 
@@ -554,8 +555,9 @@ which writes the same rows without the template's content (see
 - Password changes are recorded by `private.audit_password_changed()`, on `auth.users` as
   `on_auth_user_password_audit`: an update on the account's profile with `changed_fields` =
   `{password}`, `identity_id` the account itself, and the profile (never the hash) as
-  `old_data`/`new_data`. Except the first password: the main admin's forced change away from the
-  default, or an invited member choosing theirs.
+  `old_data`/`new_data`. An invited member's first password (the account had none) is written
+  with `{password_set}` instead, and the main admin's forced change away from the default isn't
+  written.
 - Indexes: `(occurred_at desc, id desc)`, `(table_name, row_id)`, `identity_id`.
 - **Access**: admins read. Nobody writes through the API: the trigger is `security definer`, and
   there are no insert/update/delete policies, so the log is append-only from the app.

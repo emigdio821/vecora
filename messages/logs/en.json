@@ -25,6 +25,7 @@
   "logs_summary_currency_changed": "Currency changed to {currency}",
   "logs_summary_language_changed": "Default language changed to {language}",
   "logs_summary_password_changed": "Password changed",
+  "logs_summary_account_activated": "Account activated",
 
   "logs_field_number": "Number",
   "logs_field_first_name": "First name",
@@ -95,6 +96,7 @@
   "logs_changed_to": "changed to",
   "logs_no_data": "No data to show.",
   "logs_password_not_kept": "It changed. The log never keeps passwords.",
+  "logs_password_set_not_kept": "Created their password with their access link. The log never keeps passwords.",
   "logs_related_title": "Done at the same time",
   "logs_related_description": "Other changes saved together with this one. For example, paying a request also records its transaction."
 }
