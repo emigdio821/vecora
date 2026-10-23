@@ -4,7 +4,7 @@ import { AccountSettingsPanel } from '@/components/settings/account-settings'
 import { AppSettingsPanel } from '@/components/settings/app-settings'
 import { HoaSettingsPanel } from '@/components/settings/hoa-settings'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
-import type { Settings } from '@/lib/supabase/settings'
+import type { Settings } from '@/lib/db/settings'
 import { m } from '@/paraglide/messages'
 
 /**

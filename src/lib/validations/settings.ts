@@ -60,7 +60,8 @@ export const settingsSchema = z.object({
 export type SettingsInput = z.infer<typeof settingsSchema>
 
 /** Storage bucket for the logo (see the settings_logo migration). */
-export const LOGO_BUCKET = 'branding'
+/** The bucket is private, so the settings preview goes through a link that expires. */
+export const LOGO_URL_SECONDS = 60 * 60
 
 /** What the president may upload; the server shrinks it to a small PNG anyway. */
 export const LOGO_MAX_BYTES = 2 * 1024 * 1024

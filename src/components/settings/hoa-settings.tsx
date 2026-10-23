@@ -23,7 +23,7 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Skeleton } from '@/components/ui/skeleton'
 import { toastManager } from '@/components/ui/toast'
 import { MULTI_LANGUAGE } from '@/lib/config/i18n'
-import type { Settings } from '@/lib/supabase/settings'
+import type { Settings } from '@/lib/db/settings'
 import { cn } from '@/lib/utils'
 import {
   CURRENCY_ITEMS,

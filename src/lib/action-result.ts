@@ -34,9 +34,28 @@ interface PostgrestMessageOptions {
   uniqueFallback?: string
 }
 
-/** Maps a PostgREST error to a user-facing message. */
+/** What Postgres raised: its SQLSTATE code and message. */
+export type DatabaseError = Pick<PostgrestError, 'code' | 'message'>
+
+/**
+ * The Postgres error behind a failed Drizzle query, for the helpers below.
+ * Drizzle wraps it, and node-postgres's error (with the code) is the cause.
+ * Anything else gets an empty code, so it falls through to the fallback.
+ */
+export function databaseError(error: unknown): DatabaseError {
+  let source = error
+  if (error instanceof Error && error.cause !== undefined) {
+    source = error.cause
+  }
+  if (source instanceof Error && 'code' in source && typeof source.code === 'string') {
+    return { code: source.code, message: source.message }
+  }
+  return { code: '', message: String(error) }
+}
+
+/** Maps a PostgREST error, or a Drizzle one through databaseError(), to a user-facing message. */
 export function postgrestErrorMessage(
-  error: PostgrestError,
+  error: DatabaseError,
   { fallback, unique = {}, uniqueFallback = m.common_unique_fallback() }: PostgrestMessageOptions,
 ): string {
   switch (error.code) {

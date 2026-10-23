@@ -1,14 +1,48 @@
+import {
+  DeleteObjectsCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { createServerFn } from '@tanstack/react-start'
+import { eq } from 'drizzle-orm'
 import sharp from 'sharp'
-import { type ActionResult, postgrestErrorMessage } from '@/lib/action-result'
+import { type ActionResult, databaseError, postgrestErrorMessage } from '@/lib/action-result'
+import { withCurrentUser } from '@/lib/db/current-user'
+import { settings } from '@/lib/db/schema'
+import { getSettings, LOGO_PREFIX, logoKey } from '@/lib/db/settings'
+import { ASSETS_BUCKET, storage } from '@/lib/storage'
 import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { getCurrentUser } from '@/lib/supabase/current-user'
-import { createClient } from '@/lib/supabase/server'
-import { LOGO_BUCKET, logoFileSchema, type SettingsInput, settingsSchema } from '@/lib/validations/settings'
+import {
+  LOGO_URL_SECONDS,
+  logoFileSchema,
+  type SettingsInput,
+  settingsSchema,
+} from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
 
 /** Largest side of the stored logo, in pixels: plenty for the report header. */
 const LOGO_SIZE = 512
+
+/**
+ * A link to the saved logo for the settings preview, or null when there's
+ * none. Anyone signed in may see it, as with the settings row it comes from.
+ */
+const fetchLogoUrlFn = createServerFn()
+  .middleware([authMiddleware])
+  .handler(async (): Promise<string | null> => {
+    const { logoPath } = await getSettings()
+    if (!logoPath) {
+      return null
+    }
+    return getSignedUrl(storage, new GetObjectCommand({ Bucket: ASSETS_BUCKET, Key: logoKey(logoPath) }), {
+      expiresIn: LOGO_URL_SECONDS,
+    })
+  })
+
+export const fetchLogoUrl = () => fetchLogoUrlFn()
 
 /**
  * President (or admin) edits the residential's details. RLS enforces the
@@ -24,23 +58,29 @@ const updateSettingsFn = createServerFn({ method: 'POST' })
       return { error: m.common_form_invalid() }
     }
 
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('settings')
-      .update(parsed.data)
-      .eq('singleton', true)
-      .select('id')
-      .maybeSingle()
-
-    if (error) {
+    let updated: Array<{ id: string }>
+    try {
+      updated = await withCurrentUser((tx) =>
+        tx
+          .update(settings)
+          .set({
+            residentialName: parsed.data.residential_name,
+            // Left out (undefined) when the president saves: Drizzle skips them.
+            defaultLanguage: parsed.data.default_language,
+            currency: parsed.data.currency,
+          })
+          .where(eq(settings.singleton, true))
+          .returning({ id: settings.id }),
+      )
+    } catch (error) {
       return {
-        error: postgrestErrorMessage(error, {
+        error: postgrestErrorMessage(databaseError(error), {
           fallback: m.settings_save_failed(),
         }),
       }
     }
     // RLS filtered the row out: not president nor admin.
-    if (!data) {
+    if (updated.length === 0) {
       return { error: m.common_no_permission() }
     }
 
@@ -64,40 +104,49 @@ function optimizeLogo(input: ArrayBuffer): Promise<Buffer> {
     .toBuffer()
 }
 
-/** Points the settings row at a new logo (or none), then deletes every other file in the bucket. */
+/**
+ * Points the settings row at a new logo (or none), then deletes every other
+ * logo. RLS decides who may change the row, so nothing is deleted for someone
+ * who can't.
+ */
 async function setLogoPath(path: string | null): Promise<ActionResult> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('settings')
-    .update({ logo_path: path })
-    .eq('singleton', true)
-    .select('id')
-    .maybeSingle()
-
-  if (error) {
+  let updated: Array<{ id: string }>
+  try {
+    updated = await withCurrentUser((tx) =>
+      tx
+        .update(settings)
+        .set({ logoPath: path })
+        .where(eq(settings.singleton, true))
+        .returning({ id: settings.id }),
+    )
+  } catch (error) {
     return {
-      error: postgrestErrorMessage(error, { fallback: m.settings_logo_save_failed() }),
+      error: postgrestErrorMessage(databaseError(error), { fallback: m.settings_logo_save_failed() }),
     }
   }
-  if (!data) {
+  if (updated.length === 0) {
     return { error: m.common_no_permission() }
   }
 
-  // The bucket only needs the current logo. Clearing everything else, not just the previous
-  // file, also picks up orphans: files a hosted db reset unlinked, or an earlier failed delete.
-  // The logo is already saved, so a failure here is only logged.
-  const { data: files, error: listError } = await supabase.storage.from(LOGO_BUCKET).list()
-  if (listError) {
-    console.error('listing logos failed', listError)
-    return { data: undefined }
-  }
-
-  const stalePaths = files.filter((file) => file.name !== path).map((file) => file.name)
-  if (stalePaths.length > 0) {
-    const { error: removeError } = await supabase.storage.from(LOGO_BUCKET).remove(stalePaths)
-    if (removeError) {
-      console.error('removing old logos failed', removeError)
+  // Only the current logo needs to stay. Clearing everything else, not just the previous
+  // file, also picks up orphans, like a file from an earlier failed delete. The logo is
+  // already saved, so a failure here is only logged.
+  try {
+    const listed = await storage.send(
+      new ListObjectsV2Command({ Bucket: ASSETS_BUCKET, Prefix: LOGO_PREFIX }),
+    )
+    const keep = path === null ? null : logoKey(path)
+    const stale = (listed.Contents ?? []).filter((object) => object.Key !== undefined && object.Key !== keep)
+    if (stale.length > 0) {
+      await storage.send(
+        new DeleteObjectsCommand({
+          Bucket: ASSETS_BUCKET,
+          Delete: { Objects: stale.map((object) => ({ Key: object.Key })) },
+        }),
+      )
     }
+  } catch (error) {
+    console.error('removing old logos failed', error)
   }
 
   return { data: undefined }
@@ -129,19 +178,30 @@ const uploadLogoFn = createServerFn({ method: 'POST' })
 
     // A new name every time, so no cache ever serves the previous logo.
     const path = `logo-${Date.now()}.png`
-    const supabase = await createClient()
-    const { error: uploadError } = await supabase.storage
-      .from(LOGO_BUCKET)
-      .upload(path, png, { contentType: 'image/png', cacheControl: '31536000' })
-
-    if (uploadError) {
-      console.error('logo upload failed', uploadError)
+    try {
+      await storage.send(
+        new PutObjectCommand({
+          Bucket: ASSETS_BUCKET,
+          Key: logoKey(path),
+          Body: png,
+          ContentType: 'image/png',
+          CacheControl: 'max-age=31536000',
+        }),
+      )
+    } catch (error) {
+      console.error('logo upload failed', error)
       return { error: m.settings_logo_upload_failed() }
     }
 
     const result = await setLogoPath(path)
     if (result.error !== undefined) {
-      await supabase.storage.from(LOGO_BUCKET).remove([path])
+      try {
+        await storage.send(
+          new DeleteObjectsCommand({ Bucket: ASSETS_BUCKET, Delete: { Objects: [{ Key: logoKey(path) }] } }),
+        )
+      } catch (error) {
+        console.error('removing the unsaved logo failed', error)
+      }
     }
 
     return result

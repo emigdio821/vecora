@@ -19,7 +19,7 @@ attachDatabasePool(pool)
 // The relations carry the tables too, so db.query.<table> is typed with `with:` joins.
 export const db = drizzle({ client: pool, relations })
 
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 
 /**
  * Runs `run` in a transaction that knows who is acting, the way Supabase ran
