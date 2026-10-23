@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { createColumnHelper } from '@tanstack/react-table'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import type { DataTableFeatures } from '@/components/shared/table/features'
@@ -26,14 +27,32 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
       id: 'full_name',
       size: 220,
       header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_name()} />,
-      cell: ({ row }) => (
-        <div className="flex w-0 min-w-full items-center gap-2">
-          <span className="truncate" title={row.original.full_name}>
-            {row.original.full_name}
-          </span>
-          {row.original.id === viewer.id && <Badge variant="info">{m.board_you()}</Badge>}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const { resident } = row.original
+        return (
+          <div className="flex w-0 min-w-full items-center gap-2">
+            {resident ? (
+              // The registry has the rest: phone, houses, notes.
+              <Link
+                to="/residential"
+                search={{
+                  tab: 'residents',
+                  'search-residents': `${resident.first_name} ${resident.last_name}`,
+                }}
+                className="truncate font-medium hover:underline"
+                title={row.original.full_name}
+              >
+                {row.original.full_name}
+              </Link>
+            ) : (
+              <span className="truncate" title={row.original.full_name}>
+                {row.original.full_name}
+              </span>
+            )}
+            {row.original.id === viewer.id && <Badge variant="info">{m.board_you()}</Badge>}
+          </div>
+        )
+      },
       // Search box target: name or email, accent-insensitive.
       filterFn: (row, _columnId, value: string) => {
         const filterValue = normalizeString(value)
