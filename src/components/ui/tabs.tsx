@@ -36,7 +36,9 @@ export function TabsList({
   return (
     <TabsPrimitive.List
       className={cn(
-        'relative z-0 flex w-fit items-center justify-center gap-x-0.5 text-muted-foreground',
+        'relative z-0 flex w-fit items-center justify-center-safe gap-x-0.5 text-muted-foreground',
+        // More tabs than fit (a phone): the list scrolls sideways instead of overflowing the page.
+        'max-w-full overflow-x-auto',
         'data-[orientation=vertical]:flex-col',
         variant === 'default'
           ? 'rounded-lg bg-muted p-0.5 text-muted-foreground/72'
@@ -49,6 +51,7 @@ export function TabsList({
     >
       <TabsListContext.Provider value={size}>{children}</TabsListContext.Provider>
       <TabsPrimitive.Indicator
+        renderBeforeHydration
         className={cn(
           'absolute bottom-0 left-0 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) -translate-y-(--active-tab-bottom) transition-[width,translate] duration-200 ease-in-out motion-reduce:transition-none',
           variant === 'underline'
