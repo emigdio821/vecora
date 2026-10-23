@@ -36,3 +36,10 @@ export const assignHouseSchema = z.object({
 })
 
 export type AssignHouseInput = z.infer<typeof assignHouseSchema>
+
+/** Fixes how an existing link was recorded, e.g. a tenant saved as the owner. */
+export const updateRelationshipSchema = z.object({
+  relationship: z.enum(RELATIONSHIPS, { error: () => m.residential_relationship_required() }),
+})
+
+export type UpdateRelationshipInput = z.infer<typeof updateRelationshipSchema>

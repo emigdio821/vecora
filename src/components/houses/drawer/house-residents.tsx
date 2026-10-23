@@ -11,7 +11,6 @@ import {
   ResponsiveAlertDialogPopup,
   ResponsiveAlertDialogTitle,
 } from '@/components/shared/responsive-alert-dialog'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip'
@@ -19,7 +18,8 @@ import { m } from '@/paraglide/messages'
 import { unassignResident } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
-import { RELATIONSHIP_LABEL, sortByRelationship } from '../relationship'
+import { sortByRelationship } from '../relationship'
+import { RelationshipSelect } from '../relationship-select'
 import { AssignResidentsDrawer } from './assign-residents'
 
 interface HouseResidentsProps {
@@ -28,7 +28,10 @@ interface HouseResidentsProps {
   disabled?: boolean
 }
 
-/** Editable list of the people linked to a house: unassign inline, assign via a nested drawer. */
+/**
+ * Editable list of the people linked to a house: change the relationship or
+ * unassign inline, assign via a nested drawer.
+ */
 export function HouseResidents({ house, disabled }: HouseResidentsProps) {
   const [isAssignOpen, setAssignOpen] = useState(false)
   const residents = sortByRelationship(house.property_residents)
@@ -46,7 +49,15 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
                 <span className="truncate text-xs text-muted-foreground">{resident.phone}</span>
               </div>
               <div className="flex shrink-0 items-center gap-1">
-                <Badge variant="outline">{RELATIONSHIP_LABEL[relationship]}</Badge>
+                <RelationshipSelect
+                  house={house}
+                  resident={resident}
+                  value={relationship}
+                  aria-label={m.residential_relationship_of_resident({
+                    name: `${resident.first_name} ${resident.last_name}`,
+                  })}
+                  disabled={disabled}
+                />
                 <UnassignResidentButton house={house} resident={resident} disabled={disabled} />
               </div>
             </li>

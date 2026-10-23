@@ -9,7 +9,9 @@ import {
   type CreateHouseInput,
   createHouseSchema,
   type UpdateHouseInput,
+  type UpdateRelationshipInput,
   updateHouseSchema,
+  updateRelationshipSchema,
 } from '@/lib/validations/houses'
 import { m } from '@/paraglide/messages'
 
@@ -183,6 +185,44 @@ const assignResidentsFn = createServerFn({ method: 'POST' })
 
 export const assignResidents = (houseId: string, input: AssignResidentsInput) =>
   assignResidentsFn({ data: { houseId, input } })
+
+/** Changes how a resident is linked to a house, for when it was recorded wrong. */
+const updateRelationshipFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .validator((data: { houseId: string; residentId: string; input: UpdateRelationshipInput }) => data)
+  .handler(async ({ data: { houseId, residentId, input } }): Promise<ActionResult<{ updated: number }>> => {
+    const parsed = updateRelationshipSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: m.common_form_invalid() }
+    }
+
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+      .from('property_residents')
+      .update({ relationship: parsed.data.relationship })
+      .eq('property_id', houseId)
+      .eq('resident_id', residentId)
+      .select('resident_id')
+
+    if (error) {
+      return {
+        error: postgrestErrorMessage(error, {
+          fallback: m.residential_update_relationship_failed(),
+        }),
+      }
+    }
+
+    // RLS filters instead of raising on UPDATE, so 0 rows means no permission (or the link is gone).
+    if (data.length === 0) {
+      return { error: m.common_no_permission() }
+    }
+
+    return { data: { updated: data.length } }
+  })
+
+export const updateRelationship = (houseId: string, residentId: string, input: UpdateRelationshipInput) =>
+  updateRelationshipFn({ data: { houseId, residentId, input } })
 
 /** Removes a resident from a house. The link is history, so this is only for mistakes. */
 const unassignResidentFn = createServerFn({ method: 'POST' })

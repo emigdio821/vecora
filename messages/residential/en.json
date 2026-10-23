@@ -31,6 +31,12 @@
   "residential_assign_residents_failed": "Couldn't assign the residents, please try again",
   "residential_resident_already_assigned": "One of the residents is already assigned to this house",
   "residential_unassign_resident_failed": "Couldn't remove the resident, please try again",
+  "residential_update_relationship_failed": "Couldn't change the relationship, please try again",
+  "residential_relationship_update_failed": "Couldn't change the relationship",
+  "residential_relationship_updated": "Relationship updated",
+  "residential_relationship_updated_description": "{name} at house {number}: {relationship}",
+  "residential_relationship_with_house": "Relationship with house {number}",
+  "residential_relationship_of_resident": "{name}'s relationship with the house",
 
   "residential_house_restored": "House restored",
   "residential_houses_restored": "Houses restored",

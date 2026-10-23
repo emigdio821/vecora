@@ -1,7 +1,7 @@
 import { IconHome, IconHomeX } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { RELATIONSHIP_LABEL } from '@/components/houses/relationship'
+import { RelationshipSelect } from '@/components/houses/relationship-select'
 import { CollapsibleSection, Muted } from '@/components/shared/details'
 import {
   ResponsiveAlertDialog,
@@ -12,7 +12,6 @@ import {
   ResponsiveAlertDialogPopup,
   ResponsiveAlertDialogTitle,
 } from '@/components/shared/responsive-alert-dialog'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip'
@@ -29,8 +28,9 @@ interface ResidentHousesProps {
 }
 
 /**
- * Editable list of the houses a resident is linked to: unassign inline, assign
- * via a nested drawer. The house side has the same list for its residents.
+ * Editable list of the houses a resident is linked to: change the relationship
+ * or unassign inline, assign via a nested drawer. The house side has the same
+ * list for its residents.
  */
 export function ResidentHouses({ resident, disabled }: ResidentHousesProps) {
   const [isAssignOpen, setAssignOpen] = useState(false)
@@ -48,7 +48,13 @@ export function ResidentHouses({ resident, disabled }: ResidentHousesProps) {
                 {m.common_house_label({ number: property.number })}
               </span>
               <div className="flex shrink-0 items-center gap-1">
-                <Badge variant="outline">{RELATIONSHIP_LABEL[relationship]}</Badge>
+                <RelationshipSelect
+                  house={property}
+                  resident={resident}
+                  value={relationship}
+                  aria-label={m.residential_relationship_with_house({ number: property.number })}
+                  disabled={disabled}
+                />
                 <UnassignHouseButton resident={resident} house={property} disabled={disabled} />
               </div>
             </li>

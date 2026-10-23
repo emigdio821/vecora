@@ -31,6 +31,12 @@
   "residential_assign_residents_failed": "No se pudieron asignar los residentes, intenta nuevamente",
   "residential_resident_already_assigned": "Alguno de los residentes ya está asignado a esta casa",
   "residential_unassign_resident_failed": "No se pudo quitar al residente, intenta nuevamente",
+  "residential_update_relationship_failed": "No se pudo cambiar la relación, intenta nuevamente",
+  "residential_relationship_update_failed": "No se pudo cambiar la relación",
+  "residential_relationship_updated": "Relación actualizada",
+  "residential_relationship_updated_description": "{name} en la casa {number}: {relationship}",
+  "residential_relationship_with_house": "Relación con la casa {number}",
+  "residential_relationship_of_resident": "Relación de {name} con la casa",
 
   "residential_house_restored": "Casa restaurada",
   "residential_houses_restored": "Casas restauradas",
