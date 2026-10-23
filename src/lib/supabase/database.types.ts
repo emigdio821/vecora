@@ -925,7 +925,7 @@ export type Database = {
       payment_method: 'cash' | 'transfer'
       request_status: 'pending' | 'paid' | 'rejected'
       residency_relationship: 'owner' | 'tenant' | 'family' | 'unconfirmed'
-      security_request_kind: 'cameras' | 'guards' | 'access' | 'equipment' | 'other'
+      security_request_kind: 'cameras' | 'guards' | 'access' | 'equipment' | 'supplies' | 'other'
       transaction_kind: 'income' | 'expense'
     }
     CompositeTypes: {
@@ -1049,7 +1049,7 @@ export const Constants = {
       payment_method: ['cash', 'transfer'],
       request_status: ['pending', 'paid', 'rejected'],
       residency_relationship: ['owner', 'tenant', 'family', 'unconfirmed'],
-      security_request_kind: ['cameras', 'guards', 'access', 'equipment', 'other'],
+      security_request_kind: ['cameras', 'guards', 'access', 'equipment', 'supplies', 'other'],
       transaction_kind: ['income', 'expense'],
     },
   },

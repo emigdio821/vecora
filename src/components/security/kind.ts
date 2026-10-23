@@ -14,6 +14,9 @@ export const KIND_LABEL: Record<SecurityRequestKind, string> = {
   get equipment() {
     return m.requests_security_kind_equipment()
   },
+  get supplies() {
+    return m.requests_security_kind_supplies()
+  },
   get other() {
     return m.requests_security_kind_other()
   },
@@ -32,6 +35,9 @@ export const KIND_DESCRIPTION: Record<SecurityRequestKind, string> = {
   },
   get equipment() {
     return m.requests_security_kind_equipment_description()
+  },
+  get supplies() {
+    return m.requests_security_kind_supplies_description()
   },
   get other() {
     return m.requests_security_kind_other_description()

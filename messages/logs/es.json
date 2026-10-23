@@ -73,6 +73,7 @@
   "logs_enum_guards": "Guardias",
   "logs_enum_access": "Accesos",
   "logs_enum_equipment": "Equipo",
+  "logs_enum_supplies": "Insumos",
   "logs_enum_other": "Otro",
 
   "logs_date_time": "Fecha y hora",

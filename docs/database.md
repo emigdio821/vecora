@@ -147,17 +147,17 @@ later migration means moving it (or a `create or replace` there).
 
 ## Enums
 
-| Enum                     | Values                                                       |
-| ------------------------ | ------------------------------------------------------------ |
-| `app_role`               | `admin`, `president`, `treasurer`, `security`, `maintenance` |
-| `residency_relationship` | `owner`, `tenant`, `family`, `unconfirmed`                   |
-| `transaction_kind`       | `income`, `expense`                                          |
-| `payment_method`         | `cash`, `transfer`                                           |
-| `currency_code`          | `MXN`, `USD` (add with `alter type ... add value`)           |
-| `request_status`         | `pending`, `paid`, `rejected`                                |
-| `security_request_kind`  | `cameras`, `guards`, `access`, `equipment`, `other`          |
-| `app_language`           | `es`, `en` (add with `alter type ... add value`)             |
-| `audit_operation`        | `insert`, `update`, `delete`                                 |
+| Enum                     | Values                                                          |
+| ------------------------ | --------------------------------------------------------------- |
+| `app_role`               | `admin`, `president`, `treasurer`, `security`, `maintenance`    |
+| `residency_relationship` | `owner`, `tenant`, `family`, `unconfirmed`                      |
+| `transaction_kind`       | `income`, `expense`                                             |
+| `payment_method`         | `cash`, `transfer`                                              |
+| `currency_code`          | `MXN`, `USD` (add with `alter type ... add value`)              |
+| `request_status`         | `pending`, `paid`, `rejected`                                   |
+| `security_request_kind`  | `cameras`, `guards`, `access`, `equipment`, `supplies`, `other` |
+| `app_language`           | `es`, `en` (add with `alter type ... add value`)                |
+| `audit_operation`        | `insert`, `update`, `delete`                                    |
 
 ---
 

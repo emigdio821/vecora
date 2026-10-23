@@ -17,7 +17,7 @@
 --     reversing its expense.
 --
 -- Security requests follow the same model and lifecycle, with two differences:
---   * Each request has a `kind` (cameras, guards, access, equipment, other)
+--   * Each request has a `kind` (cameras, guards, access, equipment, supplies, other)
 --     so the treasurer can tell a camera repair from a guard's pay at a glance.
 --   * The security role, not maintenance, owns the pending rows.
 --
@@ -84,7 +84,7 @@ create trigger maintenance_requests_keep_currency
 -- ---------------------------------------------------------------------------
 -- security_requests
 -- ---------------------------------------------------------------------------
-create type public.security_request_kind as enum ('cameras', 'guards', 'access', 'equipment', 'other');
+create type public.security_request_kind as enum ('cameras', 'guards', 'access', 'equipment', 'supplies', 'other');
 
 create table public.security_requests (
   id               uuid primary key default gen_random_uuid(),

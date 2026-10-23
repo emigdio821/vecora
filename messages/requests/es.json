@@ -2,7 +2,7 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
 
   "requests_maintenance_page_description": "Trabajos y compras de mantenimiento. Cada registro es una solicitud de pago que {#b}Tesorería{/b} marca como pagada o rechazada.",
-  "requests_security_page_description": "Gastos de seguridad: cámaras, guardias, accesos y equipo. Cada registro es una solicitud de pago que {#b}Tesorería{/b} marca como pagada o rechazada.",
+  "requests_security_page_description": "Gastos de seguridad: cámaras, guardias, accesos, equipo e insumos. Cada registro es una solicitud de pago que {#b}Tesorería{/b} marca como pagada o rechazada.",
 
   "requests_new": "Nueva solicitud",
   "requests_empty": "Sin solicitudes.",
@@ -71,11 +71,13 @@
   "requests_security_kind_guards": "Guardias",
   "requests_security_kind_access": "Accesos",
   "requests_security_kind_equipment": "Equipo",
+  "requests_security_kind_supplies": "Insumos",
   "requests_security_kind_other": "Otro",
   "requests_security_kind_cameras_description": "Compra, instalación o reparación de cámaras y grabadoras.",
   "requests_security_kind_guards_description": "Pago de guardias, turnos extra o empresa de vigilancia.",
   "requests_security_kind_access_description": "Plumas, portones, controles, tarjetas o cerraduras.",
   "requests_security_kind_equipment_description": "Radios, lámparas, uniformes, candados y similares.",
+  "requests_security_kind_supplies_description": "Pilas, bitácoras, papelería y otros consumibles.",
   "requests_security_kind_other_description": "Cualquier otro gasto de seguridad.",
 
   "requests_title_required": "Concepto es requerido",

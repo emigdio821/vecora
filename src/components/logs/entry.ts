@@ -532,6 +532,9 @@ const ENUM_LABEL: Record<string, string> = {
   get equipment() {
     return m.logs_enum_equipment()
   },
+  get supplies() {
+    return m.logs_enum_supplies()
+  },
   get other() {
     return m.logs_enum_other()
   },

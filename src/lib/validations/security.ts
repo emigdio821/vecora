@@ -2,7 +2,14 @@ import { z } from 'zod'
 import { m } from '@/paraglide/messages'
 
 // Mirrors the `security_request_kind` enum in the database.
-export const SECURITY_REQUEST_KINDS = ['cameras', 'guards', 'access', 'equipment', 'other'] as const
+export const SECURITY_REQUEST_KINDS = [
+  'cameras',
+  'guards',
+  'access',
+  'equipment',
+  'supplies',
+  'other',
+] as const
 
 export type SecurityRequestKind = (typeof SECURITY_REQUEST_KINDS)[number]
 
