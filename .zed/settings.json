@@ -1,21 +1,11 @@
 {
-  "format_on_save": "on",
-  "prettier": {
-    "allowed": false
-  },
-  "formatter": {
-    "language_server": {
-      "name": "oxfmt"
-    }
-  },
   "lsp": {
     "oxlint": {
       "initialization_options": {
         "settings": {
-          "configPath": "./oxlint.config.ts",
           "run": "onType",
-          "disableNestedConfig": false,
           "fixKind": "safe_fix",
+          "typeAware": true,
           "unusedDisableDirectives": "deny"
         }
       }
@@ -23,7 +13,7 @@
     "oxfmt": {
       "initialization_options": {
         "settings": {
-          "fmt.configPath": "./oxfmt.config.ts",
+          "fmt.configPath": "./vite.config.ts",
           "run": "onSave"
         }
       }
@@ -31,22 +21,29 @@
   },
   "languages": {
     "JavaScript": {
-      "language_servers": ["!eslint", "!typescript-language-server", "..."],
-      "code_actions_on_format": {
-        "source.fixAll.oxc": true
-      }
+      "format_on_save": "on",
+      "prettier": { "allowed": false },
+      "formatter": [{ "language_server": { "name": "oxfmt" } }, { "code_action": "source.fixAll.oxc" }]
+    },
+    "JSX": {
+      "format_on_save": "on",
+      "prettier": { "allowed": false },
+      "formatter": [{ "language_server": { "name": "oxfmt" } }]
     },
     "TypeScript": {
-      "language_servers": ["!eslint", "!typescript-language-server", "..."],
-      "code_actions_on_format": {
-        "source.fixAll.oxc": true
-      }
+      "format_on_save": "on",
+      "prettier": { "allowed": false },
+      "formatter": [{ "language_server": { "name": "oxfmt" } }]
     },
     "TSX": {
-      "language_servers": ["!eslint", "!typescript-language-server", "..."],
-      "code_actions_on_format": {
-        "source.fixAll.oxc": true
-      }
+      "format_on_save": "on",
+      "prettier": { "allowed": false },
+      "formatter": [{ "language_server": { "name": "oxfmt" } }]
+    },
+    "Vue.js": {
+      "format_on_save": "on",
+      "prettier": { "allowed": false },
+      "formatter": [{ "language_server": { "name": "oxfmt" } }]
     }
   }
 }
