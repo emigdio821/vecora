@@ -15,6 +15,7 @@
     "db:reset": "supabase db reset --local",
     "db:reset:empty": "supabase db reset --local --no-seed && supabase db query --local -f supabase/seed.sql",
     "db:seed": "supabase db push --linked --include-seed",
+    "db:neon:load": "node scripts/neon/load-dev.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -27,8 +28,6 @@
     "@fontsource/inter": "^5.3.0",
     "@hookform/resolvers": "^5.9.2",
     "@inlang/paraglide-js-react": "1.0.3",
-    "@neon/config": "^1.9.3",
-    "@neon/env": "^1.6.4",
     "@react-pdf/renderer": "^4.9.0",
     "@resvg/resvg-js": "^2.6.2",
     "@supabase/ssr": "^0.12.7",
@@ -54,7 +53,6 @@
     "@tiptap/starter-kit": "^3.32.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/functions": "^3.10.3",
-    "bcryptjs": "^3.0.3",
     "better-auth": "1.7.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -80,6 +78,7 @@
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@inlang/paraglide-js": "^2.29.1",
+    "@neon/config": "^1.9.3",
     "@tailwindcss/vite": "^4.3.3",
     "@types/d3-shape": "^3.2.0",
     "@types/node": "^24.19.2",
