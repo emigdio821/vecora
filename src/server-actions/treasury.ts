@@ -61,8 +61,10 @@ const recordFeePaymentFn = createServerFn({ method: 'POST' })
       return { error: m.common_form_invalid() }
     }
 
-    const { property_id, fee_months, occurred_on, payment_method, folio, reference, notes, waive_late_fee } =
+    const { property_id, fee_months, occurred_on, payment_method, folio, reference, notes, waived_months } =
       parsed.data
+    // Only months on this receipt: one left over from an earlier pick can't forgive anything else.
+    const waivedMonths = waived_months.filter((month) => fee_months.includes(month))
     const supabase = await createClient()
 
     const { data, error } = await supabase
@@ -74,8 +76,8 @@ const recordFeePaymentFn = createServerFn({ method: 'POST' })
         p_payment_method: payment_method,
         p_reference: reference || undefined,
         p_notes: notes || undefined,
-        // null = let the due-day rule decide per month; false = waive every late fee
-        p_apply_late_fee: waive_late_fee ? false : undefined,
+        // The due-day rule decides per month; these months skip their late fee.
+        p_waived_months: waivedMonths.length > 0 ? waivedMonths : undefined,
       })
       .single()
 

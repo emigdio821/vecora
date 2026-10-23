@@ -335,7 +335,8 @@ create function public.record_fee_payment(
   p_notes          text default null,
   p_period_id      uuid default null,     -- default: the period that contains p_occurred_on
   p_amount         numeric default null,  -- per-month fee; default: the period's monthly_fee
-  p_apply_late_fee boolean default null   -- null = by the due-day rule; true/false force it
+  p_apply_late_fee boolean default null,  -- null = by the due-day rule; true/false force it
+  p_waived_months  date[] default null    -- months whose late fee the board forgave
 )
 returns table (fee_count integer, late_fee_count integer, total numeric)
 language plpgsql
@@ -396,11 +397,12 @@ begin
     fee_count := fee_count + 1;
     total := total + v_amount;
 
-    -- Due on due_day of the month being paid; anything after that is late.
+    -- Due on due_day of the month being paid; anything after that is late,
+    -- unless the board forgave that month's late fee.
     v_is_late := coalesce(
       p_apply_late_fee,
       p_occurred_on > make_date(extract(year from v_month)::int, extract(month from v_month)::int, v_period.due_day)
-    );
+    ) and not v_month = any(coalesce(p_waived_months, '{}'::date[]));
 
     if v_is_late and v_period.late_fee > 0 then
       insert into public.transactions

@@ -904,6 +904,7 @@ export type Database = {
           p_period_id?: string
           p_property_id: string
           p_reference?: string
+          p_waived_months?: string[]
         }
         Returns: {
           fee_count: number

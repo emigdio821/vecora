@@ -114,13 +114,14 @@
   "treasury_search_month": "Buscar mes",
   "treasury_payment_date": "Fecha de pago",
   "treasury_waive_late_fee": "Condonar recargo",
+  "treasury_waive_late_fees": "Condonar recargos",
   "treasury_waive_late_fee_description": [
     {
       "declarations": ["input count", "input dueDay", "local countPlural = count: plural"],
       "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "1 mes se paga después del día {dueDay}. Actívalo si la mesa directiva perdonó el recargo.",
-        "countPlural=other": "{count} meses se pagan después del día {dueDay}. Actívalo si la mesa directiva perdonó el recargo."
+        "countPlural=other": "{count} meses se pagan después del día {dueDay}. Marca aquellos cuyo recargo perdonó la mesa directiva."
       }
     }
   ],
@@ -146,7 +147,16 @@
       }
     }
   ],
-  "treasury_waived": "(condonado)",
+  "treasury_waived": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "(1 condonado)",
+        "countPlural=other": "({count} condonados)"
+      }
+    }
+  ],
   "treasury_total_to_receive": "Total a recibir",
   "treasury_fee_recorded": "Cuota registrada",
   "treasury_months_count": [
@@ -161,6 +171,7 @@
   ],
   "treasury_fee_recorded_description": "{house}: {months}, {total} - Folio {folio}",
   "treasury_fee_recorded_description_late": "{house}: {months} con recargo, {total} - Folio {folio}",
+  "treasury_fee_recorded_description_some_late": "{house}: {months}, {lateFees} con recargo, {total} - Folio {folio}",
 
   "treasury_select_month_required": "Selecciona al menos un mes",
   "treasury_folio_required": "Folio es requerido",

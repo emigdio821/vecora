@@ -114,13 +114,14 @@
   "treasury_search_month": "Search month",
   "treasury_payment_date": "Payment date",
   "treasury_waive_late_fee": "Waive late fee",
+  "treasury_waive_late_fees": "Waive late fees",
   "treasury_waive_late_fee_description": [
     {
       "declarations": ["input count", "input dueDay", "local countPlural = count: plural"],
       "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "1 month is paid after day {dueDay}. Turn this on if the HOA board waived the late fee.",
-        "countPlural=other": "{count} months are paid after day {dueDay}. Turn this on if the HOA board waived the late fee."
+        "countPlural=other": "{count} months are paid after day {dueDay}. Tick the ones whose late fee the HOA board waived."
       }
     }
   ],
@@ -146,7 +147,16 @@
       }
     }
   ],
-  "treasury_waived": "(waived)",
+  "treasury_waived": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "(1 waived)",
+        "countPlural=other": "({count} waived)"
+      }
+    }
+  ],
   "treasury_total_to_receive": "Total to collect",
   "treasury_fee_recorded": "Fee recorded",
   "treasury_months_count": [
@@ -161,6 +171,7 @@
   ],
   "treasury_fee_recorded_description": "{house}: {months}, {total} - Receipt no. {folio}",
   "treasury_fee_recorded_description_late": "{house}: {months} with late fee, {total} - Receipt no. {folio}",
+  "treasury_fee_recorded_description_some_late": "{house}: {months}, {lateFees} with late fee, {total} - Receipt no. {folio}",
 
   "treasury_select_month_required": "Select at least one month",
   "treasury_folio_required": "Receipt number is required",

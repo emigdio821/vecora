@@ -9,7 +9,6 @@ import { PeriodCalendar } from '@/components/shared/period-calendar'
 import { HousesPicker, houseLabel } from '@/components/shared/pickers/houses-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Combobox,
   ComboboxChip,
@@ -39,7 +38,6 @@ import {
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
@@ -54,6 +52,7 @@ import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { PRESIDENCY_QUERY_KEY, periodsQueryOptions } from '@/tanstack-queries/presidency'
 import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { PAYMENT_METHOD_ITEMS } from '../../kind'
+import { WaiveLateFees } from './waive-late-fees'
 
 const FORM_ID = 'record-fee-form'
 
@@ -66,8 +65,14 @@ function defaultValues(): RecordFeePaymentInput {
     folio: '',
     reference: '',
     notes: '',
-    waive_late_fee: false,
+    waived_months: [],
   }
+}
+
+/** The months paid after the period's due day: the RPC's rule, so the drawer can show it. */
+function lateMonthsOf(period: { due_day: number }, feeMonths: string[], occurredOn: string): string[] {
+  const paidOn = parseISO(occurredOn)
+  return feeMonths.filter((month) => isAfter(paidOn, setDate(parseISO(month), period.due_day)))
 }
 
 interface RecordFeeDrawerProps extends React.ComponentProps<typeof Drawer> {
@@ -89,9 +94,9 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
     resolver: zodResolver(recordFeePaymentSchema),
     defaultValues: defaultValues(),
   })
-  const [feeMonths, occurredOn, paymentMethod, waiveLateFee] = useWatch({
+  const [feeMonths, occurredOn, paymentMethod, waivedMonths] = useWatch({
     control: form.control,
-    name: ['fee_months', 'occurred_on', 'payment_method', 'waive_late_fee'],
+    name: ['fee_months', 'occurred_on', 'payment_method', 'waived_months'],
   })
 
   // Mirror of the RPC's rules, so the treasurer sees the total before saving.
@@ -99,18 +104,33 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
     const period = periods ? periodFor(periods, occurredOn) : undefined
     if (!period) return null
 
-    const paidOn = parseISO(occurredOn)
-    const lateMonths = feeMonths.filter((month) => isAfter(paidOn, setDate(parseISO(month), period.due_day)))
-    const lateFees = waiveLateFee ? 0 : lateMonths.length * Number(period.late_fee)
+    const lateMonths = lateMonthsOf(period, feeMonths, occurredOn)
+    const waivedCount = lateMonths.filter((month) => waivedMonths.includes(month)).length
+    const lateFees = (lateMonths.length - waivedCount) * Number(period.late_fee)
 
     return {
       period,
-      lateMonths: lateMonths.length,
+      lateMonths,
+      waivedCount,
       fees: feeMonths.length * Number(period.monthly_fee),
       lateFees,
       total: feeMonths.length * Number(period.monthly_fee) + lateFees,
     }
-  }, [periods, feeMonths, occurredOn, waiveLateFee])
+  }, [periods, feeMonths, occurredOn, waivedMonths])
+
+  /**
+   * Keeps only the waived months that are still late with these months and this date:
+   * one dropped and picked again (or late again after a date change) starts charged.
+   */
+  function keepLateWaivedMonths(nextFeeMonths: string[], nextOccurredOn: string) {
+    const period = periods ? periodFor(periods, nextOccurredOn) : undefined
+    const lateMonths = period ? lateMonthsOf(period, nextFeeMonths, nextOccurredOn) : []
+    const current = form.getValues('waived_months')
+    form.setValue(
+      'waived_months',
+      current.filter((month) => lateMonths.includes(month)),
+    )
+  }
 
   const mutation = useMutation({
     mutationFn: async (values: RecordFeePaymentInput) => {
@@ -134,13 +154,20 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
         total: formatCurrency(summary.total, preview?.period.currency ?? home),
         folio: values.folio,
       }
+      let toastDescription = m.treasury_fee_recorded_description(description)
+      if (summary.late_fee_count === summary.fee_count) {
+        toastDescription = m.treasury_fee_recorded_description_late(description)
+      } else if (summary.late_fee_count > 0) {
+        // Some months were on time or waived: say how many carried a late fee.
+        toastDescription = m.treasury_fee_recorded_description_some_late({
+          ...description,
+          lateFees: summary.late_fee_count,
+        })
+      }
       toastManager.add({
         type: 'success',
         title: m.treasury_fee_recorded(),
-        description:
-          summary.late_fee_count > 0
-            ? m.treasury_fee_recorded_description_late(description)
-            : m.treasury_fee_recorded_description(description),
+        description: toastDescription,
       })
       onOpenChange(false)
     },
@@ -235,7 +262,9 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                     itemToStringLabel={formatMonth}
                     value={field.value}
                     onValueChange={(value: string[]) => {
-                      field.onChange([...value].sort())
+                      const sorted = [...value].sort()
+                      field.onChange(sorted)
+                      keepLateWaivedMonths(sorted, occurredOn)
                     }}
                     inputRef={field.ref}
                     disabled={isBusy}
@@ -328,6 +357,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                           value={field.value}
                           onChange={(day) => {
                             field.onChange(day)
+                            keepLateWaivedMonths(feeMonths, day)
                             setDateOpen(false)
                           }}
                         />
@@ -417,24 +447,18 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
               />
             )}
 
-            {preview && preview.lateMonths > 0 && (
+            {preview && preview.lateMonths.length > 0 && (
               <Controller
-                name="waive_late_fee"
+                name="waived_months"
                 control={form.control}
                 render={({ field }) => (
-                  // coss particle p-checkbox-4.
-                  <Label className="flex items-start gap-2 rounded-lg border p-3 hover:bg-accent/50 has-data-checked:border-primary/48 has-data-checked:bg-accent/50">
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isBusy} />
-                    <div className="flex flex-col gap-1">
-                      <p>{m.treasury_waive_late_fee()}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {m.treasury_waive_late_fee_description({
-                          count: preview.lateMonths,
-                          dueDay: preview.period.due_day,
-                        })}
-                      </p>
-                    </div>
-                  </Label>
+                  <WaiveLateFees
+                    lateMonths={preview.lateMonths}
+                    dueDay={preview.period.due_day}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isBusy}
+                  />
                 )}
               />
             )}
@@ -469,14 +493,14 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                       })}
                     </dt>
                     <dd className="text-right">{formatCurrency(preview.fees, preview.period.currency)}</dd>
-                    {preview.lateMonths > 0 && (
+                    {preview.lateMonths.length > 0 && (
                       <>
                         <dt className="text-muted-foreground">
                           {m.treasury_late_fees_of({
-                            count: preview.lateMonths,
+                            count: preview.lateMonths.length,
                             amount: formatCurrency(preview.period.late_fee, preview.period.currency),
                           })}
-                          {waiveLateFee && ` ${m.treasury_waived()}`}
+                          {preview.waivedCount > 0 && ` ${m.treasury_waived({ count: preview.waivedCount })}`}
                         </dt>
                         <dd className="text-right">
                           {formatCurrency(preview.lateFees, preview.period.currency)}
