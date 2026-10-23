@@ -6,7 +6,7 @@
   "auth_login_description": "Ingresa tus credenciales para acceder a tu cuenta.",
   "auth_login_submit": "Inicia sesión",
   "auth_invite_invalid_title": "El enlace de invitación ya no es válido",
-  "auth_invite_invalid_description": "Puede haber caducado o ya se usó. Pide un enlace nuevo a quien te lo envió.",
+  "auth_invite_invalid_description": "Los enlaces de acceso vencen 1 hora después de generarse y solo se pueden usar una vez. Pide uno nuevo a quien te lo envió.",
 
   "auth_field_password": "Contraseña",
   "auth_password_toggle_label": "Contraseña con alternar visibilidad",

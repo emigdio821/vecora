@@ -6,7 +6,7 @@
   "auth_login_description": "Enter your credentials to access your account.",
   "auth_login_submit": "Sign in",
   "auth_invite_invalid_title": "This invite link is no longer valid",
-  "auth_invite_invalid_description": "It may have expired or already been used. Ask whoever sent it to you for a new one.",
+  "auth_invite_invalid_description": "Access links expire 1 hour after they're created and can only be used once. Ask whoever sent it to you for a new one.",
 
   "auth_field_password": "Password",
   "auth_password_toggle_label": "Password with visibility toggle",

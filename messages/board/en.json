@@ -37,14 +37,14 @@
   "board_remove_failed": "Couldn't remove",
 
   "board_invite_title": "Access link for {name}",
-  "board_invite_description": "Share it by WhatsApp or copy it. When they open it, they can create their password, or reset it if they forgot it. The link can only be used once; if it gets lost or you need a new one, you can create it from the member's menu.",
+  "board_invite_description": "Share it by WhatsApp or copy it. When they open it, they can create their password, or reset it if they forgot it. The link expires in 1 hour and can only be used once; if it expires, gets lost or you need a new one, you can create it from the member's menu.",
   "board_access_link": "Access link",
   "board_copy_link": "Copy link",
   "board_link_copied": "Link copied",
   "board_copy_failed": "Couldn't copy",
   "board_copy_failed_description": "Select the link and copy it manually",
   "board_send_whatsapp": "Send by WhatsApp",
-  "board_whatsapp_message": "Hi {name}, here's your access to Vecora. Open this link and create your password: {link}",
+  "board_whatsapp_message": "Hi {name}, here's your access to Vecora. Open this link within the next hour and create your password: {link}",
 
   "board_select_role": "Select at least one role",
   "board_select_resident": "Select a resident",

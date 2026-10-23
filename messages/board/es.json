@@ -37,14 +37,14 @@
   "board_remove_failed": "No se pudo retirar",
 
   "board_invite_title": "Enlace de acceso para {name}",
-  "board_invite_description": "Compártelo por WhatsApp o cópialo. Al abrirlo, la persona podrá crear su contraseña o restablecerla si la olvidó. El enlace solo se puede usar una vez; si se pierde o necesitas generar uno nuevo, puedes hacerlo desde el menú del integrante.",
+  "board_invite_description": "Compártelo por WhatsApp o cópialo. Al abrirlo, la persona podrá crear su contraseña o restablecerla si la olvidó. El enlace vence en 1 hora y solo se puede usar una vez; si vence, se pierde o necesitas uno nuevo, puedes generarlo desde el menú del integrante.",
   "board_access_link": "Enlace de acceso",
   "board_copy_link": "Copiar enlace",
   "board_link_copied": "Enlace copiado",
   "board_copy_failed": "No se pudo copiar",
   "board_copy_failed_description": "Selecciona el enlace y cópialo manualmente",
   "board_send_whatsapp": "Enviar por WhatsApp",
-  "board_whatsapp_message": "Hola {name}, te comparto tu acceso a Vecora. Abre este enlace y crea tu contraseña: {link}",
+  "board_whatsapp_message": "Hola {name}, te comparto tu acceso a Vecora. Abre este enlace en la próxima hora y crea tu contraseña: {link}",
 
   "board_select_role": "Selecciona al menos un rol",
   "board_select_resident": "Selecciona un residente",

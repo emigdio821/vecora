@@ -232,6 +232,9 @@ max_frequency = "1s"
 # Number of characters used in the email OTP.
 otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
+# Also how long the HOA board's access links last: board_invite_description,
+# board_whatsapp_message and auth_invite_invalid_description say "1 hour", so
+# update them with this (and with the hosted Email OTP Expiration setting).
 otp_expiry = 3600
 
 # Use a production-ready SMTP server
