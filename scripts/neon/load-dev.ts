@@ -8,6 +8,7 @@
  *
  * Only for an empty, non-production branch. To start over, reset the branch to
  * its (empty) parent and run it again: `neon branches reset dev --parent`.
+ * Then `npm run db:neon:app-role`, for the role the app connects as.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'

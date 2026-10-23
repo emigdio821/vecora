@@ -4,8 +4,8 @@ import { z } from 'zod'
 const serverEnvSchema = z.object({
   /** Service-role key, for the Auth Admin API (adding and removing board members). */
   SUPABASE_SECRET_KEY: z.string().min(1),
-  /** Neon's pooled connection string, for the app's queries (Drizzle). */
-  DATABASE_URL: z.url(),
+  /** Pooled connection string of the app's own role (scripts/neon/app-role.ts), which can't bypass RLS. */
+  DATABASE_AUTHENTICATED_URL: z.url(),
   /** Signs Better Auth's session cookies and tokens. At least 32 characters. */
   BETTER_AUTH_SECRET: z.string().min(32),
   /** Neon Object Storage (S3-compatible) of the same branch, for the HOA logo. */

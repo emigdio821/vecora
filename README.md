@@ -31,16 +31,17 @@ You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
    npx supabase status
    ```
 
-   | Variable                | Value                                                            |
-   | ----------------------- | ---------------------------------------------------------------- |
-   | `VITE_SUPABASE_URL`     | `API_URL` from `supabase status` (`http://127.0.0.1:54321`)      |
-   | `VITE_SUPABASE_KEY`     | `PUBLISHABLE_KEY` from `supabase status`                         |
-   | `VITE_SITE_URL`         | `http://localhost:3000`                                          |
-   | `SUPABASE_SECRET_KEY`   | `SECRET_KEY` from `supabase status` (server-only, never `VITE_`) |
-   | `DATABASE_URL`          | Pooled connection string of your Neon `dev` branch               |
-   | `DATABASE_URL_UNPOOLED` | Direct connection string of the same branch (for drizzle-kit)    |
-   | `BETTER_AUTH_SECRET`    | Output of `openssl rand -base64 32`                              |
-   | `AWS_*` (four of them)  | Object storage of the `dev` branch, from `neon env pull`         |
+   | Variable                     | Value                                                            |
+   | ---------------------------- | ---------------------------------------------------------------- |
+   | `VITE_SUPABASE_URL`          | `API_URL` from `supabase status` (`http://127.0.0.1:54321`)      |
+   | `VITE_SUPABASE_KEY`          | `PUBLISHABLE_KEY` from `supabase status`                         |
+   | `VITE_SITE_URL`              | `http://localhost:3000`                                          |
+   | `SUPABASE_SECRET_KEY`        | `SECRET_KEY` from `supabase status` (server-only, never `VITE_`) |
+   | `DATABASE_URL`               | Pooled connection string of your Neon `dev` branch (owner role)  |
+   | `DATABASE_URL_UNPOOLED`      | Direct connection string of the same branch (for drizzle-kit)    |
+   | `DATABASE_AUTHENTICATED_URL` | The app's own role, written by `npm run db:neon:app-role`        |
+   | `BETTER_AUTH_SECRET`         | Output of `openssl rand -base64 32`                              |
+   | `AWS_*` (four of them)       | Object storage of the `dev` branch, from `neon env pull`         |
 
    The app checks them on start and stops with the name of any that's missing or invalid.
 
@@ -110,6 +111,7 @@ What each section is called on screen. Docs and comments use the English name.
 | `npm run db:reset`                | Recreate the local database from migrations + seeds (destroys local data)                                                                                                |
 | `npm run db:reset:empty`          | Same, but only the admin account from `seed.sql`: a fresh install with no data                                                                                           |
 | `npm run db:neon:load`            | Load the migrations + seeds into the (empty) Neon branch in `.env.local`, through `scripts/neon/supabase-compat.sql`; start over with `neon branches reset dev --parent` |
+| `npm run db:neon:app-role`        | Create the app's role on that branch (after a load, or again after a reset); the first time, it writes `DATABASE_AUTHENTICATED_URL` to `.env.local`                      |
 | `npm run db:types`                | Regenerate `src/lib/supabase/database.types.ts` from the local schema — run after changing a migration                                                                   |
 | `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                                                                                               |
 | `npm run i18n`                    | Compile `messages/` into `src/paraglide/` (the dev server also does it on its own)                                                                                       |
@@ -136,15 +138,15 @@ The app runs on Vercel against a hosted Supabase project.
 
 3. **Set the environment variables** in Vercel, from Project Settings → API Keys in the Supabase dashboard:
 
-   | Variable               | Value                                                   |
-   | ---------------------- | ------------------------------------------------------- |
-   | `VITE_SUPABASE_URL`    | `https://<project-ref>.supabase.co`                     |
-   | `VITE_SUPABASE_KEY`    | A publishable key                                       |
-   | `VITE_SITE_URL`        | The app's URL, e.g. `https://vecora.vercel.app`         |
-   | `SUPABASE_SECRET_KEY`  | A secret key (server-only, needed to add board members) |
-   | `DATABASE_URL`         | Pooled connection string of the Neon production branch  |
-   | `BETTER_AUTH_SECRET`   | Its own `openssl rand -base64 32`, never the local one  |
-   | `AWS_*` (four of them) | Object storage of the Neon production branch            |
+   | Variable                     | Value                                                                 |
+   | ---------------------------- | --------------------------------------------------------------------- |
+   | `VITE_SUPABASE_URL`          | `https://<project-ref>.supabase.co`                                   |
+   | `VITE_SUPABASE_KEY`          | A publishable key                                                     |
+   | `VITE_SITE_URL`              | The app's URL, e.g. `https://vecora.vercel.app`                       |
+   | `SUPABASE_SECRET_KEY`        | A secret key (server-only, needed to add board members)               |
+   | `DATABASE_AUTHENTICATED_URL` | The app role's pooled connection string on the Neon production branch |
+   | `BETTER_AUTH_SECRET`         | Its own `openssl rand -base64 32`, never the local one                |
+   | `AWS_*` (four of them)       | Object storage of the Neon production branch                          |
 
    The `VITE_` values are bundled into the browser code at build time, so redeploy after changing them.
 
