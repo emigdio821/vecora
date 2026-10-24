@@ -122,7 +122,7 @@ The app runs on Vercel against the Neon `production` branch.
 
    | Variable               | Value                                                  |
    | ---------------------- | ------------------------------------------------------ |
-   | `VITE_SITE_URL`        | The app's URL, e.g. `https://vecora.vercel.app`        |
+   | `VITE_SITE_URL`        | The app's URL, e.g. `https://example.com`              |
    | `DATABASE_URL`         | Pooled connection string of the Neon production branch |
    | `BETTER_AUTH_SECRET`   | Its own `openssl rand -base64 32`, never the local one |
    | `AWS_*` (four of them) | Object storage of the Neon production branch           |
