@@ -42,6 +42,7 @@ import {
   residents,
   securityRequests,
   settings,
+  transactionCategories,
   users,
 } from '../../src/lib/db/schema'
 import type { Actor } from '../../src/lib/services/actor'
@@ -268,20 +269,37 @@ export async function seedMainAdmin(
   })
 }
 
-async function categoryId(tx: Transaction, name: string): Promise<string> {
-  const category = await tx.query.transactionCategories.findFirst({ columns: { id: true }, where: { name } })
-  if (!category) {
-    throw new Error(`No category named ${name}`)
-  }
-  return category.id
+interface Ids {
+  house(number: string): string
+  category(name: string): string
 }
 
-async function houseId(tx: Transaction, number: string): Promise<string> {
-  const house = await tx.query.properties.findFirst({ columns: { id: true }, where: { number } })
-  if (!house) {
-    throw new Error(`No house ${number}`)
+/**
+ * The houses' and categories' ids, read once: every step is a few round
+ * trips to the database already, without one more to look them up.
+ */
+async function lookupIds(db: Database): Promise<Ids> {
+  const houses = await db.select({ id: properties.id, number: properties.number }).from(properties)
+  const categories = await db
+    .select({ id: transactionCategories.id, name: transactionCategories.name })
+    .from(transactionCategories)
+
+  return {
+    house(number) {
+      const house = houses.find((row) => row.number === number)
+      if (!house) {
+        throw new Error(`No house ${number}`)
+      }
+      return house.id
+    },
+    category(name) {
+      const category = categories.find((row) => row.name === name)
+      if (!category) {
+        throw new Error(`No category named ${name}`)
+      }
+      return category.id
+    },
   }
-  return house.id
 }
 
 export async function seed(db: Database): Promise<void> {
@@ -289,9 +307,6 @@ export async function seed(db: Database): Promise<void> {
 
   const now = new Date()
   const year = now.getFullYear()
-  const yearStart = new Date(year, 0, 1)
-  const thisMonth = startOfMonth(now)
-  const prevMonth = notBefore(subMonths(thisMonth, 1), yearStart)
   let t = subDays(now, 45)
 
   // ---------------------------------------------------------------------------
@@ -325,6 +340,7 @@ export async function seed(db: Database): Promise<void> {
     const numbers = ['A', 'B', 'C', 'D'].flatMap((block) => [1, 2, 3, 4, 5].map((n) => `${block}${n}`))
     await tx.insert(properties).values(numbers.map((number) => ({ number })))
   })
+  const ids = await lookupIds(db)
 
   t = addMinutes(t, 20)
   await step(db, president, t, async (tx) => {
@@ -357,9 +373,45 @@ export async function seed(db: Database): Promise<void> {
     for (const [number, resident, relationship] of LINKS) {
       await tx
         .insert(propertyResidents)
-        .values({ propertyId: await houseId(tx, number), residentId: residentId(resident), relationship })
+        .values({ propertyId: ids.house(number), residentId: residentId(resident), relationship })
     }
   })
+  console.log('Created the main admin, 4 board members, 20 houses and 10 residents')
+
+  // Each year writes its own period's rows only, so the three load side by
+  // side: a step waits on Neon about ten times, and one after another the
+  // ~300 steps took minutes.
+  await Promise.all([
+    seedThisYear(db, ids, now, t),
+    seedPastYear(db, ids, year - 2, 5000),
+    seedPastYear(db, ids, year - 1, 6000),
+  ])
+
+  // Y+1 stays empty; the board already set up Y+2.
+  await step(db, treasurer, subHours(now, 6), (tx) =>
+    createPeriod(tx, {
+      name: String(year + 2),
+      startsOn: `${year + 2}-01-01`,
+      endsOn: `${year + 2}-12-31`,
+      monthlyFee: 900,
+      lateFee: 120,
+      dueDay: 10,
+    }),
+  )
+  console.log(`Created the ${year + 2} period, with no movements yet`)
+}
+
+/**
+ * The current year: fees and expenses every month since January, requests in
+ * every status, two bookings, and a few edits. `start` is when the board's
+ * setup ended; the activity log goes on from there to today.
+ */
+async function seedThisYear(db: Database, ids: Ids, now: Date, start: Date): Promise<void> {
+  const year = now.getFullYear()
+  const yearStart = new Date(year, 0, 1)
+  const thisMonth = startOfMonth(now)
+  const prevMonth = notBefore(subMonths(thisMonth, 1), yearStart)
+  let t = start
 
   // ---------------------------------------------------------------------------
   // the treasurer opens the period and catches up with the paper book: each
@@ -396,7 +448,7 @@ export async function seed(db: Database): Promise<void> {
       t = addMinutes(t, 2)
       await step(db, treasurer, t, async (tx) => {
         await recordFeePayment(tx, treasurer, {
-          propertyId: await houseId(tx, payer.number),
+          propertyId: ids.house(payer.number),
           feeMonths: [day(month)],
           occurredOn: day(addDays(month, payer.day - 1)),
           folio: receipt,
@@ -411,7 +463,7 @@ export async function seed(db: Database): Promise<void> {
     await step(db, treasurer, t, async (tx) => {
       await createTransaction(tx, treasurer, {
         kind: 'expense',
-        categoryId: await categoryId(tx, 'Jardinería'),
+        categoryId: ids.category('Jardinería'),
         amount: 1200,
         occurredOn: day(addDays(month, 4)),
         paymentMethod: 'cash',
@@ -429,7 +481,7 @@ export async function seed(db: Database): Promise<void> {
       await step(db, treasurer, t, async (tx) => {
         await createTransaction(tx, treasurer, {
           kind: 'expense',
-          categoryId: await categoryId(tx, 'Servicios'),
+          categoryId: ids.category('Servicios'),
           amount: 950 + 40 * monthNumber,
           occurredOn: day(addDays(month, 11)),
           paymentMethod: 'transfer',
@@ -452,7 +504,7 @@ export async function seed(db: Database): Promise<void> {
       await step(db, treasurer, t, async (tx) => {
         await createTransaction(tx, treasurer, {
           kind: 'expense',
-          categoryId: await categoryId(tx, repair.category),
+          categoryId: ids.category(repair.category),
           amount: repair.amount,
           occurredOn: day(addDays(month, 17)),
           paymentMethod: 'cash',
@@ -470,7 +522,7 @@ export async function seed(db: Database): Promise<void> {
   t = addDays(t, 5)
   await step(db, treasurer, t, async (tx) => {
     await recordFeePayment(tx, treasurer, {
-      propertyId: await houseId(tx, 'A1'),
+      propertyId: ids.house('A1'),
       feeMonths: [day(prevMonth), day(thisMonth)],
       occurredOn: day(notBefore(subDays(now, 30), yearStart)),
       folio: '0101',
@@ -484,7 +536,7 @@ export async function seed(db: Database): Promise<void> {
   t = addHours(t, 52)
   await step(db, treasurer, t, async (tx) => {
     await recordFeePayment(tx, treasurer, {
-      propertyId: await houseId(tx, 'A2'),
+      propertyId: ids.house('A2'),
       feeMonths: [day(thisMonth)],
       occurredOn: day(notBefore(subDays(now, 28), yearStart)),
       folio: '0102',
@@ -498,7 +550,7 @@ export async function seed(db: Database): Promise<void> {
   t = addHours(t, 73)
   await step(db, treasurer, t, async (tx) => {
     await recordFeePayment(tx, treasurer, {
-      propertyId: await houseId(tx, 'B1'),
+      propertyId: ids.house('B1'),
       feeMonths: [day(prevMonth)],
       occurredOn: day(notBefore(subDays(now, 25), yearStart)),
       folio: '0103',
@@ -514,7 +566,7 @@ export async function seed(db: Database): Promise<void> {
   await step(db, treasurer, t, async (tx) => {
     await createTransaction(tx, treasurer, {
       kind: 'expense',
-      categoryId: await categoryId(tx, 'Servicios'),
+      categoryId: ids.category('Servicios'),
       amount: 1240.5,
       occurredOn: day(notBefore(subDays(now, 24), yearStart)),
       paymentMethod: 'transfer',
@@ -542,7 +594,7 @@ export async function seed(db: Database): Promise<void> {
   t = addHours(t, 53)
   await step(db, treasurer, t, async (tx) => {
     await payRequest(tx, maintenanceRequests, treasurer, paint.id, {
-      categoryId: await categoryId(tx, 'Mantenimiento'),
+      categoryId: ids.category('Mantenimiento'),
       occurredOn: day(notBefore(subDays(now, 18), yearStart)),
       paymentMethod: 'cash',
       reference: null,
@@ -613,7 +665,7 @@ export async function seed(db: Database): Promise<void> {
     const terrace = await tx.query.amenities.findFirst({ columns: { id: true }, where: { name: 'Terraza' } })
     await createReservation(tx, president, {
       amenityId: terrace?.id ?? '',
-      propertyId: await houseId(tx, 'B1'),
+      propertyId: ids.house('B1'),
       reservedOn: bookedOn,
       amount: 0,
       notes: 'Cumpleaños, 40 personas',
@@ -626,7 +678,7 @@ export async function seed(db: Database): Promise<void> {
     const pool = await tx.query.amenities.findFirst({ columns: { id: true }, where: { name: 'Alberca' } })
     await createReservation(tx, president, {
       amenityId: pool?.id ?? '',
-      propertyId: await houseId(tx, 'C2'),
+      propertyId: ids.house('C2'),
       reservedOn: bookedOn,
       amount: 250,
       notes: null,
@@ -663,118 +715,105 @@ export async function seed(db: Database): Promise<void> {
     )
   })
 
-  await seedPastPeriods(db, year)
-
-  console.log(
-    'Created the main admin, 4 board members, 20 houses, 10 residents, 4 periods and 45 days of activity',
-  )
+  console.log(`Created the ${year} period and 45 days of activity`)
 }
 
-/** Y-2 and Y-1 with a year of history each, a gap at Y+1 and an empty Y+2. */
-async function seedPastPeriods(db: Database, year: number): Promise<void> {
-  // An older receipt book: rows sharing a folio must have been created together.
-  let folio = 5000
+/**
+ * A past year (Y-2 or Y-1) with a year of fees and expenses. `firstFolio`
+ * starts the year's receipt book: rows sharing a folio must have been
+ * created together, so the years never share one.
+ */
+async function seedPastYear(db: Database, ids: Ids, pastYear: number, firstFolio: number): Promise<void> {
+  const older = pastYear === new Date().getFullYear() - 2
+  let folio = firstFolio
 
-  for (const pastYear of [year - 2, year - 1]) {
-    const older = pastYear === year - 2
-    await step(db, treasurer, new Date(pastYear, 0, 2, 10), (tx) =>
-      createPeriod(tx, {
-        name: String(pastYear),
-        startsOn: `${pastYear}-01-01`,
-        endsOn: `${pastYear}-12-31`,
-        monthlyFee: older ? 650 : 700,
-        lateFee: older ? 80 : 100,
-        dueDay: 10,
-      }),
-    )
+  await step(db, treasurer, new Date(pastYear, 0, 2, 10), (tx) =>
+    createPeriod(tx, {
+      name: String(pastYear),
+      startsOn: `${pastYear}-01-01`,
+      endsOn: `${pastYear}-12-31`,
+      monthlyFee: older ? 650 : 700,
+      lateFee: older ? 80 : 100,
+      dueDay: 10,
+    }),
+  )
 
-    for (let monthIndex = 0; monthIndex < 12; monthIndex = monthIndex + 1) {
-      const month = new Date(pastYear, monthIndex, 1)
+  for (let monthIndex = 0; monthIndex < 12; monthIndex = monthIndex + 1) {
+    const month = new Date(pastYear, monthIndex, 1)
 
-      for (const payer of PAYERS) {
-        // C1 skips December Y-2 and pays it with January Y-1.
-        const isSkippedDecember = payer.number === 'C1' && pastYear === year - 2 && monthIndex === 11
-        if (isSkippedDecember) {
-          continue
-        }
-        const feeMonths = [day(month)]
-        if (payer.number === 'C1' && pastYear === year - 1 && monthIndex === 0) {
-          feeMonths.unshift(`${year - 2}-12-01`)
-        }
-
-        folio = folio + 1
-        const receipt = String(folio)
-        const paidOn = addDays(month, payer.day - 1)
-        await step(db, treasurer, addHours(paidOn, 18), async (tx) => {
-          await recordFeePayment(tx, treasurer, {
-            propertyId: await houseId(tx, payer.number),
-            feeMonths,
-            occurredOn: day(paidOn),
-            folio: receipt,
-            paymentMethod: payer.method,
-            reference: payer.method === 'transfer' ? `SPEI ${6600000 + folio}` : null,
-            notes: null,
-          })
-        })
+    for (const payer of PAYERS) {
+      // C1 skips December Y-2 and pays it with January Y-1.
+      const isSkippedDecember = payer.number === 'C1' && older && monthIndex === 11
+      if (isSkippedDecember) {
+        continue
+      }
+      const feeMonths = [day(month)]
+      if (payer.number === 'C1' && !older && monthIndex === 0) {
+        feeMonths.unshift(`${pastYear - 1}-12-01`)
       }
 
-      await step(db, treasurer, addHours(addDays(month, 4), 12), async (tx) => {
-        await createTransaction(tx, treasurer, {
-          kind: 'expense',
-          categoryId: await categoryId(tx, 'Jardinería'),
-          amount: older ? 1000 : 1100,
-          occurredOn: day(addDays(month, 4)),
-          paymentMethod: 'cash',
-          folio: null,
-          reference: null,
-          propertyId: null,
-          description: 'Jardinería mensual',
-          notes: null,
-        })
-      })
-
-      await step(db, treasurer, addHours(addDays(month, 11), 12), async (tx) => {
-        await createTransaction(tx, treasurer, {
-          kind: 'expense',
-          categoryId: await categoryId(tx, 'Servicios'),
-          amount: 850 + 35 * (monthIndex + 1),
-          occurredOn: day(addDays(month, 11)),
-          paymentMethod: 'transfer',
-          folio: null,
-          reference: `CFE ${format(month, 'yyyyMM')}`,
-          propertyId: null,
-          description: 'Luz de áreas comunes',
+      folio = folio + 1
+      const receipt = String(folio)
+      const paidOn = addDays(month, payer.day - 1)
+      await step(db, treasurer, addHours(paidOn, 18), async (tx) => {
+        await recordFeePayment(tx, treasurer, {
+          propertyId: ids.house(payer.number),
+          feeMonths,
+          occurredOn: day(paidOn),
+          folio: receipt,
+          paymentMethod: payer.method,
+          reference: payer.method === 'transfer' ? `SPEI ${6600000 + folio}` : null,
           notes: null,
         })
       })
     }
 
-    // One bigger repair a year.
-    await step(db, treasurer, new Date(pastYear, 4, 20, 12), async (tx) => {
+    await step(db, treasurer, addHours(addDays(month, 4), 12), async (tx) => {
       await createTransaction(tx, treasurer, {
         kind: 'expense',
-        categoryId: await categoryId(tx, 'Mantenimiento'),
-        amount: older ? 3200 : 2750,
-        occurredOn: `${pastYear}-05-20`,
+        categoryId: ids.category('Jardinería'),
+        amount: older ? 1000 : 1100,
+        occurredOn: day(addDays(month, 4)),
         paymentMethod: 'cash',
         folio: null,
         reference: null,
         propertyId: null,
-        description: older ? 'Pintura de la barda perimetral' : 'Cambio de la bomba de agua',
+        description: 'Jardinería mensual',
+        notes: null,
+      })
+    })
+
+    await step(db, treasurer, addHours(addDays(month, 11), 12), async (tx) => {
+      await createTransaction(tx, treasurer, {
+        kind: 'expense',
+        categoryId: ids.category('Servicios'),
+        amount: 850 + 35 * (monthIndex + 1),
+        occurredOn: day(addDays(month, 11)),
+        paymentMethod: 'transfer',
+        folio: null,
+        reference: `CFE ${format(month, 'yyyyMM')}`,
+        propertyId: null,
+        description: 'Luz de áreas comunes',
         notes: null,
       })
     })
   }
 
-  // Y+1 stays empty; the board already set up Y+2.
-  await step(db, treasurer, subHours(new Date(), 6), (tx) =>
-    createPeriod(tx, {
-      name: String(year + 2),
-      startsOn: `${year + 2}-01-01`,
-      endsOn: `${year + 2}-12-31`,
-      monthlyFee: 900,
-      lateFee: 120,
-      dueDay: 10,
-    }),
-  )
+  // One bigger repair a year.
+  await step(db, treasurer, new Date(pastYear, 4, 20, 12), async (tx) => {
+    await createTransaction(tx, treasurer, {
+      kind: 'expense',
+      categoryId: ids.category('Mantenimiento'),
+      amount: older ? 3200 : 2750,
+      occurredOn: `${pastYear}-05-20`,
+      paymentMethod: 'cash',
+      folio: null,
+      reference: null,
+      propertyId: null,
+      description: older ? 'Pintura de la barda perimetral' : 'Cambio de la bomba de agua',
+      notes: null,
+    })
+  })
+
+  console.log(`Created the ${pastYear} period and its year of fees and expenses`)
 }

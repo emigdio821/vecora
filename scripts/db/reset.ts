@@ -59,6 +59,7 @@ try {
     await seedMainAdmin(db, { password: 'admin', mustChangePassword: false })
     console.log('Created admin@vecora.app (password "admin")')
   } else {
+    console.log('Loading the test data (about a minute)…')
     await seed(db)
   }
 } finally {
