@@ -14,6 +14,28 @@ export function periodFor<T extends PeriodDates>(periods: T[], day: string) {
   return periods.find((period) => period.starts_on <= day && day <= period.ends_on)
 }
 
+/** Whether a period covers at least one day from `from` to `to`, both included. */
+export function overlapsPeriod(periods: PeriodDates[], from: string, to: string): boolean {
+  return periods.some((period) => period.starts_on <= to && from <= period.ends_on)
+}
+
+/**
+ * Months ("YYYY-MM-01") a period touches, up to `today`'s month, newest first.
+ * Every movement belongs to a period, so a month outside them all has nothing
+ * to report; gaps between periods are left out. Reports never look past today.
+ */
+export function reportableMonths(periods: PeriodDates[], today: string): string[] {
+  const months = new Set<string>()
+  for (const period of periods) {
+    if (period.starts_on > today) continue
+    const end = period.ends_on < today ? period.ends_on : today
+    for (const month of eachMonthOfInterval({ start: parseISO(period.starts_on), end: parseISO(end) })) {
+      months.add(format(month, ISO_DAY))
+    }
+  }
+  return [...months].sort((a, b) => b.localeCompare(a))
+}
+
 /** Fee months ("YYYY-MM-01") as combobox groups, one per period, in the periods' order. */
 export interface FeeMonthGroup {
   /** The period's name. */

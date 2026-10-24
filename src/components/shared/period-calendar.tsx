@@ -1,23 +1,10 @@
-import { ParaglideMessage } from '@inlang/paraglide-js-react'
-import { IconCalendarOff } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 import { addYears, format, parseISO, subYears } from 'date-fns'
-import { messageMarkup } from '@/components/shared/message-markup'
-import { Button } from '@/components/ui/button'
+import { NoPeriodsEmpty } from '@/components/shared/no-periods-empty'
 import { Calendar } from '@/components/ui/calendar'
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty'
 import { useToday } from '@/hooks/use-today'
 import { periodFor } from '@/lib/periods'
 import { ISO_DAY } from '@/lib/utils'
-import { m } from '@/paraglide/messages'
 import { periodsQueryOptions } from '@/tanstack-queries/presidency'
 
 interface PeriodCalendarProps {
@@ -36,24 +23,7 @@ export function PeriodCalendar({ value, onChange }: PeriodCalendarProps) {
   const today = useToday()
 
   if (periods?.length === 0) {
-    return (
-      <Empty className="w-72 gap-4 px-4 py-6 md:py-6">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <IconCalendarOff />
-          </EmptyMedia>
-          <EmptyTitle>{m.common_no_periods()}</EmptyTitle>
-          <EmptyDescription>
-            <ParaglideMessage markup={messageMarkup} message={m.common_no_periods_description} />
-          </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
-          <Button size="sm" variant="outline" render={<Link to="/presidency" search={{ tab: 'periods' }} />}>
-            {m.common_go_to_periods()}
-          </Button>
-        </EmptyContent>
-      </Empty>
-    )
+    return <NoPeriodsEmpty />
   }
 
   // Newest first: navigation runs from the first period's start to the last one's end.

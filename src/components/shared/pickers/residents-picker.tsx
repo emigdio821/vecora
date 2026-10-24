@@ -52,13 +52,12 @@ export function ResidentsPicker({ scope = 'all', excludeIds, ...props }: Residen
     return numbers.length > 0 ? m.common_house_label({ number: numbers.join(', ') }) : m.common_no_house()
   }
 
-  const emptyMessage = isPending
-    ? m.common_loading_residents()
-    : isError
-      ? m.common_residents_load_failed()
-      : scope === 'unassigned' && items.length === 0
-        ? m.common_all_residents_have_house()
-        : m.common_no_results()
+  function emptyMessage() {
+    if (isPending) return m.common_loading_residents()
+    if (isError) return m.common_residents_load_failed()
+    if (scope === 'unassigned' && items.length === 0) return m.common_all_residents_have_house()
+    return m.common_no_results()
+  }
 
   return (
     <Combobox items={items} itemToStringLabel={label} autoHighlight {...props}>
@@ -89,7 +88,7 @@ export function ResidentsPicker({ scope = 'all', excludeIds, ...props }: Residen
         />
       )}
       <ComboboxPopup>
-        <ComboboxEmpty>{emptyMessage}</ComboboxEmpty>
+        <ComboboxEmpty>{emptyMessage()}</ComboboxEmpty>
         <ComboboxList>
           {(id: string) => (
             <ComboboxItem key={id} value={id}>
