@@ -13,7 +13,15 @@ import { NumberField, NumberFieldGroup, NumberFieldInput } from '@/components/ui
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { useToday } from '@/hooks/use-today'
 import { adjacentGaps } from '@/lib/periods'
-import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import {
+  type CurrencyCode,
+  currencySymbol,
+  formatDay,
+  intlLocale,
+  ISO_DAY,
+  MONEY_FORMAT,
+  MONEY_STEP,
+} from '@/lib/utils'
 import type { PeriodInput } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { periodsQueryOptions } from '@/tanstack-queries/presidency'
@@ -179,6 +187,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse, periodId }: 
                   min={0}
                   locale={intlLocale()}
                   format={MONEY_FORMAT}
+                  step={MONEY_STEP}
                   disabled={disabled}
                 >
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
@@ -217,6 +226,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse, periodId }: 
                   min={0}
                   locale={intlLocale()}
                   format={MONEY_FORMAT}
+                  step={MONEY_STEP}
                   disabled={disabled}
                 >
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />

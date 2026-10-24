@@ -146,6 +146,13 @@ function currencyFormatter(currency: CurrencyCode, locale: Locale = getLocale())
 export const MONEY_FORMAT: Intl.NumberFormatOptions = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
 
 /**
+ * NumberField `step` for money inputs, next to MONEY_FORMAT. With `min` set,
+ * Base UI checks the step on submit, and the default step of 1 makes the
+ * browser refuse any amount with cents, silently. The arrow keys still step by 1.
+ */
+export const MONEY_STEP = 'any'
+
+/**
  * "$1,250.00" from a number or the numeric string PostgREST returns. With
  * `home` (the HOA's current currency), an amount in any other currency gets
  * its code, "$1,250.00 MXN", so records from before a switch stand out.
