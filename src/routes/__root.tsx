@@ -25,6 +25,7 @@ import {
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { siteConfig } from '@/lib/config/site'
+import { MAINTENANCE_PATH } from '@/lib/maintenance'
 import { OG_IMAGE_SIZE, pageTitle } from '@/lib/metadata'
 import { intlLocale } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
@@ -36,7 +37,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   // Every route guard reads the user from here. Static: once cached it never
   // holds up a navigation; signing in or out drops it, and an expired session
   // surfaces on the next server function instead.
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
+    // The maintenance page reads nothing, the account included.
+    if (location.pathname === MAINTENANCE_PATH) {
+      return { user: null }
+    }
     const user = await context.queryClient.query({ ...currentUserQueryOptions, staleTime: 'static' })
     return { user }
   },

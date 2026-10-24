@@ -128,6 +128,7 @@ The app runs on Vercel against the Neon `production` branch.
    | `DATABASE_URL`         | Pooled connection string of the Neon production branch |
    | `BETTER_AUTH_SECRET`   | Its own `openssl rand -base64 32`, never the local one |
    | `AWS_*` (four of them) | Object storage of the Neon production branch           |
+   | `MAINTENANCE_MODE`     | Unset; `true` only during maintenance (below)          |
 
    `VITE_SITE_URL` is bundled into the browser code at build time, so redeploy after changing it.
 
@@ -144,6 +145,10 @@ The app runs on Vercel against the Neon `production` branch.
 3. `npm run db:import -- --dry-run` copies and checks, then rolls back. `npm run db:import` keeps it. Either way it compares the two sides (counts per table, each period's totals) and keeps nothing if they differ.
 
 Accounts keep their id, email, name and roles, but not their password: Supabase's hashes don't carry over. The main admin gets a one-time password, printed once at the end, which the app makes it replace at the first sign-in; board members get a new access link from HOA board. The logo isn't copied: upload it again.
+
+### Maintenance mode
+
+`MAINTENANCE_MODE=true` in Vercel, then a redeploy (Deployments → ⋯ → Redeploy), closes the app while the data moves: every page sends the visitor to `/unavailable` (laid out like the 404), and server functions and the API answer 503, so a tab left open can't write either. Remove it and redeploy to open the app again; anyone still on `/unavailable` goes back to the app.
 
 ### The main admin
 

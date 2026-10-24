@@ -11,6 +11,8 @@ const serverEnvSchema = z.object({
   AWS_REGION: z.string().min(1),
   AWS_ACCESS_KEY_ID: z.string().min(1),
   AWS_SECRET_ACCESS_KEY: z.string().min(1),
+  /** "true" while the data moves: the app answers with the maintenance page only (src/server.ts). */
+  MAINTENANCE_MODE: z.stringbool().default(false),
 })
 
 const parsed = serverEnvSchema.safeParse(process.env)
