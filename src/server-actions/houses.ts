@@ -1,8 +1,14 @@
-import type { PostgrestError } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
-import { type ActionResult, postgrestErrorMessage, UNIQUE_VIOLATION } from '@/lib/action-result'
+import { and, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm'
+import {
+  type ActionResult,
+  databaseError,
+  postgrestErrorMessage,
+  UNIQUE_VIOLATION,
+} from '@/lib/action-result'
+import { withCurrentUser } from '@/lib/db/current-user'
+import { properties, propertyResidents } from '@/lib/db/schema'
 import { authMiddleware } from '@/lib/supabase/auth-middleware'
-import { createClient } from '@/lib/supabase/server'
 import {
   type AssignResidentsInput,
   assignResidentsSchema,
@@ -17,13 +23,105 @@ import { m } from '@/paraglide/messages'
 
 // "House" in the app, `properties` in the database.
 
-function toMessage(error: PostgrestError, fallback: string) {
-  return postgrestErrorMessage(error, {
+function toMessage(error: unknown, fallback: string) {
+  return postgrestErrorMessage(databaseError(error), {
     fallback,
     unique: { properties_number_unique: m.residential_house_number_taken() },
     uniqueFallback: m.residential_house_duplicate(),
   })
 }
+
+/**
+ * The houses and who lives in each, last changed first. The rows keep the
+ * database's column names and ISO timestamps, the shape the screens were built on.
+ */
+const fetchHousesFn = createServerFn()
+  .middleware([authMiddleware])
+  .handler(async () => {
+    const houses = await withCurrentUser((tx) =>
+      tx.query.properties.findMany({
+        columns: { id: true, number: true, notes: true, createdAt: true, updatedAt: true },
+        with: {
+          propertyResidents: {
+            columns: { relationship: true },
+            with: {
+              resident: { columns: { id: true, firstName: true, lastName: true, phone: true, email: true } },
+            },
+            // Soft-deleted residents keep their links (so undo restores them), but they're not shown.
+            where: { resident: { deletedAt: { isNull: true } } },
+          },
+        },
+        where: { deletedAt: { isNull: true } },
+        orderBy: { updatedAt: 'desc' },
+      }),
+    )
+
+    return houses.map((house) => ({
+      id: house.id,
+      number: house.number,
+      notes: house.notes,
+      created_at: house.createdAt.toISOString(),
+      updated_at: house.updatedAt.toISOString(),
+      property_residents: house.propertyResidents.flatMap((link) => {
+        // Always there after the filter above; Drizzle types the join as optional anyway.
+        if (!link.resident) {
+          return []
+        }
+        const { resident } = link
+        return [
+          {
+            relationship: link.relationship,
+            resident: {
+              id: resident.id,
+              first_name: resident.firstName,
+              last_name: resident.lastName,
+              phone: resident.phone,
+              email: resident.email,
+            },
+          },
+        ]
+      }),
+    }))
+  })
+
+export const fetchHouses = () => fetchHousesFn()
+
+/** Lightweight list for pickers: number + its owners (who the fee is billed to), "2" before "10". */
+const fetchHousesPickerFn = createServerFn()
+  .middleware([authMiddleware])
+  .handler(async () => {
+    const houses = await withCurrentUser((tx) =>
+      tx.query.properties.findMany({
+        columns: { id: true, number: true },
+        with: {
+          propertyResidents: {
+            columns: {},
+            with: { resident: { columns: { id: true, firstName: true, lastName: true } } },
+            where: { relationship: 'owner', resident: { deletedAt: { isNull: true } } },
+          },
+        },
+        where: { deletedAt: { isNull: true } },
+      }),
+    )
+
+    return houses
+      .map((house) => ({
+        id: house.id,
+        number: house.number,
+        owners: house.propertyResidents.flatMap((link) => {
+          if (!link.resident) {
+            return []
+          }
+          const { resident } = link
+          return [
+            { resident: { id: resident.id, first_name: resident.firstName, last_name: resident.lastName } },
+          ]
+        }),
+      }))
+      .sort((a, b) => a.number.localeCompare(b.number, 'es', { numeric: true }))
+  })
+
+export const fetchHousesPicker = () => fetchHousesPickerFn()
 
 const createHouseFn = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
@@ -34,20 +132,21 @@ const createHouseFn = createServerFn({ method: 'POST' })
       return { error: m.common_form_invalid() }
     }
 
-    const { notes, ...rest } = parsed.data
-    const supabase = await createClient()
+    const { number, notes } = parsed.data
 
-    const { data, error } = await supabase
-      .from('properties')
-      .insert({ ...rest, notes: notes || null })
-      .select('id')
-      .single()
-
-    if (error) {
+    let created: Array<{ id: string }>
+    try {
+      created = await withCurrentUser((tx) =>
+        tx
+          .insert(properties)
+          .values({ number, notes: notes || null })
+          .returning({ id: properties.id }),
+      )
+    } catch (error) {
       return { error: toMessage(error, m.residential_create_house_failed()) }
     }
 
-    return { data }
+    return { data: created[0] }
   })
 
 export const createHouse = (input: CreateHouseInput) => createHouseFn({ data: input })
@@ -61,21 +160,25 @@ const updateHouseFn = createServerFn({ method: 'POST' })
       return { error: m.common_form_invalid() }
     }
 
-    const { notes, ...rest } = parsed.data
-    const supabase = await createClient()
+    const { number, notes } = parsed.data
 
-    const { data, error } = await supabase
-      .from('properties')
-      .update({ ...rest, notes: notes || null })
-      .eq('id', id)
-      .select('id')
-      .single()
-
-    if (error) {
+    let updated: Array<{ id: string }>
+    try {
+      updated = await withCurrentUser((tx) =>
+        tx
+          .update(properties)
+          .set({ number, notes: notes || null })
+          .where(eq(properties.id, id))
+          .returning({ id: properties.id }),
+      )
+    } catch (error) {
       return { error: toMessage(error, m.residential_update_house_failed()) }
     }
+    if (updated.length === 0) {
+      return { error: m.common_no_permission() }
+    }
 
-    return { data }
+    return { data: updated[0] }
   })
 
 export const updateHouse = (id: string, input: UpdateHouseInput) => updateHouseFn({ data: { id, input } })
@@ -94,23 +197,24 @@ const deleteHousesFn = createServerFn({ method: 'POST' })
       return { error: m.residential_select_house_required() }
     }
 
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('properties')
-      .update({ deleted_at: new Date().toISOString() })
-      .in('id', uniqueIds)
-      .is('deleted_at', null)
-      .select('id')
-
-    if (error) {
+    let deleted: Array<{ id: string }>
+    try {
+      deleted = await withCurrentUser((tx) =>
+        tx
+          .update(properties)
+          .set({ deletedAt: sql`now()` })
+          .where(and(inArray(properties.id, uniqueIds), isNull(properties.deletedAt)))
+          .returning({ id: properties.id }),
+      )
+    } catch (error) {
       return { error: toMessage(error, m.residential_delete_houses_failed()) }
     }
 
-    if (data.length === 0) {
+    if (deleted.length === 0) {
       return { error: m.common_no_permission() }
     }
 
-    return { data: { deleted: data.length } }
+    return { data: { deleted: deleted.length } }
   })
 
 export const deleteHouses = (ids: string[]) => deleteHousesFn({ data: ids })
@@ -125,29 +229,30 @@ const restoreHousesFn = createServerFn({ method: 'POST' })
       return { error: m.common_nothing_to_restore() }
     }
 
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('properties')
-      .update({ deleted_at: null })
-      .in('id', uniqueIds)
-      .not('deleted_at', 'is', null)
-      .select('id')
-
-    if (error) {
+    let restored: Array<{ id: string }>
+    try {
+      restored = await withCurrentUser((tx) =>
+        tx
+          .update(properties)
+          .set({ deletedAt: null })
+          .where(and(inArray(properties.id, uniqueIds), isNotNull(properties.deletedAt)))
+          .returning({ id: properties.id }),
+      )
+    } catch (error) {
       const message = toMessage(error, m.residential_restore_houses_failed())
       return {
         error:
-          error.code === UNIQUE_VIOLATION
+          databaseError(error).code === UNIQUE_VIOLATION
             ? m.residential_restore_failed_reason({ reason: message.toLowerCase() })
             : message,
       }
     }
 
-    if (data.length === 0) {
+    if (restored.length === 0) {
       return { error: m.common_no_permission() }
     }
 
-    return { data: { restored: data.length } }
+    return { data: { restored: restored.length } }
   })
 
 export const restoreHouses = (ids: string[]) => restoreHousesFn({ data: ids })
@@ -164,23 +269,25 @@ const assignResidentsFn = createServerFn({ method: 'POST' })
 
     const { relationship } = parsed.data
     const residentIds = [...new Set(parsed.data.residentIds)]
-    const supabase = await createClient()
 
-    const { data, error } = await supabase
-      .from('property_residents')
-      .insert(residentIds.map((resident_id) => ({ property_id: houseId, resident_id, relationship })))
-      .select('resident_id')
-
-    if (error) {
+    let assigned: Array<{ residentId: string }>
+    try {
+      assigned = await withCurrentUser((tx) =>
+        tx
+          .insert(propertyResidents)
+          .values(residentIds.map((residentId) => ({ propertyId: houseId, residentId, relationship })))
+          .returning({ residentId: propertyResidents.residentId }),
+      )
+    } catch (error) {
       return {
-        error: postgrestErrorMessage(error, {
+        error: postgrestErrorMessage(databaseError(error), {
           fallback: m.residential_assign_residents_failed(),
           uniqueFallback: m.residential_resident_already_assigned(),
         }),
       }
     }
 
-    return { data: { assigned: data.length } }
+    return { data: { assigned: assigned.length } }
   })
 
 export const assignResidents = (houseId: string, input: AssignResidentsInput) =>
@@ -196,29 +303,29 @@ const updateRelationshipFn = createServerFn({ method: 'POST' })
       return { error: m.common_form_invalid() }
     }
 
-    const supabase = await createClient()
-
-    const { data, error } = await supabase
-      .from('property_residents')
-      .update({ relationship: parsed.data.relationship })
-      .eq('property_id', houseId)
-      .eq('resident_id', residentId)
-      .select('resident_id')
-
-    if (error) {
+    let updated: Array<{ residentId: string }>
+    try {
+      updated = await withCurrentUser((tx) =>
+        tx
+          .update(propertyResidents)
+          .set({ relationship: parsed.data.relationship })
+          .where(and(eq(propertyResidents.propertyId, houseId), eq(propertyResidents.residentId, residentId)))
+          .returning({ residentId: propertyResidents.residentId }),
+      )
+    } catch (error) {
       return {
-        error: postgrestErrorMessage(error, {
+        error: postgrestErrorMessage(databaseError(error), {
           fallback: m.residential_update_relationship_failed(),
         }),
       }
     }
 
     // RLS filters instead of raising on UPDATE, so 0 rows means no permission (or the link is gone).
-    if (data.length === 0) {
+    if (updated.length === 0) {
       return { error: m.common_no_permission() }
     }
 
-    return { data: { updated: data.length } }
+    return { data: { updated: updated.length } }
   })
 
 export const updateRelationship = (houseId: string, residentId: string, input: UpdateRelationshipInput) =>
@@ -229,29 +336,28 @@ const unassignResidentFn = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
   .validator((data: { houseId: string; residentId: string }) => data)
   .handler(async ({ data: { houseId, residentId } }): Promise<ActionResult<{ removed: number }>> => {
-    const supabase = await createClient()
-
-    const { data, error } = await supabase
-      .from('property_residents')
-      .delete()
-      .eq('property_id', houseId)
-      .eq('resident_id', residentId)
-      .select('resident_id')
-
-    if (error) {
+    let removed: Array<{ residentId: string }>
+    try {
+      removed = await withCurrentUser((tx) =>
+        tx
+          .delete(propertyResidents)
+          .where(and(eq(propertyResidents.propertyId, houseId), eq(propertyResidents.residentId, residentId)))
+          .returning({ residentId: propertyResidents.residentId }),
+      )
+    } catch (error) {
       return {
-        error: postgrestErrorMessage(error, {
+        error: postgrestErrorMessage(databaseError(error), {
           fallback: m.residential_unassign_resident_failed(),
         }),
       }
     }
 
     // RLS filters instead of raising on DELETE, so 0 rows means no permission (or already gone).
-    if (data.length === 0) {
+    if (removed.length === 0) {
       return { error: m.common_no_permission() }
     }
 
-    return { data: { removed: data.length } }
+    return { data: { removed: removed.length } }
   })
 
 export const unassignResident = (houseId: string, residentId: string) =>

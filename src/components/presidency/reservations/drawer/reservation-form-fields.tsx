@@ -151,6 +151,7 @@ export function ReservationFormFields({
               {m.common_field_house()} <span className="text-destructive">*</span>
             </FieldLabel>
             <HousesPicker
+              fromSupabase
               value={field.value || null}
               onValueChange={(value) => {
                 field.onChange(value ?? '')

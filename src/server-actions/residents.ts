@@ -1,8 +1,14 @@
-import type { PostgrestError } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
-import { type ActionResult, postgrestErrorMessage, UNIQUE_VIOLATION } from '@/lib/action-result'
+import { and, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm'
+import {
+  type ActionResult,
+  databaseError,
+  postgrestErrorMessage,
+  UNIQUE_VIOLATION,
+} from '@/lib/action-result'
+import { withCurrentUser } from '@/lib/db/current-user'
+import { residents } from '@/lib/db/schema'
 import { authMiddleware } from '@/lib/supabase/auth-middleware'
-import { createClient } from '@/lib/supabase/server'
 import {
   type CreateResidentInput,
   createResidentSchema,
@@ -11,8 +17,8 @@ import {
 } from '@/lib/validations/residents'
 import { m } from '@/paraglide/messages'
 
-function toMessage(error: PostgrestError, fallback: string) {
-  return postgrestErrorMessage(error, {
+function toMessage(error: unknown, fallback: string) {
+  return postgrestErrorMessage(databaseError(error), {
     fallback,
     unique: {
       residents_email_unique: m.residential_resident_email_taken(),
@@ -21,6 +27,117 @@ function toMessage(error: PostgrestError, fallback: string) {
     uniqueFallback: m.residential_resident_duplicate(),
   })
 }
+
+/**
+ * The residents, their board account if any, and their houses, last changed first.
+ * The rows keep the database's column names and ISO timestamps, the shape the
+ * screens were built on.
+ */
+const fetchResidentsFn = createServerFn()
+  .middleware([authMiddleware])
+  .handler(async () => {
+    const list = await withCurrentUser((tx) =>
+      tx.query.residents.findMany({
+        columns: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          email: true,
+          notes: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        with: {
+          profileProfileId: {
+            columns: { id: true, fullName: true },
+            with: { userRolesUserId: { columns: { role: true } } },
+          },
+          propertyResidents: {
+            columns: { relationship: true },
+            with: { property: { columns: { id: true, number: true } } },
+            // Soft-deleted houses keep their links (so undo restores them), but they're not shown.
+            where: { property: { deletedAt: { isNull: true } } },
+          },
+        },
+        where: { deletedAt: { isNull: true } },
+        orderBy: { updatedAt: 'desc' },
+      }),
+    )
+
+    return list.map((resident) => {
+      const profile = resident.profileProfileId
+      return {
+        id: resident.id,
+        first_name: resident.firstName,
+        last_name: resident.lastName,
+        phone: resident.phone,
+        email: resident.email,
+        notes: resident.notes,
+        created_at: resident.createdAt.toISOString(),
+        updated_at: resident.updatedAt.toISOString(),
+        profile: profile
+          ? {
+              id: profile.id,
+              full_name: profile.fullName,
+              user_roles: profile.userRolesUserId.map((grant) => ({ role: grant.role })),
+            }
+          : null,
+        property_residents: resident.propertyResidents.flatMap((link) => {
+          // Always there after the filter above; Drizzle types the join as optional anyway.
+          if (!link.property) {
+            return []
+          }
+          return [
+            {
+              relationship: link.relationship,
+              property: { id: link.property.id, number: link.property.number },
+            },
+          ]
+        }),
+      }
+    })
+  })
+
+export const fetchResidents = () => fetchResidentsFn()
+
+/**
+ * Lightweight list for pickers: identity + which houses each resident is
+ * linked to. `email` is there for the board picker (an account needs one).
+ */
+const fetchResidentsPickerFn = createServerFn()
+  .middleware([authMiddleware])
+  .handler(async () => {
+    const list = await withCurrentUser((tx) =>
+      tx.query.residents.findMany({
+        columns: { id: true, firstName: true, lastName: true, email: true },
+        with: {
+          propertyResidents: {
+            columns: {},
+            with: { property: { columns: { id: true, number: true } } },
+            where: { property: { deletedAt: { isNull: true } } },
+          },
+        },
+        where: { deletedAt: { isNull: true } },
+        orderBy: { firstName: 'asc', lastName: 'asc' },
+      }),
+    )
+
+    return list.map((resident) => ({
+      id: resident.id,
+      first_name: resident.firstName,
+      last_name: resident.lastName,
+      email: resident.email,
+      property_residents: resident.propertyResidents.flatMap((link) => {
+        if (!link.property) {
+          return []
+        }
+        return [{ property: { id: link.property.id, number: link.property.number } }]
+      }),
+    }))
+  })
+
+export const fetchResidentsPicker = () => fetchResidentsPickerFn()
 
 const createResidentFn = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
@@ -32,28 +149,34 @@ const createResidentFn = createServerFn({ method: 'POST' })
     }
 
     const { first_name, last_name, phone, email, notes, property_id, relationship } = parsed.data
-    const supabase = await createClient()
 
-    // RPC so the resident and their house link are created in one transaction.
-    const { data, error } = await supabase.rpc('create_resident', {
-      p_first_name: first_name,
-      p_last_name: last_name,
-      p_phone: phone,
-      p_email: email || undefined,
-      p_notes: notes || undefined,
-      p_property_id: property_id || undefined,
-      p_relationship: property_id ? relationship : undefined,
-    })
-
-    if (error) {
-      // P0002: raised by the RPC for a missing/soft-deleted house; 23503: FK race.
-      if (error.code === 'P0002' || error.code === '23503') {
+    let residentId: string
+    try {
+      // An SQL function so the resident and their house link are created in one transaction.
+      const result = await withCurrentUser((tx) =>
+        tx.execute<{ id: string }>(sql`
+          select public.create_resident(
+            p_first_name => ${first_name},
+            p_last_name => ${last_name},
+            p_phone => ${phone},
+            p_email => ${email || null},
+            p_notes => ${notes || null},
+            p_property_id => ${property_id || null},
+            p_relationship => ${property_id ? relationship : null}
+          ) as id
+        `),
+      )
+      residentId = result.rows[0].id
+    } catch (error) {
+      const failure = databaseError(error)
+      // P0002: raised by the function for a missing/soft-deleted house; 23503: FK race.
+      if (failure.code === 'P0002' || failure.code === '23503') {
         return { error: m.residential_selected_house_missing() }
       }
       return { error: toMessage(error, m.residential_create_resident_failed()) }
     }
 
-    return { data: { id: data } }
+    return { data: { id: residentId } }
   })
 
 export const createResident = (input: CreateResidentInput) => createResidentFn({ data: input })
@@ -67,21 +190,31 @@ const updateResidentFn = createServerFn({ method: 'POST' })
       return { error: m.common_form_invalid() }
     }
 
-    const { email, notes, ...rest } = parsed.data
-    const supabase = await createClient()
+    const { first_name, last_name, phone, email, notes } = parsed.data
 
-    const { data, error } = await supabase
-      .from('residents')
-      .update({ ...rest, email: email || null, notes: notes || null })
-      .eq('id', id)
-      .select('id')
-      .single()
-
-    if (error) {
+    let updated: Array<{ id: string }>
+    try {
+      updated = await withCurrentUser((tx) =>
+        tx
+          .update(residents)
+          .set({
+            firstName: first_name,
+            lastName: last_name,
+            phone,
+            email: email || null,
+            notes: notes || null,
+          })
+          .where(eq(residents.id, id))
+          .returning({ id: residents.id }),
+      )
+    } catch (error) {
       return { error: toMessage(error, m.residential_update_resident_failed()) }
     }
+    if (updated.length === 0) {
+      return { error: m.common_no_permission() }
+    }
 
-    return { data }
+    return { data: updated[0] }
   })
 
 export const updateResident = (id: string, input: UpdateResidentInput) =>
@@ -101,23 +234,24 @@ const deleteResidentsFn = createServerFn({ method: 'POST' })
       return { error: m.residential_select_resident_required() }
     }
 
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('residents')
-      .update({ deleted_at: new Date().toISOString() })
-      .in('id', uniqueIds)
-      .is('deleted_at', null)
-      .select('id')
-
-    if (error) {
+    let deleted: Array<{ id: string }>
+    try {
+      deleted = await withCurrentUser((tx) =>
+        tx
+          .update(residents)
+          .set({ deletedAt: sql`now()` })
+          .where(and(inArray(residents.id, uniqueIds), isNull(residents.deletedAt)))
+          .returning({ id: residents.id }),
+      )
+    } catch (error) {
       return { error: toMessage(error, m.residential_delete_residents_failed()) }
     }
 
-    if (data.length === 0) {
+    if (deleted.length === 0) {
       return { error: m.common_no_permission() }
     }
 
-    return { data: { deleted: data.length } }
+    return { data: { deleted: deleted.length } }
   })
 
 export const deleteResidents = (ids: string[]) => deleteResidentsFn({ data: ids })
@@ -132,29 +266,30 @@ const restoreResidentsFn = createServerFn({ method: 'POST' })
       return { error: m.common_nothing_to_restore() }
     }
 
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('residents')
-      .update({ deleted_at: null })
-      .in('id', uniqueIds)
-      .not('deleted_at', 'is', null)
-      .select('id')
-
-    if (error) {
+    let restored: Array<{ id: string }>
+    try {
+      restored = await withCurrentUser((tx) =>
+        tx
+          .update(residents)
+          .set({ deletedAt: null })
+          .where(and(inArray(residents.id, uniqueIds), isNotNull(residents.deletedAt)))
+          .returning({ id: residents.id }),
+      )
+    } catch (error) {
       const message = toMessage(error, m.residential_restore_residents_failed())
       return {
         error:
-          error.code === UNIQUE_VIOLATION
+          databaseError(error).code === UNIQUE_VIOLATION
             ? m.residential_restore_failed_reason({ reason: message.toLowerCase() })
             : message,
       }
     }
 
-    if (data.length === 0) {
+    if (restored.length === 0) {
       return { error: m.common_no_permission() }
     }
 
-    return { data: { restored: data.length } }
+    return { data: { restored: restored.length } }
   })
 
 export const restoreResidents = (ids: string[]) => restoreResidentsFn({ data: ids })

@@ -14,11 +14,16 @@ import {
   ComboboxValue,
 } from '@/components/ui/combobox'
 import { m } from '@/paraglide/messages'
-import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
+import { housesPickerQueryOptions, supabaseHousesPickerQueryOptions } from '@/tanstack-queries/houses'
 
 type HousesPickerProps = Omit<ComboboxPrimitive.Root.Props<string, boolean | undefined>, 'items'> & {
   /** Hide these houses, e.g. the ones already linked to the resident being edited. */
   excludeIds?: string[]
+  /**
+   * The houses as Supabase has them, for a form that still saves there (house ids
+   * differ between the two databases). Goes away once Treasury and Presidency move to Neon.
+   */
+  fromSupabase?: boolean
 }
 
 export function houseLabel(house: { number: string }) {
@@ -26,8 +31,10 @@ export function houseLabel(house: { number: string }) {
 }
 
 /** Pick one house (`string | null`) or, with `multiple`, several (`string[]`), by id. */
-export function HousesPicker({ excludeIds, ...props }: HousesPickerProps) {
-  const { data, isPending, isError } = useQuery(housesPickerQueryOptions)
+export function HousesPicker({ excludeIds, fromSupabase = false, ...props }: HousesPickerProps) {
+  const neonHouses = useQuery({ ...housesPickerQueryOptions, enabled: !fromSupabase })
+  const supabaseHouses = useQuery({ ...supabaseHousesPickerQueryOptions, enabled: fromSupabase })
+  const { data, isPending, isError } = fromSupabase ? supabaseHouses : neonHouses
 
   const byId = useMemo(() => new Map(data?.map((house) => [house.id, house])), [data])
   const items = useMemo(

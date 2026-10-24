@@ -25,7 +25,7 @@ import { formatDay, ISO_DAY } from '@/lib/utils'
 import { type ReservationInput, reservationSchema } from '@/lib/validations/presidency'
 import { m } from '@/paraglide/messages'
 import { createReservation } from '@/server-actions/presidency'
-import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
+import { supabaseHousesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { amenitiesQueryOptions, PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'
 import { ReservationFormFields } from './reservation-form-fields'
 
@@ -57,7 +57,7 @@ export function CreateReservationDrawer({
         .getQueryData(amenitiesQueryOptions.queryKey)
         ?.find((a) => a.id === values.amenity_id)
       const house = queryClient
-        .getQueryData(housesPickerQueryOptions.queryKey)
+        .getQueryData(supabaseHousesPickerQueryOptions.queryKey)
         ?.find((h) => h.id === values.property_id)
 
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })

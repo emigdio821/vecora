@@ -349,6 +349,7 @@ export function TransactionFormFields({
               >
                 <FieldLabel>{m.common_field_house()}</FieldLabel>
                 <HousesPicker
+                  fromSupabase
                   value={field.value}
                   onValueChange={field.onChange}
                   inputRef={field.ref}
