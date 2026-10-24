@@ -100,6 +100,8 @@ What each section is called on screen. Docs and comments use the English name.
 | `npm run dev`                     | Development server                                                                                         |
 | `npm run db:reset`                | Empty the Neon branch in `.env.local`, apply every migration and load the test data (refuses `production`) |
 | `npm run db:reset:empty`          | Same, but only the main admin (password `admin`): a fresh install with no data                             |
+| `npm run db:reset:schema`         | Same, but the schema alone, ready for `npm run db:import`                                                  |
+| `npm run db:import`               | Copy the data from Supabase into the branch (see [Moving from Supabase](#moving-from-supabase))            |
 | `npm run db:generate`             | Turn a change in `src/lib/db/schema/` into a new migration in `drizzle/`                                   |
 | `npm run db:migrate`              | Apply the pending migrations to the branch in `.env.local`                                                 |
 | `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                                 |
@@ -129,9 +131,19 @@ The app runs on Vercel against the Neon `production` branch.
 
    `VITE_SITE_URL` is bundled into the browser code at build time, so redeploy after changing it.
 
-3. **Create the main admin.** Nobody can sign in until an account has a role. The script that creates `admin@vecora.app` on production, with a default password it has to change at the first sign-in, is still to do.
+3. **Bring the data over** with `npm run db:import` (see [Moving from Supabase](#moving-from-supabase)), which brings the main admin along. On a fresh install with nothing to import, the script that creates the main admin on production is still to do.
 
-4. **Deploy** and sign in as the admin. Then set the residential's name, logo and currency in Ajustes → Residencial and add the board members in HOA board.
+4. **Deploy** and sign in as the admin. Then upload the logo in Ajustes → Residencial and send the board their access links from HOA board.
+
+### Moving from Supabase
+
+`npm run db:import` (`scripts/db/import-supabase.ts`) copies everything from the Supabase database into the Neon branch in `.env.local`: settings, categories, houses, residents, periods, movements, common areas, requests, document templates and the activity log, keeping every id and timestamp. Supabase is only read, from one snapshot.
+
+1. Add `SUPABASE_DB_URL` and `SUPABASE_DB_CA` to `.env.local` (see `.env.example`).
+2. Leave only the schema on the branch: `npm run db:reset:schema` on `dev`, `npm run db:migrate` on a new `production`. The import refuses a branch that already has accounts.
+3. `npm run db:import -- --dry-run` copies and checks, then rolls back. `npm run db:import` keeps it. Either way it compares the two sides (counts per table, each period's totals) and keeps nothing if they differ.
+
+Accounts keep their id, email, name and roles, but not their password: Supabase's hashes don't carry over. The main admin gets a one-time password, printed once at the end, which the app makes it replace at the first sign-in; board members get a new access link from HOA board. The logo isn't copied: upload it again.
 
 ### The main admin
 
