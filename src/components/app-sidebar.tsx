@@ -1,6 +1,6 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar'
+import type { CurrentUser } from '@/lib/auth/current-user'
 import type { Settings } from '@/lib/db/settings'
-import type { CurrentUser } from '@/lib/supabase/current-user'
 import { HeaderNav } from './navs/header'
 import { NavMain } from './navs/main'
 import { NavReports } from './navs/reports'

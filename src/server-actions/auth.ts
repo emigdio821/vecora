@@ -1,11 +1,12 @@
-import type { EmailOtpType } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
-import { getCookie, setCookie } from '@tanstack/react-start/server'
-import { passwordUpdateErrorMessage } from '@/lib/action-result'
+import { getCookie, getRequestHeaders, setCookie } from '@tanstack/react-start/server'
+import { isAPIError } from 'better-auth/api'
+import { auth, NOT_ON_THE_BOARD } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth/current-user'
+import { authMiddleware } from '@/lib/auth/middleware'
 import { MULTI_LANGUAGE } from '@/lib/config/i18n'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
-import { getCurrentUser } from '@/lib/supabase/current-user'
-import { createClient } from '@/lib/supabase/server'
+import { withUser } from '@/lib/db'
+import { settings } from '@/lib/db/schema'
 import {
   type ChangePasswordInput,
   changePasswordSchema,
@@ -24,21 +25,30 @@ export type ActionResult = { error: string } | undefined
  */
 export type SignInResult = { error?: string; locale?: Locale } | undefined
 
-type ServerClient = Awaited<ReturnType<typeof createClient>>
+/** The error code Better Auth answered with, if it was one of its own. */
+function authErrorCode(error: unknown): string | undefined {
+  if (!isAPIError(error)) return undefined
+  return error.body?.code
+}
 
 /**
  * A device whose visitor never picked a language follows the browser until
  * someone signs in; from then on it's in the HOA's default language. Writes
  * Paraglide's cookie, so a later pick in the language menu replaces it.
+ *
+ * Takes the user: the session cookie was only just set, so this request
+ * doesn't carry it yet.
  */
-async function adoptHoaLanguage(supabase: ServerClient): Promise<Locale | undefined> {
+async function adoptHoaLanguage(userId: string): Promise<Locale | undefined> {
   if (!MULTI_LANGUAGE || getCookie(LANGUAGE_PICKED_COOKIE)) return undefined
 
-  const { data } = await supabase.from('settings').select('default_language').maybeSingle()
-  if (!data || data.default_language === getCookie(cookieName)) return undefined
+  const [row] = await withUser(userId, (tx) =>
+    tx.select({ defaultLanguage: settings.defaultLanguage }).from(settings).limit(1),
+  )
+  if (!row || row.defaultLanguage === getCookie(cookieName)) return undefined
 
-  setCookie(cookieName, data.default_language, { path: '/', maxAge: cookieMaxAge, sameSite: 'lax' })
-  return data.default_language
+  setCookie(cookieName, row.defaultLanguage, { path: '/', maxAge: cookieMaxAge, sameSite: 'lax' })
+  return row.defaultLanguage
 }
 
 /** Navigation is left to the caller, which also drops the cached signed-out user. */
@@ -51,26 +61,24 @@ const loginFn = createServerFn({ method: 'POST' })
       return { error: m.auth_credentials_required() }
     }
 
-    const supabase = await createClient()
-    const { data, error } = await supabase.auth.signInWithPassword(parsed.data)
-
-    if (error) {
-      return { error: m.auth_credentials_invalid() }
+    let userId: string
+    try {
+      const signedIn = await auth.api.signInEmail({ body: parsed.data, headers: getRequestHeaders() })
+      userId = signedIn.user.id
+    } catch (error) {
+      // Only board members (accounts with a role) may use the app. Someone taken
+      // off the board keeps their account, for history, but is turned away here
+      // (src/lib/auth/index.ts refuses them a session).
+      if (authErrorCode(error) === NOT_ON_THE_BOARD) {
+        return { error: m.auth_no_access_message() }
+      }
+      if (isAPIError(error)) {
+        return { error: m.auth_credentials_invalid() }
+      }
+      throw error
     }
 
-    // Only board members (accounts with a role) may use the app. Someone taken
-    // off the board keeps their account, for history, but is turned away here.
-    const { count } = await supabase
-      .from('user_roles')
-      .select('role', { count: 'exact', head: true })
-      .eq('user_id', data.user.id)
-
-    if (!count) {
-      await supabase.auth.signOut()
-      return { error: m.auth_no_access_message() }
-    }
-
-    return { locale: await adoptHoaLanguage(supabase) }
+    return { locale: await adoptHoaLanguage(userId) }
   })
 
 export const login = (input: LoginInput) => loginFn({ data: input })
@@ -83,32 +91,40 @@ export const login = (input: LoginInput) => loginFn({ data: input })
  * scanners open the URL with a GET, which must never use the token.
  */
 const confirmAccessLinkFn = createServerFn({ method: 'POST' })
-  .validator((data: { tokenHash: string; type: EmailOtpType }) => data)
-  .handler(async ({ data: { tokenHash, type } }): Promise<SignInResult> => {
-    const supabase = await createClient()
+  .validator((token: string) => token)
+  .handler(async ({ data: token }): Promise<SignInResult> => {
+    const headers = getRequestHeaders()
 
     // Drop a previous session from this browser only; other devices stay signed in.
-    const { data: current } = await supabase.auth.getClaims()
-    if (current) await supabase.auth.signOut({ scope: 'local' })
+    const current = await auth.api.getSession({ headers })
+    if (current) await auth.api.signOut({ headers })
 
-    const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash })
-    if (error) return { error: m.auth_invite_invalid_title() }
+    let userId: string
+    try {
+      const verified = await auth.api.magicLinkVerify({ query: { token }, headers })
+      userId = verified.user.id
+    } catch (error) {
+      // Expired, already used, or the person left the board since.
+      if (isAPIError(error)) {
+        return { error: m.auth_invite_invalid_title() }
+      }
+      throw error
+    }
 
-    return { locale: await adoptHoaLanguage(supabase) }
+    return { locale: await adoptHoaLanguage(userId) }
   })
 
-export const confirmAccessLink = (tokenHash: string, type: EmailOtpType) =>
-  confirmAccessLinkFn({ data: { tokenHash, type } })
+export const confirmAccessLink = (token: string) => confirmAccessLinkFn({ data: token })
 
 /**
  * Signs the user out. Navigation is left to the caller so it can clear
  * client-side state (e.g. the TanStack Query cache) before redirecting.
  */
 const logoutFn = createServerFn({ method: 'POST' }).handler(async (): Promise<ActionResult> => {
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signOut()
-
-  if (error) {
+  try {
+    await auth.api.signOut({ headers: getRequestHeaders() })
+  } catch (error) {
+    console.error('signOut failed', error)
     return { error: m.auth_logout_failed() }
   }
 })
@@ -134,32 +150,24 @@ const changePasswordFn = createServerFn({ method: 'POST' })
       return { error: m.common_no_permission() }
     }
 
-    const supabase = await createClient()
-
-    // An open session isn't enough: whoever is at the keyboard must know the current one.
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: parsed.data.current,
-    })
-    if (signInError) {
-      return { error: m.auth_current_password_wrong() }
+    // An open session isn't enough: whoever is at the keyboard must know the
+    // current one. Every other device signs in again with the new password.
+    try {
+      await auth.api.changePassword({
+        body: {
+          currentPassword: parsed.data.current,
+          newPassword: parsed.data.password,
+          revokeOtherSessions: true,
+        },
+        headers: getRequestHeaders(),
+      })
+    } catch (error) {
+      if (authErrorCode(error) === 'INVALID_PASSWORD') {
+        return { error: m.auth_current_password_wrong() }
+      }
+      console.error('changePassword failed', error)
+      return { error: m.board_password_save_failed() }
     }
-
-    // current_password too: Auth asks for it when "Require current password when updating" is on.
-    const { error } = await supabase.auth.updateUser({
-      password: parsed.data.password,
-      current_password: parsed.data.current,
-    })
-    if (error?.code === 'same_password') {
-      return { error: m.auth_password_same() }
-    }
-    if (error) {
-      return { error: passwordUpdateErrorMessage(error, m.board_password_save_failed()) }
-    }
-
-    // Every other device signs in again with the new password.
-    const { error: signOutError } = await supabase.auth.signOut({ scope: 'others' })
-    if (signOutError) console.error('signOut others failed', signOutError)
   })
 
 export const changePassword = (input: ChangePasswordInput) => changePasswordFn({ data: input })

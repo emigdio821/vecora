@@ -7,9 +7,9 @@ import {
   postgrestErrorMessage,
   requestResolutionErrorMessage,
 } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/auth/middleware'
 import { withCurrentUser } from '@/lib/db/current-user'
 import { securityRequests } from '@/lib/db/schema'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import {
   type PayRequestInput,
   payRequestSchema,

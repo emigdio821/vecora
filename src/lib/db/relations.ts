@@ -6,31 +6,15 @@ import { defineRelations } from 'drizzle-orm'
 import * as schema from './schema'
 
 export const relations = defineRelations(schema, (r) => ({
-  amenityReservations: {
-    amenity: r.one.amenities({
-      from: r.amenityReservations.amenityId,
-      to: r.amenities.id,
-    }),
-    profileCancelledBy: r.one.profiles({
-      from: r.amenityReservations.cancelledBy,
+  accountsInAuth: {
+    profile: r.one.profiles({
+      from: r.accountsInAuth.userId,
       to: r.profiles.id,
-      alias: 'amenityReservations_cancelledBy_profiles_id',
     }),
-    profileCreatedBy: r.one.profiles({
-      from: r.amenityReservations.createdBy,
-      to: r.profiles.id,
-      alias: 'amenityReservations_createdBy_profiles_id',
-    }),
-    property: r.one.properties({
-      from: r.amenityReservations.propertyId,
-      to: r.properties.id,
-    }),
-    transactions: r.many.transactions(),
-  },
-  amenities: {
-    amenityReservations: r.many.amenityReservations(),
   },
   profiles: {
+    accountsInAuths: r.many.accountsInAuth(),
+    sessionsInAuths: r.many.sessionsInAuth(),
     amenityReservationsCancelledBy: r.many.amenityReservations({
       alias: 'amenityReservations_cancelledBy_profiles_id',
     }),
@@ -70,6 +54,36 @@ export const relations = defineRelations(schema, (r) => ({
     userRolesUserId: r.many.userRoles({
       alias: 'userRoles_userId_profiles_id',
     }),
+  },
+  sessionsInAuth: {
+    profile: r.one.profiles({
+      from: r.sessionsInAuth.userId,
+      to: r.profiles.id,
+    }),
+  },
+  amenityReservations: {
+    amenity: r.one.amenities({
+      from: r.amenityReservations.amenityId,
+      to: r.amenities.id,
+    }),
+    profileCancelledBy: r.one.profiles({
+      from: r.amenityReservations.cancelledBy,
+      to: r.profiles.id,
+      alias: 'amenityReservations_cancelledBy_profiles_id',
+    }),
+    profileCreatedBy: r.one.profiles({
+      from: r.amenityReservations.createdBy,
+      to: r.profiles.id,
+      alias: 'amenityReservations_createdBy_profiles_id',
+    }),
+    property: r.one.properties({
+      from: r.amenityReservations.propertyId,
+      to: r.properties.id,
+    }),
+    transactions: r.many.transactions(),
+  },
+  amenities: {
+    amenityReservations: r.many.amenityReservations(),
   },
   properties: {
     amenityReservations: r.many.amenityReservations(),
@@ -141,9 +155,6 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.transactions.propertyId,
       to: r.properties.id,
     }),
-  },
-  usersInAuth: {
-    profiles: r.many.profiles(),
   },
   residents: {
     properties: r.many.properties(),

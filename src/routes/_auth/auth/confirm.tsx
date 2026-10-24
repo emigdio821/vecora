@@ -1,4 +1,3 @@
-import type { EmailOtpType } from '@supabase/supabase-js'
 import { IconKey, IconUserX } from '@tabler/icons-react'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { z } from 'zod'
@@ -27,14 +26,13 @@ import { m } from '@/paraglide/messages'
  */
 export const Route = createFileRoute('/_auth/auth/confirm')({
   validateSearch: z.object({
-    token_hash: z.string().optional().catch(undefined),
-    type: z.string().optional().catch(undefined),
+    token: z.string().optional().catch(undefined),
   }),
   beforeLoad: ({ search }) => {
-    if (!search.token_hash || !search.type) {
+    if (!search.token) {
       throw redirect({ to: '/login', search: { error: 'invite' } })
     }
-    return { tokenHash: search.token_hash, type: search.type as EmailOtpType }
+    return { token: search.token }
   },
   // The link is shared over WhatsApp, so this is also its preview.
   head: () =>
@@ -46,7 +44,7 @@ export const Route = createFileRoute('/_auth/auth/confirm')({
 })
 
 function ConfirmAccessPage() {
-  const { user, tokenHash, type } = Route.useRouteContext()
+  const { user, token } = Route.useRouteContext()
 
   return (
     <Empty className="max-w-sm">
@@ -78,7 +76,7 @@ function ConfirmAccessPage() {
               {m.common_action_cancel()}
             </Button>
           )}
-          <ConfirmAccessButton tokenHash={tokenHash} type={type}>
+          <ConfirmAccessButton token={token}>
             {user ? m.auth_confirm_sign_out_and_continue() : m.auth_confirm_continue()}
           </ConfirmAccessButton>
         </div>

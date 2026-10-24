@@ -6,9 +6,9 @@ import {
   postgrestErrorMessage,
   UNIQUE_VIOLATION,
 } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/auth/middleware'
 import { withCurrentUser } from '@/lib/db/current-user'
 import { properties, propertyResidents } from '@/lib/db/schema'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import {
   type AssignResidentsInput,
   assignResidentsSchema,

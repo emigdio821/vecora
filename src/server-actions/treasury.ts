@@ -9,6 +9,7 @@ import {
   postgrestErrorMessage,
   UNIQUE_VIOLATION,
 } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/auth/middleware'
 import { withCurrentUser } from '@/lib/db/current-user'
 import {
   houseFeeStatus,
@@ -17,7 +18,6 @@ import {
   transactions,
   treasuryPeriodSummary,
 } from '@/lib/db/schema'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import { systemCategorySource } from '@/lib/system-categories'
 import { formatMonth } from '@/lib/utils'
 import {

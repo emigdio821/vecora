@@ -1,13 +1,10 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { useEffect } from 'react'
 import { AppHeader } from '@/components/app-header'
 import { AppSidebar } from '@/components/app-sidebar'
 import { CurrentUserProvider } from '@/components/current-user-provider'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { FirstVisitWelcomeDialog } from '@/components/welcome-dialog'
-import { createClient } from '@/lib/supabase/client'
-import { loginHrefForCurrentPage } from '@/lib/utils'
 import { settingsQueryOptions } from '@/tanstack-queries/session'
 
 export const Route = createFileRoute('/_authed')({
@@ -39,18 +36,6 @@ function AuthedLayout() {
   const { user } = Route.useRouteContext()
   // The settings page invalidates this query after saving.
   const { data: settings } = useSuspenseQuery(settingsQueryOptions)
-
-  // Reads go from the browser straight to Supabase, past the server functions'
-  // auth middleware. When the session can't be refreshed (expired, or signed
-  // out elsewhere) the client signs out; show the login page, not load errors.
-  useEffect(() => {
-    const { data } = createClient().auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') window.location.assign(loginHrefForCurrentPage())
-    })
-    return () => {
-      data.subscription.unsubscribe()
-    }
-  }, [])
 
   return (
     <CurrentUserProvider user={user}>

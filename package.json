@@ -16,6 +16,8 @@
     "db:reset:empty": "supabase db reset --local --no-seed && supabase db query --local -f supabase/seed.sql",
     "db:seed": "supabase db push --linked --include-seed",
     "db:neon:load": "node scripts/neon/load-dev.ts",
+    "db:neon:migrate": "node scripts/neon/migrate.ts",
+    "db:neon:dev-passwords": "node scripts/neon/dev-passwords.ts",
     "db:neon:app-role": "node scripts/neon/app-role.ts",
     "db:schema": "node scripts/neon/pull-schema.ts && vp fmt src/lib/db/schema.ts src/lib/db/relations.ts",
     "prepare": "husky"

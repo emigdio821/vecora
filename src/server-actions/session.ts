@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getCurrentUser } from '@/lib/auth/current-user'
+import { authMiddleware } from '@/lib/auth/middleware'
 import { getSettings } from '@/lib/db/settings'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
-import { getCurrentUser } from '@/lib/supabase/current-user'
 
 /**
  * Reads for the route guards and the authed layout; see tanstack-queries/session.ts.

@@ -9,12 +9,12 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import sharp from 'sharp'
 import { type ActionResult, databaseError, postgrestErrorMessage } from '@/lib/action-result'
+import { getCurrentUser } from '@/lib/auth/current-user'
+import { authMiddleware } from '@/lib/auth/middleware'
 import { withCurrentUser } from '@/lib/db/current-user'
 import { settings } from '@/lib/db/schema'
 import { getSettings, LOGO_PREFIX, logoKey } from '@/lib/db/settings'
 import { ASSETS_BUCKET, storage } from '@/lib/storage'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
-import { getCurrentUser } from '@/lib/supabase/current-user'
 import {
   LOGO_URL_SECONDS,
   logoFileSchema,

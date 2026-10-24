@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import type { CurrentUser } from '@/lib/supabase/current-user'
+import type { CurrentUser } from '@/lib/auth/current-user'
 import { getAvatarFallback } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import { logout } from '@/server-actions/auth'

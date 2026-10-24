@@ -9,9 +9,9 @@ import {
   postgrestErrorMessage,
   requestResolutionErrorMessage,
 } from '@/lib/action-result'
+import { authMiddleware } from '@/lib/auth/middleware'
 import { withCurrentUser } from '@/lib/db/current-user'
 import { amenities, amenityReservations } from '@/lib/db/schema'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
 import {
   type AmenityInput,
   amenitySchema,

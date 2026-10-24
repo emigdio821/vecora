@@ -10,7 +10,7 @@ TanStack Start (Vite + Nitro) · React · Supabase (Postgres, Auth, RLS) · Tail
 
 ## Run it locally
 
-You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
+You need **Node 24**, npm, the [Neon CLI](https://neon.com/docs/reference/neon-cli) and a Neon `dev` branch of the project.
 
 1. **Install dependencies**
 
@@ -18,40 +18,34 @@ You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
    npm install
    ```
 
-2. **Start Supabase** (Postgres, Auth, Studio). The first run downloads the Docker images.
-
-   ```bash
-   npx supabase start
-   ```
-
-3. **Create `.env.local`** from the example and paste the local keys printed by `npx supabase status`:
+2. **Create `.env.local`** from the example:
 
    ```bash
    cp .env.example .env.local
-   npx supabase status
    ```
 
-   | Variable                     | Value                                                            |
-   | ---------------------------- | ---------------------------------------------------------------- |
-   | `VITE_SUPABASE_URL`          | `API_URL` from `supabase status` (`http://127.0.0.1:54321`)      |
-   | `VITE_SUPABASE_KEY`          | `PUBLISHABLE_KEY` from `supabase status`                         |
-   | `VITE_SITE_URL`              | `http://localhost:3000`                                          |
-   | `SUPABASE_SECRET_KEY`        | `SECRET_KEY` from `supabase status` (server-only, never `VITE_`) |
-   | `DATABASE_URL`               | Pooled connection string of your Neon `dev` branch (owner role)  |
-   | `DATABASE_URL_UNPOOLED`      | Direct connection string of the same branch (for drizzle-kit)    |
-   | `DATABASE_AUTHENTICATED_URL` | The app's own role, written by `npm run db:neon:app-role`        |
-   | `BETTER_AUTH_SECRET`         | Output of `openssl rand -base64 32`                              |
-   | `AWS_*` (four of them)       | Object storage of the `dev` branch, from `neon env pull`         |
+   | Variable                     | Value                                                                        |
+   | ---------------------------- | ---------------------------------------------------------------------------- |
+   | `VITE_SITE_URL`              | `http://localhost:3000`                                                      |
+   | `DATABASE_URL`               | Pooled connection string of your Neon `dev` branch (owner role)              |
+   | `DATABASE_URL_UNPOOLED`      | Direct connection string of the same branch (for drizzle-kit and the loader) |
+   | `DATABASE_AUTHENTICATED_URL` | The app's own role, written by `npm run db:neon:app-role` (step 3)           |
+   | `DATABASE_AUTH_URL`          | Better Auth's role, written by `npm run db:neon:app-role` (step 3)           |
+   | `BETTER_AUTH_SECRET`         | Output of `openssl rand -base64 32`                                          |
+   | `AWS_*` (four of them)       | Object storage of the `dev` branch, from `neon env pull`                     |
 
    The app checks them on start and stops with the name of any that's missing or invalid.
 
-4. **Load the schema and test data**. Applies every migration and both seeds; it also wipes any local data, so run it whenever you want a clean slate.
+3. **Load the schema and test data** into the empty `dev` branch, then give the app's two roles their logins. The load applies every migration, both seeds and the Neon migrations, and sets the test accounts' passwords.
 
    ```bash
-   npm run db:reset
+   npm run db:neon:load
+   npm run db:neon:app-role
    ```
 
-5. **Start the app**
+   For a clean slate, `neon branches reset dev --parent` empties the branch; run both commands again.
+
+4. **Start the app**
 
    ```bash
    npm run dev
@@ -61,7 +55,7 @@ You need **Node 24**, **Docker** (for the local Supabase stack) and npm.
 
 ## Test accounts
 
-All local accounts use the password **`admin`**. They come from `supabase/seed.sql` (admin) and `supabase/seeds/dev.sql` (everyone else) and only exist in the local database.
+All local accounts use the password **`admin`**, set by `scripts/neon/dev-passwords.ts` during the load. They come from `supabase/seed.sql` (admin) and `supabase/seeds/dev.sql` (everyone else) and only exist in the `dev` branch.
 
 | Email                    | Role                         | Can write in                                                               |
 | ------------------------ | ---------------------------- | -------------------------------------------------------------------------- |
@@ -105,20 +99,22 @@ What each section is called on screen. Docs and comments use the English name.
 
 ## Useful commands
 
-| Command                           | What it does                                                                                                                                                             |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `npm run dev`                     | Development server                                                                                                                                                       |
-| `npm run db:reset`                | Recreate the local database from migrations + seeds (destroys local data)                                                                                                |
-| `npm run db:reset:empty`          | Same, but only the admin account from `seed.sql`: a fresh install with no data                                                                                           |
-| `npm run db:neon:load`            | Load the migrations + seeds into the (empty) Neon branch in `.env.local`, through `scripts/neon/supabase-compat.sql`; start over with `neon branches reset dev --parent` |
-| `npm run db:neon:app-role`        | Create the app's role on that branch (after a load, or again after a reset); the first time, it writes `DATABASE_AUTHENTICATED_URL` to `.env.local`                      |
-| `npm run db:schema`               | Regenerate the Drizzle schema (`src/lib/db/schema.ts`, `relations.ts`) from the Neon branch in `.env.local`; run after changing a migration                              |
-| `npm run db:types`                | Regenerate `src/lib/supabase/database.types.ts` from the local schema — run after changing a migration                                                                   |
-| `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                                                                                               |
-| `npm run i18n`                    | Compile `messages/` into `src/paraglide/` (the dev server also does it on its own)                                                                                       |
-| `npm run lint` / `npm run format` | oxlint / oxfmt                                                                                                                                                           |
-| `npx supabase status`             | Local URLs and keys; Studio is at <http://127.0.0.1:54323>                                                                                                               |
-| `npx supabase stop`               | Stop the local stack (data is kept)                                                                                                                                      |
+| Command                           | What it does                                                                                                                                                                                                   |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                     | Development server                                                                                                                                                                                             |
+| `npm run db:reset`                | Recreate the local database from migrations + seeds (destroys local data)                                                                                                                                      |
+| `npm run db:reset:empty`          | Same, but only the admin account from `seed.sql`: a fresh install with no data                                                                                                                                 |
+| `npm run db:neon:load`            | Load the migrations + seeds into the (empty) Neon branch in `.env.local`, through `scripts/neon/supabase-compat.sql`; start over with `neon branches reset dev --parent`                                       |
+| `npm run db:neon:migrate`         | Apply the pending `neon/migrations/` to the Neon branch in `.env.local` (the load already runs them)                                                                                                           |
+| `npm run db:neon:dev-passwords`   | Give every account without a password the test password `admin` (the load already runs it; refuses the production branch)                                                                                      |
+| `npm run db:neon:app-role`        | Give the app's role (`vecora_app`) and Better Auth's (`vecora_auth`) their logins on that branch, after a load; the first time, it writes `DATABASE_AUTHENTICATED_URL` and `DATABASE_AUTH_URL` to `.env.local` |
+| `npm run db:schema`               | Regenerate the Drizzle schema (`src/lib/db/schema.ts`, `relations.ts`) from the Neon branch in `.env.local`; run after changing a migration                                                                    |
+| `npm run db:types`                | Regenerate `src/lib/supabase/database.types.ts` from the local schema — run after changing a migration                                                                                                         |
+| `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                                                                                                                                     |
+| `npm run i18n`                    | Compile `messages/` into `src/paraglide/` (the dev server also does it on its own)                                                                                                                             |
+| `npm run lint` / `npm run format` | oxlint / oxfmt                                                                                                                                                                                                 |
+| `npx supabase status`             | Local URLs and keys; Studio is at <http://127.0.0.1:54323>                                                                                                                                                     |
+| `npx supabase stop`               | Stop the local stack (data is kept)                                                                                                                                                                            |
 
 ## Deploy
 

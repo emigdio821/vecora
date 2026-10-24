@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+import { authMiddleware } from '@/lib/auth/middleware'
 import { withCurrentUser } from '@/lib/db/current-user'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
 
 /** Instants, not days: the browser turns its own days into them, so the range follows its time zone. */
 const logsWindowSchema = z.object({

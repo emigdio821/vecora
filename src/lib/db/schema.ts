@@ -9,15 +9,15 @@ import {
   pgEnum,
   uuid,
   bigint,
-  boolean,
   text,
+  boolean,
   timestamp,
   date,
   numeric,
   jsonb,
   smallint,
-  uniqueIndex,
   index,
+  uniqueIndex,
   foreignKey,
   primaryKey,
   unique,
@@ -27,9 +27,7 @@ import {
   integer,
 } from 'drizzle-orm/pg-core'
 
-// Supabase's accounts table (scripts/neon/supabase-compat.sql), until Better Auth.
-const users = pgSchema('auth').table('users', { id: uuid().primaryKey() })
-
+export const auth = pgSchema('auth')
 export const appRole = pgEnum('app_role', ['admin', 'president', 'treasurer', 'security', 'maintenance'])
 export const residencyRelationship = pgEnum('residency_relationship', [
   'owner',
@@ -51,6 +49,83 @@ export const securityRequestKind = pgEnum('security_request_kind', [
 ])
 export const appLanguage = pgEnum('app_language', ['es', 'en'])
 export const auditOperation = pgEnum('audit_operation', ['insert', 'update', 'delete'])
+
+export const accountsInAuth = auth.table(
+  'accounts',
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull(),
+    accountId: text('account_id').notNull(),
+    providerId: text('provider_id').notNull(),
+    password: text(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    accessToken: text('access_token'),
+    refreshToken: text('refresh_token'),
+    idToken: text('id_token'),
+    accessTokenExpiresAt: timestamp('access_token_expires_at', { withTimezone: true }),
+    refreshTokenExpiresAt: timestamp('refresh_token_expires_at', { withTimezone: true }),
+    scope: text(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [profiles.id],
+      name: 'accounts_user_id_fkey',
+    }).onDelete('cascade'),
+    index('accounts_user_id_idx').using('btree', table.userId.asc().nullsLast()),
+    unique('accounts_provider_id_account_id_key').on(table.providerId, table.accountId),
+  ],
+)
+
+export const sessionsInAuth = auth.table(
+  'sessions',
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull(),
+    token: text().notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    fromAccessLink: boolean('from_access_link').default(false).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [profiles.id],
+      name: 'sessions_user_id_fkey',
+    }).onDelete('cascade'),
+    index('sessions_user_id_idx').using('btree', table.userId.asc().nullsLast()),
+    unique('sessions_token_key').on(table.token),
+  ],
+)
+
+export const verificationsInAuth = auth.table(
+  'verifications',
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    identifier: text().notNull(),
+    value: text().notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .default(sql`now()`)
+      .notNull(),
+  },
+  (table) => [index('verifications_identifier_idx').using('btree', table.identifier.asc().nullsLast())],
+)
 
 export const amenities = pgTable.withRLS(
   'amenities',
@@ -431,7 +506,7 @@ export const periods = pgTable.withRLS(
 export const profiles = pgTable.withRLS(
   'profiles',
   {
-    id: uuid().primaryKey(),
+    id: uuid().defaultRandom().primaryKey(),
     fullName: text('full_name').default('').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .default(sql`now()`)
@@ -442,16 +517,22 @@ export const profiles = pgTable.withRLS(
     welcomedAt: timestamp('welcomed_at', { withTimezone: true }),
     isMainAdmin: boolean('is_main_admin').default(false).notNull(),
     mustChangePassword: boolean('must_change_password').default(false).notNull(),
+    email: text().notNull(),
+    emailVerified: boolean('email_verified').default(true).notNull(),
+    image: text(),
   },
   (table) => [
-    foreignKey({
-      columns: [table.id],
-      foreignColumns: [users.id],
-      name: 'profiles_id_fkey',
-    }).onDelete('cascade'),
     uniqueIndex('profiles_one_main_admin')
       .using('btree', table.isMainAdmin.asc().nullsLast())
       .where(sql`is_main_admin`),
+    unique('profiles_email_key').on(table.email),
+    pgPolicy('profiles: better auth can read', { for: 'select', to: ['vecora_auth'], using: sql`true` }),
+
+    pgPolicy('profiles: board managers can create accounts', {
+      for: 'insert',
+      to: ['authenticated'],
+      withCheck: sql`( SELECT private.has_role('president'::app_role) AS has_role)`,
+    }),
 
     pgPolicy('profiles: members can read', { for: 'select', to: ['authenticated'], using: sql`true` }),
 
@@ -461,6 +542,7 @@ export const profiles = pgTable.withRLS(
       using: sql`((( SELECT auth.uid() AS uid) = id) OR ( SELECT private.is_admin() AS is_admin))`,
       withCheck: sql`((( SELECT auth.uid() AS uid) = id) OR ( SELECT private.is_admin() AS is_admin))`,
     }),
+    check('profiles_email_lowercase', sql`(email = lower(email))`),
   ],
 )
 

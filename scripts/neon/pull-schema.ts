@@ -61,22 +61,6 @@ const FIXES: Fix[] = [
       return sqlImport + source.replace(sqlImport, '')
     },
   },
-  {
-    file: 'schema.ts',
-    reason: 'profiles references auth.users, outside the pulled public schema',
-    apply: (source) =>
-      source
-        .replace('import { pgTable,', 'import { pgSchema, pgTable,')
-        .replace(
-          '\n\nexport const appRole',
-          '\n\n// Supabase\'s accounts table (scripts/neon/supabase-compat.sql), until Better Auth.\nconst users = pgSchema("auth").table("users", { id: uuid().primaryKey() })\n\nexport const appRole',
-        ),
-  },
-  {
-    file: 'relations.ts',
-    reason: 'profiles gets a relation to auth.users, which the schema keeps private',
-    apply: (source) => source.replace(/\n\s*usersInAuth: r\.one\.usersInAuth\(\{[^}]*\}\),/, ''),
-  },
 ]
 
 if (existsSync(join(ROOT, '.env.local'))) {
@@ -90,17 +74,24 @@ if (!url) {
 
 const pullDir = mkdtempSync(join(tmpdir(), 'vecora-pull-'))
 try {
+  // A config file, because only there does drizzle-kit take more than one
+  // schema (auth: Better Auth's tables, from neon/migrations). It reads the URL
+  // from the environment, which drizzle-kit inherits, so it never lands on disk.
+  const configFile = join(pullDir, 'drizzle.config.mjs')
+  writeFileSync(
+    configFile,
+    `export default {
+  dialect: 'postgresql',
+  out: ${JSON.stringify(pullDir)},
+  dbCredentials: { url: process.env.DATABASE_URL_UNPOOLED },
+  schemaFilter: ['public', 'auth'],
+  introspect: { casing: 'camel' },
+}
+`,
+  )
   const pull = spawnSync(
     process.execPath,
-    [
-      join(ROOT, 'node_modules', 'drizzle-kit', 'bin.cjs'),
-      'pull',
-      '--dialect=postgresql',
-      `--url=${url}`,
-      `--out=${pullDir}`,
-      '--schemaFilter=public',
-      '--introspect-casing=camel',
-    ],
+    [join(ROOT, 'node_modules', 'drizzle-kit', 'bin.cjs'), 'pull', `--config=${configFile}`],
     { cwd: ROOT, encoding: 'utf8' },
   )
   if (pull.status !== 0) {

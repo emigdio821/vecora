@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { AppRole, CurrentUser } from '@/lib/supabase/current-user'
+import type { AppRole, CurrentUser } from '@/lib/auth/current-user'
 
 const CurrentUserContext = createContext<CurrentUser | null>(null)
 

@@ -1,8 +1,10 @@
 /**
  * Loads the app's schema and test data into the Neon branch in .env.local:
  * scripts/neon/supabase-compat.sql, then every supabase/migrations file, then
- * the same seeds `npm run db:reset` runs. One transaction: it all lands, or
- * nothing does.
+ * the same seeds `npm run db:reset` runs, then the Neon-only migrations
+ * (scripts/neon/migrate.ts) and the seeds' passwords for Better Auth
+ * (scripts/neon/dev-passwords.ts). One transaction: it all lands, or nothing
+ * does.
  *
  *   npm run db:neon:load
  *
@@ -13,6 +15,8 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import pg from 'pg'
+import { setDevPasswords } from './dev-passwords.ts'
+import { applyNeonMigrations } from './migrate.ts'
 
 const ROOT = join(import.meta.dirname, '..', '..')
 
@@ -112,6 +116,10 @@ try {
       await client.query(`select set_config('app.settings.jwt_secret', $1, false)`, [LOCAL_JWT_SECRET])
     }
   }
+  // After the seeds: the Better Auth migration moves the accounts they create.
+  await applyNeonMigrations(client)
+  const withPassword = await setDevPasswords(client)
+  console.log(`  the seeds' password on ${withPassword} account(s) (scripts/neon/dev-passwords.ts)`)
   await client.query('commit')
   console.log('Done')
 } catch (error) {
