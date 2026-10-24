@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/input-group'
 import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { useCurrency } from '@/hooks/use-currency'
-import { currencySymbol, intlLocale, MONEY_FORMAT } from '@/lib/utils'
+import { currencySymbol, intlLocale, MONEY_FORMAT, MONEY_STEP } from '@/lib/utils'
 import type { AmenityInput } from '@/lib/validations/presidency'
 import { m } from '@/paraglide/messages'
 
@@ -64,6 +64,7 @@ export function AmenityFormFields({ form, disabled }: AmenityFormFieldsProps) {
                 min={0}
                 locale={intlLocale()}
                 format={MONEY_FORMAT}
+                step={MONEY_STEP}
                 disabled={disabled}
               >
                 <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />

@@ -26,6 +26,7 @@ import {
   intlLocale,
   ISO_DAY,
   MONEY_FORMAT,
+  MONEY_STEP,
 } from '@/lib/utils'
 import type { ReservationInput } from '@/lib/validations/presidency'
 import { m } from '@/paraglide/messages'
@@ -271,6 +272,7 @@ export function ReservationFormFields({
                   min={0}
                   locale={intlLocale()}
                   format={MONEY_FORMAT}
+                  step={MONEY_STEP}
                   disabled={disabled || lockPaidFields}
                 >
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />

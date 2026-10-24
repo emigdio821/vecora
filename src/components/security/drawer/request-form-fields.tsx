@@ -12,7 +12,15 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
-import { type CurrencyCode, currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT } from '@/lib/utils'
+import {
+  type CurrencyCode,
+  currencySymbol,
+  formatDay,
+  intlLocale,
+  ISO_DAY,
+  MONEY_FORMAT,
+  MONEY_STEP,
+} from '@/lib/utils'
 import type { SecurityRequestInput } from '@/lib/validations/security'
 import { m } from '@/paraglide/messages'
 import { KIND_DESCRIPTION, KIND_ITEMS } from '../kind'
@@ -114,6 +122,7 @@ export function RequestFormFields({ form, currency, disabled }: RequestFormField
                   min={0}
                   locale={intlLocale()}
                   format={MONEY_FORMAT}
+                  step={MONEY_STEP}
                   disabled={disabled}
                 >
                   <NumberFieldInput ref={field.ref} className="text-left" inputMode="decimal" />
