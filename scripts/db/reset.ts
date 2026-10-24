@@ -13,6 +13,7 @@ import { join } from 'node:path'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
 import pg from 'pg'
 import { createDatabase } from '../../src/lib/db/client'
+import { withVerifiedSsl } from '../../src/lib/db/connection-string'
 import { seed, seedMainAdmin } from './seed'
 
 const ROOT = join(import.meta.dirname, '..', '..')
@@ -36,7 +37,7 @@ const onlyAdmin = process.argv.includes('--empty')
 
 // Everything but Postgres's own schemas: the app's tables, the activity log's
 // functions and drizzle's record of the migrations it applied.
-const client = new pg.Client({ connectionString: url })
+const client = new pg.Client({ connectionString: withVerifiedSsl(url) })
 await client.connect()
 const { rows } = await client.query<{ name: string }>(`
   select nspname as name from pg_namespace

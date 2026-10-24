@@ -3,10 +3,11 @@
 import { sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import pg from 'pg'
+import { withVerifiedSsl } from './connection-string'
 import { relations } from './relations'
 
 export function createDatabase(connectionString: string) {
-  const pool = new pg.Pool({ connectionString })
+  const pool = new pg.Pool({ connectionString: withVerifiedSsl(connectionString) })
   // The relations carry the tables too, so db.query.<table> is typed with `with:` joins.
   const db = drizzle({ client: pool, relations })
   return { db, pool }

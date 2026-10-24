@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs'
 import { defineConfig } from 'drizzle-kit'
+import { withVerifiedSsl } from './src/lib/db/connection-string'
 
 // drizzle-kit doesn't read .env files the way Vite does. Migrations run from a
 // developer's machine, against the branch in .env.local.
@@ -21,5 +22,5 @@ export default defineConfig({
   dialect: 'postgresql',
   schema: './src/lib/db/schema/index.ts',
   out: './drizzle',
-  dbCredentials: { url },
+  dbCredentials: { url: withVerifiedSsl(url) },
 })
