@@ -4,7 +4,6 @@
  *
  *   npm run db:reset             schema + test data
  *   npm run db:reset -- --empty   schema + the main admin only
- *   npm run db:reset -- --schema  schema only, for npm run db:import
  *
  * Only for a development branch: it refuses NEON_BRANCH=production, and it
  * drops every schema the app's tables live in.
@@ -35,7 +34,6 @@ if (branch === 'production') {
 }
 
 const onlyAdmin = process.argv.includes('--empty')
-const onlySchema = process.argv.includes('--schema')
 
 // Everything but Postgres's own schemas: the app's tables, the activity log's
 // functions and drizzle's record of the migrations it applied.
@@ -57,9 +55,7 @@ try {
   await migrate(db, { migrationsFolder: join(ROOT, 'drizzle') })
   console.log('Applied the migrations')
 
-  if (onlySchema) {
-    console.log('Ready for npm run db:import')
-  } else if (onlyAdmin) {
+  if (onlyAdmin) {
     await seedMainAdmin(db, { password: 'admin', mustChangePassword: false })
     console.log('Created admin@vecora.app (password "admin")')
   } else {

@@ -100,8 +100,7 @@ What each section is called on screen. Docs and comments use the English name.
 | `npm run dev`                     | Development server                                                                                         |
 | `npm run db:reset`                | Empty the Neon branch in `.env.local`, apply every migration and load the test data (refuses `production`) |
 | `npm run db:reset:empty`          | Same, but only the main admin (password `admin`): a fresh install with no data                             |
-| `npm run db:reset:schema`         | Same, but the schema alone, ready for `npm run db:import`                                                  |
-| `npm run db:import`               | Copy the data from Supabase into the branch (see [Moving from Supabase](#moving-from-supabase))            |
+| `npm run db:create-admin`         | Create the main admin on a branch with no accounts, with a one-time password (production too)              |
 | `npm run db:generate`             | Turn a change in `src/lib/db/schema/` into a new migration in `drizzle/`                                   |
 | `npm run db:migrate`              | Apply the pending migrations to the branch in `.env.local`                                                 |
 | `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                                 |
@@ -116,9 +115,9 @@ What the schema can't declare (the exclusion constraints, the activity log's tri
 
 ## Deploy
 
-The app runs on Vercel against the Neon `production` branch.
+The app runs on Vercel against the Neon `production` branch. Each residential is its own install: its own Vercel project and Neon project, set up with these steps.
 
-1. **Apply the migrations** to the production branch with `npm run db:migrate`, with `.env.local` pointing at it (`neon checkout production`; `neon checkout dev` to go back).
+1. **Apply the migrations** to the production branch with `npm run db:migrate`, with `.env.local` pointing at it (`neon checkout production`; `neon checkout dev` to go back once step 3 is done).
 
 2. **Set the environment variables** in Vercel:
 
@@ -132,23 +131,13 @@ The app runs on Vercel against the Neon `production` branch.
 
    `VITE_SITE_URL` is bundled into the browser code at build time, so redeploy after changing it.
 
-3. **Bring the data over** with `npm run db:import` (see [Moving from Supabase](#moving-from-supabase)), which brings the main admin along. On a fresh install with nothing to import, the script that creates the main admin on production is still to do.
+3. **Create the main admin** with `npm run db:create-admin`, still pointing at the production branch. The migrations make no accounts, so without it nobody can sign in. It prints a one-time password once: keep it until the first sign-in, where the app asks for a new one. It refuses a branch that already has accounts.
 
-4. **Deploy** and sign in as the admin. Then upload the logo in Ajustes → Residencial and send the board their access links from HOA board.
-
-### Moving from Supabase
-
-`npm run db:import` (`scripts/db/import-supabase.ts`) copies everything from the Supabase database into the Neon branch in `.env.local`: settings, categories, houses, residents, periods, movements, common areas, requests, document templates and the activity log, keeping every id and timestamp. Supabase is only read, from one snapshot.
-
-1. Add `SUPABASE_DB_URL` and `SUPABASE_DB_CA` to `.env.local` (see `.env.example`).
-2. Leave only the schema on the branch: `npm run db:reset:schema` on `dev`, `npm run db:migrate` on a new `production`. The import refuses a branch that already has accounts.
-3. `npm run db:import -- --dry-run` copies and checks, then rolls back. `npm run db:import` keeps it. Either way it compares the two sides (counts per table, each period's totals) and keeps nothing if they differ.
-
-Accounts keep their id, email, name and roles, but not their password: Supabase's hashes don't carry over. The main admin gets a one-time password, printed once at the end, which the app makes it replace at the first sign-in; board members get a new access link from HOA board. The logo isn't copied: upload it again.
+4. **Deploy** and sign in as the admin. Then set the name and logo in Ajustes → Residencial and send the board their access links from HOA board.
 
 ### Maintenance mode
 
-`MAINTENANCE_MODE=true` in Vercel, then a redeploy (Deployments → ⋯ → Redeploy), closes the app while the data moves: every page sends the visitor to `/unavailable` (laid out like the 404), and server functions and the API answer 503, so a tab left open can't write either. Remove it and redeploy to open the app again; anyone still on `/unavailable` goes back to the app.
+`MAINTENANCE_MODE=true` in Vercel, then a redeploy (Deployments → ⋯ → Redeploy), closes the app for maintenance: every page sends the visitor to `/unavailable` (laid out like the 404), and server functions and the API answer 503, so a tab left open can't write either. Remove it and redeploy to open the app again; anyone still on `/unavailable` goes back to the app.
 
 ### The main admin
 

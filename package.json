@@ -15,8 +15,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:reset": "tsx scripts/db/reset.ts",
     "db:reset:empty": "tsx scripts/db/reset.ts --empty",
-    "db:reset:schema": "tsx scripts/db/reset.ts --schema",
-    "db:import": "tsx scripts/db/import-supabase.ts",
+    "db:create-admin": "tsx scripts/db/create-admin.ts",
     "prepare": "husky"
   },
   "dependencies": {
