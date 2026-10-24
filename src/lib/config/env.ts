@@ -1,9 +1,7 @@
 import { z } from 'zod'
 
 const envSchema = z.object({
-  VITE_SUPABASE_URL: z.url(),
-  VITE_SUPABASE_KEY: z.string().min(1),
-  /** Where the app is deployed, for the absolute URLs link previews need. */
+  /** Where the app is deployed, for the absolute URLs link previews need (and Better Auth's secure cookies). */
   VITE_SITE_URL: z.url(),
 })
 

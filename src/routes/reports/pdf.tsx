@@ -2,17 +2,18 @@ import { renderToBuffer } from '@react-pdf/renderer'
 import { createFileRoute } from '@tanstack/react-router'
 import { FinancialReportDocument, isWholeMonth } from '@/components/reports/pdf/financial-report'
 import { preparePdfFonts } from '@/components/reports/pdf/layout'
-import { getCurrentUser } from '@/lib/supabase/current-user'
-import { getFinancialReport } from '@/lib/supabase/financial-report'
-import { getLogo, getSettings } from '@/lib/supabase/settings'
+import { getCurrentUser } from '@/lib/auth/current-user'
+import { db } from '@/lib/db'
+import { getLogo, getSettings } from '@/lib/db/settings'
+import { financialReport } from '@/lib/services/financial-report'
 import { slugify } from '@/lib/utils'
 import { reportRangeSchema } from '@/lib/validations/reports'
 import { defaultResidentialLabel } from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
 import type { Locale } from '@/paraglide/runtime'
 
-// Any board member can pull a report; the same gate as the _authed layout,
-// which doesn't run for server routes. The data itself goes through RLS.
+// Any board member can pull a report; the same gate as boardMiddleware, which
+// server routes don't go through.
 
 /**
  * "vecora-reporte-loma-verde-coto-404-2026-08.pdf", or "…-2026-08-01_a_2026-08-15.pdf"
@@ -36,7 +37,7 @@ async function GET(request: Request) {
   if (!user) {
     return Response.json({ error: m.reports_sign_in_required() }, { status: 401 })
   }
-  if (user.roles.length === 0 || user.mustSetPassword) {
+  if (user.roles.length === 0 || user.mustSetPassword || user.mustChangePassword) {
     return Response.json({ error: m.common_no_permission() }, { status: 403 })
   }
 
@@ -49,7 +50,7 @@ async function GET(request: Request) {
     )
   }
 
-  const [report, settings] = await Promise.all([getFinancialReport(range.data), getSettings()]).catch(
+  const [report, settings] = await Promise.all([financialReport(db, range.data), getSettings()]).catch(
     (error: unknown) => {
       console.error('financial_report failed', error)
       return [null, null] as const
@@ -63,7 +64,7 @@ async function GET(request: Request) {
   const logo = settings.logoPath ? await getLogo(settings.logoPath) : null
   const generatedBy = user.isMainAdmin
     ? m.common_role_admin({}, { locale: settings.defaultLanguage })
-    : user.fullName
+    : user.name
   await preparePdfFonts()
   const pdf = await renderToBuffer(
     <FinancialReportDocument

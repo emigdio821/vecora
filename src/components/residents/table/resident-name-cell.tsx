@@ -9,7 +9,7 @@ interface ResidentNameCellProps {
 
 export function ResidentNameCell({ resident }: ResidentNameCellProps) {
   const [isDetailsOpen, setDetailsOpen] = useState(false)
-  const fullName = `${resident.first_name} ${resident.last_name}`
+  const fullName = `${resident.firstName} ${resident.lastName}`
 
   return (
     <div className="w-0 min-w-full">

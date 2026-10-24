@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/menu'
 import { m } from '@/paraglide/messages'
 import type { LogEntryQueryData } from '@/tanstack-queries/logs'
-import { ACTION_LABEL, ACTIONS, identityName, SECTION_LABEL, SECTIONS } from '../entry'
+import { ACTION_LABEL, ACTIONS, actorName, SECTION_LABEL, SECTIONS } from '../entry'
 import {
   type ActionFilter,
   type SectionFilter,
@@ -71,9 +71,7 @@ export function LogsDataTableHeader({ table }: LogsDataTableHeaderProps) {
   // Whoever shows up in the loaded range, so the list never offers an empty filter.
   const identityItems = useMemo(
     () =>
-      [...new Set(coreRows.map((row) => identityName(row.original)))].sort((a, b) =>
-        a.localeCompare(b, 'es'),
-      ),
+      [...new Set(coreRows.map((row) => actorName(row.original)))].sort((a, b) => a.localeCompare(b, 'es')),
     [coreRows],
   )
 

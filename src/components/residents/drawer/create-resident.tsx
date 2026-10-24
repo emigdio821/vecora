@@ -33,12 +33,12 @@ import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
 const FORM_ID = 'create-resident-form'
 
 const defaultValues: CreateResidentInput = {
-  first_name: '',
-  last_name: '',
+  firstName: '',
+  lastName: '',
   phone: '',
   email: '',
   notes: '',
-  property_id: null,
+  propertyId: null,
   relationship: 'owner',
 }
 
@@ -54,7 +54,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
     resolver: zodResolver(createResidentSchema),
     defaultValues,
   })
-  const propertyId = useWatch({ control: form.control, name: 'property_id' })
+  const propertyId = useWatch({ control: form.control, name: 'propertyId' })
 
   const mutation = useMutation({
     mutationFn: async (values: CreateResidentInput) => {
@@ -64,17 +64,15 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
     },
     onSuccess: (_data, values) => {
       // Read before invalidating; the picker loaded this list to offer the house.
-      const house = values.property_id
-        ? queryClient
-            .getQueryData(housesPickerQueryOptions.queryKey)
-            ?.find((h) => h.id === values.property_id)
+      const house = values.propertyId
+        ? queryClient.getQueryData(housesPickerQueryOptions.queryKey)?.find((h) => h.id === values.propertyId)
         : undefined
 
       // The new link shows up in the houses list too.
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
-      if (values.property_id) void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
+      if (values.propertyId) void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
 
-      const name = `${values.first_name} ${values.last_name}`
+      const name = `${values.firstName} ${values.lastName}`
       toastManager.add({
         type: 'success',
         title: m.residential_resident_created(),
@@ -134,7 +132,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <Controller
-                name="first_name"
+                name="firstName"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field
@@ -153,7 +151,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
               />
 
               <Controller
-                name="last_name"
+                name="lastName"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field
@@ -216,7 +214,7 @@ export function CreateResidentDrawer({ open, onOpenChange, ...props }: CreateRes
             />
 
             <Controller
-              name="property_id"
+              name="propertyId"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field

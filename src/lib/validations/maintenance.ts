@@ -11,7 +11,7 @@ export const maintenanceRequestSchema = z.object({
   amount: z
     .number({ error: () => m.common_amount_required() })
     .positive({ error: () => m.common_amount_positive() }),
-  requested_on: z.iso.date({ error: () => m.common_invalid_date() }),
+  requestedOn: z.iso.date({ error: () => m.common_invalid_date() }),
 })
 
 export type MaintenanceRequestInput = z.infer<typeof maintenanceRequestSchema>

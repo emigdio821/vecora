@@ -16,7 +16,7 @@ const columnHelper = createColumnHelper<DataTableFeatures, ResidentQueryData>()
 
 /** Highest-ranking relationship a resident has across their properties. */
 function primaryRelationship(resident: ResidentQueryData): Relationship | null {
-  const [first] = sortByRelationship(resident.property_residents)
+  const [first] = sortByRelationship(resident.propertyLinks)
   return first ? first.relationship : null
 }
 
@@ -47,14 +47,14 @@ export const residentsTableColumns = columnHelper.columns([
     ),
   }),
 
-  columnHelper.accessor((row) => `${row.first_name} ${row.last_name}`, {
+  columnHelper.accessor((row) => `${row.firstName} ${row.lastName}`, {
     id: 'name',
     size: 200,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_name()} />,
     cell: ({ row }) => <ResidentNameCell resident={row.original} />,
     sortFn: (rowA, rowB) =>
-      `${rowA.original.last_name} ${rowA.original.first_name}`.localeCompare(
-        `${rowB.original.last_name} ${rowB.original.first_name}`,
+      `${rowA.original.lastName} ${rowA.original.firstName}`.localeCompare(
+        `${rowB.original.lastName} ${rowB.original.firstName}`,
         'es',
       ),
     // Search box target: matches name, email or phone, accent-insensitive.
@@ -63,10 +63,10 @@ export const residentsTableColumns = columnHelper.columns([
 
       if (!filterValue) return true
 
-      const { first_name, last_name, email, phone } = row.original
+      const { firstName, lastName, email, phone } = row.original
 
       return (
-        normalizeString(`${first_name} ${last_name}`).includes(filterValue) ||
+        normalizeString(`${firstName} ${lastName}`).includes(filterValue) ||
         normalizeString(email ?? '').includes(filterValue) ||
         normalizeString(phone).includes(filterValue)
       )
@@ -99,7 +99,7 @@ export const residentsTableColumns = columnHelper.columns([
     header: () => m.common_section_houses(),
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
-        {row.original.property_residents.map(({ property }) => (
+        {row.original.propertyLinks.map(({ property }) => (
           <Badge key={property.id} variant="outline">
             {property.number}
           </Badge>
@@ -126,12 +126,12 @@ export const residentsTableColumns = columnHelper.columns([
     },
   }),
 
-  columnHelper.accessor((row) => row.profile?.user_roles[0]?.role ?? null, {
+  columnHelper.accessor((row) => row.account?.roles[0] ?? null, {
     id: 'role',
     size: 120,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.residential_column_role()} />,
     cell: ({ row, getValue }) => {
-      if (!row.original.profile) return <Badge variant="outline">{m.residential_no_account()}</Badge>
+      if (!row.original.account) return <Badge variant="outline">{m.residential_no_account()}</Badge>
       const role = getValue()
       return role ? (
         <RoleNameBadge roleName={role} />

@@ -1,6 +1,6 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns'
-import type { CurrencyTotals, FinancialReport } from '@/lib/supabase/financial-report'
+import type { CurrencyTotals, FinancialReport } from '@/lib/services/financial-report'
 import {
   type CurrencyCode,
   dateLocale,
@@ -131,7 +131,7 @@ function byHouse(a: string, b: string): number {
 }
 
 type Category = CurrencyTotals['categories'][number]
-type HouseMonths = FinancialReport['fee_status']['pending'][number]
+type HouseMonths = FinancialReport['feeStatus']['pending'][number]
 
 function categoryColumns(money: (value: number) => string, language: Locale): Column<Category>[] {
   const locale = { locale: language }
@@ -218,7 +218,7 @@ export function FinancialReportDocument({
   const locale = { locale: language }
   const range = rangeLabel(report.from, report.to, language)
   const isMultiCurrency = report.currencies.length > 1
-  const { fee_status: fees } = report
+  const { feeStatus: fees } = report
   const pending = [...fees.pending].sort((a, b) => byHouse(a.house, b.house))
   const advance = [...fees.advance].sort((a, b) => byHouse(a.house, b.house))
 
@@ -257,7 +257,7 @@ export function FinancialReportDocument({
               <Text style={styles.sectionHint}>
                 {m.reports_pdf_fees_up_to_date(
                   {
-                    upToDate: fees.up_to_date,
+                    upToDate: fees.upToDate,
                     houses: fees.houses,
                     months: m.reports_pdf_months_considered({ count: fees.months }, locale),
                   },
@@ -325,22 +325,22 @@ function CurrencySection({ totals, from, language, suffix }: CurrencySectionProp
         <View style={styles.summary}>
           <SummaryBox
             label={m.reports_pdf_opening_balance({}, locale)}
-            value={money(totals.opening_balance)}
+            value={money(totals.openingBalance)}
           />
           <SummaryBox
             label={m.common_income({}, locale)}
-            value={money(totals.total_income)}
+            value={money(totals.totalIncome)}
             color={COLOR.income}
           />
           <SummaryBox
             label={m.common_expense({}, locale)}
-            value={money(totals.total_expense)}
+            value={money(totals.totalExpense)}
             color={COLOR.expense}
           />
           <SummaryBox
             label={m.reports_pdf_closing_balance({}, locale)}
-            value={money(totals.closing_balance)}
-            color={totals.closing_balance < 0 ? COLOR.destructive : undefined}
+            value={money(totals.closingBalance)}
+            color={totals.closingBalance < 0 ? COLOR.destructive : undefined}
           />
         </View>
         <Text style={styles.note}>
@@ -355,7 +355,7 @@ function CurrencySection({ totals, from, language, suffix }: CurrencySectionProp
             columns={columns}
             rows={income}
             emptyText={m.reports_pdf_no_income({}, locale)}
-            total={{ label: m.common_field_total({}, locale), value: money(totals.total_income) }}
+            total={{ label: m.common_field_total({}, locale), value: money(totals.totalIncome) }}
           />
         </View>
         <View style={styles.column}>
@@ -364,7 +364,7 @@ function CurrencySection({ totals, from, language, suffix }: CurrencySectionProp
             columns={columns}
             rows={expense}
             emptyText={m.reports_pdf_no_expense({}, locale)}
-            total={{ label: m.common_field_total({}, locale), value: money(totals.total_expense) }}
+            total={{ label: m.common_field_total({}, locale), value: money(totals.totalExpense) }}
           />
         </View>
       </View>

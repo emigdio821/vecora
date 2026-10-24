@@ -31,7 +31,7 @@ export function TransactionDetailsDrawer({
   onOpenChange,
   ...props
 }: TransactionDetailsDrawerProps) {
-  const { kind, property, fee_month, folio, reference, notes } = transaction
+  const { kind, property, feeMonth, folio, reference, notes } = transaction
   const isIncome = kind === 'income'
 
   return (
@@ -57,13 +57,13 @@ export function TransactionDetailsDrawer({
                   <Money value={transaction.amount} currency={transaction.currency} />
                 </span>
               </Detail>
-              <Detail label={m.common_field_date()}>{formatDay(transaction.occurred_on)}</Detail>
+              <Detail label={m.common_field_date()}>{formatDay(transaction.occurredOn)}</Detail>
               <Detail label={m.treasury_period()}>{transaction.period.name}</Detail>
               <Detail label={m.common_field_category()}>
                 <Badge variant="outline">{transaction.category.name}</Badge>
               </Detail>
               {property && <Detail label={m.common_field_house()}>{property.number}</Detail>}
-              {fee_month && <Detail label={m.treasury_fee_month()}>{formatMonth(fee_month)}</Detail>}
+              {feeMonth && <Detail label={m.treasury_fee_month()}>{formatMonth(feeMonth)}</Detail>}
               {folio && <Detail label={m.common_field_folio()}>{folio}</Detail>}
             </div>
           </CollapsibleSection>
@@ -71,7 +71,7 @@ export function TransactionDetailsDrawer({
           <CollapsibleSection icon={<IconWallet />} title={m.treasury_payment()}>
             <div className="grid grid-cols-2 gap-3">
               <Detail label={m.common_field_payment_method()}>
-                {PAYMENT_METHOD_LABEL[transaction.payment_method]}
+                {PAYMENT_METHOD_LABEL[transaction.paymentMethod]}
               </Detail>
               {reference && <Detail label={m.common_field_reference()}>{reference}</Detail>}
             </div>
@@ -87,9 +87,9 @@ export function TransactionDetailsDrawer({
             <Timestamp
               icon={<IconCalendarPlus />}
               label={m.treasury_created()}
-              value={transaction.created_at}
+              value={transaction.createdAt}
             />
-            <Timestamp icon={<IconHistory />} label={m.treasury_updated()} value={transaction.updated_at} />
+            <Timestamp icon={<IconHistory />} label={m.treasury_updated()} value={transaction.updatedAt} />
           </dl>
         </DrawerPanel>
 

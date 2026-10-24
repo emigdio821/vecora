@@ -371,13 +371,13 @@ export function CustomReportCard({ includeAdvance }: ReportOptions) {
   const presets = useMemo(() => {
     const todayDay = format(today, ISO_DAY)
     const periodPresets = (periods ?? [])
-      .filter((period) => period.starts_on <= todayDay)
+      .filter((period) => period.startsOn <= todayDay)
       .slice(0, PERIOD_PRESETS)
       .map((period): RangePreset => ({
         label: m.reports_preset_period({ name: period.name }),
         range: (day) => {
           const end = format(day, ISO_DAY)
-          return { from: period.starts_on, to: period.ends_on < end ? period.ends_on : end }
+          return { from: period.startsOn, to: period.endsOn < end ? period.endsOn : end }
         },
       }))
     const fixedPresets = REPORT_PRESETS.filter((preset) => {
@@ -413,7 +413,7 @@ export function CustomReportCard({ includeAdvance }: ReportOptions) {
             presets={presets}
             className="w-full"
             disabled={isPending}
-            startMonth={firstPeriod ? parseISO(firstPeriod.starts_on) : undefined}
+            startMonth={firstPeriod ? parseISO(firstPeriod.startsOn) : undefined}
             // Failed to load: no limits here, like before; the PDF route answers for any dates.
             isDayDisabled={periods ? (day) => !periodFor(periods, format(day, ISO_DAY)) : undefined}
           />

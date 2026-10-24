@@ -1,6 +1,6 @@
 import { IconChartLine } from '@tabler/icons-react'
 import { Link, useLocation } from '@tanstack/react-router'
-import type { Settings } from '@/lib/supabase/settings'
+import type { Settings } from '@/lib/db/settings'
 import { defaultResidentialLabel } from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
 import { VecoraIcon } from '../shared/icons'

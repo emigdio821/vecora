@@ -10,7 +10,7 @@ import {
   ACTION_LABEL,
   entryAction,
   entrySummary,
-  identityName,
+  actorName,
   sectionLabel,
 } from '../entry'
 import { EntrySummaryCell } from './entry-summary-cell'
@@ -18,14 +18,14 @@ import { EntrySummaryCell } from './entry-summary-cell'
 const columnHelper = createColumnHelper<DataTableFeatures, LogEntryQueryData>()
 
 export const logsTableColumns = columnHelper.columns([
-  columnHelper.accessor('occurred_at', {
-    id: 'occurred_at',
+  columnHelper.accessor('occurredAt', {
+    id: 'occurredAt',
     size: 170,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.logs_date_time()} />,
     cell: ({ getValue }) => <span className="whitespace-nowrap tabular-nums">{formatDate(getValue())}</span>,
   }),
 
-  columnHelper.accessor((row) => identityName(row), {
+  columnHelper.accessor((row) => actorName(row), {
     id: 'identity',
     size: 160,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.logs_who()} />,
@@ -42,7 +42,7 @@ export const logsTableColumns = columnHelper.columns([
     },
   }),
 
-  columnHelper.accessor((row) => sectionLabel(row.table_name), {
+  columnHelper.accessor((row) => sectionLabel(row.tableName), {
     id: 'section',
     size: 140,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.logs_section()} />,
@@ -59,11 +59,9 @@ export const logsTableColumns = columnHelper.columns([
       const filterValue = normalizeString(value)
       if (!filterValue) return true
 
-      return [
-        entrySummary(row.original),
-        identityName(row.original),
-        sectionLabel(row.original.table_name),
-      ].some((field) => normalizeString(field).includes(filterValue))
+      return [entrySummary(row.original), actorName(row.original), sectionLabel(row.original.tableName)].some(
+        (field) => normalizeString(field).includes(filterValue),
+      )
     },
   }),
 ])

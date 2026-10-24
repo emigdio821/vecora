@@ -22,8 +22,9 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toastManager } from '@/components/ui/toast'
+import { can } from '@/lib/auth/permissions'
 import { MULTI_LANGUAGE } from '@/lib/config/i18n'
-import type { Settings } from '@/lib/supabase/settings'
+import type { Settings } from '@/lib/db/settings'
 import { cn } from '@/lib/utils'
 import {
   CURRENCY_ITEMS,
@@ -70,17 +71,17 @@ function DetailsCard({ settings }: HoaSettingsPanelProps) {
   const user = useCurrentUser()
   const queryClient = useQueryClient()
   // Language and currency shape the whole HOA's records, so they're admin only.
-  const isAdmin = user.roles.includes('admin')
+  const isAdmin = can(user.roles, { settings: ['configure'] })
   const form = useForm<SettingsInput>({
     resolver: zodResolver(settingsSchema),
     defaultValues: isAdmin
       ? {
-          residential_name: settings.residentialName,
+          residentialName: settings.residentialName,
           // Left out with a single language, so saving never touches it.
-          default_language: MULTI_LANGUAGE ? settings.defaultLanguage : undefined,
+          defaultLanguage: MULTI_LANGUAGE ? settings.defaultLanguage : undefined,
           currency: settings.currency,
         }
-      : { residential_name: settings.residentialName },
+      : { residentialName: settings.residentialName },
   })
   const currency = useWatch({ control: form.control, name: 'currency' })
 
@@ -129,7 +130,7 @@ function DetailsCard({ settings }: HoaSettingsPanelProps) {
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
       >
         <Controller
-          name="residential_name"
+          name="residentialName"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field
@@ -152,7 +153,7 @@ function DetailsCard({ settings }: HoaSettingsPanelProps) {
           <>
             {MULTI_LANGUAGE && (
               <Controller
-                name="default_language"
+                name="defaultLanguage"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field

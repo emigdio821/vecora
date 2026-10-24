@@ -47,7 +47,7 @@ interface PayReservationDrawerProps extends React.ComponentProps<typeof Drawer> 
   onOpenChange: (open: boolean) => void
 }
 
-type PayMutation = UseMutationResult<{ transaction_id: string }, Error, PayReservationInput>
+type PayMutation = UseMutationResult<{ transactionId: string }, Error, PayReservationInput>
 
 /** Treasurer: records the fee as income in the ledger, which marks the booking paid. */
 export function PayReservationDrawer({
@@ -131,15 +131,15 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
   const form = useForm<PayReservationInput>({
     resolver: zodResolver(payReservationSchema),
     defaultValues: {
-      occurred_on: format(today, ISO_DAY),
+      occurredOn: format(today, ISO_DAY),
       folio: '',
-      payment_method: 'cash',
+      paymentMethod: 'cash',
       reference: '',
       notes: '',
     },
   })
-  const paymentMethod = useWatch({ control: form.control, name: 'payment_method' })
-  const occurredOn = useWatch({ control: form.control, name: 'occurred_on' })
+  const paymentMethod = useWatch({ control: form.control, name: 'paymentMethod' })
+  const occurredOn = useWatch({ control: form.control, name: 'occurredOn' })
   const isPeriodMissing = useIsPeriodMissing(occurredOn)
 
   // Still busy after a payment, until the drawer has closed and reset the mutation.
@@ -159,7 +159,7 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <Controller
-              name="occurred_on"
+              name="occurredOn"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field
@@ -227,7 +227,7 @@ function PayReservationForm({ mutation }: { mutation: PayMutation }) {
           </div>
 
           <Controller
-            name="payment_method"
+            name="paymentMethod"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field

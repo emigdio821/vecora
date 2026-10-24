@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { BoardMembersDataTable } from '@/components/hoa-board/table/data-table'
+import { can } from '@/lib/auth/permissions'
 import { pageTitle } from '@/lib/metadata'
 import { m } from '@/paraglide/messages'
 
@@ -11,8 +12,11 @@ export const Route = createFileRoute('/_authed/hoa-board')({
 function HoaBoardPage() {
   const { user } = Route.useRouteContext()
 
-  const isAdmin = user.roles.includes('admin')
-  const viewer = { id: user.id, isAdmin, isManager: isAdmin || user.roles.includes('president') }
+  const viewer = {
+    id: user.id,
+    isAdmin: user.roles.includes('admin'),
+    isManager: can(user.roles, { board: ['manage'] }),
+  }
 
   return (
     <>

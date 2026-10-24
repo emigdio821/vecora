@@ -1,8 +1,7 @@
-import type { Database } from '@/lib/supabase/database.types'
+import type { PaymentMethod, TransactionKind } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 
-export type TransactionKind = Database['public']['Enums']['transaction_kind']
-export type PaymentMethod = Database['public']['Enums']['payment_method']
+export type { PaymentMethod, TransactionKind } from '@/lib/enums'
 
 export const KIND_LABEL: Record<TransactionKind, string> = {
   get income() {

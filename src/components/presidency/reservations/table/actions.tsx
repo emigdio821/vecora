@@ -1,6 +1,6 @@
 import { IconDots } from '@tabler/icons-react'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { m } from '@/paraglide/messages'
@@ -16,8 +16,8 @@ interface ActionsProps {
 }
 
 export function ReservationsTableActions({ reservation }: ActionsProps) {
-  const canManage = useHasRole('president', 'treasurer')
-  const isTreasurer = useHasRole('treasurer')
+  const canManage = useCan({ reservation: ['write'] })
+  const isTreasurer = useCan({ reservation: ['collect'] })
   const [isEditOpen, setEditOpen] = useState(false)
   const [isPayOpen, setPayOpen] = useState(false)
   const [isCancelOpen, setCancelOpen] = useState(false)

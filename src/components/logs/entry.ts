@@ -43,11 +43,9 @@ export const SECTION_LABEL: Record<string, string> = {
   get security_requests() {
     return m.common_section_security()
   },
-  get user_roles() {
+  // Only the board signs in, so the accounts are its members; their roles live on them.
+  get users() {
     return m.common_section_hoa_board()
-  },
-  get profiles() {
-    return m.logs_section_profiles()
   },
   get properties() {
     return m.common_section_houses()
@@ -136,35 +134,43 @@ export function entryAction(entry: LogEntryQueryData): LogAction {
   if (entry.operation === 'insert') return 'created'
   if (entry.operation === 'delete') return 'deleted'
 
-  const changed = entry.changed_fields ?? []
-  const after = (entry.new_data ?? {}) as RowData
+  const changed = entry.changedFields ?? []
+  const after = entry.newData ?? {}
 
   // Houses, residents and transactions are soft-deleted: an update to deleted_at.
   if (changed.includes('deleted_at')) return after.deleted_at ? 'deleted' : 'restored'
-  // Request status changes only through the treasurer's RPCs; back to pending is a reopen.
+  // Request status changes only through the treasurer's actions; back to pending is a reopen.
   if (changed.includes('status')) {
     if (after.status === 'paid') return 'paid'
     if (after.status === 'rejected') return 'rejected'
     if (after.status === 'pending') return 'reopened'
   }
-  // Paid bookings are cancelled, not deleted, by the treasurer's RPC.
+  // Paid bookings are cancelled, not deleted, by the treasurer.
   if (changed.includes('cancelled_at')) return 'cancelled'
   return 'updated'
 }
 
-/** Who made the change; "Sistema" when no user was signed in (triggers, jobs, seeds). */
-export function identityName(entry: LogEntryQueryData) {
-  return entry.identity?.full_name || m.common_system()
+/** Who made the change; "Sistema" when nobody did (the app's own jobs, migrations, seeds). */
+export function actorName(entry: LogEntryQueryData) {
+  return entry.actor?.name || m.common_system()
 }
 
 /** The row's own data: what it looked like after the change, or before if it was deleted. */
 export function entryRow(entry: LogEntryQueryData): RowData {
-  return (entry.new_data ?? entry.old_data ?? {}) as RowData
+  return entry.newData ?? entry.oldData ?? {}
 }
 
 function refName(entry: LogEntryQueryData, id: unknown) {
-  const refs = (entry.refs ?? {}) as Record<string, string>
-  return typeof id === 'string' ? refs[id] : undefined
+  return typeof id === 'string' ? entry.refs[id] : undefined
+}
+
+/** The admin plugin keeps a member's roles as one comma-separated column. */
+function rolesText(value: unknown): string {
+  return asText(value)
+    .split(',')
+    .filter(Boolean)
+    .map((role) => getRoleLabel(role))
+    .join(', ')
 }
 
 /** jsonb values are `unknown`; only scalars have a sensible text form. */
@@ -189,9 +195,9 @@ function formatAmount(row: RowData, value: unknown): string {
  * happened. Each change is spelled out instead, in plain words for whoever reads the log.
  */
 function settingsSummary(entry: LogEntryQueryData): string {
-  const before = (entry.old_data ?? {}) as RowData
-  const after = (entry.new_data ?? {}) as RowData
-  const changedFields = entry.changed_fields ?? []
+  const before = entry.oldData ?? {}
+  const after = entry.newData ?? {}
+  const changedFields = entry.changedFields ?? []
 
   const changes: string[] = []
 
@@ -239,7 +245,7 @@ export function entrySummary(entry: LogEntryQueryData): string {
   const row = entryRow(entry)
   const { label } = entry
 
-  switch (entry.table_name) {
+  switch (entry.tableName) {
     case 'transactions': {
       // Descriptions don't name the house; the movement's property does.
       const house = refName(entry, row.property_id)
@@ -261,18 +267,22 @@ export function entrySummary(entry: LogEntryQueryData): string {
     }
     case 'properties':
       return m.common_house_label({ number: label })
-    case 'user_roles':
-      return `${enumLabel(row.role) ?? asText(row.role)} - ${label}`
-    case 'profiles':
-      // Written by its own trigger, on the account's profile (see entryChanges).
-      if (entry.changed_fields?.includes('password')) {
+    case 'users': {
+      // Written by its own trigger, on the account (see entryChanges).
+      if (entry.changedFields?.includes('password')) {
         return `${label} - ${m.logs_summary_password_changed()}`
       }
       // An invited member's first password: they've just got in.
-      if (entry.changed_fields?.includes('password_set')) {
+      if (entry.changedFields?.includes('password_set')) {
         return `${label} - ${m.logs_summary_account_activated()}`
       }
-      return label
+      const roles = rolesText(row.role)
+      // Leaving the board empties the roles; the account stays for the log.
+      if (entry.operation === 'update' && entry.changedFields?.includes('role') && !roles) {
+        return `${label} - ${m.logs_summary_board_removed()}`
+      }
+      return roles ? `${label} - ${roles}` : label
+    }
     case 'settings':
       return settingsSummary(entry)
     default:
@@ -297,9 +307,6 @@ const FIELD_LABEL: Record<string, string> = {
   },
   get last_name() {
     return m.logs_field_last_name()
-  },
-  get full_name() {
-    return m.common_field_name()
   },
   get phone() {
     return m.common_field_phone()
@@ -345,9 +352,6 @@ const FIELD_LABEL: Record<string, string> = {
   },
   get resident_id() {
     return m.logs_resident()
-  },
-  get profile_id() {
-    return m.logs_field_account()
   },
   get user_id() {
     return m.logs_field_account()
@@ -427,9 +431,6 @@ const FIELD_LABEL: Record<string, string> = {
   get created_by() {
     return m.logs_field_created_by()
   },
-  get granted_by() {
-    return m.logs_field_granted_by()
-  },
   get resolved_by() {
     return m.logs_field_resolved_by()
   },
@@ -485,8 +486,21 @@ export function fieldLabel(field: string, tableName: string) {
   return FIELD_LABEL[field] ?? field
 }
 
-/** Bookkeeping columns nobody needs to see; `key` is a category's internal code. */
-const HIDDEN_FIELDS = new Set(['id', 'updated_at', 'singleton', 'key'])
+/**
+ * Bookkeeping columns nobody needs to see: `key` is a category's internal code, and the
+ * rest of the account's are Better Auth's (the app neither verifies emails nor bans).
+ */
+const HIDDEN_FIELDS = new Set([
+  'id',
+  'updated_at',
+  'singleton',
+  'key',
+  'email_verified',
+  'image',
+  'banned',
+  'ban_reason',
+  'ban_expires',
+])
 
 const CURRENCY_FIELDS = new Set(['amount', 'monthly_fee', 'late_fee', 'default_fee'])
 const DAY_FIELDS = new Set(['occurred_on', 'requested_on', 'reserved_on', 'starts_on', 'ends_on'])
@@ -560,6 +574,7 @@ export function formatFieldValue(entry: LogEntryQueryData, field: string, value:
   const text = asText(value)
   if (CURRENCY_FIELDS.has(field)) return formatAmount(entryRow(entry), value)
   if (field === 'fee_month') return formatMonth(text)
+  if (field === 'role') return rolesText(value)
   if (DAY_FIELDS.has(field)) return formatDay(text)
   if (TIMESTAMP_FIELDS.has(field)) return formatDate(text)
   return refName(entry, value) ?? enumLabel(value) ?? text
@@ -578,12 +593,12 @@ export interface FieldChange {
  * ones on update. Empty values are dropped on create/delete since they say nothing.
  */
 export function entryChanges(entry: LogEntryQueryData): FieldChange[] {
-  const before = (entry.old_data ?? {}) as RowData
-  const after = (entry.new_data ?? {}) as RowData
+  const before = entry.oldData ?? {}
+  const after = entry.newData ?? {}
 
   const fields =
     entry.operation === 'update'
-      ? (entry.changed_fields ?? [])
+      ? (entry.changedFields ?? [])
       : Object.keys(entry.operation === 'insert' ? after : before)
 
   return fields

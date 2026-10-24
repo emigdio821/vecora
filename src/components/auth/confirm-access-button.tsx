@@ -1,4 +1,3 @@
-import type { EmailOtpType } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -7,8 +6,7 @@ import { getLocale } from '@/paraglide/runtime'
 import { confirmAccessLink } from '@/server-actions/auth'
 
 interface ConfirmAccessButtonProps {
-  tokenHash: string
-  type: EmailOtpType
+  token: string
   children: React.ReactNode
 }
 
@@ -16,23 +14,23 @@ interface ConfirmAccessButtonProps {
  * The click that spends the link. Like the login form, it stays loading until
  * the next page shows: /set-password, or /login with the invite warning.
  */
-export function ConfirmAccessButton({ tokenHash, type, children }: ConfirmAccessButtonProps) {
+export function ConfirmAccessButton({ token, children }: ConfirmAccessButtonProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [isLoading, setLoading] = useState(false)
 
   async function handleClick() {
     setLoading(true)
-    const result = await confirmAccessLink(tokenHash, type)
+    const result = await confirmAccessLink(token)
 
     // Either way the session changed (a previous one may have been closed).
     queryClient.clear()
-    if (result?.error) {
+    if ('error' in result) {
       await navigate({ to: '/login', search: { error: 'invite' }, replace: true })
       return
     }
     // Now in the HOA's language: a full load renders the next page in it.
-    if (result?.locale && result.locale !== getLocale()) {
+    if (result.locale && result.locale !== getLocale()) {
       window.location.replace('/set-password')
       return
     }

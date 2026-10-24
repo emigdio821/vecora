@@ -2,8 +2,8 @@ import { renderToBuffer } from '@react-pdf/renderer'
 import { createFileRoute } from '@tanstack/react-router'
 import { DocumentPdf } from '@/components/reports/pdf/document'
 import { preparePdfFonts } from '@/components/reports/pdf/layout'
-import { getCurrentUser } from '@/lib/supabase/current-user'
-import { getLogo, getSettings } from '@/lib/supabase/settings'
+import { getCurrentUser } from '@/lib/auth/current-user'
+import { getLogo, getSettings } from '@/lib/db/settings'
 import { slugify } from '@/lib/utils'
 import { documentSchema } from '@/lib/validations/documents'
 import { defaultResidentialLabel } from '@/lib/validations/settings'
@@ -34,7 +34,7 @@ async function POST(request: Request) {
   if (!user) {
     return Response.json({ error: m.reports_sign_in_required() }, { status: 401 })
   }
-  if (user.roles.length === 0 || user.mustSetPassword) {
+  if (user.roles.length === 0 || user.mustSetPassword || user.mustChangePassword) {
     return Response.json({ error: m.common_no_permission() }, { status: 403 })
   }
 
@@ -63,7 +63,7 @@ async function POST(request: Request) {
   const logo = settings.logoPath ? await getLogo(settings.logoPath) : null
   const generatedBy = user.isMainAdmin
     ? m.common_role_admin({}, { locale: settings.defaultLanguage })
-    : user.fullName
+    : user.name
 
   let pdf: Buffer
   try {

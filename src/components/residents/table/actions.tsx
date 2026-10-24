@@ -1,6 +1,6 @@
 import { IconDots } from '@tabler/icons-react'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { m } from '@/paraglide/messages'
@@ -14,11 +14,11 @@ interface ActionsProps {
 }
 
 export function ResidentsTableActions({ resident }: ActionsProps) {
-  const canManage = useHasRole('president')
+  const canManage = useCan({ registry: ['write'] })
   const [isDetailsOpen, setDetailsOpen] = useState(false)
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
-  const residentFullName = `${resident.first_name} ${resident.last_name}`
+  const residentFullName = `${resident.firstName} ${resident.lastName}`
 
   return (
     <>

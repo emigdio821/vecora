@@ -1,6 +1,6 @@
 import type { Table } from '@tanstack/react-table'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ interface AmenitiesDataTableHeaderProps {
 }
 
 export function AmenitiesDataTableHeader({ table, isLoading }: AmenitiesDataTableHeaderProps) {
-  const canManage = useHasRole('president')
+  const canManage = useCan({ amenity: ['write'] })
   const [isCreateOpen, setCreateOpen] = useState(false)
 
   return (

@@ -25,7 +25,7 @@ import { AmenityFormFields } from './amenity-form-fields'
 
 const FORM_ID = 'create-amenity-form'
 
-const DEFAULT_VALUES: AmenityInput = { name: '', default_fee: 0 }
+const DEFAULT_VALUES: AmenityInput = { name: '', defaultFee: 0 }
 
 interface CreateAmenityDrawerProps extends React.ComponentProps<typeof Drawer> {
   open: boolean

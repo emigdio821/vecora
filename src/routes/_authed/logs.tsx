@@ -1,12 +1,15 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { LogsDataTable } from '@/components/logs/table/data-table'
+import { can } from '@/lib/auth/permissions'
 import { pageTitle } from '@/lib/metadata'
 import { m } from '@/paraglide/messages'
 
 export const Route = createFileRoute('/_authed/logs')({
-  // Admin only. RLS hides the rows anyway; this keeps others off an empty page.
+  // Admin only. The server function refuses everyone else anyway; this keeps them off an empty page.
   beforeLoad: ({ context }) => {
-    if (!context.user.roles.includes('admin')) throw redirect({ to: '/' })
+    if (!can(context.user.roles, { log: ['read'] })) {
+      throw redirect({ to: '/' })
+    }
   },
   head: () => ({ meta: [{ title: pageTitle(m.common_section_logs()) }] }),
   component: LogsPage,

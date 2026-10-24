@@ -33,7 +33,7 @@ import {
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import type { AppRole } from '@/lib/supabase/current-user'
+import type { AppRole } from '@/lib/auth/current-user'
 import { m } from '@/paraglide/messages'
 import { markWelcomed } from '@/server-actions/profile'
 import { currentUserQueryOptions } from '@/tanstack-queries/session'

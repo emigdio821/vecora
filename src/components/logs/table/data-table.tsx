@@ -4,7 +4,7 @@ import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
 import { type LogEntryQueryData, logEntriesQueryOptions } from '@/tanstack-queries/logs'
-import { entryAction, identityName } from '../entry'
+import { entryAction, actorName } from '../entry'
 import { logsTableColumns } from './columns'
 import { LogsDataTableHeader } from './data-table-header'
 import { useActionFilter, useIdentityFilter, useRangeFilter, useSectionFilter } from './filters'
@@ -24,9 +24,9 @@ export function LogsDataTable() {
     () =>
       entries.filter(
         (entry) =>
-          (section === 'all' || entry.table_name === section) &&
+          (section === 'all' || entry.tableName === section) &&
           (action === 'all' || entryAction(entry) === action) &&
-          (identity === 'all' || identityName(entry) === identity),
+          (identity === 'all' || actorName(entry) === identity),
       ),
     [entries, section, action, identity],
   )
@@ -41,7 +41,7 @@ export function LogsDataTable() {
       tableId="logs"
       columns={logsTableColumns}
       getRowId={(entry) => String(entry.id)}
-      initialSorting={[{ id: 'occurred_at', desc: true }]}
+      initialSorting={[{ id: 'occurredAt', desc: true }]}
       header={(table) => <LogsDataTableHeader table={table} />}
       emptyMessage={m.logs_empty()}
       isLoading={isLoading}

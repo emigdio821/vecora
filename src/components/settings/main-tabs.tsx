@@ -1,19 +1,19 @@
 import { useQueryState } from 'nuqs'
-import { useCurrentUser, useHasRole } from '@/components/current-user-provider'
+import { useCan, useCurrentUser } from '@/components/current-user-provider'
 import { AccountSettingsPanel } from '@/components/settings/account-settings'
 import { AppSettingsPanel } from '@/components/settings/app-settings'
 import { HoaSettingsPanel } from '@/components/settings/hoa-settings'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
-import type { Settings } from '@/lib/supabase/settings'
+import type { Settings } from '@/lib/db/settings'
 import { m } from '@/paraglide/messages'
 
 /**
  * This device's preferences for everyone, and the HOA's details for president
- * or admin (RLS re-checks the role). Without the role there are no tabs, only
+ * or admin (the server re-checks the role). Without the role there are no tabs, only
  * the device's preferences. The main admin also gets its password.
  */
 export function SettingsMainTabs({ settings }: { settings: Settings }) {
-  const canEditHoa = useHasRole('president')
+  const canEditHoa = useCan({ settings: ['write'] })
   const user = useCurrentUser()
   const [tab, setTab] = useQueryState('tab', { defaultValue: 'app' })
 

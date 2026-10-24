@@ -39,11 +39,11 @@ interface PeriodFormFieldsProps {
 
 /** Shared by the create and edit drawers. */
 export function PeriodFormFields({ form, currency, disabled, inUse, periodId }: PeriodFormFieldsProps) {
-  const [openDate, setOpenDate] = useState<'starts_on' | 'ends_on' | null>(null)
+  const [openDate, setOpenDate] = useState<'startsOn' | 'endsOn' | null>(null)
   // The triggers are plain buttons, so Field can't link the labels to them on its own.
   // Each name is its label plus the picked date, which would otherwise go unread.
   const dateTriggerId = useId()
-  const [startsOn, endsOn] = useWatch({ control: form.control, name: ['starts_on', 'ends_on'] })
+  const [startsOn, endsOn] = useWatch({ control: form.control, name: ['startsOn', 'endsOn'] })
   const today = useToday()
   const { data: periods } = useQuery(periodsQueryOptions)
   // A gap is allowed (a year the board skipped), but no movement can be dated in it.
@@ -72,7 +72,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse, periodId }: 
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {(['starts_on', 'ends_on'] as const).map((name) => (
+        {(['startsOn', 'endsOn'] as const).map((name) => (
           <Controller
             key={name}
             name={name}
@@ -85,7 +85,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse, periodId }: 
                 dirty={fieldState.isDirty}
               >
                 <FieldLabel id={`${dateTriggerId}-${name}-label`} htmlFor={`${dateTriggerId}-${name}`}>
-                  {name === 'starts_on' ? m.presidency_period_starts_on() : m.presidency_period_ends_on()}{' '}
+                  {name === 'startsOn' ? m.presidency_period_starts_on() : m.presidency_period_ends_on()}{' '}
                   <span className="text-destructive">*</span>
                 </FieldLabel>
                 <Popover
@@ -121,7 +121,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse, periodId }: 
                       selected={parseISO(field.value)}
                       defaultMonth={parseISO(field.value)}
                       // The end must come after the start (same rule as the schema).
-                      disabled={name === 'ends_on' ? { before: addDays(parseISO(startsOn), 1) } : undefined}
+                      disabled={name === 'endsOn' ? { before: addDays(parseISO(startsOn), 1) } : undefined}
                       onSelect={(date) => {
                         field.onChange(format(date ?? new Date(), ISO_DAY))
                         setOpenDate(null)
@@ -166,7 +166,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse, periodId }: 
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Controller
-          name="monthly_fee"
+          name="monthlyFee"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field
@@ -205,7 +205,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse, periodId }: 
         />
 
         <Controller
-          name="late_fee"
+          name="lateFee"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field
@@ -245,7 +245,7 @@ export function PeriodFormFields({ form, currency, disabled, inUse, periodId }: 
       </div>
 
       <Controller
-        name="due_day"
+        name="dueDay"
         control={form.control}
         render={({ field, fieldState }) => (
           <Field

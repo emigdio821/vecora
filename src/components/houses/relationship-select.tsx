@@ -10,7 +10,7 @@ import { RELATIONSHIP_ITEMS, RELATIONSHIP_LABEL } from './relationship'
 
 interface RelationshipSelectProps {
   house: { id: string; number: string }
-  resident: { id: string; first_name: string; last_name: string }
+  resident: { id: string; firstName: string; lastName: string }
   value: Relationship
   'aria-label': string
   disabled?: boolean
@@ -28,7 +28,7 @@ export function RelationshipSelect({
   disabled,
 }: RelationshipSelectProps) {
   const queryClient = useQueryClient()
-  const name = `${resident.first_name} ${resident.last_name}`
+  const name = `${resident.firstName} ${resident.lastName}`
 
   const mutation = useMutation({
     mutationFn: async (relationship: Relationship) => {

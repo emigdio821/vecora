@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { RequestsDataTable } from '@/components/security/table/data-table'
 import { messageMarkup } from '@/components/shared/message-markup'
+import { can } from '@/lib/auth/permissions'
 import { pageTitle } from '@/lib/metadata'
 import { m } from '@/paraglide/messages'
 
@@ -18,10 +19,9 @@ export const Route = createFileRoute('/_authed/security')({
 function SecurityPage() {
   const { user } = Route.useRouteContext()
 
-  const isAdmin = user.roles.includes('admin')
   const viewer = {
-    canRequest: isAdmin || user.roles.includes('security'),
-    canResolve: isAdmin || user.roles.includes('treasurer'),
+    canRequest: can(user.roles, { securityRequest: ['write'] }),
+    canResolve: can(user.roles, { securityRequest: ['resolve'] }),
   }
 
   return (

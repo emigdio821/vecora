@@ -23,8 +23,8 @@ const columnHelper = createColumnHelper<DataTableFeatures, BoardMemberQueryData>
 /** Columns need the viewer for the actions cell, so they're built per page. */
 export function boardMembersTableColumns(viewer: BoardViewer) {
   return columnHelper.columns([
-    columnHelper.accessor('full_name', {
-      id: 'full_name',
+    columnHelper.accessor('name', {
+      id: 'name',
       size: 220,
       header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_name()} />,
       cell: ({ row }) => {
@@ -37,16 +37,16 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
                 to="/residential"
                 search={{
                   tab: 'residents',
-                  'search-residents': `${resident.first_name} ${resident.last_name}`,
+                  'search-residents': `${resident.firstName} ${resident.lastName}`,
                 }}
                 className="truncate font-medium hover:underline"
-                title={row.original.full_name}
+                title={row.original.name}
               >
-                {row.original.full_name}
+                {row.original.name}
               </Link>
             ) : (
-              <span className="truncate" title={row.original.full_name}>
-                {row.original.full_name}
+              <span className="truncate" title={row.original.name}>
+                {row.original.name}
               </span>
             )}
             {row.original.id === viewer.id && <Badge variant="info">{m.board_you()}</Badge>}
@@ -57,7 +57,7 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
       filterFn: (row, _columnId, value: string) => {
         const filterValue = normalizeString(value)
         if (!filterValue) return true
-        const haystack = normalizeString(`${row.original.full_name} ${row.original.resident?.email ?? ''}`)
+        const haystack = normalizeString(`${row.original.name} ${row.original.resident?.email ?? ''}`)
         return haystack.includes(filterValue)
       },
     }),
@@ -67,8 +67,8 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
       size: 220,
       header: m.board_roles(),
       cell: ({ row }) => {
-        // Fixed order (admin first) regardless of insertion order.
-        const roles = APP_ROLES.filter((role) => row.original.user_roles.some((r) => r.role === role))
+        // Fixed order (admin first) regardless of the stored order.
+        const roles = APP_ROLES.filter((role) => row.original.roles.includes(role))
         return (
           <div className="flex flex-wrap gap-1">
             {roles.map((role) => (
@@ -85,7 +85,7 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
       header: m.common_section_houses(),
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1">
-          {row.original.resident?.property_residents.map(({ property }) => (
+          {row.original.resident?.propertyLinks.map(({ property }) => (
             <Badge key={property.id} variant="outline">
               {property.number}
             </Badge>
@@ -110,7 +110,7 @@ export function boardMembersTableColumns(viewer: BoardViewer) {
       size: 50,
       cell: ({ row }) => {
         const member = row.original
-        const isAdminRow = member.user_roles.some((r) => r.role === 'admin')
+        const isAdminRow = member.roles.includes('admin')
         // Mirrors the server: nobody manages their own seat; admins only by admins.
         // The main admin, which nobody manages, isn't listed (see boardMembersQuery).
         const canManage = viewer.isManager && member.id !== viewer.id && (viewer.isAdmin || !isAdminRow)

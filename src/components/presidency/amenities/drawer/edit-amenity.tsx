@@ -103,7 +103,7 @@ function EditAmenityForm({
 }) {
   const form = useForm<AmenityInput>({
     resolver: zodResolver(amenitySchema),
-    defaultValues: { name: amenity.name, default_fee: Number(amenity.default_fee) },
+    defaultValues: { name: amenity.name, defaultFee: amenity.defaultFee },
   })
 
   // Still busy after a save, until the drawer has closed and reset the mutation.

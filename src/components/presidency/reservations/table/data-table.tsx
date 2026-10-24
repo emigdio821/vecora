@@ -40,7 +40,7 @@ export function ReservationsDataTable() {
       tableId="reservations"
       columns={reservationsTableColumns}
       getRowId={(reservation) => reservation.id}
-      initialSorting={[{ id: 'reserved_on', desc: true }]}
+      initialSorting={[{ id: 'reservedOn', desc: true }]}
       header={(table) => (
         <ReservationsDataTableHeader table={table} amenities={amenities.data ?? []} isLoading={isLoading} />
       )}

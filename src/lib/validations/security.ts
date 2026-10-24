@@ -1,17 +1,8 @@
 import { z } from 'zod'
+import { SECURITY_REQUEST_KINDS } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 
-// Mirrors the `security_request_kind` enum in the database.
-export const SECURITY_REQUEST_KINDS = [
-  'cameras',
-  'guards',
-  'access',
-  'equipment',
-  'supplies',
-  'other',
-] as const
-
-export type SecurityRequestKind = (typeof SECURITY_REQUEST_KINDS)[number]
+export { SECURITY_REQUEST_KINDS, type SecurityRequestKind } from '@/lib/enums'
 
 /** A security expense (cameras, guards, gates...) that the treasurer should pay for. */
 export const securityRequestSchema = z.object({
@@ -24,7 +15,7 @@ export const securityRequestSchema = z.object({
   amount: z
     .number({ error: () => m.common_amount_required() })
     .positive({ error: () => m.common_amount_positive() }),
-  requested_on: z.iso.date({ error: () => m.common_invalid_date() }),
+  requestedOn: z.iso.date({ error: () => m.common_invalid_date() }),
 })
 
 export type SecurityRequestInput = z.infer<typeof securityRequestSchema>

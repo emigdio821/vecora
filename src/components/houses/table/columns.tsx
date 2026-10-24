@@ -11,12 +11,12 @@ import { HouseNumberCell } from './house-number-cell'
 
 const columnHelper = createColumnHelper<DataTableFeatures, HouseQueryData>()
 
-function residentName(resident: { first_name: string; last_name: string }) {
-  return `${resident.first_name} ${resident.last_name}`
+function residentName(resident: { firstName: string; lastName: string }) {
+  return `${resident.firstName} ${resident.lastName}`
 }
 
 function owners(house: HouseQueryData) {
-  return house.property_residents.filter((pr) => pr.relationship === 'owner').map((pr) => pr.resident)
+  return house.residentLinks.filter((link) => link.relationship === 'owner').map((link) => link.resident)
 }
 
 export const housesTableColumns = columnHelper.columns([
@@ -60,11 +60,11 @@ export const housesTableColumns = columnHelper.columns([
 
       if (!filterValue) return true
 
-      const { number, property_residents } = row.original
+      const { number, residentLinks } = row.original
 
       return (
         normalizeString(number).includes(filterValue) ||
-        property_residents.some((pr) => normalizeString(residentName(pr.resident)).includes(filterValue))
+        residentLinks.some((link) => normalizeString(residentName(link.resident)).includes(filterValue))
       )
     },
   }),
@@ -98,7 +98,7 @@ export const housesTableColumns = columnHelper.columns([
     header: () => m.common_section_residents(),
     cell: ({ row }) => (
       <div className="flex flex-wrap gap-1">
-        {row.original.property_residents.map(({ resident }) => (
+        {row.original.residentLinks.map(({ resident }) => (
           <Badge key={resident.id} variant="outline">
             {residentName(resident)}
           </Badge>
@@ -107,7 +107,7 @@ export const housesTableColumns = columnHelper.columns([
     ),
   }),
 
-  columnHelper.accessor((row) => row.property_residents.length, {
+  columnHelper.accessor((row) => row.residentLinks.length, {
     id: 'residents_count',
     size: 100,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.residential_column_people()} />,

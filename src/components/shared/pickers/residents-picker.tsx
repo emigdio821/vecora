@@ -36,19 +36,19 @@ export function ResidentsPicker({ scope = 'all', excludeIds, ...props }: Residen
     () =>
       (data ?? [])
         .filter((resident) => !excludeIds?.includes(resident.id))
-        .filter((resident) => scope === 'all' || resident.property_residents.length === 0)
+        .filter((resident) => scope === 'all' || resident.propertyLinks.length === 0)
         .map((resident) => resident.id),
     [data, excludeIds, scope],
   )
 
   function label(id: string) {
     const resident = byId.get(id)
-    return resident ? `${resident.first_name} ${resident.last_name}` : ''
+    return resident ? `${resident.firstName} ${resident.lastName}` : ''
   }
 
   // Just the house: contact details live in the residents section.
   function details(id: string) {
-    const numbers = byId.get(id)?.property_residents.map((pr) => pr.property.number) ?? []
+    const numbers = byId.get(id)?.propertyLinks.map((link) => link.property.number) ?? []
     return numbers.length > 0 ? m.common_house_label({ number: numbers.join(', ') }) : m.common_no_house()
   }
 

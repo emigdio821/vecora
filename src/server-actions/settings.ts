@@ -1,47 +1,73 @@
+import {
+  DeleteObjectsCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { createServerFn } from '@tanstack/react-start'
 import sharp from 'sharp'
-import { type ActionResult, postgrestErrorMessage } from '@/lib/action-result'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
-import { getCurrentUser } from '@/lib/supabase/current-user'
-import { createClient } from '@/lib/supabase/server'
-import { LOGO_BUCKET, logoFileSchema, type SettingsInput, settingsSchema } from '@/lib/validations/settings'
+import { type ActionResult, errorMessage } from '@/lib/action-result'
+import { boardMiddleware, requirePermission } from '@/lib/auth/middleware'
+import { can } from '@/lib/auth/permissions'
+import { transactionAs } from '@/lib/db'
+import { getSettings, LOGO_PREFIX, logoKey } from '@/lib/db/settings'
+import * as settingsService from '@/lib/services/settings'
+import { ASSETS_BUCKET, storage } from '@/lib/storage'
+import {
+  LOGO_URL_SECONDS,
+  logoFileSchema,
+  type SettingsInput,
+  settingsSchema,
+} from '@/lib/validations/settings'
 import { m } from '@/paraglide/messages'
 
 /** Largest side of the stored logo, in pixels: plenty for the report header. */
 const LOGO_SIZE = 512
 
 /**
- * President (or admin) edits the residential's details. RLS enforces the
- * role; language and currency only reach here from an admin, and a trigger
- * refuses them from anyone else.
+ * A link to the saved logo for the settings preview, or null when there's
+ * none. Every board member may see it, as with the settings row it comes from.
+ */
+const fetchLogoUrlFn = createServerFn()
+  .middleware([boardMiddleware])
+  .handler(async (): Promise<string | null> => {
+    const { logoPath } = await getSettings()
+    if (!logoPath) {
+      return null
+    }
+    return getSignedUrl(storage, new GetObjectCommand({ Bucket: ASSETS_BUCKET, Key: logoKey(logoPath) }), {
+      expiresIn: LOGO_URL_SECONDS,
+    })
+  })
+
+export const fetchLogoUrl = () => fetchLogoUrlFn()
+
+/**
+ * President (or admin) edits the residential's details. Language and currency
+ * only reach here from an admin's form; anyone else sending them is refused.
  */
 const updateSettingsFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([requirePermission({ settings: ['write'] })])
   .validator((input: SettingsInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult> => {
+  .handler(async ({ data: input, context }): Promise<ActionResult> => {
     const parsed = settingsSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
-
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('settings')
-      .update(parsed.data)
-      .eq('singleton', true)
-      .select('id')
-      .maybeSingle()
-
-    if (error) {
-      return {
-        error: postgrestErrorMessage(error, {
-          fallback: m.settings_save_failed(),
-        }),
-      }
-    }
-    // RLS filtered the row out: not president nor admin.
-    if (!data) {
+    const { residentialName, defaultLanguage, currency } = parsed.data
+    const configures = defaultLanguage !== undefined || currency !== undefined
+    if (configures && !can(context.user.roles, { settings: ['configure'] })) {
       return { error: m.common_no_permission() }
+    }
+
+    try {
+      await transactionAs(context.user.id, (tx) =>
+        // Left out (undefined) when the president saves: Drizzle skips them.
+        settingsService.updateSettings(tx, { residentialName, defaultLanguage, currency }),
+      )
+    } catch (error) {
+      return { error: errorMessage(error, { fallback: m.settings_save_failed() }) }
     }
 
     return { data: undefined }
@@ -64,59 +90,52 @@ function optimizeLogo(input: ArrayBuffer): Promise<Buffer> {
     .toBuffer()
 }
 
-/** Points the settings row at a new logo (or none), then deletes every other file in the bucket. */
-async function setLogoPath(path: string | null): Promise<ActionResult> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('settings')
-    .update({ logo_path: path })
-    .eq('singleton', true)
-    .select('id')
-    .maybeSingle()
+/**
+ * Points the settings row at a new logo (or none), then deletes every other
+ * logo. The callers' middleware already checked the role.
+ */
+async function setLogoPath(actorId: string, path: string | null): Promise<ActionResult> {
+  try {
+    await transactionAs(actorId, (tx) => settingsService.updateSettings(tx, { logoPath: path }))
+  } catch (error) {
+    return { error: errorMessage(error, { fallback: m.settings_logo_save_failed() }) }
+  }
 
-  if (error) {
-    return {
-      error: postgrestErrorMessage(error, { fallback: m.settings_logo_save_failed() }),
+  // Only the current logo needs to stay. Clearing everything else, not just the previous
+  // file, also picks up orphans, like a file from an earlier failed delete. The logo is
+  // already saved, so a failure here is only logged.
+  try {
+    const listed = await storage.send(
+      new ListObjectsV2Command({ Bucket: ASSETS_BUCKET, Prefix: LOGO_PREFIX }),
+    )
+    const keep = path === null ? null : logoKey(path)
+    const stale = (listed.Contents ?? []).filter((object) => object.Key !== undefined && object.Key !== keep)
+    if (stale.length > 0) {
+      await storage.send(
+        new DeleteObjectsCommand({
+          Bucket: ASSETS_BUCKET,
+          Delete: { Objects: stale.map((object) => ({ Key: object.Key })) },
+        }),
+      )
     }
-  }
-  if (!data) {
-    return { error: m.common_no_permission() }
-  }
-
-  // The bucket only needs the current logo. Clearing everything else, not just the previous
-  // file, also picks up orphans: files a hosted db reset unlinked, or an earlier failed delete.
-  // The logo is already saved, so a failure here is only logged.
-  const { data: files, error: listError } = await supabase.storage.from(LOGO_BUCKET).list()
-  if (listError) {
-    console.error('listing logos failed', listError)
-    return { data: undefined }
-  }
-
-  const stalePaths = files.filter((file) => file.name !== path).map((file) => file.name)
-  if (stalePaths.length > 0) {
-    const { error: removeError } = await supabase.storage.from(LOGO_BUCKET).remove(stalePaths)
-    if (removeError) {
-      console.error('removing old logos failed', removeError)
-    }
+  } catch (error) {
+    console.error('removing old logos failed', error)
   }
 
   return { data: undefined }
 }
 
-/** President (or admin) uploads the residential's logo. RLS enforces the role. */
+/**
+ * President (or admin) uploads the residential's logo. The middleware turns
+ * others away before the expensive part, processing the image.
+ */
 const uploadLogoFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([requirePermission({ settings: ['write'] })])
   .validator((formData: FormData) => formData)
-  .handler(async ({ data: formData }): Promise<ActionResult> => {
+  .handler(async ({ data: formData, context }): Promise<ActionResult> => {
     const parsed = logoFileSchema.safeParse(formData.get('logo'))
     if (!parsed.success) {
       return { error: parsed.error.issues[0]?.message ?? m.settings_logo_select_image() }
-    }
-
-    // Processing the image is the expensive part: turn others away before it.
-    const user = await getCurrentUser()
-    if (!user?.roles.some((role) => role === 'president' || role === 'admin')) {
-      return { error: m.common_no_permission() }
     }
 
     let png: Buffer
@@ -129,19 +148,30 @@ const uploadLogoFn = createServerFn({ method: 'POST' })
 
     // A new name every time, so no cache ever serves the previous logo.
     const path = `logo-${Date.now()}.png`
-    const supabase = await createClient()
-    const { error: uploadError } = await supabase.storage
-      .from(LOGO_BUCKET)
-      .upload(path, png, { contentType: 'image/png', cacheControl: '31536000' })
-
-    if (uploadError) {
-      console.error('logo upload failed', uploadError)
+    try {
+      await storage.send(
+        new PutObjectCommand({
+          Bucket: ASSETS_BUCKET,
+          Key: logoKey(path),
+          Body: png,
+          ContentType: 'image/png',
+          CacheControl: 'max-age=31536000',
+        }),
+      )
+    } catch (error) {
+      console.error('logo upload failed', error)
       return { error: m.settings_logo_upload_failed() }
     }
 
-    const result = await setLogoPath(path)
+    const result = await setLogoPath(context.user.id, path)
     if (result.error !== undefined) {
-      await supabase.storage.from(LOGO_BUCKET).remove([path])
+      try {
+        await storage.send(
+          new DeleteObjectsCommand({ Bucket: ASSETS_BUCKET, Delete: { Objects: [{ Key: logoKey(path) }] } }),
+        )
+      } catch (error) {
+        console.error('removing the unsaved logo failed', error)
+      }
     }
 
     return result
@@ -150,7 +180,7 @@ const uploadLogoFn = createServerFn({ method: 'POST' })
 export const uploadLogo = (formData: FormData) => uploadLogoFn({ data: formData })
 
 const removeLogoFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
-  .handler((): Promise<ActionResult> => setLogoPath(null))
+  .middleware([requirePermission({ settings: ['write'] })])
+  .handler(({ context }): Promise<ActionResult> => setLogoPath(context.user.id, null))
 
 export const removeLogo = () => removeLogoFn()

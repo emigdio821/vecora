@@ -8,6 +8,7 @@ import { DocumentFormSkeleton } from '@/components/documents/document-form-skele
 import { TemplateMenu } from '@/components/documents/template-menu'
 import { templateDocument } from '@/components/documents/templates'
 import { toastManager } from '@/components/ui/toast'
+import { can } from '@/lib/auth/permissions'
 import { pageTitle } from '@/lib/metadata'
 import { ISO_DAY } from '@/lib/utils'
 import type { DocumentInput } from '@/lib/validations/documents'
@@ -65,7 +66,7 @@ function DocumentsPage() {
             <p className="text-sm text-muted-foreground">{m.documents_page_description()}</p>
           </div>
           <TemplateMenu
-            viewer={{ id: user.id, isAdmin: user.roles.includes('admin') }}
+            viewer={{ id: user.id, isAdmin: can(user.roles, { document: ['manage'] }) }}
             onSelect={(template) => {
               offerTemplate({
                 name: template.name(),

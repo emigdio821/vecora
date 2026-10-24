@@ -34,7 +34,9 @@ export function AccountSettingsPanel() {
   const mutation = useMutation({
     mutationFn: async (values: ChangePasswordInput) => {
       const result = await changePassword(values)
-      if (result?.error) throw new Error(result.error)
+      if (result.error !== undefined) {
+        throw new Error(result.error)
+      }
     },
     onSuccess: () => {
       toastManager.add({ type: 'success', title: m.auth_password_changed() })
@@ -185,7 +187,7 @@ export function AccountSettingsPanel() {
       >
         <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-2 text-sm">
           <dt className="text-muted-foreground">{m.common_field_name()}</dt>
-          <dd className="truncate">{user.fullName}</dd>
+          <dd className="truncate">{user.name}</dd>
           <dt className="text-muted-foreground">{m.common_field_email()}</dt>
           <dd className="truncate">{user.email}</dd>
         </dl>

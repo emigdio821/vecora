@@ -19,8 +19,8 @@ import { ReservationsTableActions } from './actions'
 const columnHelper = createColumnHelper<DataTableFeatures, ReservationQueryData>()
 
 export const reservationsTableColumns = columnHelper.columns([
-  columnHelper.accessor('reserved_on', {
-    id: 'reserved_on',
+  columnHelper.accessor('reservedOn', {
+    id: 'reservedOn',
     size: 200,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_date()} />,
     cell: ({ getValue }) => {
@@ -72,7 +72,7 @@ export const reservationsTableColumns = columnHelper.columns([
       }),
   }),
 
-  columnHelper.accessor((row) => Number(row.amount), {
+  columnHelper.accessor('amount', {
     id: 'amount',
     size: 140,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_amount()} />,

@@ -55,16 +55,16 @@ export function CreateReservationDrawer({
     onSuccess: (_data, values) => {
       const amenity = queryClient
         .getQueryData(amenitiesQueryOptions.queryKey)
-        ?.find((a) => a.id === values.amenity_id)
+        ?.find((a) => a.id === values.amenityId)
       const house = queryClient
         .getQueryData(housesPickerQueryOptions.queryKey)
-        ?.find((h) => h.id === values.property_id)
+        ?.find((h) => h.id === values.propertyId)
 
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY] })
       toastManager.add({
         type: 'success',
         title: m.presidency_reservation_created(),
-        description: [amenity?.name, formatDay(values.reserved_on), house && houseLabel(house)]
+        description: [amenity?.name, formatDay(values.reservedOn), house && houseLabel(house)]
           .filter(Boolean)
           .join(' - '),
       })
@@ -113,16 +113,16 @@ function CreateReservationForm({ mutation }: { mutation: CreateMutation }) {
   const currency = useCurrency()
   const { data: amenities } = useQuery(amenitiesQueryOptions)
   // With a single area to book, there's nothing to choose.
-  const active = (amenities ?? []).filter((a) => a.is_active)
+  const active = (amenities ?? []).filter((a) => a.isActive)
   const onlyAmenity = active.length === 1 ? active[0] : undefined
 
   const form = useForm<ReservationInput>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
-      amenity_id: onlyAmenity?.id ?? '',
-      property_id: '',
-      reserved_on: format(today, ISO_DAY),
-      amount: Number(onlyAmenity?.default_fee ?? 0),
+      amenityId: onlyAmenity?.id ?? '',
+      propertyId: '',
+      reservedOn: format(today, ISO_DAY),
+      amount: onlyAmenity?.defaultFee ?? 0,
       notes: '',
     },
   })

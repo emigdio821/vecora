@@ -105,13 +105,13 @@ export function EditTransactionDrawer({
 function toFormValues(transaction: TransactionQueryData): UpdateTransactionInput {
   return {
     kind: transaction.kind,
-    category_id: transaction.category.id,
-    amount: Number(transaction.amount),
-    occurred_on: transaction.occurred_on,
-    payment_method: transaction.payment_method,
+    categoryId: transaction.category.id,
+    amount: transaction.amount,
+    occurredOn: transaction.occurredOn,
+    paymentMethod: transaction.paymentMethod,
     folio: transaction.folio ?? '',
     reference: transaction.reference ?? '',
-    property_id: transaction.property?.id ?? null,
+    propertyId: transaction.property?.id ?? null,
     description: transaction.description,
     notes: transaction.notes ?? '',
   }
@@ -128,9 +128,9 @@ function EditTransactionForm({
     resolver: zodResolver(updateTransactionSchema),
     defaultValues: toFormValues(transaction),
   })
-  const occurredOn = useWatch({ control: form.control, name: 'occurred_on' })
+  const occurredOn = useWatch({ control: form.control, name: 'occurredOn' })
   const isPeriodMissing = useIsPeriodMissing(occurredOn)
-  // Fee, late-fee and reservation rows come from their RPCs (category key is set).
+  // Fee, late-fee and reservation rows come from their services (category key is set).
   const { key } = transaction.category
   const isFee = key !== null
 

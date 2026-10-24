@@ -10,9 +10,9 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { Form } from '@/components/ui/form'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { toastManager } from '@/components/ui/toast'
-import { type SetPasswordInput, setPasswordSchema } from '@/lib/validations/hoa-board'
+import { type SetPasswordInput, setPasswordSchema } from '@/lib/validations/auth'
 import { m } from '@/paraglide/messages'
-import { setPassword } from '@/server-actions/hoa-board'
+import { setPassword } from '@/server-actions/auth'
 import { USER_QUERY_KEY } from '@/tanstack-queries/session'
 
 export function SetPasswordForm() {

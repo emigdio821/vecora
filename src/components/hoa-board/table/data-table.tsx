@@ -28,7 +28,7 @@ export function BoardMembersDataTable({ viewer }: BoardMembersDataTableProps) {
       tableId="board"
       columns={columns}
       getRowId={(member) => member.id}
-      initialSorting={[{ id: 'full_name', desc: false }]}
+      initialSorting={[{ id: 'name', desc: false }]}
       header={(table) => <BoardMembersDataTableHeader table={table} viewer={viewer} isLoading={isLoading} />}
       emptyMessage={m.board_empty()}
       isLoading={isLoading}

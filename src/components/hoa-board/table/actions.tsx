@@ -66,7 +66,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
               size="icon"
               variant="ghost"
               className="ms-auto flex"
-              aria-label={m.board_member_actions({ name: member.full_name })}
+              aria-label={m.board_member_actions({ name: member.name })}
               loading={resend.isPending}
             >
               <IconDots className="size-4" />
@@ -75,7 +75,7 @@ export function BoardMembersTableActions({ member, viewer }: ActionsProps) {
         />
         <MenuPopup align="end" className="max-w-56">
           <MenuGroup>
-            <MenuGroupLabel className="my-1.5 py-0">{member.full_name}</MenuGroupLabel>
+            <MenuGroupLabel className="my-1.5 py-0">{member.name}</MenuGroupLabel>
 
             <MenuItem
               onClick={() => {

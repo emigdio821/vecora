@@ -27,8 +27,8 @@ export const amenitiesTableColumns = columnHelper.columns([
     },
   }),
 
-  columnHelper.accessor((row) => Number(row.default_fee), {
-    id: 'default_fee',
+  columnHelper.accessor('defaultFee', {
+    id: 'defaultFee',
     size: 160,
     header: ({ column }) => (
       <DataTableSortableHeader column={column} title={m.presidency_amenity_default_fee()} />
@@ -54,8 +54,8 @@ export const amenitiesTableColumns = columnHelper.columns([
     cell: ({ getValue }) => <span className="tabular-nums">{getValue()}</span>,
   }),
 
-  columnHelper.accessor('is_active', {
-    id: 'is_active',
+  columnHelper.accessor('isActive', {
+    id: 'isActive',
     size: 140,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_status()} />,
     cell: ({ getValue }) =>

@@ -23,7 +23,7 @@ import {
   entrySummary,
   type FieldChange,
   fieldLabel,
-  identityName,
+  actorName,
   sectionLabel,
 } from '../entry'
 
@@ -79,9 +79,9 @@ export function EntryDetailsDrawer({
           <DrawerTitle>{entrySummary(entry)}</DrawerTitle>
           <DrawerDescription>
             {m.logs_entry_description({
-              name: identityName(entry),
+              name: actorName(entry),
               action: ACTION_LABEL[action].toLowerCase(),
-              date: formatDate(entry.occurred_at),
+              date: formatDate(entry.occurredAt),
             })}
           </DrawerDescription>
         </DrawerHeader>
@@ -89,15 +89,15 @@ export function EntryDetailsDrawer({
         <DrawerPanel className="grid gap-3">
           <CollapsibleSection icon={<IconScript />} title={m.logs_summary()}>
             <div className="grid grid-cols-2 gap-3">
-              <Detail label={m.logs_who()}>{identityName(entry)}</Detail>
+              <Detail label={m.logs_who()}>{actorName(entry)}</Detail>
               <Detail label={m.logs_when()}>
-                <span className="tabular-nums">{formatDate(entry.occurred_at)}</span>
+                <span className="tabular-nums">{formatDate(entry.occurredAt)}</span>
               </Detail>
               <Detail label={m.logs_action()}>
                 <Badge variant={ACTION_BADGE_VARIANT[action]}>{ACTION_LABEL[action]}</Badge>
               </Detail>
               <Detail label={m.logs_section()}>
-                <Badge variant="outline">{sectionLabel(entry.table_name)}</Badge>
+                <Badge variant="outline">{sectionLabel(entry.tableName)}</Badge>
               </Detail>
             </div>
           </CollapsibleSection>
@@ -108,7 +108,7 @@ export function EntryDetailsDrawer({
                 {changes.map((change) => (
                   <div key={change.field} className="grid gap-0.5">
                     <dt className="text-xs text-muted-foreground">
-                      {fieldLabel(change.field, entry.table_name)}
+                      {fieldLabel(change.field, entry.tableName)}
                     </dt>
                     <dd className="text-sm font-medium">
                       <ChangeValue change={change} isUpdate={isUpdate} />
@@ -131,7 +131,7 @@ export function EntryDetailsDrawer({
                     <li key={other.id} className="grid gap-1">
                       <span className="flex flex-wrap gap-2">
                         <Badge variant={ACTION_BADGE_VARIANT[otherAction]}>{ACTION_LABEL[otherAction]}</Badge>
-                        <Badge variant="outline">{sectionLabel(other.table_name)}</Badge>
+                        <Badge variant="outline">{sectionLabel(other.tableName)}</Badge>
                       </span>
                       <span className="min-w-0 wrap-break-word">{entrySummary(other)}</span>
                     </li>

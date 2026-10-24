@@ -24,8 +24,8 @@ const columnHelper = createColumnHelper<DataTableFeatures, SecurityRequestQueryD
 /** Columns need the viewer for the actions cell, so they're built per page. */
 export function requestsTableColumns(viewer: SecurityViewer) {
   return columnHelper.columns([
-    columnHelper.accessor('requested_on', {
-      id: 'requested_on',
+    columnHelper.accessor('requestedOn', {
+      id: 'requestedOn',
       size: 120,
       header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_date()} />,
       cell: ({ getValue }) => <span className="whitespace-nowrap tabular-nums">{formatDay(getValue())}</span>,
@@ -44,7 +44,7 @@ export function requestsTableColumns(viewer: SecurityViewer) {
         if (!filterValue) return true
 
         const { title, details, kind, requester } = row.original
-        return [title, details, KIND_LABEL[kind], requester.full_name].some(
+        return [title, details, KIND_LABEL[kind], requester.name].some(
           (field) => field && normalizeString(field).includes(filterValue),
         )
       },
@@ -57,14 +57,14 @@ export function requestsTableColumns(viewer: SecurityViewer) {
       cell: ({ getValue }) => <Badge variant="outline">{getValue()}</Badge>,
     }),
 
-    columnHelper.accessor((row) => row.requester.full_name, {
+    columnHelper.accessor((row) => row.requester.name, {
       id: 'requester',
       size: 180,
       header: ({ column }) => <DataTableSortableHeader column={column} title={m.requests_requester()} />,
       cell: ({ getValue }) => <span className="block w-0 min-w-full truncate">{getValue()}</span>,
     }),
 
-    columnHelper.accessor((row) => Number(row.amount), {
+    columnHelper.accessor('amount', {
       id: 'amount',
       size: 130,
       header: ({ column }) => (

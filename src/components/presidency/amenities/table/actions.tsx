@@ -1,7 +1,7 @@
 import { IconDots } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
@@ -16,7 +16,7 @@ interface ActionsProps {
 }
 
 export function AmenitiesTableActions({ amenity }: ActionsProps) {
-  const canManage = useHasRole('president')
+  const canManage = useCan({ amenity: ['write'] })
   const queryClient = useQueryClient()
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
@@ -25,15 +25,15 @@ export function AmenitiesTableActions({ amenity }: ActionsProps) {
 
   const toggleActive = useMutation({
     mutationFn: async () => {
-      const result = await setAmenityActive(amenity.id, !amenity.is_active)
+      const result = await setAmenityActive(amenity.id, !amenity.isActive)
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [PRESIDENCY_QUERY_KEY, 'amenities'] })
       toastManager.add({
         type: 'success',
-        title: amenity.is_active ? m.presidency_amenity_deactivated() : m.presidency_amenity_activated(),
-        description: amenity.is_active
+        title: amenity.isActive ? m.presidency_amenity_deactivated() : m.presidency_amenity_activated(),
+        description: amenity.isActive
           ? m.presidency_amenity_deactivated_description({ name: amenity.name })
           : m.presidency_amenity_activated_description({ name: amenity.name }),
       })
@@ -84,7 +84,7 @@ export function AmenitiesTableActions({ amenity }: ActionsProps) {
                 toggleActive.mutate()
               }}
             >
-              {amenity.is_active ? m.presidency_deactivate() : m.presidency_activate()}
+              {amenity.isActive ? m.presidency_deactivate() : m.presidency_activate()}
             </MenuItem>
 
             {canDelete && (

@@ -1,4 +1,4 @@
-import { type AuthError, isAuthWeakPasswordError, type PostgrestError } from '@supabase/supabase-js'
+import { isServiceError, type ServiceErrorCode } from '@/lib/services/errors'
 import { m } from '@/paraglide/messages'
 
 /**
@@ -7,81 +7,92 @@ import { m } from '@/paraglide/messages'
  */
 export type ActionResult<T = undefined> = { data: T; error?: never } | { data?: never; error: string }
 
-const RLS_VIOLATION = '42501'
-// PostgREST: `.single()` found no row. After an UPDATE this means RLS filtered
-// it out (Postgres reports 0 rows instead of an error in that case).
-const NO_ROWS = 'PGRST116'
 export const UNIQUE_VIOLATION = '23505'
+export const FK_VIOLATION = '23503'
+export const CHECK_VIOLATION = '23514'
 export const EXCLUSION_VIOLATION = '23P01'
 
-/**
- * transactions_folio_one_receipt: the receipt book never repeats a folio.
- * Answer it with `m.common_folio_taken()`.
- */
-export function isFolioTaken(error: PostgrestError) {
-  return error.code === EXCLUSION_VIOLATION && error.message.includes('transactions_folio_one_receipt')
+/** What Postgres raised: its SQLSTATE code, the constraint it names, and its message. */
+export interface DatabaseError {
+  code: string
+  constraint: string
+  message: string
 }
 
-interface PostgrestMessageOptions {
+/**
+ * The Postgres error behind a failed Drizzle query. Drizzle wraps it, and
+ * node-postgres's error (with the code and the constraint) is the cause.
+ * Anything else gets an empty code, so it falls through to the fallback.
+ */
+export function databaseError(error: unknown): DatabaseError {
+  let source = error
+  if (error instanceof Error && error.cause !== undefined) {
+    source = error.cause
+  }
+  if (source instanceof Error && 'code' in source && typeof source.code === 'string') {
+    let constraint = ''
+    if ('constraint' in source && typeof source.constraint === 'string') {
+      constraint = source.constraint
+    }
+    return { code: source.code, constraint, message: source.message }
+  }
+  return { code: '', constraint: '', message: String(error) }
+}
+
+interface ErrorMessages {
   /** Shown for anything not recognised below. */
   fallback: string
-  /**
-   * Unique-violation messages keyed by constraint/index name. Postgres names
-   * it in the message: `duplicate key value violates unique constraint "…"`.
-   */
-  unique?: Record<string, string>
-  /** Unique violation on a constraint not listed in `unique`. */
+  /** Messages for the rules of src/lib/services, by code. Unlisted ones get a general message, or the fallback. */
+  service?: Partial<Record<ServiceErrorCode, string>>
+  /** Messages for a constraint that refused the write (a unique index, an exclusion, a foreign key), by name. */
+  constraints?: Record<string, string>
+  /** Unique violation on a constraint not listed in `constraints`. */
   uniqueFallback?: string
 }
 
-/** Maps a PostgREST error to a user-facing message. */
-export function postgrestErrorMessage(
-  error: PostgrestError,
-  { fallback, unique = {}, uniqueFallback = m.common_unique_fallback() }: PostgrestMessageOptions,
-): string {
-  switch (error.code) {
-    case RLS_VIOLATION:
-    case NO_ROWS:
-      return m.common_no_permission()
-    case UNIQUE_VIOLATION: {
-      const constraint = Object.keys(unique).find((name) => error.message.includes(name))
-      return constraint ? unique[constraint] : uniqueFallback
-    }
-    default:
-      return fallback
-  }
-}
-
-// Raised by the pay/reject/reopen request RPCs (Maintenance and Security).
-const NOT_FOUND = 'P0002'
-const ALREADY_RESOLVED = 'P0003'
-export const FK_VIOLATION = '23503'
-
-/** Maps an error from `pay_*_request` / `reject_*_request` / `reopen_*_request` to a user-facing message. */
-export function requestResolutionErrorMessage(error: PostgrestError, fallback: string): string {
-  if (error.code === ALREADY_RESOLVED && error.message.includes('not rejected')) {
-    return m.common_request_already_reopened()
-  }
-  if (error.code === ALREADY_RESOLVED) return m.common_request_already_resolved()
-  if (error.code === NOT_FOUND && error.message.includes('no period')) {
-    return m.common_request_no_period()
-  }
-  if (error.code === NOT_FOUND) return m.common_request_not_found()
-  return postgrestErrorMessage(error, { fallback })
+// What a broken rule says when the section has nothing more specific.
+const SERVICE_MESSAGES: Partial<Record<ServiceErrorCode, () => string>> = {
+  no_period: m.common_request_no_period,
+  already_resolved: m.common_request_already_resolved,
+  not_rejected: m.common_request_already_reopened,
+  admin_only: m.common_no_permission,
+  not_author: m.common_no_permission,
 }
 
 /**
- * Maps a rejected `auth.updateUser({ password })` to a user-facing message.
- * Hosted Auth applies its dashboard settings, which config.toml doesn't
- * mirror, so a local test never shows these. `same_password` is left to the
- * caller: each flow answers it differently.
+ * The message for a failed write: a rule of the services (ServiceError), or
+ * a constraint of the database. The paper receipt book's folio has the same
+ * message everywhere.
  */
-export function passwordUpdateErrorMessage(error: AuthError, fallback: string): string {
-  if (isAuthWeakPasswordError(error)) {
-    if (error.reasons.includes('pwned')) return m.auth_password_pwned()
-    if (error.reasons.includes('characters')) return m.auth_password_weak_characters()
-    if (error.reasons.includes('length')) return m.auth_password_weak_length()
+export function errorMessage(error: unknown, messages: ErrorMessages): string {
+  if (isServiceError(error)) {
+    const specific = messages.service?.[error.code]
+    if (specific !== undefined) {
+      return specific
+    }
+    const general = SERVICE_MESSAGES[error.code]
+    if (general !== undefined) {
+      return general()
+    }
+    return messages.fallback
   }
-  if (error.code === 'reauthentication_needed') return m.auth_password_reauthenticate()
-  return fallback
+
+  const cause = databaseError(error)
+  const byConstraint = messages.constraints?.[cause.constraint]
+  if (byConstraint !== undefined) {
+    return byConstraint
+  }
+  if (cause.constraint === 'transactions_folio_one_receipt') {
+    return m.common_folio_taken()
+  }
+  if (cause.code === UNIQUE_VIOLATION) {
+    return messages.uniqueFallback ?? m.common_unique_fallback()
+  }
+  return messages.fallback
+}
+
+/** Whether a write was refused by a unique index or an exclusion constraint (restoring a row whose number, email or folio was used again). */
+export function isTaken(error: unknown): boolean {
+  const { code } = databaseError(error)
+  return code === UNIQUE_VIOLATION || code === EXCLUSION_VIOLATION
 }

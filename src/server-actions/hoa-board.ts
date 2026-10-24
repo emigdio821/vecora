@@ -1,243 +1,182 @@
-import type { AuthError, PostgrestError, User } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeader, getRequestUrl } from '@tanstack/react-start/server'
-import { type ActionResult, passwordUpdateErrorMessage, postgrestErrorMessage } from '@/lib/action-result'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
-import { type CurrentUser, getCurrentUser } from '@/lib/supabase/current-user'
-import { createClient } from '@/lib/supabase/server'
+import { type ActionResult, errorMessage } from '@/lib/action-result'
+import { createAccessToken } from '@/lib/auth'
+import { boardMiddleware, requirePermission } from '@/lib/auth/middleware'
+import { parseRoles } from '@/lib/auth/roles'
+import { db, transactionAs } from '@/lib/db'
+import * as board from '@/lib/services/board'
 import {
   type AddBoardMemberInput,
   addBoardMemberSchema,
-  type AppRole,
-  type SetPasswordInput,
-  setPasswordSchema,
   type UpdateBoardMemberRolesInput,
   updateBoardMemberRolesSchema,
 } from '@/lib/validations/hoa-board'
 import { m } from '@/paraglide/messages'
 
-// Raised by the guards on the main admin (admin@vecora.app).
-const MAIN_ADMIN_PROTECTED = 'P0004'
-
-// The main admin's password on hosted until its first sign-in (seed.sql).
-const HOSTED_DEFAULT_PASSWORD = 'admin123'
-
-function toMessage(error: PostgrestError, fallback: string) {
-  if (error.code === MAIN_ADMIN_PROTECTED) {
-    return m.board_main_admin_protected()
-  }
-  return postgrestErrorMessage(error, { fallback })
-}
+const boardManage = requirePermission({ board: ['manage'] })
 
 /**
- * Admin and president manage the board. RLS enforces the same on user_roles,
- * but the Auth Admin API bypasses RLS, so every action checks here first.
+ * Board members = accounts holding at least one role. The resident link is
+ * optional: an account created outside the app (seeds) may not be tied to the
+ * registry yet. The main admin is the app's own account, not a board seat, so
+ * it isn't listed.
  */
-async function requireBoardManager(): Promise<{ user: CurrentUser; isAdmin: boolean } | { error: string }> {
-  const user = await getCurrentUser()
-  if (!user) return { error: m.common_no_permission() }
+const fetchBoardMembersFn = createServerFn()
+  .middleware([boardMiddleware])
+  .handler(async () => {
+    const members = await db.query.users.findMany({
+      columns: { id: true, name: true, role: true },
+      with: {
+        resident: {
+          columns: { id: true, firstName: true, lastName: true, email: true, phone: true },
+          with: {
+            propertyLinks: {
+              columns: {},
+              with: { property: { columns: { id: true, number: true } } },
+              where: { property: { deletedAt: { isNull: true } } },
+            },
+          },
+        },
+      },
+      where: { isMainAdmin: false, role: { isNotNull: true, ne: '' } },
+      orderBy: { name: 'asc' },
+    })
 
-  const isAdmin = user.roles.includes('admin')
-  if (!isAdmin && !user.roles.includes('president')) return { error: m.common_no_permission() }
+    return members.map(({ role, ...member }) => ({ ...member, roles: parseRoles(role) }))
+  })
 
-  return { user, isAdmin }
-}
+export const fetchBoardMembers = () => fetchBoardMembersFn()
 
 /**
- * One-time sign-in link for the invited person, pointing at our own
- * /auth/confirm page so the session lands in cookies (SSR) instead of the
- * URL hash. Auth refuses `invite` once the account exists (`email_exists`), so
- * existing accounts (re-sends, re-added members) get a `recovery` link instead;
- * both land on /set-password.
+ * One-time sign-in link for the account, pointing at our own /auth/confirm
+ * page, where a button (not the visit) spends it. Valid for an hour; the
+ * person lands on /set-password, whether it's their first or a reset.
  */
-async function createInviteLink(
-  email: string,
-  fullName: string,
-  hasAccount: boolean,
-): Promise<{ error: AuthError } | { user: User; link: string }> {
-  const admin = createAdminClient()
-  const { data, error } = hasAccount
-    ? await admin.auth.admin.generateLink({ type: 'recovery', email })
-    : await admin.auth.admin.generateLink({
-        type: 'invite',
-        email,
-        options: { data: { full_name: fullName } },
-      })
-  if (error) {
-    console.error('generateLink failed', error)
-    return { error }
+async function createAccessLink(email: string): Promise<string | null> {
+  let token: string
+  try {
+    token = await createAccessToken(email)
+  } catch (error) {
+    console.error('createAccessToken failed', error)
+    return null
   }
 
   const origin = getRequestHeader('origin') || getRequestUrl({ xForwardedHost: true }).origin
   const url = new URL('/auth/confirm', origin)
-  url.searchParams.set('token_hash', data.properties.hashed_token)
-  url.searchParams.set('type', data.properties.verification_type)
-
-  return { user: data.user, link: url.toString() }
+  url.searchParams.set('token', token)
+  return url.toString()
 }
 
 export interface InviteResult {
   /** Share by WhatsApp or copy; valid until the person opens it (or it expires). */
   link: string
-  full_name: string
+  name: string
   phone: string
 }
 
 /**
  * Seats a resident on the board: creates their account if they have none,
- * grants the roles, and returns the invite link to hand over.
+ * grants the roles, and returns the invite link to hand over. The account,
+ * the resident link and the roles land together, or not at all.
  */
 const addBoardMemberFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([boardManage])
   .validator((input: AddBoardMemberInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult<InviteResult>> => {
+  .handler(async ({ data: input, context }): Promise<ActionResult<InviteResult>> => {
     const parsed = addBoardMemberSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const manager = await requireBoardManager()
-    if ('error' in manager) return manager
-
-    const { resident_id, roles } = parsed.data
-    if (roles.includes('admin') && !manager.isAdmin) {
-      return { error: m.board_only_admin_grant_admin() }
-    }
-
-    const supabase = await createClient()
-    const { data: resident } = await supabase
-      .from('residents')
-      .select(
-        'id, first_name, last_name, email, phone, profile_id, profile:profiles!profile_id ( user_roles!user_id ( role ) )',
+    let seated: board.AccessLinkTarget
+    try {
+      seated = await transactionAs(context.user.id, (tx) =>
+        board.seatBoardMember(tx, context.user, parsed.data),
       )
-      .eq('id', resident_id)
-      .is('deleted_at', null)
-      .maybeSingle()
-
-    if (!resident) return { error: m.board_resident_not_found() }
-    if (!resident.email) {
-      return { error: m.board_resident_no_email() }
-    }
-    if (resident.profile?.user_roles.length) {
-      return { error: m.board_resident_already_member() }
-    }
-
-    const fullName = `${resident.first_name} ${resident.last_name}`
-    const isNewAccount = resident.profile_id === null
-    const invite = await createInviteLink(resident.email, fullName, !isNewAccount)
-    if ('error' in invite) {
+    } catch (error) {
       return {
-        error: invite.error.code === 'email_exists' ? m.board_email_taken() : m.board_account_create_failed(),
+        error: errorMessage(error, {
+          fallback: m.board_account_create_failed(),
+          service: {
+            admin_only: m.board_only_admin_grant_admin(),
+            not_found: m.board_resident_not_found(),
+            resident_no_email: m.board_resident_no_email(),
+            already_member: m.board_resident_already_member(),
+            email_taken: m.board_email_taken(),
+          },
+          uniqueFallback: m.board_email_taken(),
+        }),
       }
     }
 
-    const userId = invite.user.id
-
-    // Undo the account if the registry side fails; there is no history to keep yet.
-    const rollback = async () => {
-      if (isNewAccount) await createAdminClient().auth.admin.deleteUser(userId)
+    // On the board by now; if the link fails, "New access link" gets another.
+    const link = await createAccessLink(seated.email)
+    if (!link) {
+      return { error: m.board_link_create_failed() }
     }
 
-    if (isNewAccount) {
-      const { error } = await supabase.from('residents').update({ profile_id: userId }).eq('id', resident_id)
-      if (error) {
-        await rollback()
-        return { error: toMessage(error, m.board_link_account_failed()) }
-      }
-    }
-
-    const { error: rolesError } = await supabase
-      .from('user_roles')
-      .insert(roles.map((role) => ({ user_id: userId, role })))
-    if (rolesError) {
-      if (isNewAccount) {
-        await supabase.from('residents').update({ profile_id: null }).eq('id', resident_id)
-      }
-      await rollback()
-      return { error: toMessage(rolesError, m.board_assign_roles_failed()) }
-    }
-
-    return { data: { link: invite.link, full_name: fullName, phone: resident.phone } }
+    return { data: { link, name: seated.name, phone: seated.phone } }
   })
 
 export const addBoardMember = (input: AddBoardMemberInput) => addBoardMemberFn({ data: input })
 
 /** A fresh link for someone who lost theirs or let it expire. */
 const resendInviteFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([boardManage])
   .validator((userId: string) => userId)
-  .handler(async ({ data: userId }): Promise<ActionResult<InviteResult>> => {
-    const manager = await requireBoardManager()
-    if ('error' in manager) return manager
-
-    const supabase = await createClient()
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name, user_roles!user_id ( role ), resident:residents!profile_id ( email, phone )')
-      .eq('id', userId)
-      .maybeSingle()
-
-    // The link signs in as that person, so it's as good as their account.
-    if (profile?.user_roles.some((r) => r.role === 'admin') && !manager.isAdmin) {
-      return { error: m.board_only_admin_link_admin() }
-    }
-    if (!profile?.resident?.email) {
-      return { error: m.board_member_no_email() }
+  .handler(async ({ data: userId, context }): Promise<ActionResult<InviteResult>> => {
+    let target: board.AccessLinkTarget
+    try {
+      target = await transactionAs(context.user.id, (tx) => board.accessLinkTarget(tx, context.user, userId))
+    } catch (error) {
+      return {
+        error: errorMessage(error, {
+          fallback: m.board_link_create_failed(),
+          service: {
+            admin_only: m.board_only_admin_link_admin(),
+            not_found: m.board_member_no_email(),
+            resident_no_email: m.board_member_no_email(),
+          },
+        }),
+      }
     }
 
-    const invite = await createInviteLink(profile.resident.email, profile.full_name, true)
-    if ('error' in invite) {
+    const link = await createAccessLink(target.email)
+    if (!link) {
       return { error: m.board_link_create_failed() }
     }
 
-    return { data: { link: invite.link, full_name: profile.full_name, phone: profile.resident.phone } }
+    return { data: { link, name: target.name, phone: target.phone } }
   })
 
 export const resendInvite = (userId: string) => resendInviteFn({ data: userId })
 
 const updateBoardMemberRolesFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([boardManage])
   .validator((data: { userId: string; input: UpdateBoardMemberRolesInput }) => data)
-  .handler(async ({ data: { userId, input } }): Promise<ActionResult> => {
+  .handler(async ({ data: { userId, input }, context }): Promise<ActionResult> => {
     const parsed = updateBoardMemberRolesSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const manager = await requireBoardManager()
-    if ('error' in manager) return manager
-    if (userId === manager.user.id) {
-      return { error: m.board_cannot_change_own_roles() }
-    }
-
-    const supabase = await createClient()
-    const { data: currentRows, error: readError } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-    if (readError) {
-      return { error: toMessage(readError, m.board_read_roles_failed()) }
-    }
-
-    const current = new Set<AppRole>(currentRows.map((r) => r.role))
-    const next = new Set<AppRole>(parsed.data.roles)
-    const toAdd = [...next].filter((role) => !current.has(role))
-    const toRemove = [...current].filter((role) => !next.has(role))
-
-    if ([...toAdd, ...toRemove].includes('admin') && !manager.isAdmin) {
-      return { error: m.board_only_admin_change_admin() }
-    }
-
-    if (toRemove.length > 0) {
-      const { error } = await supabase.from('user_roles').delete().eq('user_id', userId).in('role', toRemove)
-      if (error) return { error: toMessage(error, m.board_update_roles_failed()) }
-    }
-    if (toAdd.length > 0) {
-      const { error } = await supabase
-        .from('user_roles')
-        .insert(toAdd.map((role) => ({ user_id: userId, role })))
-      if (error) return { error: toMessage(error, m.board_update_roles_failed()) }
+    try {
+      await transactionAs(context.user.id, (tx) =>
+        board.updateBoardMemberRoles(tx, context.user, { userId, roles: parsed.data.roles }),
+      )
+    } catch (error) {
+      return {
+        error: errorMessage(error, {
+          fallback: m.board_update_roles_failed(),
+          service: {
+            self_change: m.board_cannot_change_own_roles(),
+            admin_only: m.board_only_admin_change_admin(),
+            main_admin_protected: m.board_main_admin_protected(),
+            not_found: m.board_update_roles_failed(),
+          },
+        }),
+      }
     }
 
     return { data: undefined }
@@ -251,92 +190,26 @@ export const updateBoardMemberRoles = (userId: string, input: UpdateBoardMemberR
  * but with no roles they can no longer sign in, and they leave the board list.
  */
 const removeBoardMemberFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([boardManage])
   .validator((userId: string) => userId)
-  .handler(async ({ data: userId }): Promise<ActionResult> => {
-    const manager = await requireBoardManager()
-    if ('error' in manager) return manager
-    if (userId === manager.user.id) {
-      return { error: m.board_cannot_remove_self() }
-    }
-
-    const supabase = await createClient()
-    const { data: rows, error: readError } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-    if (readError) {
-      return { error: toMessage(readError, m.board_remove_member_failed()) }
-    }
-    if (rows.some((r) => r.role === 'admin') && !manager.isAdmin) {
-      return { error: m.board_only_admin_remove_admin() }
-    }
-
-    const { data, error } = await supabase.from('user_roles').delete().eq('user_id', userId).select('role')
-    if (error) {
-      return { error: toMessage(error, m.board_remove_member_failed()) }
-    }
-    if (data.length === 0) {
-      return { error: m.common_no_permission() }
+  .handler(async ({ data: userId, context }): Promise<ActionResult> => {
+    try {
+      await transactionAs(context.user.id, (tx) => board.removeBoardMember(tx, context.user, userId))
+    } catch (error) {
+      return {
+        error: errorMessage(error, {
+          fallback: m.board_remove_member_failed(),
+          service: {
+            self_change: m.board_cannot_remove_self(),
+            admin_only: m.board_only_admin_remove_admin(),
+            main_admin_protected: m.board_main_admin_protected(),
+            not_found: m.board_remove_member_failed(),
+          },
+        }),
+      }
     }
 
     return { data: undefined }
   })
 
 export const removeBoardMember = (userId: string) => removeBoardMemberFn({ data: userId })
-
-/**
- * First sign-in after an invite: the person chooses their password. Also the
- * main admin's first hosted sign-in, away from the default password; the
- * database clears must_change_password once the password changes.
- */
-const setPasswordFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
-  .validator((input: SetPasswordInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult> => {
-    const parsed = setPasswordSchema.safeParse(input)
-    if (!parsed.success) {
-      return { error: m.common_form_invalid() }
-    }
-
-    const supabase = await createClient()
-    const { data: claims } = await supabase.auth.getClaims()
-    const email = claims?.claims.email
-    if (!email) return { error: m.common_no_permission() }
-
-    // Hosted Auth asks for the current password ("Require current password when
-    // updating"), except in an access-link session. The main admin's first sign-in
-    // is a regular one, still on seed.sql's default: the flag clears on any change.
-    const user = await getCurrentUser()
-    const { error } = await supabase.auth.updateUser({
-      password: parsed.data.password,
-      current_password: user?.mustChangePassword ? HOSTED_DEFAULT_PASSWORD : undefined,
-    })
-    if (error?.code === 'same_password') {
-      // Someone resetting who typed the password they already had: it's still
-      // theirs, let them in. Unless it's the default one being replaced.
-      if (user?.mustChangePassword) return { error: m.auth_password_same_as_default() }
-    } else if (error) {
-      return { error: passwordUpdateErrorMessage(error, m.board_password_save_failed()) }
-    }
-
-    // The link session stays marked as such (see CurrentUser.mustSetPassword), so
-    // replace it with a regular sign-in; otherwise the app keeps sending them here.
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password: parsed.data.password,
-    })
-    if (signInError) {
-      return { error: m.board_password_saved_sign_in_failed() }
-    }
-
-    // Sign out every other device. Auth already ends the other sessions on a
-    // password change, but keeps the link session we just replaced, and does
-    // nothing on the same_password path.
-    const { error: signOutError } = await supabase.auth.signOut({ scope: 'others' })
-    if (signOutError) console.error('signOut others failed', signOutError)
-
-    return { data: undefined }
-  })
-
-export const setPassword = (input: SetPasswordInput) => setPasswordFn({ data: input })

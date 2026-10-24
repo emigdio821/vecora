@@ -5,18 +5,18 @@ import { ISO_DAY } from '@/lib/utils'
 interface PeriodDates {
   id: string
   name: string
-  starts_on: string
-  ends_on: string
+  startsOn: string
+  endsOn: string
 }
 
 /** The period `day` falls in. Periods never overlap, so there is at most one. */
 export function periodFor<T extends PeriodDates>(periods: T[], day: string) {
-  return periods.find((period) => period.starts_on <= day && day <= period.ends_on)
+  return periods.find((period) => period.startsOn <= day && day <= period.endsOn)
 }
 
 /** Whether a period covers at least one day from `from` to `to`, both included. */
 export function overlapsPeriod(periods: PeriodDates[], from: string, to: string): boolean {
-  return periods.some((period) => period.starts_on <= to && from <= period.ends_on)
+  return periods.some((period) => period.startsOn <= to && from <= period.endsOn)
 }
 
 /**
@@ -27,9 +27,9 @@ export function overlapsPeriod(periods: PeriodDates[], from: string, to: string)
 export function reportableMonths(periods: PeriodDates[], today: string): string[] {
   const months = new Set<string>()
   for (const period of periods) {
-    if (period.starts_on > today) continue
-    const end = period.ends_on < today ? period.ends_on : today
-    for (const month of eachMonthOfInterval({ start: parseISO(period.starts_on), end: parseISO(end) })) {
+    if (period.startsOn > today) continue
+    const end = period.endsOn < today ? period.endsOn : today
+    for (const month of eachMonthOfInterval({ start: parseISO(period.startsOn), end: parseISO(end) })) {
       months.add(format(month, ISO_DAY))
     }
   }
@@ -52,7 +52,7 @@ export function feeMonthsByPeriod(periods: PeriodDates[]): FeeMonthGroup[] {
   const groups: FeeMonthGroup[] = []
 
   for (const period of periods) {
-    const months = eachMonthOfInterval({ start: parseISO(period.starts_on), end: parseISO(period.ends_on) })
+    const months = eachMonthOfInterval({ start: parseISO(period.startsOn), end: parseISO(period.endsOn) })
       .map((month) => format(month, ISO_DAY))
       .filter((month) => !listed.has(month))
     for (const month of months) listed.add(month)
@@ -82,33 +82,33 @@ export function adjacentGaps(
   excludeId?: string,
 ): { before?: PeriodGap; after?: PeriodGap } {
   const others = periods.filter((period) => period.id !== excludeId)
-  if (others.some((period) => period.starts_on <= endsOn && startsOn <= period.ends_on)) return {}
+  if (others.some((period) => period.startsOn <= endsOn && startsOn <= period.endsOn)) return {}
 
   const previous = others
-    .filter((period) => period.ends_on < startsOn)
+    .filter((period) => period.endsOn < startsOn)
     .reduce<PeriodDates | undefined>(
-      (latest, period) => (latest === undefined || period.ends_on > latest.ends_on ? period : latest),
+      (latest, period) => (latest === undefined || period.endsOn > latest.endsOn ? period : latest),
       undefined,
     )
   const next = others
-    .filter((period) => period.starts_on > endsOn)
+    .filter((period) => period.startsOn > endsOn)
     .reduce<PeriodDates | undefined>(
       (earliest, period) =>
-        earliest === undefined || period.starts_on < earliest.starts_on ? period : earliest,
+        earliest === undefined || period.startsOn < earliest.startsOn ? period : earliest,
       undefined,
     )
 
   const gaps: { before?: PeriodGap; after?: PeriodGap } = {}
   if (previous) {
-    const from = format(addDays(parseISO(previous.ends_on), 1), ISO_DAY)
+    const from = format(addDays(parseISO(previous.endsOn), 1), ISO_DAY)
     if (from < startsOn) {
       gaps.before = { from, to: format(subDays(parseISO(startsOn), 1), ISO_DAY), neighbour: previous.name }
     }
   }
   if (next) {
     const from = format(addDays(parseISO(endsOn), 1), ISO_DAY)
-    if (from < next.starts_on) {
-      gaps.after = { from, to: format(subDays(parseISO(next.starts_on), 1), ISO_DAY), neighbour: next.name }
+    if (from < next.startsOn) {
+      gaps.after = { from, to: format(subDays(parseISO(next.startsOn), 1), ISO_DAY), neighbour: next.name }
     }
   }
   return gaps

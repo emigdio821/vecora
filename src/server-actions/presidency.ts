@@ -1,14 +1,11 @@
-import type { PostgrestError } from '@supabase/supabase-js'
 import { createServerFn } from '@tanstack/react-start'
-import {
-  type ActionResult,
-  FK_VIOLATION,
-  isFolioTaken,
-  postgrestErrorMessage,
-  requestResolutionErrorMessage,
-} from '@/lib/action-result'
-import { authMiddleware } from '@/lib/supabase/auth-middleware'
-import { createClient } from '@/lib/supabase/server'
+import { eq, sql } from 'drizzle-orm'
+import { type ActionResult, databaseError, errorMessage, FK_VIOLATION } from '@/lib/action-result'
+import { boardMiddleware, requirePermission } from '@/lib/auth/middleware'
+import { db, transactionAs } from '@/lib/db'
+import { amenities } from '@/lib/db/schema'
+import type { ServiceErrorCode } from '@/lib/services/errors'
+import * as presidency from '@/lib/services/presidency'
 import {
   type AmenityInput,
   amenitySchema,
@@ -21,61 +18,109 @@ import {
 } from '@/lib/validations/presidency'
 import { m } from '@/paraglide/messages'
 
+const amenityWrite = requirePermission({ amenity: ['write'] })
+const reservationWrite = requirePermission({ reservation: ['write'] })
+const reservationCollect = requirePermission({ reservation: ['collect'] })
+
+// ---------------------------------------------------------------------------
+// periods
+// ---------------------------------------------------------------------------
+
+/**
+ * Newest first. `transactionCount` includes soft-deleted rows on purpose:
+ * the ledger is never purged, so any row at all blocks a hard delete.
+ */
+const fetchPeriodsFn = createServerFn()
+  .middleware([boardMiddleware])
+  .handler(() =>
+    db.query.periods.findMany({
+      columns: {
+        id: true,
+        name: true,
+        startsOn: true,
+        endsOn: true,
+        monthlyFee: true,
+        lateFee: true,
+        dueDay: true,
+        currency: true,
+      },
+      extras: {
+        transactionCount: (table) =>
+          sql<number>`(select count(*)::int from transactions t where t.period_id = ${table.id})`,
+      },
+      orderBy: { startsOn: 'desc' },
+    }),
+  )
+
+export const fetchPeriods = () => fetchPeriodsFn()
+
 // ---------------------------------------------------------------------------
 // amenities
 // ---------------------------------------------------------------------------
 
-function toAmenityMessage(error: PostgrestError, fallback: string) {
-  return postgrestErrorMessage(error, {
+/**
+ * Every common area, by name, retired ones included: their bookings still
+ * name them. `reservationCount` decides whether one can be deleted.
+ */
+const fetchAmenitiesFn = createServerFn()
+  .middleware([boardMiddleware])
+  .handler(() =>
+    db.query.amenities.findMany({
+      columns: { id: true, name: true, defaultFee: true, isActive: true },
+      extras: {
+        reservationCount: (table) =>
+          sql<number>`(select count(*)::int from amenity_reservations r where r.amenity_id = ${table.id})`,
+      },
+      orderBy: { name: 'asc' },
+    }),
+  )
+
+export const fetchAmenities = () => fetchAmenitiesFn()
+
+function toAmenityMessage(error: unknown, fallback: string) {
+  return errorMessage(error, {
     fallback,
-    unique: { amenities_name_unique: m.presidency_error_amenity_name_taken() },
+    constraints: { amenities_name_unique: m.presidency_error_amenity_name_taken() },
   })
 }
 
 const createAmenityFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([amenityWrite])
   .validator((input: AmenityInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
+  .handler(async ({ data: input, context }): Promise<ActionResult<{ id: string }>> => {
     const parsed = amenitySchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const supabase = await createClient()
-    const { data, error } = await supabase.from('amenities').insert(parsed.data).select('id').single()
-
-    if (error) {
+    try {
+      const [created] = await transactionAs(context.user.id, (tx) =>
+        tx.insert(amenities).values(parsed.data).returning({ id: amenities.id }),
+      )
+      return { data: created }
+    } catch (error) {
       return { error: toAmenityMessage(error, m.presidency_error_create_amenity()) }
     }
-
-    return { data }
   })
 
 export const createAmenity = (input: AmenityInput) => createAmenityFn({ data: input })
 
 /** Past bookings keep their amount; the new fee applies from the next one. */
 const updateAmenityFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([amenityWrite])
   .validator((data: { id: string; input: AmenityInput }) => data)
-  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+  .handler(async ({ data: { id, input }, context }): Promise<ActionResult> => {
     const parsed = amenitySchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('amenities')
-      .update(parsed.data)
-      .eq('id', id)
-      .select('id')
-      .single()
-
-    if (error) {
+    try {
+      await transactionAs(context.user.id, (tx) =>
+        tx.update(amenities).set(parsed.data).where(eq(amenities.id, id)),
+      )
+    } catch (error) {
       return { error: toAmenityMessage(error, m.presidency_error_update_amenity()) }
-    }
-    if (!data) {
-      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -85,22 +130,15 @@ export const updateAmenity = (id: string, input: AmenityInput) => updateAmenityF
 
 /** Retire / reinstate. Retired areas keep their bookings but leave the booking form. */
 const setAmenityActiveFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([amenityWrite])
   .validator((data: { id: string; isActive: boolean }) => data)
-  .handler(async ({ data: { id, isActive } }): Promise<ActionResult> => {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('amenities')
-      .update({ is_active: isActive })
-      .eq('id', id)
-      .select('id')
-      .single()
-
-    if (error) {
+  .handler(async ({ data: { id, isActive }, context }): Promise<ActionResult> => {
+    try {
+      await transactionAs(context.user.id, (tx) =>
+        tx.update(amenities).set({ isActive }).where(eq(amenities.id, id)),
+      )
+    } catch (error) {
       return { error: toAmenityMessage(error, m.presidency_error_update_amenity()) }
-    }
-    if (!data) {
-      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -111,20 +149,16 @@ export const setAmenityActive = (id: string, isActive: boolean) =>
 
 /** Hard delete; only possible while the area has no bookings. */
 const deleteAmenityFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([amenityWrite])
   .validator((id: string) => id)
-  .handler(async ({ data: id }): Promise<ActionResult> => {
-    const supabase = await createClient()
-    const { data, error } = await supabase.from('amenities').delete().eq('id', id).select('id')
-
-    if (error) {
-      if (error.code === FK_VIOLATION) {
+  .handler(async ({ data: id, context }): Promise<ActionResult> => {
+    try {
+      await transactionAs(context.user.id, (tx) => tx.delete(amenities).where(eq(amenities.id, id)))
+    } catch (error) {
+      if (databaseError(error).code === FK_VIOLATION) {
         return { error: m.presidency_error_amenity_in_use() }
       }
       return { error: toAmenityMessage(error, m.presidency_error_delete_amenity()) }
-    }
-    if (data.length === 0) {
-      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -136,83 +170,117 @@ export const deleteAmenity = (id: string) => deleteAmenityFn({ data: id })
 // reservations
 // ---------------------------------------------------------------------------
 
-// Raised by the guard trigger once a booking has money recorded against it.
-const PAID = 'P0003'
+/**
+ * Every booking, upcoming first. Soft-deleted houses stay attached: the booking did happen.
+ * `movements` are its live fee (income) and refund (expense) in the ledger;
+ * the payment status is derived from them (see reservationStatus).
+ */
+const fetchReservationsFn = createServerFn()
+  .middleware([boardMiddleware])
+  .handler(async () => {
+    const reservations = await db.query.amenityReservations.findMany({
+      columns: {
+        id: true,
+        reservedOn: true,
+        amount: true,
+        currency: true,
+        notes: true,
+        createdAt: true,
+        cancelledAt: true,
+      },
+      with: {
+        amenity: { columns: { id: true, name: true } },
+        property: { columns: { id: true, number: true } },
+        transactions: {
+          columns: { id: true, kind: true, amount: true, occurredOn: true, folio: true },
+          where: { deletedAt: { isNull: true } },
+        },
+      },
+      orderBy: { reservedOn: 'desc' },
+    })
 
-function toMessage(error: PostgrestError, fallback: string) {
-  if (error.code === PAID && error.message.includes('cancel it instead')) {
-    return m.presidency_error_reservation_paid_cancel()
-  }
-  if (error.code === PAID) {
-    return m.presidency_error_reservation_paid_locked()
-  }
-  return postgrestErrorMessage(error, {
+    return reservations.map(({ transactions, ...reservation }) => ({
+      ...reservation,
+      movements: transactions,
+    }))
+  })
+
+export const fetchReservations = () => fetchReservationsFn()
+
+/** What the booking rules say, wherever they come up; `service` overrides them. */
+function toMessage(error: unknown, fallback: string, service?: Partial<Record<ServiceErrorCode, string>>) {
+  return errorMessage(error, {
     fallback,
-    unique: { amenity_reservations_one_per_day: m.presidency_error_day_taken() },
+    service: {
+      not_found: m.presidency_error_reservation_not_found(),
+      reservation_cancelled: m.presidency_error_already_cancelled(),
+      reservation_free: m.presidency_error_no_cost(),
+      already_resolved: m.presidency_error_already_paid(),
+      refund_too_large: m.presidency_error_refund_exceeds(),
+      transfer_needs_reference: m.presidency_reference_required(),
+      ...service,
+    },
+    constraints: { amenity_reservations_one_per_day: m.presidency_error_day_taken() },
   })
 }
 
-/** Errors from pay_amenity_reservation / cancel_amenity_reservation. */
-function toResolutionMessage(error: PostgrestError, fallback: string) {
-  if (isFolioTaken(error)) return m.common_folio_taken()
-  if (error.message.includes('already paid')) return m.presidency_error_already_paid()
-  if (error.message.includes('cancelled')) return m.presidency_error_already_cancelled()
-  if (error.message.includes('no cost')) return m.presidency_error_no_cost()
-  if (error.message.includes('exceeds')) return m.presidency_error_refund_exceeds()
-  if (error.message.includes('not found')) return m.presidency_error_reservation_not_found()
-  return requestResolutionErrorMessage(error, fallback)
-}
-
 const createReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationWrite])
   .validator((input: ReservationInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
+  .handler(async ({ data: input, context }): Promise<ActionResult<{ id: string }>> => {
     const parsed = reservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { amenity_id, property_id, reserved_on, amount, notes } = parsed.data
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('amenity_reservations')
-      .insert({ amenity_id, property_id, reserved_on, amount, notes: notes || null })
-      .select('id')
-      .single()
+    const { amenityId, propertyId, reservedOn, amount, notes } = parsed.data
 
-    if (error) {
+    try {
+      const created = await transactionAs(context.user.id, (tx) =>
+        presidency.createReservation(tx, context.user, {
+          amenityId,
+          propertyId,
+          reservedOn,
+          amount,
+          notes: notes || null,
+        }),
+      )
+      return { data: created }
+    } catch (error) {
       return { error: toMessage(error, m.presidency_error_create_reservation()) }
     }
-
-    return { data }
   })
 
 export const createReservation = (input: ReservationInput) => createReservationFn({ data: input })
 
-/** Not once cancelled (RLS). Once paid, the guard trigger keeps the area, house and amount. */
+/** Not once cancelled. Once paid, the area, house and amount stay. */
 const updateReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationWrite])
   .validator((data: { id: string; input: ReservationInput }) => data)
-  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+  .handler(async ({ data: { id, input }, context }): Promise<ActionResult> => {
     const parsed = reservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { amenity_id, property_id, reserved_on, amount, notes } = parsed.data
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('amenity_reservations')
-      .update({ amenity_id, property_id, reserved_on, amount, notes: notes || null })
-      .eq('id', id)
-      .select('id')
-      .single()
+    const { amenityId, propertyId, reservedOn, amount, notes } = parsed.data
 
-    if (error) {
-      return { error: toMessage(error, m.presidency_error_update_reservation()) }
-    }
-    if (!data) {
-      return { error: m.common_no_permission() }
+    try {
+      await transactionAs(context.user.id, (tx) =>
+        presidency.updateReservation(tx, id, {
+          amenityId,
+          propertyId,
+          reservedOn,
+          amount,
+          notes: notes || null,
+        }),
+      )
+    } catch (error) {
+      return {
+        error: toMessage(error, m.presidency_error_update_reservation(), {
+          reservation_paid: m.presidency_error_reservation_paid_locked(),
+        }),
+      }
     }
 
     return { data: undefined }
@@ -223,17 +291,17 @@ export const updateReservation = (id: string, input: ReservationInput) =>
 
 /** Unpaid bookings only; a paid one is cancelled with cancelReservation. */
 const deleteReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationWrite])
   .validator((id: string) => id)
-  .handler(async ({ data: id }): Promise<ActionResult> => {
-    const supabase = await createClient()
-    const { data, error } = await supabase.from('amenity_reservations').delete().eq('id', id).select('id')
-
-    if (error) {
-      return { error: toMessage(error, m.presidency_error_cancel_reservation()) }
-    }
-    if (data.length === 0) {
-      return { error: m.common_no_permission() }
+  .handler(async ({ data: id, context }): Promise<ActionResult> => {
+    try {
+      await transactionAs(context.user.id, (tx) => presidency.deleteReservation(tx, id))
+    } catch (error) {
+      return {
+        error: toMessage(error, m.presidency_error_cancel_reservation(), {
+          reservation_paid: m.presidency_error_reservation_paid_cancel(),
+        }),
+      }
     }
 
     return { data: undefined }
@@ -242,57 +310,58 @@ const deleteReservationFn = createServerFn({ method: 'POST' })
 export const deleteReservation = (id: string) => deleteReservationFn({ data: id })
 
 const payReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationCollect])
   .validator((data: { id: string; input: PayReservationInput }) => data)
-  .handler(async ({ data: { id, input } }): Promise<ActionResult<{ transaction_id: string }>> => {
+  .handler(async ({ data: { id, input }, context }): Promise<ActionResult<{ transactionId: string }>> => {
     const parsed = payReservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { occurred_on, folio, payment_method, reference, notes } = parsed.data
-    const supabase = await createClient()
-    const { data, error } = await supabase.rpc('pay_amenity_reservation', {
-      p_reservation_id: id,
-      p_occurred_on: occurred_on,
-      p_folio: folio,
-      p_payment_method: payment_method,
-      p_reference: reference || undefined,
-      p_notes: notes || undefined,
-    })
+    const { occurredOn, folio, paymentMethod, reference, notes } = parsed.data
 
-    if (error) {
-      return { error: toResolutionMessage(error, m.presidency_error_record_payment()) }
+    try {
+      const paid = await transactionAs(context.user.id, (tx) =>
+        presidency.payReservation(tx, context.user, id, {
+          occurredOn,
+          folio,
+          paymentMethod,
+          reference: reference || null,
+          notes: notes || null,
+        }),
+      )
+      return { data: paid }
+    } catch (error) {
+      return { error: toMessage(error, m.presidency_error_record_payment()) }
     }
-
-    return { data: { transaction_id: data } }
   })
 
 export const payReservation = (id: string, input: PayReservationInput) =>
   payReservationFn({ data: { id, input } })
 
 const cancelReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationCollect])
   .validator((data: { id: string; input: CancelReservationInput }) => data)
-  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+  .handler(async ({ data: { id, input }, context }): Promise<ActionResult> => {
     const parsed = cancelReservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { refund_amount, occurred_on, payment_method, reference, notes } = parsed.data
-    const supabase = await createClient()
-    const { error } = await supabase.rpc('cancel_amenity_reservation', {
-      p_reservation_id: id,
-      p_refund_amount: refund_amount,
-      p_occurred_on: occurred_on,
-      p_payment_method: payment_method,
-      p_reference: reference || undefined,
-      p_notes: notes || undefined,
-    })
+    const { refundAmount, occurredOn, paymentMethod, reference, notes } = parsed.data
 
-    if (error) {
-      return { error: toResolutionMessage(error, m.presidency_error_cancel_reservation()) }
+    try {
+      await transactionAs(context.user.id, (tx) =>
+        presidency.cancelReservation(tx, context.user, id, {
+          refundAmount,
+          occurredOn,
+          paymentMethod,
+          reference: reference || null,
+          notes: notes || null,
+        }),
+      )
+    } catch (error) {
+      return { error: toMessage(error, m.presidency_error_cancel_reservation()) }
     }
 
     return { data: undefined }

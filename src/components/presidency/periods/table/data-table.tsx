@@ -22,7 +22,7 @@ export function PeriodsDataTable() {
         ...period,
         // The period's own currency first, then any other it has movements in.
         summaries: summaries
-          ?.filter((s) => s.period_id === period.id)
+          ?.filter((s) => s.periodId === period.id)
           .sort((a, b) => Number(b.currency === period.currency) - Number(a.currency === period.currency)),
       })),
     [periods, summaries],
@@ -38,7 +38,7 @@ export function PeriodsDataTable() {
       tableId="periods"
       columns={periodsTableColumns}
       getRowId={(period) => period.id}
-      initialSorting={[{ id: 'starts_on', desc: true }]}
+      initialSorting={[{ id: 'startsOn', desc: true }]}
       // The query is ordered newest first, so periods[0] is the latest.
       header={(table) => <PeriodsDataTableHeader table={table} latest={periods[0]} isLoading={isLoading} />}
       emptyMessage={m.presidency_periods_empty()}

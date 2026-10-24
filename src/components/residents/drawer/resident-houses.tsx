@@ -34,7 +34,7 @@ interface ResidentHousesProps {
  */
 export function ResidentHouses({ resident, disabled }: ResidentHousesProps) {
   const [isAssignOpen, setAssignOpen] = useState(false)
-  const links = [...resident.property_residents].sort((a, b) =>
+  const links = [...resident.propertyLinks].sort((a, b) =>
     a.property.number.localeCompare(b.property.number, 'es', { numeric: true }),
   )
 
@@ -81,7 +81,7 @@ export function ResidentHouses({ resident, disabled }: ResidentHousesProps) {
   )
 }
 
-type LinkedHouse = ResidentQueryData['property_residents'][number]['property']
+type LinkedHouse = ResidentQueryData['propertyLinks'][number]['property']
 
 function UnassignHouseButton({
   resident,
@@ -94,7 +94,7 @@ function UnassignHouseButton({
 }) {
   const queryClient = useQueryClient()
   const [isConfirmOpen, setConfirmOpen] = useState(false)
-  const name = `${resident.first_name} ${resident.last_name}`
+  const name = `${resident.firstName} ${resident.lastName}`
 
   const mutation = useMutation({
     mutationFn: async () => {

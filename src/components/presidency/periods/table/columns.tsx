@@ -19,7 +19,7 @@ export type PeriodRow = PeriodQueryData & { summaries: PeriodSummaryQueryData[] 
 /** "YYYY-MM-DD" strings compare correctly as text, so no parsing needed. */
 function isCurrentPeriod(period: PeriodQueryData) {
   const today = format(new Date(), ISO_DAY)
-  return period.starts_on <= today && today <= period.ends_on
+  return period.startsOn <= today && today <= period.endsOn
 }
 
 const columnHelper = createColumnHelper<DataTableFeatures, PeriodRow>()
@@ -43,8 +43,8 @@ export const periodsTableColumns = columnHelper.columns([
     },
   }),
 
-  columnHelper.accessor('starts_on', {
-    id: 'starts_on',
+  columnHelper.accessor('startsOn', {
+    id: 'startsOn',
     size: 120,
     header: ({ column }) => (
       <DataTableSortableHeader column={column} title={m.presidency_period_starts_on()} />
@@ -52,15 +52,15 @@ export const periodsTableColumns = columnHelper.columns([
     cell: ({ getValue }) => <span className="whitespace-nowrap tabular-nums">{formatDay(getValue())}</span>,
   }),
 
-  columnHelper.accessor('ends_on', {
-    id: 'ends_on',
+  columnHelper.accessor('endsOn', {
+    id: 'endsOn',
     size: 120,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.presidency_period_ends_on()} />,
     cell: ({ getValue }) => <span className="whitespace-nowrap tabular-nums">{formatDay(getValue())}</span>,
   }),
 
-  columnHelper.accessor((row) => Number(row.monthly_fee), {
-    id: 'monthly_fee',
+  columnHelper.accessor('monthlyFee', {
+    id: 'monthlyFee',
     size: 130,
     header: ({ column }) => (
       <DataTableSortableHeader column={column} title={m.presidency_period_fee()} className="justify-end" />
@@ -72,8 +72,8 @@ export const periodsTableColumns = columnHelper.columns([
     ),
   }),
 
-  columnHelper.accessor((row) => Number(row.late_fee), {
-    id: 'late_fee',
+  columnHelper.accessor('lateFee', {
+    id: 'lateFee',
     size: 120,
     header: ({ column }) => (
       <DataTableSortableHeader
@@ -89,8 +89,8 @@ export const periodsTableColumns = columnHelper.columns([
     ),
   }),
 
-  columnHelper.accessor('due_day', {
-    id: 'due_day',
+  columnHelper.accessor('dueDay', {
+    id: 'dueDay',
     size: 110,
     header: () => m.presidency_period_due_day_short(),
     cell: ({ getValue }) => (
@@ -99,7 +99,7 @@ export const periodsTableColumns = columnHelper.columns([
   }),
 
   // Sorts by the balance in the period's own currency.
-  columnHelper.accessor((row) => Number(row.summaries?.[0]?.balance ?? 0), {
+  columnHelper.accessor((row) => row.summaries?.[0]?.balance ?? 0, {
     id: 'balance',
     size: 140,
     header: ({ column }) => (
@@ -107,7 +107,7 @@ export const periodsTableColumns = columnHelper.columns([
     ),
     cell: ({ row }) =>
       row.original.summaries?.map((summary) => {
-        const balance = Number(summary.balance)
+        const { balance } = summary
         return (
           <span
             key={summary.currency}
@@ -116,7 +116,7 @@ export const periodsTableColumns = columnHelper.columns([
               balance < 0 && 'text-destructive-foreground',
             )}
           >
-            <Money value={balance} currency={summary.currency ?? row.original.currency} />
+            <Money value={balance} currency={summary.currency} />
           </span>
         )
       }),

@@ -77,8 +77,8 @@ export function NoticesCard() {
   // The query is newest first; the notices read soonest first. A cancelled
   // booking no longer happens.
   const upcoming = reservations.data
-    .filter((r) => r.reserved_on >= today && !r.cancelled_at)
-    .sort((a, b) => a.reserved_on.localeCompare(b.reserved_on))
+    .filter((r) => r.reservedOn >= today && !r.cancelledAt)
+    .sort((a, b) => a.reservedOn.localeCompare(b.reservedOn))
     .slice(0, MAX_NOTICES)
 
   return (
@@ -106,10 +106,10 @@ export function NoticesCard() {
                     }}
                     className="max-w-full justify-self-start truncate font-medium hover:underline"
                   >
-                    {format(parseISO(reservation.reserved_on), m.dashboard_notices_date_pattern(), {
+                    {format(parseISO(reservation.reservedOn), m.dashboard_notices_date_pattern(), {
                       locale: dateLocale(),
                     })}
-                    {reservation.reserved_on === today && ` - ${m.common_today()}`}
+                    {reservation.reservedOn === today && ` - ${m.common_today()}`}
                   </Link>
                   <span className="truncate text-xs text-muted-foreground">
                     {reservation.amenity.name} -{' '}

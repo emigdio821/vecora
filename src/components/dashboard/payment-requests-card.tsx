@@ -36,7 +36,7 @@ interface PaymentRequest {
   title: string
   amount: number
   currency: CurrencyCode
-  requested_on: string
+  requestedOn: string
 }
 
 // On phones the amount goes below the title, so a row is 100px: two are 201px with the divider.
@@ -110,7 +110,7 @@ export function PaymentRequestsCard() {
         title: r.title,
         amount: r.amount,
         currency: r.currency,
-        requested_on: r.requested_on,
+        requestedOn: r.requestedOn,
       })),
     ...security.data
       .filter((r) => r.status === 'pending')
@@ -121,7 +121,7 @@ export function PaymentRequestsCard() {
         title: r.title,
         amount: r.amount,
         currency: r.currency,
-        requested_on: r.requested_on,
+        requestedOn: r.requestedOn,
       })),
     ...reservations.data
       .filter((r) => reservationStatus(r) === 'pending')
@@ -138,11 +138,11 @@ export function PaymentRequestsCard() {
         }),
         section: m.common_section_reservations(),
         title: m.dashboard_requests_reservation_fee({ amenity: r.amenity.name, number: r.property.number }),
-        amount: Number(r.amount),
+        amount: r.amount,
         currency: r.currency,
-        requested_on: r.reserved_on,
+        requestedOn: r.reservedOn,
       })),
-  ].sort((a, b) => a.requested_on.localeCompare(b.requested_on))
+  ].sort((a, b) => a.requestedOn.localeCompare(b.requestedOn))
 
   return (
     <CardFrame className="w-full">
@@ -165,7 +165,7 @@ export function PaymentRequestsCard() {
                         {request.title}
                       </Link>
                       <span className="truncate text-xs text-muted-foreground">
-                        {request.section} - {formatDay(request.requested_on)}
+                        {request.section} - {formatDay(request.requestedOn)}
                       </span>
                     </span>
                     <span className="shrink-0 font-medium tabular-nums">

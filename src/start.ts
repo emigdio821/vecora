@@ -4,7 +4,7 @@ import { loginHrefForCurrentPage } from '@/lib/utils'
 
 /**
  * A server function that finds the session gone throws a redirect to /login
- * (lib/supabase/auth-middleware.ts). The caller is usually a mutation or a
+ * (sessionMiddleware in lib/auth/middleware.ts). The caller is usually a mutation or a
  * query, which would show it as an error; a full page load instead resets
  * the cached user and lands on the login page.
  */

@@ -103,8 +103,8 @@ function EditRequestForm({
     defaultValues: {
       title: request.title,
       details: request.details ?? '',
-      amount: Number(request.amount),
-      requested_on: request.requested_on,
+      amount: request.amount,
+      requestedOn: request.requestedOn,
     },
   })
 

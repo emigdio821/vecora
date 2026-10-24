@@ -1,5 +1,6 @@
 import { IconPencil, IconTrash } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import { useState } from 'react'
 import { Muted } from '@/components/shared/details'
 import { Button } from '@/components/ui/button'
@@ -14,7 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip'
-import { formatDay } from '@/lib/utils'
+import { formatDay, ISO_DAY } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import { type SavedTemplateQueryData, savedTemplatesQueryOptions } from '@/tanstack-queries/documents'
 import { DeleteTemplateAlertDialog } from './delete-template'
@@ -51,7 +52,7 @@ export function ManageTemplatesDialog({ viewer, ...props }: ManageTemplatesDialo
           {templates.length === 0 && <Muted>{m.documents_templates_none()}</Muted>}
           <ul className="grid gap-4">
             {templates.map((template) => {
-              const canManage = viewer.isAdmin || template.created_by === viewer.id
+              const canManage = viewer.isAdmin || template.createdBy === viewer.id
               return (
                 <li key={template.id} className="flex items-start justify-between gap-3 text-sm">
                   <div className="grid min-w-0 gap-0.5">
@@ -105,9 +106,9 @@ export function ManageTemplatesDialog({ viewer, ...props }: ManageTemplatesDialo
 
 /** "Guardada por Ana el 21 Oct 2026"; without the name once that account is gone. */
 function savedLine(template: SavedTemplateQueryData): string {
-  const date = formatDay(template.created_at)
+  const date = formatDay(format(template.createdAt, ISO_DAY))
   if (template.author) {
-    return m.documents_template_saved_by({ name: template.author.full_name, date })
+    return m.documents_template_saved_by({ name: template.author.name, date })
   }
   return m.documents_template_saved_on({ date })
 }
