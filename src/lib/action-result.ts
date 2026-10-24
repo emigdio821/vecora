@@ -18,7 +18,7 @@ export const EXCLUSION_VIOLATION = '23P01'
  * transactions_folio_one_receipt: the receipt book never repeats a folio.
  * Answer it with `m.common_folio_taken()`.
  */
-export function isFolioTaken(error: PostgrestError) {
+export function isFolioTaken(error: DatabaseError) {
   return error.code === EXCLUSION_VIOLATION && error.message.includes('transactions_folio_one_receipt')
 }
 

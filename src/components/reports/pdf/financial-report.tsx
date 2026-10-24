@@ -1,6 +1,6 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns'
-import type { CurrencyTotals, FinancialReport } from '@/lib/supabase/financial-report'
+import type { CurrencyTotals, FinancialReport } from '@/lib/db/financial-report'
 import {
   type CurrencyCode,
   dateLocale,

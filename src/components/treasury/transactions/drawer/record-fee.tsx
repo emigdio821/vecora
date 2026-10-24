@@ -48,7 +48,7 @@ import { formatDay, formatMonth, ISO_DAY } from '@/lib/utils'
 import { type RecordFeePaymentInput, recordFeePaymentSchema } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { recordFeePayment } from '@/server-actions/treasury'
-import { supabaseHousesPickerQueryOptions } from '@/tanstack-queries/houses'
+import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { PRESIDENCY_QUERY_KEY, periodsQueryOptions } from '@/tanstack-queries/presidency'
 import { TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'
 import { PAYMENT_METHOD_ITEMS } from '../../kind'
@@ -140,7 +140,7 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
     },
     onSuccess: (summary, values) => {
       const house = queryClient
-        .getQueryData(supabaseHousesPickerQueryOptions.queryKey)
+        .getQueryData(housesPickerQueryOptions.queryKey)
         ?.find((h) => h.id === values.property_id)
 
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
@@ -231,7 +231,6 @@ export function RecordFeeDrawer({ open, onOpenChange, ...props }: RecordFeeDrawe
                     {m.common_field_house()} <span className="text-destructive">*</span>
                   </FieldLabel>
                   <HousesPicker
-                    fromSupabase
                     value={field.value || null}
                     onValueChange={(value) => {
                       field.onChange(value ?? '')

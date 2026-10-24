@@ -23,7 +23,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn, formatMonth } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
-import { supabaseHousesPickerQueryOptions } from '@/tanstack-queries/houses'
+import { housesPickerQueryOptions } from '@/tanstack-queries/houses'
 import { houseFeeStatusQueryOptions } from '@/tanstack-queries/treasury'
 
 /** Header line: spell out the two extremes instead of "0 de 20" / "20 de 20". */
@@ -67,7 +67,7 @@ function FeeStatusSkeleton() {
 export function FeeStatusCard() {
   const status = useQuery(houseFeeStatusQueryOptions)
   // Owners come from the picker list, which is already cached by the forms.
-  const houses = useQuery(supabaseHousesPickerQueryOptions)
+  const houses = useQuery(housesPickerQueryOptions)
 
   if (status.isPending) {
     return <FeeStatusSkeleton />
