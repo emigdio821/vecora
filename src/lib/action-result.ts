@@ -77,7 +77,7 @@ const ALREADY_RESOLVED = 'P0003'
 export const FK_VIOLATION = '23503'
 
 /** Maps an error from `pay_*_request` / `reject_*_request` / `reopen_*_request` to a user-facing message. */
-export function requestResolutionErrorMessage(error: PostgrestError, fallback: string): string {
+export function requestResolutionErrorMessage(error: DatabaseError, fallback: string): string {
   if (error.code === ALREADY_RESOLVED && error.message.includes('not rejected')) {
     return m.common_request_already_reopened()
   }
