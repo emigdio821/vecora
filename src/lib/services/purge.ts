@@ -6,27 +6,56 @@
 // defense, so a missing check fails the purge instead of losing history.
 //
 // Runs with no actor: the activity log shows its deletes as the system's.
-import { sql } from 'drizzle-orm'
+import { and, eq, lt, notExists, sql } from 'drizzle-orm'
 import type { Database } from '@/lib/db/client'
+import { amenityReservations, properties, propertyResidents, residents, transactions } from '@/lib/db/schema'
+
+const SIX_MONTHS_AGO = sql`now() - interval '6 months'`
 
 export async function purgeSoftDeleted(db: Database): Promise<{ residents: number; houses: number }> {
   return db.transaction(async (tx) => {
-    const residents = await tx.execute<{ id: string }>(sql`
-      delete from residents r
-      where r.deleted_at < now() - interval '6 months'
-        and not exists (select 1 from property_residents pr where pr.resident_id = r.id)
-      returning r.id
-    `)
+    const purgedResidents = await tx
+      .delete(residents)
+      .where(
+        and(
+          lt(residents.deletedAt, SIX_MONTHS_AGO),
+          notExists(
+            tx
+              .select({ id: propertyResidents.residentId })
+              .from(propertyResidents)
+              .where(eq(propertyResidents.residentId, residents.id)),
+          ),
+        ),
+      )
+      .returning({ id: residents.id })
 
-    const houses = await tx.execute<{ id: string }>(sql`
-      delete from properties p
-      where p.deleted_at < now() - interval '6 months'
-        and not exists (select 1 from property_residents pr where pr.property_id = p.id)
-        and not exists (select 1 from transactions t where t.property_id = p.id)
-        and not exists (select 1 from amenity_reservations ar where ar.property_id = p.id)
-      returning p.id
-    `)
+    const purgedHouses = await tx
+      .delete(properties)
+      .where(
+        and(
+          lt(properties.deletedAt, SIX_MONTHS_AGO),
+          notExists(
+            tx
+              .select({ id: propertyResidents.propertyId })
+              .from(propertyResidents)
+              .where(eq(propertyResidents.propertyId, properties.id)),
+          ),
+          notExists(
+            tx
+              .select({ id: transactions.id })
+              .from(transactions)
+              .where(eq(transactions.propertyId, properties.id)),
+          ),
+          notExists(
+            tx
+              .select({ id: amenityReservations.id })
+              .from(amenityReservations)
+              .where(eq(amenityReservations.propertyId, properties.id)),
+          ),
+        ),
+      )
+      .returning({ id: properties.id })
 
-    return { residents: residents.rows.length, houses: houses.rows.length }
+    return { residents: purgedResidents.length, houses: purgedHouses.length }
   })
 }

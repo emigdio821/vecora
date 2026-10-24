@@ -8,7 +8,7 @@
 //     admin role, its name and its email, and isn't listed on the board.
 //   * Someone taken off the board keeps the account (their past movements
 //     point at it) but loses every session, so it counts at once.
-import { and, eq, ne, sql } from 'drizzle-orm'
+import { and, eq, isNull, ne, sql } from 'drizzle-orm'
 import { type AppRole, formatRoles, parseRoles } from '@/lib/auth/roles'
 import type { Transaction } from '@/lib/db/client'
 import { residents, sessions, users } from '@/lib/db/schema'
@@ -177,5 +177,5 @@ export async function markWelcomed(tx: Transaction, userId: string): Promise<voi
   await tx
     .update(users)
     .set({ welcomedAt: sql`now()` })
-    .where(and(eq(users.id, userId), sql`${users.welcomedAt} is null`))
+    .where(and(eq(users.id, userId), isNull(users.welcomedAt)))
 }
