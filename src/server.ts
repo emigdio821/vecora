@@ -9,7 +9,7 @@ const UNAVAILABLE_HEADERS = { 'cache-control': 'no-store', 'retry-after': '3600'
 /**
  * While MAINTENANCE_MODE is on, nothing but the maintenance page answers:
  * pages are sent to it, and server functions and the API get a bare 503, so
- * a tab left open can't write while the data moves. Null when the request
+ * a tab left open can't write during the maintenance. Null when the request
  * may go on.
  */
 function maintenanceGate(request: Request, pathname: string): Response | null {
