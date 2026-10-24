@@ -61,7 +61,7 @@
     "pg": "^8.23.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "react-hook-form": "^7.90.0",
+    "react-hook-form": "^7.91.0",
     "react-phone-number-input": "^3.4.18",
     "satori": "^0.63.2",
     "shadcn": "^4.22.1",
