@@ -2,6 +2,8 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "common_app_name": "Vecora",
   "common_language": "Language",
+  "common_maintenance_title": "Down for maintenance",
+  "common_maintenance_description": "We'll be back shortly. Your data is safe.",
 
   "common_role_admin": "Administrator",
   "common_role_president": "President",

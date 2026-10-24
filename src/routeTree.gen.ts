@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
+import { Route as UnavailableRouteImport } from './routes/unavailable'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthNoAccessRouteImport } from './routes/_auth/no-access'
 import { Route as AuthSetPasswordRouteImport } from './routes/_auth/set-password'
@@ -36,6 +37,11 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
 } as any)
 const AuthedRouteRoute = AuthedRouteRouteImport.update({
   id: '/_authed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnavailableRoute = UnavailableRouteImport.update({
+  id: '/unavailable',
+  path: '/unavailable',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -131,6 +137,7 @@ const AuthAuthConfirmRoute = AuthAuthConfirmRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
+  '/unavailable': typeof UnavailableRoute
   '/login': typeof AuthLoginRoute
   '/no-access': typeof AuthNoAccessRoute
   '/set-password': typeof AuthSetPasswordRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof AuthedIndexRoute
+  '/unavailable': typeof UnavailableRoute
   '/login': typeof AuthLoginRoute
   '/no-access': typeof AuthNoAccessRoute
   '/set-password': typeof AuthSetPasswordRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_authed': typeof AuthedRouteRouteWithChildren
+  '/unavailable': typeof UnavailableRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/no-access': typeof AuthNoAccessRoute
   '/_auth/set-password': typeof AuthSetPasswordRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/unavailable'
     | '/login'
     | '/no-access'
     | '/set-password'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/unavailable'
     | '/login'
     | '/no-access'
     | '/set-password'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_auth'
     | '/_authed'
+    | '/unavailable'
     | '/_auth/login'
     | '/_auth/no-access'
     | '/_auth/set-password'
@@ -260,6 +272,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
+  UnavailableRoute: typeof UnavailableRoute
   ApiOgRoute: typeof ApiOgRoute
   ReportsDocumentRoute: typeof ReportsDocumentRoute
   ReportsPdfRoute: typeof ReportsPdfRoute
@@ -279,6 +292,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unavailable': {
+      id: '/unavailable'
+      path: '/unavailable'
+      fullPath: '/unavailable'
+      preLoaderRoute: typeof UnavailableRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/login': {
@@ -463,6 +483,7 @@ const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   AuthedRouteRoute: AuthedRouteRouteWithChildren,
+  UnavailableRoute: UnavailableRoute,
   ApiOgRoute: ApiOgRoute,
   ReportsDocumentRoute: ReportsDocumentRoute,
   ReportsPdfRoute: ReportsPdfRoute,

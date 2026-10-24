@@ -127,7 +127,7 @@ The app runs on Vercel against a hosted Supabase project.
 
 2. **Configure Auth** in the Supabase dashboard, under Authentication:
    - **Sign In / Providers**: turn off "Allow new users to sign up", and leave the **Email** provider on (turning it off also disables password login).
-   - **URL Configuration**: set the Site URL to the app's URL (e.g. `https://vecora.vercel.app`) and add `https://vecora.vercel.app/**` to the redirect URLs.
+   - **URL Configuration**: set the Site URL to the app's URL (e.g. `https://example.com`) and add `https://example.com/**` to the redirect URLs.
 
 3. **Set the environment variables** in Vercel, from Project Settings → API Keys in the Supabase dashboard:
 
@@ -135,14 +135,19 @@ The app runs on Vercel against a hosted Supabase project.
    | --------------------- | ------------------------------------------------------- |
    | `VITE_SUPABASE_URL`   | `https://<project-ref>.supabase.co`                     |
    | `VITE_SUPABASE_KEY`   | A publishable key                                       |
-   | `VITE_SITE_URL`       | The app's URL, e.g. `https://vecora.vercel.app`         |
+   | `VITE_SITE_URL`       | The app's URL, e.g. `https://example.com`               |
    | `SUPABASE_SECRET_KEY` | A secret key (server-only, needed to add board members) |
+   | `MAINTENANCE_MODE`    | Unset; `true` only during maintenance (below)           |
 
    The `VITE_` values are bundled into the browser code at build time, so redeploy after changing them.
 
 4. **Create the main admin** with `npm run db:seed`. Nobody can sign in until an account has a role; this runs `supabase/seed.sql`, which creates `admin@vecora.app` with the default password `admin123`. The test data in `supabase/seeds/` skips itself on hosted.
 
 5. **Deploy** and sign in as the admin. The app first asks for a new password: everyone can read the default one in the repo, so it's only good for that. Then set the residential's name, logo and currency in Ajustes → Residencial and add the board members in HOA board.
+
+### Maintenance mode
+
+`MAINTENANCE_MODE=true` in Vercel, then a redeploy (Deployments → ⋯ → Redeploy), closes the app while the data moves: every page sends the visitor to `/unavailable` (laid out like the 404), and server functions and the API answer 503, so a tab left open can't write either. Remove it and redeploy to open the app again; anyone still on `/unavailable` goes back to the app.
 
 ### The main admin
 
