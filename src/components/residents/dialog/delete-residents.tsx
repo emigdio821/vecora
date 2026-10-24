@@ -65,15 +65,14 @@ export function DeleteResidentsAlertDialog({
   const isSingle = count === 1
   const singleName = isSingle ? `${residents[0].first_name} ${residents[0].last_name}` : ''
   const houseCount = new Set(residents.flatMap((r) => r.property_residents.map((pr) => pr.property.id))).size
-  const residentsClause =
-    houseCount > 0
-      ? isSingle
-        ? m.residential_delete_resident_houses({ count: houseCount })
-        : m.residential_delete_residents_houses({ count: houseCount })
-      : isSingle
-        ? m.residential_delete_resident_no_houses()
-        : m.residential_delete_residents_no_houses()
-  const description = `${residentsClause} ${m.residential_undo_window()}`
+  function residentsClause() {
+    if (houseCount === 0) {
+      return isSingle ? m.residential_delete_resident_no_houses() : m.residential_delete_residents_no_houses()
+    }
+    if (isSingle) return m.residential_delete_resident_houses({ count: houseCount })
+    return m.residential_delete_residents_houses({ count: houseCount })
+  }
+  const description = `${residentsClause()} ${m.residential_undo_window()}`
 
   const mutation = useMutation({
     mutationFn: async () => {
