@@ -75,7 +75,7 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart(),
     nitro({
-      vercel: { functions: { regions: ['pdx1'] } },
+      vercel: { functions: { regions: ['iad1'] } },
       // Packages that only work unbundled. pdfkit resolves its fonts through
       // package.json "imports"; satori's harfbuzzjs loads its wasm from __dirname.
       // The tracer misses those files, hence the full copies (*).
