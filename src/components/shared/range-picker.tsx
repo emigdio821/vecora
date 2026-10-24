@@ -37,6 +37,11 @@ interface RangePickerProps {
   /** For the trigger button, e.g. "w-full" to line up with other fields. */
   className?: string
   id?: string
+  /** The earliest month the calendar goes back to; 5 years by default. */
+  startMonth?: Date
+  /** Days that can't start or end a range, besides the ones after today. */
+  isDayDisabled?: (day: Date) => boolean
+  disabled?: boolean
 }
 
 export function toRange(from: Date, to: Date): DayRange {
@@ -80,7 +85,16 @@ const DEFAULT_PRESETS: RangePreset[] = [
  * Which days to show. The first click starts a new range and the second one
  * finishes it, in either order; only then does `onChange` fire.
  */
-export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, className, id }: RangePickerProps) {
+export function RangePicker({
+  value,
+  onChange,
+  presets = DEFAULT_PRESETS,
+  className,
+  id,
+  startMonth,
+  isDayDisabled,
+  disabled = false,
+}: RangePickerProps) {
   const today = useToday()
   const [isOpen, setOpen] = useState(false)
   const [month, setMonth] = useState(() => parseISO(value.from))
@@ -106,12 +120,16 @@ export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, classN
       onOpenChange={(nextOpen) => {
         setOpen(nextOpen)
         if (!nextOpen) setDraftFrom(undefined)
+        // The value can change from outside (a default that waited for data), so open on it.
+        if (nextOpen) setMonth(parseISO(value.from))
       }}
     >
       <PopoverTrigger
         id={id}
         aria-labelledby={id ? `${id}-label ${id}-value` : undefined}
-        render={<Button variant="outline" className={cn('pr-2 font-normal', className)} />}
+        render={
+          <Button variant="outline" disabled={disabled} className={cn('pr-2 font-normal', className)} />
+        }
       >
         <IconCalendar aria-hidden="true" />
         {/* flex-1: at full width the selector sits on the right edge, like the single-date pickers'. */}
@@ -143,11 +161,11 @@ export function RangePicker({ value, onChange, presets = DEFAULT_PRESETS, classN
             className="max-sm:pb-3 sm:ps-2"
             mode="range"
             captionLayout="dropdown"
-            startMonth={subYears(today, 5)}
+            startMonth={startMonth ?? subYears(today, 5)}
             endMonth={today}
             month={month}
             onMonthChange={setMonth}
-            disabled={{ after: today }}
+            disabled={isDayDisabled ? [{ after: today }, isDayDisabled] : { after: today }}
             selected={selected}
             // The library's own range logic would extend or shrink the range
             // already shown; we only care about which day was clicked.

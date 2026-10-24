@@ -1,11 +1,13 @@
 import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import {
+  IconCalendar,
   IconCalendarEvent,
   IconCalendarMonth,
   IconDownload,
   IconFileDescription,
   IconHomeDollar,
   IconScale,
+  IconSelector,
   IconTrendingDown,
   IconTrendingUp,
   type TablerIcon,
@@ -23,6 +25,7 @@ import {
 } from 'date-fns'
 import { useId, useMemo, useState } from 'react'
 import { messageMarkup } from '@/components/shared/message-markup'
+import { NoPeriodsEmpty } from '@/components/shared/no-periods-empty'
 import { type DayRange, RangePicker, type RangePreset, toRange } from '@/components/shared/range-picker'
 import { Button } from '@/components/ui/button'
 import {
@@ -37,28 +40,104 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Label } from '@/components/ui/label'
-import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
+import {
+  Select,
+  SelectButton,
+  SelectItem,
+  SelectPopup,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { toastManager } from '@/components/ui/toast'
 import { useToday } from '@/hooks/use-today'
+import { overlapsPeriod, periodFor, reportableMonths } from '@/lib/periods'
 import { formatMonth, ISO_DAY } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import { periodsQueryOptions } from '@/tanstack-queries/presidency'
 
-/** How far back the monthly picker goes. */
+/** How far back the monthly picker goes when the periods fail to load. */
 const MONTHS_BACK = 24
 
 function monthRange(month: Date): DayRange {
   return toRange(startOfMonth(month), endOfMonth(month))
 }
 
-/** Newest first; the running month is included and marked as such. */
-function monthItems(today: Date): { value: string; label: string }[] {
-  return Array.from({ length: MONTHS_BACK }, (_, i) => {
-    const month = startOfMonth(subMonths(today, i))
-    const value = format(month, ISO_DAY)
+/** The last MONTHS_BACK months, newest first: the fallback without periods to go by. */
+function lastMonths(today: Date): string[] {
+  return Array.from({ length: MONTHS_BACK }, (_, i) => format(startOfMonth(subMonths(today, i)), ISO_DAY))
+}
+
+/** The picker's items; the running month is marked as such. */
+function monthItems(months: string[], today: Date): { value: string; label: string }[] {
+  const current = format(startOfMonth(today), ISO_DAY)
+  return months.map((value) => {
     const label = formatMonth(value)
-    return { value, label: i === 0 ? m.reports_month_in_progress({ month: label }) : label }
+    return { value, label: value === current ? m.reports_month_in_progress({ month: label }) : label }
   })
+}
+
+/**
+ * The months worth a report: those a period touches, up to today (see
+ * reportableMonths). Undefined while the periods load; if they fail, the
+ * last MONTHS_BACK months, and the PDF route still answers for any of them.
+ */
+function useReportMonths(today: Date): string[] | undefined {
+  const { data: periods, isError } = useQuery(periodsQueryOptions)
+  return useMemo(() => {
+    if (periods) return reportableMonths(periods, format(today, ISO_DAY))
+    if (isError) return lastMonths(today)
+    return undefined
+  }, [periods, isError, today])
+}
+
+interface NoReportDatesPickerProps {
+  /** The field's label is `${id}-label`. */
+  id: string
+  /** The range picker's look (calendar icon, outline button); the month select's otherwise. */
+  range?: boolean
+}
+
+/**
+ * Stands in for a date picker once the periods are in and none has started:
+ * the card stays, and opening the field says why there's nothing to pick.
+ */
+function NoReportDatesPicker({ id, range = false }: NoReportDatesPickerProps) {
+  const valueId = `${id}-value`
+
+  return (
+    <Popover>
+      <PopoverTrigger
+        id={id}
+        aria-labelledby={`${id}-label ${valueId}`}
+        render={
+          range ? (
+            <Button variant="outline" className="w-full pr-2 font-normal" />
+          ) : (
+            <SelectButton className="w-full" data-placeholder="" />
+          )
+        }
+      >
+        {range ? (
+          <>
+            <IconCalendar aria-hidden="true" />
+            <span id={valueId} className="flex-1 truncate text-start text-muted-foreground">
+              {m.reports_no_dates_placeholder()}
+            </span>
+            <IconSelector className="pointer-events-none size-4" />
+          </>
+        ) : (
+          <span id={valueId}>{m.reports_no_dates_placeholder()}</span>
+        )}
+      </PopoverTrigger>
+      <PopoverPopup>
+        <NoPeriodsEmpty
+          title={m.reports_no_dates_title()}
+          description={<ParaglideMessage markup={messageMarkup} message={m.reports_no_dates_description} />}
+        />
+      </PopoverPopup>
+    </Popover>
+  )
 }
 
 const REPORT_PRESETS: RangePreset[] = [
@@ -123,8 +202,14 @@ async function downloadReport({ range, includeAdvance }: { range: DayRange; incl
   }, 1000)
 }
 
-/** Each card has its own, so only the one clicked shows as busy. */
-function DownloadReportButton({ range, includeAdvance }: { range: DayRange; includeAdvance: boolean }) {
+/** Each card has its own, so only the one clicked shows as busy. Disabled without a range. */
+function DownloadReportButton({
+  range,
+  includeAdvance,
+}: {
+  range: DayRange | null
+  includeAdvance: boolean
+}) {
   const mutation = useMutation({
     mutationFn: downloadReport,
     onSuccess: () => {
@@ -138,9 +223,9 @@ function DownloadReportButton({ range, includeAdvance }: { range: DayRange; incl
   return (
     <Button
       loading={mutation.isPending}
-      disabled={mutation.isPending}
+      disabled={mutation.isPending || range === null}
       onClick={() => {
-        mutation.mutate({ range, includeAdvance })
+        if (range) mutation.mutate({ range, includeAdvance })
       }}
     >
       <IconDownload />
@@ -155,7 +240,8 @@ interface ReportCardProps {
   icon: TablerIcon
   /** The date field; the download button goes next to it. */
   children: React.ReactNode
-  range: DayRange
+  /** Null while there's nothing to pick yet (the periods are loading). */
+  range: DayRange | null
   includeAdvance: boolean
 }
 
@@ -188,40 +274,64 @@ interface ReportOptions {
   includeAdvance: boolean
 }
 
-/** A whole month; last month by default, the one usually reported. */
+/**
+ * A whole month, from the ones a period touches. Last month by default, the one
+ * usually reported, or the newest there is when no period covers last month.
+ */
 export function MonthlyReportCard({ includeAdvance }: ReportOptions) {
   const today = useToday()
-  const [months] = useState(() => monthItems(today))
-  const [month, setMonth] = useState(() => format(startOfMonth(subMonths(today, 1)), ISO_DAY))
+  const pickerId = useId()
+  const months = useReportMonths(today)
+  const items = useMemo(() => monthItems(months ?? [], today), [months, today])
+  const hasNoDates = months?.length === 0
+  const [picked, setPicked] = useState<string | null>(null)
+
+  let month = picked
+  if (month === null && months) {
+    const lastMonth = format(startOfMonth(subMonths(today, 1)), ISO_DAY)
+    month = months.includes(lastMonth) ? lastMonth : (months[0] ?? null)
+  }
 
   return (
     <ReportCard
       title={m.reports_monthly_title()}
       description={m.reports_month_description()}
       icon={IconCalendarMonth}
-      range={monthRange(parseISO(month))}
+      // No month while loading, or when no period has started: the download waits.
+      range={month ? monthRange(parseISO(month)) : null}
       includeAdvance={includeAdvance}
     >
       <Field className="min-w-0 @md:flex-1">
-        <FieldLabel>{m.reports_month_label()}</FieldLabel>
-        <Select
-          items={months}
-          value={month}
-          onValueChange={(value) => {
-            if (value) setMonth(value)
-          }}
+        <FieldLabel
+          id={`${pickerId}-label`}
+          // The Select registers itself with the field; the stand-in doesn't, so point at it here.
+          {...(hasNoDates ? { htmlFor: pickerId } : {})}
         >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectPopup>
-            {months.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
-              </SelectItem>
-            ))}
-          </SelectPopup>
-        </Select>
+          {m.reports_month_label()}
+        </FieldLabel>
+        {hasNoDates ? (
+          <NoReportDatesPicker id={pickerId} />
+        ) : (
+          <Select
+            items={items}
+            value={month}
+            disabled={months === undefined}
+            onValueChange={(value) => {
+              if (value) setPicked(value)
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={m.common_loading()} />
+            </SelectTrigger>
+            <SelectPopup>
+              {items.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectPopup>
+          </Select>
+        )}
       </Field>
     </ReportCard>
   )
@@ -230,14 +340,34 @@ export function MonthlyReportCard({ includeAdvance }: ReportOptions) {
 /** The latest periods get a preset each; older ones are a few clicks away in the calendar. */
 const PERIOD_PRESETS = 3
 
-/** Any range of days, from one day to several years. */
+/**
+ * Any range of days, from one day to several years. Both ends must fall in a
+ * period; the range itself may span a gap between two of them.
+ */
 export function CustomReportCard({ includeAdvance }: ReportOptions) {
   const today = useToday()
-  const [range, setRange] = useState<DayRange>(() => toRange(startOfMonth(today), today))
   const pickerId = useId()
-  const { data: periods } = useQuery(periodsQueryOptions)
+  const { data: periods, isPending } = useQuery(periodsQueryOptions)
+  const [picked, setPicked] = useState<DayRange | null>(null)
 
-  // Periods that have started, newest first; the current one runs up to today.
+  // Undefined while loading (or failed); empty when no period has started yet.
+  const months = useMemo(
+    () => (periods ? reportableMonths(periods, format(today, ISO_DAY)) : undefined),
+    [periods, today],
+  )
+  const hasNoDates = months?.length === 0
+
+  // This month so far, or the newest month a period covers when none covers this one.
+  const defaultRange = useMemo(() => {
+    const thisMonth = toRange(startOfMonth(today), today)
+    if (!periods || overlapsPeriod(periods, thisMonth.from, thisMonth.to)) return thisMonth
+    const newest = months?.[0]
+    return newest ? monthRange(parseISO(newest)) : thisMonth
+  }, [periods, months, today])
+  const range = picked ?? defaultRange
+
+  // Periods that have started, newest first; the current one runs up to today. The fixed
+  // presets only show if a period covers some of their days: otherwise the PDF is empty.
   const presets = useMemo(() => {
     const todayDay = format(today, ISO_DAY)
     const periodPresets = (periods ?? [])
@@ -250,22 +380,44 @@ export function CustomReportCard({ includeAdvance }: ReportOptions) {
           return { from: period.starts_on, to: period.ends_on < end ? period.ends_on : end }
         },
       }))
-    return [...REPORT_PRESETS, ...periodPresets]
+    const fixedPresets = REPORT_PRESETS.filter((preset) => {
+      if (!periods) return true
+      const presetRange = preset.range(today)
+      return overlapsPeriod(periods, presetRange.from, presetRange.to)
+    })
+    return [...fixedPresets, ...periodPresets]
   }, [periods, today])
+
+  // Newest first: the calendar goes back to the first period's start.
+  const firstPeriod = periods?.at(-1)
 
   return (
     <ReportCard
       title={m.reports_custom_title()}
       description={m.reports_range_description()}
       icon={IconCalendarEvent}
-      range={range}
+      range={isPending || hasNoDates ? null : range}
       includeAdvance={includeAdvance}
     >
       <Field className="min-w-0 @md:flex-1">
         <FieldLabel id={`${pickerId}-label`} htmlFor={pickerId}>
           {m.reports_range_label()}
         </FieldLabel>
-        <RangePicker id={pickerId} value={range} onChange={setRange} presets={presets} className="w-full" />
+        {hasNoDates ? (
+          <NoReportDatesPicker id={pickerId} range />
+        ) : (
+          <RangePicker
+            id={pickerId}
+            value={range}
+            onChange={setPicked}
+            presets={presets}
+            className="w-full"
+            disabled={isPending}
+            startMonth={firstPeriod ? parseISO(firstPeriod.starts_on) : undefined}
+            // Failed to load: no limits here, like before; the PDF route answers for any dates.
+            isDayDisabled={periods ? (day) => !periodFor(periods, format(day, ISO_DAY)) : undefined}
+          />
+        )}
       </Field>
     </ReportCard>
   )
