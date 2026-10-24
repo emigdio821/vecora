@@ -21,6 +21,7 @@
  */
 import { randomBytes, randomUUID } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
+import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { hashPassword } from 'better-auth/crypto'
 import pg from 'pg'
@@ -217,8 +218,12 @@ function sourceClient(connectionString: string): pg.Client {
   url.searchParams.delete('sslmode')
 
   let ssl: pg.ClientConfig['ssl'] = true
-  const caPath = process.env.SUPABASE_DB_CA
+  let caPath = process.env.SUPABASE_DB_CA
   if (caPath) {
+    // Written like a shell path; Node doesn't expand ~ on its own.
+    if (caPath.startsWith('~/')) {
+      caPath = join(homedir(), caPath.slice(2))
+    }
     ssl = { ca: readFileSync(caPath, 'utf8') }
   }
   return new pg.Client({ connectionString: url.toString(), ssl })
@@ -339,8 +344,8 @@ async function giveMainAdminPassword(target: pg.Client, users: Map<string, Impor
   const password = randomBytes(12).toString('base64url')
   await target.query(
     `insert into accounts (id, account_id, provider_id, user_id, password, created_at, updated_at)
-     values ($1, $2, 'credential', $2, $3, now(), now())`,
-    [randomUUID(), mainAdmin.id, await hashPassword(password)],
+     values ($1, $2, 'credential', $3, $4, now(), now())`,
+    [randomUUID(), mainAdmin.id, mainAdmin.id, await hashPassword(password)],
   )
   return { email: mainAdmin.email, password }
 }
