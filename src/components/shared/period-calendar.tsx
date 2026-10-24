@@ -36,8 +36,8 @@ export function PeriodCalendar({ value, onChange }: PeriodCalendarProps) {
       mode="single"
       required
       captionLayout="dropdown"
-      startMonth={first ? parseISO(first.starts_on) : subYears(today, 5)}
-      endMonth={last ? parseISO(last.ends_on) : addYears(today, 1)}
+      startMonth={first ? parseISO(first.startsOn) : subYears(today, 5)}
+      endMonth={last ? parseISO(last.endsOn) : addYears(today, 1)}
       selected={parseISO(value)}
       defaultMonth={parseISO(value)}
       // Loading: nothing to pick yet. Failed: no limits here, saving still checks.

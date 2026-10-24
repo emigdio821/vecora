@@ -24,8 +24,8 @@ interface InviteLinkDialogProps {
   onOpenChangeComplete?: (open: boolean) => void
 }
 
-function whatsappUrl({ phone, full_name, link }: InviteResult) {
-  const message = m.board_whatsapp_message({ name: full_name.split(' ')[0], link })
+function whatsappUrl({ phone, name, link }: InviteResult) {
+  const message = m.board_whatsapp_message({ name: name.split(' ')[0], link })
   return `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`
 }
 
@@ -66,9 +66,7 @@ export function InviteLinkDialog({
     >
       <ResponsiveDialogPopup>
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>
-            {m.board_invite_title({ name: invite?.full_name ?? '' })}
-          </ResponsiveDialogTitle>
+          <ResponsiveDialogTitle>{m.board_invite_title({ name: invite?.name ?? '' })}</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>{m.board_invite_description()}</ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 

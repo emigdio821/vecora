@@ -2,8 +2,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { signOut } from '@/lib/auth/client'
 import { m } from '@/paraglide/messages'
-import { logout } from '@/server-actions/auth'
 
 /** For /no-access, outside the sidebar; plain state instead of a mutation. */
 export function LogoutButton() {
@@ -15,9 +15,9 @@ export function LogoutButton() {
   async function handleClick() {
     setLoading(true)
     setError(null)
-    const result = await logout()
+    const result = await signOut()
 
-    if (result?.error) {
+    if (result.error) {
       setLoading(false)
       setError(result.error)
       return

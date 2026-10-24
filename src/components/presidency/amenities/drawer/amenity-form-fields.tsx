@@ -45,7 +45,7 @@ export function AmenityFormFields({ form, disabled }: AmenityFormFieldsProps) {
       />
 
       <Controller
-        name="default_fee"
+        name="defaultFee"
         control={form.control}
         render={({ field, fieldState }) => (
           <Field

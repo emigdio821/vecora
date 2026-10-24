@@ -73,7 +73,7 @@ export function CancelReservationDrawer({
   const queryClient = useQueryClient()
   const formatCurrency = useFormatCurrency()
   const summary = reservationSummary(reservation)
-  const paid = Number(reservationPayment(reservation)?.amount ?? 0)
+  const paid = reservationPayment(reservation)?.amount ?? 0
   const { currency } = reservation
 
   const mutation = useMutation({
@@ -88,10 +88,10 @@ export function CancelReservationDrawer({
         type: 'success',
         title: m.presidency_reservation_cancelled(),
         description:
-          values.refund_amount > 0
+          values.refundAmount > 0
             ? m.presidency_reservation_cancelled_refund_description({
                 summary,
-                amount: formatCurrency(values.refund_amount, currency),
+                amount: formatCurrency(values.refundAmount, currency),
               })
             : m.presidency_reservation_cancelled_no_refund_description({ summary }),
       })
@@ -155,22 +155,22 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
 
   const form = useForm<CancelReservationInput>({
     resolver: zodResolver(
-      cancelReservationSchema.refine((data) => data.refund_amount <= paid, {
-        path: ['refund_amount'],
+      cancelReservationSchema.refine((data) => data.refundAmount <= paid, {
+        path: ['refundAmount'],
         error: () => m.presidency_refund_max({ amount: formatCurrency(paid, currency) }),
       }),
     ),
     defaultValues: {
-      refund_amount: paid,
-      occurred_on: format(today, ISO_DAY),
-      payment_method: 'cash',
+      refundAmount: paid,
+      occurredOn: format(today, ISO_DAY),
+      paymentMethod: 'cash',
       reference: '',
       notes: '',
     },
   })
-  const refundAmount = useWatch({ control: form.control, name: 'refund_amount' })
-  const paymentMethod = useWatch({ control: form.control, name: 'payment_method' })
-  const occurredOn = useWatch({ control: form.control, name: 'occurred_on' })
+  const refundAmount = useWatch({ control: form.control, name: 'refundAmount' })
+  const paymentMethod = useWatch({ control: form.control, name: 'paymentMethod' })
+  const occurredOn = useWatch({ control: form.control, name: 'occurredOn' })
   const hasRefund = refundAmount > 0
   // Only the refund is a movement; cancelling without one needs no period.
   const isPeriodMissing = useIsPeriodMissing(occurredOn) && hasRefund
@@ -191,7 +191,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
           )}
         >
           <Controller
-            name="refund_amount"
+            name="refundAmount"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field
@@ -235,7 +235,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
             <>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Controller
-                  name="occurred_on"
+                  name="occurredOn"
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field
@@ -282,7 +282,7 @@ function CancelReservationForm({ paid, currency, mutation }: CancelReservationFo
                 />
 
                 <Controller
-                  name="payment_method"
+                  name="paymentMethod"
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field

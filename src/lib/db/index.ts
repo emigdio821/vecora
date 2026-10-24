@@ -1,40 +1,20 @@
 import '@tanstack/react-start/server-only'
 import { attachDatabasePool } from '@vercel/functions'
-import { sql } from 'drizzle-orm'
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { Pool } from 'pg'
 import { serverEnv } from '@/lib/config/env.server'
-import { relations } from '@/lib/db/relations'
+import { actorTransaction, createDatabase, type Database, type Transaction } from '@/lib/db/client'
+
+export type { Database, Transaction } from '@/lib/db/client'
 
 // node-postgres over Neon's pooled URL, as Neon recommends on Vercel: the pool
 // lives as long as the function instance, and attachDatabasePool lets Vercel
 // close idle clients before the instance is suspended. Outside Vercel it does nothing.
-//
-// It connects as the app's own role (scripts/neon/app-role.ts), never the
-// owner. That role has no grants of its own, so a query that skips withUser()
-// is refused outright.
-const pool = new Pool({ connectionString: serverEnv.DATABASE_AUTHENTICATED_URL })
+const { db: database, pool } = createDatabase(serverEnv.DATABASE_URL)
 attachDatabasePool(pool)
 
-// The relations carry the tables too, so db.query.<table> is typed with `with:` joins.
-export const db = drizzle({ client: pool, relations })
+/** Reads go straight through it; writes through transactionAs(). */
+export const db: Database = database
 
-export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
-
-/**
- * Runs `run` in a transaction that knows who is acting, the way Supabase ran
- * each request as its signed-in user. RLS policies, the `created_by` defaults
- * and the audit log read the user with `auth.uid()` (for now the one in
- * scripts/neon/supabase-compat.sql), and the transaction switches to the
- * `authenticated` role their grants and policies are written for.
- *
- * Both are `local` to this transaction, so a pooled connection never carries
- * them over to the next user.
- */
-export function withUser<T>(userId: string, run: (tx: Transaction) => Promise<T>): Promise<T> {
-  return db.transaction(async (tx) => {
-    await tx.execute(sql`select set_config('app.user_id', ${userId}, true)`)
-    await tx.execute(sql`set local role authenticated`)
-    return run(tx)
-  })
+/** A write transaction on behalf of `actorId`, so the activity log knows who did it (see actorTransaction). */
+export function transactionAs<T>(actorId: string, run: (tx: Transaction) => Promise<T>): Promise<T> {
+  return actorTransaction(db, actorId, run)
 }

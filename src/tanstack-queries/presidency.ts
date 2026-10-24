@@ -5,7 +5,7 @@ export const PRESIDENCY_QUERY_KEY = 'presidency'
 
 /**
  * Treasury reads the periods too (summaries, fees, the record drawers), and every
- * movement saved changes a `transaction_count`, so its mutations invalidate this as well.
+ * movement saved changes a `transactionCount`, so its mutations invalidate this as well.
  */
 export type PeriodQueryData = Awaited<ReturnType<typeof fetchPeriods>>[number]
 
@@ -18,7 +18,7 @@ export type AmenityQueryData = Awaited<ReturnType<typeof fetchAmenities>>[number
 
 /** How many bookings an amenity has; it can be deleted only at 0. */
 export function reservationCount(amenity: AmenityQueryData) {
-  return amenity.reservation_count
+  return amenity.reservationCount
 }
 
 export const amenitiesQueryOptions = queryOptions({

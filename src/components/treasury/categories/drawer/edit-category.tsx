@@ -104,7 +104,7 @@ function EditCategoryForm({
     resolver: zodResolver(categorySchema),
     defaultValues: { kind: category.kind, name: category.name },
   })
-  // The fee, late fee and common area categories: the RPCs look them up by key.
+  // The fee, late fee and common area categories: the services look them up by key.
   const { key } = category
 
   // Still busy after a save, until the drawer has closed and reset the mutation.

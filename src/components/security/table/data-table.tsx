@@ -44,7 +44,7 @@ export function RequestsDataTable({ viewer }: RequestsDataTableProps) {
       tableId="requests"
       columns={columns}
       getRowId={(request) => request.id}
-      initialSorting={[{ id: 'requested_on', desc: true }]}
+      initialSorting={[{ id: 'requestedOn', desc: true }]}
       header={(table) => <RequestsDataTableHeader table={table} viewer={viewer} isLoading={isLoading} />}
       emptyMessage={m.requests_empty()}
       isLoading={isLoading}

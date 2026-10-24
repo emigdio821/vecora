@@ -88,12 +88,12 @@ export function FeeStatusCard() {
   }
 
   const total = status.data.length
-  const pending = status.data.filter((h) => (h.unpaid_months?.length ?? 0) > 0)
+  const pending = status.data.filter((h) => h.unpaidMonths.length > 0)
   const upToDate = total - pending.length
-  const ownersOf = (propertyId: string | null) =>
+  const ownersOf = (propertyId: string) =>
     houses.data
       ?.find((h) => h.id === propertyId)
-      ?.owners.map(({ resident }) => `${resident.first_name} ${resident.last_name}`)
+      ?.owners.map((owner) => `${owner.firstName} ${owner.lastName}`)
       .join(', ')
 
   return (
@@ -130,10 +130,10 @@ export function FeeStatusCard() {
           ) : (
             <ul className={CARD_LIST_CLASS}>
               {pending.map((house) => {
-                const months = house.unpaid_months ?? []
-                const owners = ownersOf(house.property_id)
+                const months = house.unpaidMonths
+                const owners = ownersOf(house.propertyId)
                 return (
-                  <li key={house.property_id} className={cn(CARD_LIST_ROW_CLASS, 'text-sm')}>
+                  <li key={house.propertyId} className={cn(CARD_LIST_ROW_CLASS, 'text-sm')}>
                     <div className="flex min-w-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
                       <span className="max-w-full truncate">
                         <Link

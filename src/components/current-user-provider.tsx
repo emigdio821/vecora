@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react'
-import type { AppRole, CurrentUser } from '@/lib/auth/current-user'
+import type { CurrentUser } from '@/lib/auth/current-user'
+import { can, type Permissions } from '@/lib/auth/permissions'
 
 const CurrentUserContext = createContext<CurrentUser | null>(null)
 
@@ -15,11 +16,11 @@ export function useCurrentUser(): CurrentUser {
 }
 
 /**
- * Whether the user holds any of the given roles. Admin always qualifies, like
- * `private.has_role` in the database. This only decides what to *show*: RLS
- * still enforces every write on the server.
+ * Whether the user's roles grant `permissions` (src/lib/auth/permissions.ts).
+ * This only decides what to *show*: the server function asks the same
+ * question before every write.
  */
-export function useHasRole(...roles: AppRole[]): boolean {
-  const { roles: userRoles } = useCurrentUser()
-  return userRoles.includes('admin') || roles.some((role) => userRoles.includes(role))
+export function useCan(permissions: Permissions): boolean {
+  const { roles } = useCurrentUser()
+  return can(roles, permissions)
 }

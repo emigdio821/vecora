@@ -29,6 +29,7 @@ import { Route as ApiOgRouteImport } from './routes/api/og'
 import { Route as ReportsDocumentRouteImport } from './routes/reports/document'
 import { Route as ReportsPdfRouteImport } from './routes/reports/pdf'
 import { Route as AuthAuthConfirmRouteImport } from './routes/_auth/auth/confirm'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
@@ -128,6 +129,11 @@ const AuthAuthConfirmRoute = AuthAuthConfirmRouteImport.update({
   path: '/auth/confirm',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/reports/document': typeof ReportsDocumentRoute
   '/reports/pdf': typeof ReportsPdfRoute
   '/auth/confirm': typeof AuthAuthConfirmRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthedIndexRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/reports/document': typeof ReportsDocumentRoute
   '/reports/pdf': typeof ReportsPdfRoute
   '/auth/confirm': typeof AuthAuthConfirmRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/reports/pdf': typeof ReportsPdfRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_auth/auth/confirm': typeof AuthAuthConfirmRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/reports/document'
     | '/reports/pdf'
     | '/auth/confirm'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/reports/document'
     | '/reports/pdf'
     | '/auth/confirm'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/_auth'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/reports/pdf'
     | '/_authed/'
     | '/_auth/auth/confirm'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -263,6 +275,7 @@ export interface RootRouteChildren {
   ApiOgRoute: typeof ApiOgRoute
   ReportsDocumentRoute: typeof ReportsDocumentRoute
   ReportsPdfRoute: typeof ReportsPdfRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -407,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAuthConfirmRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -466,6 +486,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiOgRoute: ApiOgRoute,
   ReportsDocumentRoute: ReportsDocumentRoute,
   ReportsPdfRoute: ReportsPdfRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -43,8 +43,8 @@ export const categoriesTableColumns = columnHelper.columns([
     cell: ({ getValue }) => <Badge variant="outline">{KIND_LABEL[getValue()]}</Badge>,
   }),
 
-  columnHelper.accessor('is_active', {
-    id: 'is_active',
+  columnHelper.accessor('isActive', {
+    id: 'isActive',
     size: 140,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_status()} />,
     cell: ({ getValue }) =>

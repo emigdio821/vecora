@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
@@ -19,7 +19,7 @@ export function TransactionsDataTable() {
     refetch,
   } = useQuery(transactionsListQueryOptions)
   const [kind] = useKindFilter()
-  const canManage = useHasRole('treasurer')
+  const canManage = useCan({ transaction: ['write'] })
   // Selection only feeds bulk delete, so readers don't get the checkboxes.
   const columns = useMemo(
     () =>
@@ -45,7 +45,7 @@ export function TransactionsDataTable() {
       tableId="transactions"
       columns={columns}
       getRowId={(transaction) => transaction.id}
-      initialSorting={[{ id: 'occurred_on', desc: true }]}
+      initialSorting={[{ id: 'occurredOn', desc: true }]}
       header={(table) => <TransactionsDataTableHeader table={table} isLoading={isLoading} />}
       emptyMessage={m.treasury_transactions_empty()}
       isLoading={isLoading}

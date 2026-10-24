@@ -59,8 +59,8 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
                   <Money value={request.amount} currency={request.currency} />
                 </span>
               </Detail>
-              <Detail label={m.common_field_date()}>{formatDay(request.requested_on)}</Detail>
-              <Detail label={m.requests_requester()}>{request.requester.full_name}</Detail>
+              <Detail label={m.common_field_date()}>{formatDay(request.requestedOn)}</Detail>
+              <Detail label={m.requests_requester()}>{request.requester.name}</Detail>
             </div>
           </CollapsibleSection>
 
@@ -73,14 +73,14 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
           {status === 'paid' && transaction && (
             <CollapsibleSection icon={<IconCash />} title={m.requests_section_payment()}>
               <div className="grid grid-cols-2 gap-3">
-                <Detail label={m.requests_payment_date()}>{formatDay(transaction.occurred_on)}</Detail>
+                <Detail label={m.requests_payment_date()}>{formatDay(transaction.occurredOn)}</Detail>
                 <Detail label={m.common_field_payment_method()}>
-                  {PAYMENT_METHOD_LABEL[transaction.payment_method]}
+                  {PAYMENT_METHOD_LABEL[transaction.paymentMethod]}
                 </Detail>
                 {transaction.reference && (
                   <Detail label={m.common_field_reference()}>{transaction.reference}</Detail>
                 )}
-                {resolver && <Detail label={m.requests_recorded_by()}>{resolver.full_name}</Detail>}
+                {resolver && <Detail label={m.requests_recorded_by()}>{resolver.name}</Detail>}
               </div>
             </CollapsibleSection>
           )}
@@ -88,23 +88,19 @@ export function RequestDetailsDrawer({ request, open, onOpenChange, ...props }: 
           {status === 'rejected' && (
             <CollapsibleSection icon={<IconCircleX />} title={m.requests_section_rejection()}>
               <Detail label={m.requests_reason()}>
-                <p className="font-normal whitespace-pre-wrap">{request.rejection_reason}</p>
+                <p className="font-normal whitespace-pre-wrap">{request.rejectionReason}</p>
               </Detail>
-              {resolver && <Detail label={m.requests_rejected_by()}>{resolver.full_name}</Detail>}
+              {resolver && <Detail label={m.requests_rejected_by()}>{resolver.name}</Detail>}
             </CollapsibleSection>
           )}
 
           <dl className="grid grid-cols-2 gap-3 px-1 pt-1">
-            <Timestamp
-              icon={<IconCalendarPlus />}
-              label={m.requests_submitted()}
-              value={request.created_at}
-            />
-            {request.resolved_at && (
+            <Timestamp icon={<IconCalendarPlus />} label={m.requests_submitted()} value={request.createdAt} />
+            {request.resolvedAt && (
               <Timestamp
                 icon={<IconCircleCheck />}
                 label={m.requests_resolved()}
-                value={request.resolved_at}
+                value={request.resolvedAt}
               />
             )}
           </dl>

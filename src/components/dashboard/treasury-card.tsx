@@ -103,20 +103,20 @@ function monthDate(month: string) {
  * no gaps. A period that hasn't started yet shows all of its months.
  */
 function monthlyTotals(period: PeriodQueryData, movements: PeriodMovementQueryData[], today: string) {
-  const last = movements.reduce((max, m) => (m.occurred_on > max ? m.occurred_on : max), today)
-  const shownThrough = last < period.ends_on ? last : period.ends_on
+  const last = movements.reduce((max, m) => (m.occurredOn > max ? m.occurredOn : max), today)
+  const shownThrough = last < period.endsOn ? last : period.endsOn
   // Before the period starts, today would end the axis ahead of its first month.
-  const end = shownThrough < period.starts_on ? period.ends_on : shownThrough
+  const end = shownThrough < period.startsOn ? period.endsOn : shownThrough
   const totals = new Map<string, MonthTotals>(
-    eachMonthOfInterval({ start: parseISO(period.starts_on), end: parseISO(end) }).map((d) => {
+    eachMonthOfInterval({ start: parseISO(period.startsOn), end: parseISO(end) }).map((d) => {
       const month = format(d, 'yyyy-MM')
       return [month, { month, income: 0, expense: 0 }]
     }),
   )
 
   for (const m of movements) {
-    const month = totals.get(m.occurred_on.slice(0, 7))
-    if (month) month[m.kind] += Number(m.amount)
+    const month = totals.get(m.occurredOn.slice(0, 7))
+    if (month) month[m.kind] += m.amount
   }
 
   return [...totals.values()]
@@ -155,7 +155,7 @@ export function TreasuryCard() {
   const period = periods.data.find((p) => p.id === pickedId) ?? current
   // The period's own currency first, then any other it has movements in.
   const periodSummaries = summaries.data
-    .filter((s) => s.period_id === period?.id)
+    .filter((s) => s.periodId === period?.id)
     .sort((a, b) => Number(b.currency === period?.currency) - Number(a.currency === period?.currency))
 
   // Only when picking would change something: there's a period besides the one shown.
@@ -317,8 +317,7 @@ function PeriodTreasury({
   picker: ReactNode
 }) {
   const [summary, ...others] = summaries
-  const currency = summary.currency ?? period.currency
-  const balance = Number(summary.balance ?? 0)
+  const { currency, balance } = summary
   const formatCurrency = useFormatCurrency()
 
   return (
@@ -334,13 +333,13 @@ function PeriodTreasury({
             <Total
               label={m.common_income()}
               swatch="bg-(--chart-income)"
-              value={summary.total_income ?? 0}
+              value={summary.totalIncome}
               currency={currency}
             />
             <Total
               label={m.common_expense()}
               swatch="bg-(--chart-expense)"
-              value={summary.total_expense ?? 0}
+              value={summary.totalExpense}
               currency={currency}
             />
             <Total
@@ -353,14 +352,14 @@ function PeriodTreasury({
           {others.length > 0 && (
             <ul className="grid gap-1 text-sm text-muted-foreground tabular-nums">
               {others.map((other) => {
-                const code = other.currency ?? period.currency
+                const code = other.currency
                 return (
                   <li key={code}>
                     {m.dashboard_treasury_other_currency({
                       code,
-                      income: formatCurrency(other.total_income ?? 0, code),
-                      expense: formatCurrency(other.total_expense ?? 0, code),
-                      balance: formatCurrency(other.balance ?? 0, code),
+                      income: formatCurrency(other.totalIncome, code),
+                      expense: formatCurrency(other.totalExpense, code),
+                      balance: formatCurrency(other.balance, code),
                     })}
                   </li>
                 )

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { TanstackQueryError } from '@/components/shared/errors/tanstack-query'
 import { DataTable } from '@/components/shared/table/data-table'
 import { m } from '@/paraglide/messages'
@@ -13,7 +13,7 @@ const EMPTY_HOUSES: HouseQueryData[] = []
 
 export function HousesDataTable() {
   const { data: houses = EMPTY_HOUSES, isLoading, error, refetch } = useQuery(housesListQueryOptions)
-  const canManage = useHasRole('president')
+  const canManage = useCan({ registry: ['write'] })
   // Selection only feeds bulk delete, so readers don't get the checkboxes.
   const columns = useMemo(
     () => (canManage ? housesTableColumns : housesTableColumns.filter((column) => column.id !== 'select')),

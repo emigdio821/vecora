@@ -34,7 +34,7 @@ function defaultValues(): MaintenanceRequestInput {
     details: '',
     // The schema wants a number; RHF/NumberField hand us null until typed.
     amount: null as unknown as number,
-    requested_on: format(new Date(), ISO_DAY),
+    requestedOn: format(new Date(), ISO_DAY),
   }
 }
 

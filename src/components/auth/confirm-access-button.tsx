@@ -25,12 +25,12 @@ export function ConfirmAccessButton({ token, children }: ConfirmAccessButtonProp
 
     // Either way the session changed (a previous one may have been closed).
     queryClient.clear()
-    if (result?.error) {
+    if ('error' in result) {
       await navigate({ to: '/login', search: { error: 'invite' }, replace: true })
       return
     }
     // Now in the HOA's language: a full load renders the next page in it.
-    if (result?.locale && result.locale !== getLocale()) {
+    if (result.locale && result.locale !== getLocale()) {
       window.location.replace('/set-password')
       return
     }

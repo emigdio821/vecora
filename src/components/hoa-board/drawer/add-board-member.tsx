@@ -30,7 +30,7 @@ import { RolesField } from '../roles-field'
 
 const FORM_ID = 'add-board-member-form'
 
-const DEFAULT_VALUES: AddBoardMemberInput = { resident_id: '', roles: [] }
+const DEFAULT_VALUES: AddBoardMemberInput = { residentId: '', roles: [] }
 
 interface AddBoardMemberDrawerProps extends React.ComponentProps<typeof Drawer> {
   open: boolean
@@ -122,7 +122,7 @@ export function AddBoardMemberDrawer({
             onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
           >
             <Controller
-              name="resident_id"
+              name="residentId"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field

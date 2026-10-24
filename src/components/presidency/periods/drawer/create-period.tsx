@@ -35,17 +35,17 @@ const FORM_ID = 'create-period-form'
  * Rates in another currency (it changed since) aren't carried over.
  */
 function defaultValues(latest: PeriodQueryData | undefined, currency: CurrencyCode): PeriodInput {
-  const startsOn = latest ? addDays(parseISO(latest.ends_on), 1) : startOfMonth(new Date())
+  const startsOn = latest ? addDays(parseISO(latest.endsOn), 1) : startOfMonth(new Date())
   const endsOn = addDays(addYears(startsOn, 1), -1)
   const rates = latest?.currency === currency ? latest : undefined
 
   return {
     name: `${getYear(startsOn)}-${getYear(endsOn)}`,
-    starts_on: format(startsOn, ISO_DAY),
-    ends_on: format(endsOn, ISO_DAY),
-    monthly_fee: rates ? Number(rates.monthly_fee) : (null as unknown as number),
-    late_fee: rates ? Number(rates.late_fee) : 100,
-    due_day: latest?.due_day ?? 10,
+    startsOn: format(startsOn, ISO_DAY),
+    endsOn: format(endsOn, ISO_DAY),
+    monthlyFee: rates ? rates.monthlyFee : (null as unknown as number),
+    lateFee: rates ? rates.lateFee : 100,
+    dueDay: latest?.dueDay ?? 10,
   }
 }
 

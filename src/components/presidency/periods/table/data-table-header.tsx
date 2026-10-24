@@ -1,6 +1,6 @@
 import type { Table } from '@tanstack/react-table'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,7 @@ interface PeriodsDataTableHeaderProps {
 }
 
 export function PeriodsDataTableHeader({ table, latest, isLoading }: PeriodsDataTableHeaderProps) {
-  const canManage = useHasRole('treasurer', 'president')
+  const canManage = useCan({ period: ['write'] })
   const [isCreateOpen, setCreateOpen] = useState(false)
 
   return (

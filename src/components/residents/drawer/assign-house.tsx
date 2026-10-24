@@ -42,7 +42,7 @@ interface AssignHouseDrawerProps extends React.ComponentProps<typeof Drawer> {
 
 export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: AssignHouseDrawerProps) {
   const queryClient = useQueryClient()
-  const name = `${resident.first_name} ${resident.last_name}`
+  const name = `${resident.firstName} ${resident.lastName}`
 
   const form = useForm<AssignHouseInput>({
     resolver: zodResolver(assignHouseSchema),
@@ -97,7 +97,7 @@ export function AssignHouseDrawer({ resident, open, onOpenChange, ...props }: As
   // Still busy after a save, until the drawer has closed and reset the mutation.
   const isBusy = mutation.isPending || mutation.isSuccess
 
-  const currentHouseIds = resident.property_residents.map(({ property }) => property.id)
+  const currentHouseIds = resident.propertyLinks.map(({ property }) => property.id)
 
   return (
     <Drawer

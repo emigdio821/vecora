@@ -8,6 +8,19 @@ export const loginSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>
 
+/** Choosing a password after an access link, or away from the main admin's default one. */
+export const setPasswordSchema = z
+  .object({
+    password: z.string().min(8, { error: () => m.board_password_min() }),
+    confirm: z.string(),
+  })
+  .refine((data) => data.password === data.confirm, {
+    path: ['confirm'],
+    error: () => m.board_passwords_mismatch(),
+  })
+
+export type SetPasswordInput = z.infer<typeof setPasswordSchema>
+
 /** The main admin's password, from Settings. Same rules as a new member's (setPasswordSchema). */
 export const changePasswordSchema = z
   .object({

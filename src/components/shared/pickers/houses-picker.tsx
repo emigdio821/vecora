@@ -84,9 +84,8 @@ export function HousesPicker({ excludeIds, ...props }: HousesPickerProps) {
                 <div className="grid gap-0.5">
                   <span className="truncate">{label(id)}</span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {owners
-                      .map(({ resident }) => `${resident.first_name} ${resident.last_name}`)
-                      .join(', ') || m.common_no_owner()}
+                    {owners.map((owner) => `${owner.firstName} ${owner.lastName}`).join(', ') ||
+                      m.common_no_owner()}
                   </span>
                 </div>
               </ComboboxItem>

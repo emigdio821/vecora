@@ -1,7 +1,6 @@
 import '@tanstack/react-start/server-only'
 import { GetObjectCommand } from '@aws-sdk/client-s3'
-import { withUser } from '@/lib/db'
-import { getSessionUserId } from '@/lib/db/current-user'
+import { db } from '@/lib/db'
 import { ASSETS_BUCKET, storage } from '@/lib/storage'
 import type { CurrencyCode } from '@/lib/utils'
 import type { AppLanguage } from '@/lib/validations/settings'
@@ -32,22 +31,15 @@ export function logoKey(path: string) {
 }
 
 /**
- * The single public.settings row (the authed layout loads it and hands it
- * down). Reports can call this too. Signed out, or when the read fails, it
- * answers the defaults so the app still renders with its generic labels.
+ * The single settings row (the authed layout loads it and hands it down).
+ * Reports read it too. Who may is the caller's check. When the read fails,
+ * it answers the defaults so the app still renders with its generic labels.
  */
 export async function getSettings(): Promise<Settings> {
-  const userId = await getSessionUserId()
-  if (!userId) {
-    return DEFAULT_SETTINGS
-  }
-
   try {
-    const row = await withUser(userId, (tx) =>
-      tx.query.settings.findFirst({
-        columns: { residentialName: true, logoPath: true, defaultLanguage: true, currency: true },
-      }),
-    )
+    const row = await db.query.settings.findFirst({
+      columns: { residentialName: true, logoPath: true, defaultLanguage: true, currency: true },
+    })
     if (!row) {
       return DEFAULT_SETTINGS
     }

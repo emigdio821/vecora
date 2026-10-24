@@ -1,6 +1,6 @@
 import { IconDots } from '@tabler/icons-react'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { m } from '@/paraglide/messages'
@@ -14,7 +14,7 @@ interface ActionsProps {
 }
 
 export function PeriodsTableActions({ period }: ActionsProps) {
-  const canManage = useHasRole('treasurer', 'president')
+  const canManage = useCan({ period: ['write'] })
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
   // Soft-deleted movements count too: the ledger is never purged.

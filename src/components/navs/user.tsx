@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
+import { signOut } from '@/lib/auth/client'
 import type { CurrentUser } from '@/lib/auth/current-user'
 import { getAvatarFallback } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
-import { logout } from '@/server-actions/auth'
 import { RoleNameBadge } from '../shared/role-name-badge'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { Badge } from '../ui/badge'
@@ -25,8 +25,10 @@ export function NavUser({ user }: NavUserProps) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const result = await logout()
-      if (result?.error) throw new Error(result.error)
+      const result = await signOut()
+      if (result.error) {
+        throw new Error(result.error)
+      }
     },
     onSuccess: async () => {
       queryClient.clear()
@@ -51,11 +53,11 @@ export function NavUser({ user }: NavUserProps) {
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <Avatar>
                     <AvatarFallback className="bg-linear-to-br from-primary to-emerald-900 font-medium text-white">
-                      {getAvatarFallback(user.fullName)}
+                      {getAvatarFallback(user.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid min-w-0 flex-1 gap-0.5 text-left">
-                    <span className="truncate font-medium">{user.fullName}</span>
+                    <span className="truncate font-medium">{user.name}</span>
                     <div className="flex gap-1 overflow-hidden">
                       {user.roles.length ? (
                         user.roles.map((role) => <RoleNameBadge key={role} size="sm" roleName={role} />)
@@ -73,7 +75,7 @@ export function NavUser({ user }: NavUserProps) {
           <MenuPopup className="w-(--anchor-width)" align="center">
             <MenuGroup>
               <div>
-                <MenuGroupLabel className="line-clamp-2 pb-0">{user.fullName}</MenuGroupLabel>
+                <MenuGroupLabel className="line-clamp-2 pb-0">{user.name}</MenuGroupLabel>
                 <MenuGroupLabel className="line-clamp-2 py-0">{user.email}</MenuGroupLabel>
               </div>
             </MenuGroup>

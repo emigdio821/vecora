@@ -2,7 +2,7 @@ import { IconFilter2, IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
@@ -58,7 +58,7 @@ interface TransactionsDataTableHeaderProps {
 }
 
 export function TransactionsDataTableHeader({ table, isLoading }: TransactionsDataTableHeaderProps) {
-  const canManage = useHasRole('treasurer')
+  const canManage = useCan({ transaction: ['write'] })
   const [kind, setKind] = useKindFilter()
   const isFiltered = kind !== 'all'
   const activeKindLabel = KIND_FILTER_ITEMS.find((item) => item.value === kind)?.label

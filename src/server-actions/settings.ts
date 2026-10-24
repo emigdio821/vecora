@@ -6,14 +6,13 @@ import {
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
 import sharp from 'sharp'
-import { type ActionResult, databaseError, postgrestErrorMessage } from '@/lib/action-result'
-import { getCurrentUser } from '@/lib/auth/current-user'
-import { authMiddleware } from '@/lib/auth/middleware'
-import { withCurrentUser } from '@/lib/db/current-user'
-import { settings } from '@/lib/db/schema'
+import { type ActionResult, errorMessage } from '@/lib/action-result'
+import { boardMiddleware, requirePermission } from '@/lib/auth/middleware'
+import { can } from '@/lib/auth/permissions'
+import { transactionAs } from '@/lib/db'
 import { getSettings, LOGO_PREFIX, logoKey } from '@/lib/db/settings'
+import * as settingsService from '@/lib/services/settings'
 import { ASSETS_BUCKET, storage } from '@/lib/storage'
 import {
   LOGO_URL_SECONDS,
@@ -28,10 +27,10 @@ const LOGO_SIZE = 512
 
 /**
  * A link to the saved logo for the settings preview, or null when there's
- * none. Anyone signed in may see it, as with the settings row it comes from.
+ * none. Every board member may see it, as with the settings row it comes from.
  */
 const fetchLogoUrlFn = createServerFn()
-  .middleware([authMiddleware])
+  .middleware([boardMiddleware])
   .handler(async (): Promise<string | null> => {
     const { logoPath } = await getSettings()
     if (!logoPath) {
@@ -45,43 +44,30 @@ const fetchLogoUrlFn = createServerFn()
 export const fetchLogoUrl = () => fetchLogoUrlFn()
 
 /**
- * President (or admin) edits the residential's details. RLS enforces the
- * role; language and currency only reach here from an admin, and a trigger
- * refuses them from anyone else.
+ * President (or admin) edits the residential's details. Language and currency
+ * only reach here from an admin's form; anyone else sending them is refused.
  */
 const updateSettingsFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([requirePermission({ settings: ['write'] })])
   .validator((input: SettingsInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult> => {
+  .handler(async ({ data: input, context }): Promise<ActionResult> => {
     const parsed = settingsSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
+    const { residentialName, defaultLanguage, currency } = parsed.data
+    const configures = defaultLanguage !== undefined || currency !== undefined
+    if (configures && !can(context.user.roles, { settings: ['configure'] })) {
+      return { error: m.common_no_permission() }
+    }
 
-    let updated: Array<{ id: string }>
     try {
-      updated = await withCurrentUser((tx) =>
-        tx
-          .update(settings)
-          .set({
-            residentialName: parsed.data.residential_name,
-            // Left out (undefined) when the president saves: Drizzle skips them.
-            defaultLanguage: parsed.data.default_language,
-            currency: parsed.data.currency,
-          })
-          .where(eq(settings.singleton, true))
-          .returning({ id: settings.id }),
+      await transactionAs(context.user.id, (tx) =>
+        // Left out (undefined) when the president saves: Drizzle skips them.
+        settingsService.updateSettings(tx, { residentialName, defaultLanguage, currency }),
       )
     } catch (error) {
-      return {
-        error: postgrestErrorMessage(databaseError(error), {
-          fallback: m.settings_save_failed(),
-        }),
-      }
-    }
-    // RLS filtered the row out: not president nor admin.
-    if (updated.length === 0) {
-      return { error: m.common_no_permission() }
+      return { error: errorMessage(error, { fallback: m.settings_save_failed() }) }
     }
 
     return { data: undefined }
@@ -106,26 +92,13 @@ function optimizeLogo(input: ArrayBuffer): Promise<Buffer> {
 
 /**
  * Points the settings row at a new logo (or none), then deletes every other
- * logo. RLS decides who may change the row, so nothing is deleted for someone
- * who can't.
+ * logo. The callers' middleware already checked the role.
  */
-async function setLogoPath(path: string | null): Promise<ActionResult> {
-  let updated: Array<{ id: string }>
+async function setLogoPath(actorId: string, path: string | null): Promise<ActionResult> {
   try {
-    updated = await withCurrentUser((tx) =>
-      tx
-        .update(settings)
-        .set({ logoPath: path })
-        .where(eq(settings.singleton, true))
-        .returning({ id: settings.id }),
-    )
+    await transactionAs(actorId, (tx) => settingsService.updateSettings(tx, { logoPath: path }))
   } catch (error) {
-    return {
-      error: postgrestErrorMessage(databaseError(error), { fallback: m.settings_logo_save_failed() }),
-    }
-  }
-  if (updated.length === 0) {
-    return { error: m.common_no_permission() }
+    return { error: errorMessage(error, { fallback: m.settings_logo_save_failed() }) }
   }
 
   // Only the current logo needs to stay. Clearing everything else, not just the previous
@@ -152,20 +125,17 @@ async function setLogoPath(path: string | null): Promise<ActionResult> {
   return { data: undefined }
 }
 
-/** President (or admin) uploads the residential's logo. RLS enforces the role. */
+/**
+ * President (or admin) uploads the residential's logo. The middleware turns
+ * others away before the expensive part, processing the image.
+ */
 const uploadLogoFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([requirePermission({ settings: ['write'] })])
   .validator((formData: FormData) => formData)
-  .handler(async ({ data: formData }): Promise<ActionResult> => {
+  .handler(async ({ data: formData, context }): Promise<ActionResult> => {
     const parsed = logoFileSchema.safeParse(formData.get('logo'))
     if (!parsed.success) {
       return { error: parsed.error.issues[0]?.message ?? m.settings_logo_select_image() }
-    }
-
-    // Processing the image is the expensive part: turn others away before it.
-    const user = await getCurrentUser()
-    if (!user?.roles.some((role) => role === 'president' || role === 'admin')) {
-      return { error: m.common_no_permission() }
     }
 
     let png: Buffer
@@ -193,7 +163,7 @@ const uploadLogoFn = createServerFn({ method: 'POST' })
       return { error: m.settings_logo_upload_failed() }
     }
 
-    const result = await setLogoPath(path)
+    const result = await setLogoPath(context.user.id, path)
     if (result.error !== undefined) {
       try {
         await storage.send(
@@ -210,7 +180,7 @@ const uploadLogoFn = createServerFn({ method: 'POST' })
 export const uploadLogo = (formData: FormData) => uploadLogoFn({ data: formData })
 
 const removeLogoFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
-  .handler((): Promise<ActionResult> => setLogoPath(null))
+  .middleware([requirePermission({ settings: ['write'] })])
+  .handler(({ context }): Promise<ActionResult> => setLogoPath(context.user.id, null))
 
 export const removeLogo = () => removeLogoFn()

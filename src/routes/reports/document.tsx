@@ -34,7 +34,7 @@ async function POST(request: Request) {
   if (!user) {
     return Response.json({ error: m.reports_sign_in_required() }, { status: 401 })
   }
-  if (user.roles.length === 0 || user.mustSetPassword) {
+  if (user.roles.length === 0 || user.mustSetPassword || user.mustChangePassword) {
     return Response.json({ error: m.common_no_permission() }, { status: 403 })
   }
 
@@ -63,7 +63,7 @@ async function POST(request: Request) {
   const logo = settings.logoPath ? await getLogo(settings.logoPath) : null
   const generatedBy = user.isMainAdmin
     ? m.common_role_admin({}, { locale: settings.defaultLanguage })
-    : user.fullName
+    : user.name
 
   let pdf: Buffer
   try {

@@ -39,14 +39,14 @@ const FORM_ID = 'create-transaction-form'
 function defaultValues(kind: TransactionKind): CreateTransactionInput {
   return {
     kind,
-    category_id: '',
+    categoryId: '',
     // The schema wants a number; RHF/NumberField hand us null until typed.
     amount: null as unknown as number,
-    occurred_on: format(new Date(), ISO_DAY),
-    payment_method: 'cash',
+    occurredOn: format(new Date(), ISO_DAY),
+    paymentMethod: 'cash',
     folio: '',
     reference: '',
-    property_id: null,
+    propertyId: null,
     description: '',
     notes: '',
   }
@@ -73,7 +73,7 @@ export function CreateTransactionDrawer({
     resolver: zodResolver(createTransactionSchema),
     defaultValues: defaultValues(defaultKind),
   })
-  const occurredOn = useWatch({ control: form.control, name: 'occurred_on' })
+  const occurredOn = useWatch({ control: form.control, name: 'occurredOn' })
   const isPeriodMissing = useIsPeriodMissing(occurredOn)
 
   const mutation = useMutation({

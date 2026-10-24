@@ -3,7 +3,7 @@ import { formatDay } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import type { ReservationQueryData } from '@/tanstack-queries/presidency'
 
-/** Derived, never stored: see supabase/migrations/20260921000300_amenities.sql. */
+/** Derived, never stored: see src/lib/services/presidency.ts. */
 export type ReservationStatus = 'pending' | 'paid' | 'free' | 'cancelled'
 
 export const RESERVATION_STATUS_LABEL: Record<ReservationStatus, string> = {
@@ -50,13 +50,13 @@ export function reservationRefund(reservation: ReservationQueryData) {
 }
 
 export function reservationStatus(reservation: ReservationQueryData): ReservationStatus {
-  if (reservation.cancelled_at) return 'cancelled'
+  if (reservation.cancelledAt) return 'cancelled'
   if (reservationPayment(reservation)) return 'paid'
-  if (Number(reservation.amount) === 0) return 'free'
+  if (reservation.amount === 0) return 'free'
   return 'pending'
 }
 
 /** Area, day and house: how menus, drawers and toasts name a booking. */
 export function reservationSummary(reservation: ReservationQueryData) {
-  return `${reservation.amenity.name} - ${formatDay(reservation.reserved_on)} - ${m.common_house_label({ number: reservation.property.number })}`
+  return `${reservation.amenity.name} - ${formatDay(reservation.reservedOn)} - ${m.common_house_label({ number: reservation.property.number })}`
 }

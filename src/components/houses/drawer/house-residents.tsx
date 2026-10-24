@@ -34,7 +34,7 @@ interface HouseResidentsProps {
  */
 export function HouseResidents({ house, disabled }: HouseResidentsProps) {
   const [isAssignOpen, setAssignOpen] = useState(false)
-  const residents = sortByRelationship(house.property_residents)
+  const residents = sortByRelationship(house.residentLinks)
 
   return (
     <CollapsibleSection icon={<IconUsers />} title={m.common_section_residents()} count={residents.length}>
@@ -44,7 +44,7 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
             <li key={resident.id} className="flex items-center justify-between gap-2 text-sm">
               <div className="grid min-w-0 gap-0.5">
                 <span className="truncate font-medium">
-                  {resident.first_name} {resident.last_name}
+                  {resident.firstName} {resident.lastName}
                 </span>
                 <span className="truncate text-xs text-muted-foreground">{resident.phone}</span>
               </div>
@@ -54,7 +54,7 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
                   resident={resident}
                   value={relationship}
                   aria-label={m.residential_relationship_of_resident({
-                    name: `${resident.first_name} ${resident.last_name}`,
+                    name: `${resident.firstName} ${resident.lastName}`,
                   })}
                   disabled={disabled}
                 />
@@ -84,7 +84,7 @@ export function HouseResidents({ house, disabled }: HouseResidentsProps) {
   )
 }
 
-type LinkedResident = HouseQueryData['property_residents'][number]['resident']
+type LinkedResident = HouseQueryData['residentLinks'][number]['resident']
 
 function UnassignResidentButton({
   house,
@@ -97,7 +97,7 @@ function UnassignResidentButton({
 }) {
   const queryClient = useQueryClient()
   const [isConfirmOpen, setConfirmOpen] = useState(false)
-  const name = `${resident.first_name} ${resident.last_name}`
+  const name = `${resident.firstName} ${resident.lastName}`
 
   const mutation = useMutation({
     mutationFn: async () => {

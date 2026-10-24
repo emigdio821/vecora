@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { RELATIONSHIPS } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 
 export const createHouseSchema = z.object({
@@ -17,10 +18,7 @@ export const updateHouseSchema = createHouseSchema
 
 export type UpdateHouseInput = z.infer<typeof updateHouseSchema>
 
-// Mirrors the `residency_relationship` enum in the database.
-export const RELATIONSHIPS = ['owner', 'tenant', 'family', 'unconfirmed'] as const
-
-export type Relationship = (typeof RELATIONSHIPS)[number]
+export { RELATIONSHIPS, type Relationship } from '@/lib/enums'
 
 export const assignResidentsSchema = z.object({
   residentIds: z.array(z.uuid()).min(1, { error: () => m.residential_select_resident_required() }),

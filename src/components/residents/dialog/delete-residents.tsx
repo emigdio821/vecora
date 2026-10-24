@@ -63,8 +63,8 @@ export function DeleteResidentsAlertDialog({
   const queryClient = useQueryClient()
   const count = residents.length
   const isSingle = count === 1
-  const singleName = isSingle ? `${residents[0].first_name} ${residents[0].last_name}` : ''
-  const houseCount = new Set(residents.flatMap((r) => r.property_residents.map((pr) => pr.property.id))).size
+  const singleName = isSingle ? `${residents[0].firstName} ${residents[0].lastName}` : ''
+  const houseCount = new Set(residents.flatMap((r) => r.propertyLinks.map((link) => link.property.id))).size
   function residentsClause() {
     if (houseCount === 0) {
       return isSingle ? m.residential_delete_resident_no_houses() : m.residential_delete_residents_no_houses()
@@ -87,7 +87,7 @@ export function DeleteResidentsAlertDialog({
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
       void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
 
-      const partial = deleted < count // RLS filtered some rows out
+      const partial = deleted < count // some were already deleted, by someone else meanwhile
       const toastId = toastManager.add({
         type: partial ? 'warning' : 'success',
         title: partial
@@ -162,7 +162,7 @@ export function DeleteResidentsAlertDialog({
             <ul>
               {residents.map((resident) => (
                 <li key={resident.id} className="truncate">
-                  {resident.first_name} {resident.last_name}
+                  {resident.firstName} {resident.lastName}
                 </li>
               ))}
             </ul>

@@ -1,17 +1,11 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq, sql } from 'drizzle-orm'
-import {
-  type ActionResult,
-  type DatabaseError,
-  databaseError,
-  FK_VIOLATION,
-  isFolioTaken,
-  postgrestErrorMessage,
-  requestResolutionErrorMessage,
-} from '@/lib/action-result'
-import { authMiddleware } from '@/lib/auth/middleware'
-import { withCurrentUser } from '@/lib/db/current-user'
-import { amenities, amenityReservations } from '@/lib/db/schema'
+import { type ActionResult, databaseError, errorMessage, FK_VIOLATION } from '@/lib/action-result'
+import { boardMiddleware, requirePermission } from '@/lib/auth/middleware'
+import { db, transactionAs } from '@/lib/db'
+import { amenities } from '@/lib/db/schema'
+import type { ServiceErrorCode } from '@/lib/services/errors'
+import * as presidency from '@/lib/services/presidency'
 import {
   type AmenityInput,
   amenitySchema,
@@ -24,50 +18,39 @@ import {
 } from '@/lib/validations/presidency'
 import { m } from '@/paraglide/messages'
 
+const amenityWrite = requirePermission({ amenity: ['write'] })
+const reservationWrite = requirePermission({ reservation: ['write'] })
+const reservationCollect = requirePermission({ reservation: ['collect'] })
+
 // ---------------------------------------------------------------------------
 // periods
 // ---------------------------------------------------------------------------
 
 /**
- * Newest first. `transaction_count` includes soft-deleted rows on purpose:
+ * Newest first. `transactionCount` includes soft-deleted rows on purpose:
  * the ledger is never purged, so any row at all blocks a hard delete.
- * The rows keep the database's column names, the shape the screens were built on.
  */
 const fetchPeriodsFn = createServerFn()
-  .middleware([authMiddleware])
-  .handler(async () => {
-    const periods = await withCurrentUser((tx) =>
-      tx.query.periods.findMany({
-        columns: {
-          id: true,
-          name: true,
-          startsOn: true,
-          endsOn: true,
-          monthlyFee: true,
-          lateFee: true,
-          dueDay: true,
-          currency: true,
-        },
-        extras: {
-          transactionCount: (table) =>
-            sql<number>`(select count(*)::int from public.transactions t where t.period_id = ${table.id})`,
-        },
-        orderBy: { startsOn: 'desc' },
-      }),
-    )
-
-    return periods.map((period) => ({
-      id: period.id,
-      name: period.name,
-      starts_on: period.startsOn,
-      ends_on: period.endsOn,
-      monthly_fee: period.monthlyFee,
-      late_fee: period.lateFee,
-      due_day: period.dueDay,
-      currency: period.currency,
-      transaction_count: period.transactionCount,
-    }))
-  })
+  .middleware([boardMiddleware])
+  .handler(() =>
+    db.query.periods.findMany({
+      columns: {
+        id: true,
+        name: true,
+        startsOn: true,
+        endsOn: true,
+        monthlyFee: true,
+        lateFee: true,
+        dueDay: true,
+        currency: true,
+      },
+      extras: {
+        transactionCount: (table) =>
+          sql<number>`(select count(*)::int from transactions t where t.period_id = ${table.id})`,
+      },
+      orderBy: { startsOn: 'desc' },
+    }),
+  )
 
 export const fetchPeriods = () => fetchPeriodsFn()
 
@@ -77,91 +60,67 @@ export const fetchPeriods = () => fetchPeriodsFn()
 
 /**
  * Every common area, by name, retired ones included: their bookings still
- * name them. `reservation_count` decides whether one can be deleted.
+ * name them. `reservationCount` decides whether one can be deleted.
  */
 const fetchAmenitiesFn = createServerFn()
-  .middleware([authMiddleware])
-  .handler(async () => {
-    const rows = await withCurrentUser((tx) =>
-      tx.query.amenities.findMany({
-        columns: { id: true, name: true, defaultFee: true, isActive: true },
-        extras: {
-          reservationCount: (table) =>
-            sql<number>`(select count(*)::int from public.amenity_reservations r where r.amenity_id = ${table.id})`,
-        },
-        orderBy: { name: 'asc' },
-      }),
-    )
-
-    return rows.map((amenity) => ({
-      id: amenity.id,
-      name: amenity.name,
-      default_fee: amenity.defaultFee,
-      is_active: amenity.isActive,
-      reservation_count: amenity.reservationCount,
-    }))
-  })
+  .middleware([boardMiddleware])
+  .handler(() =>
+    db.query.amenities.findMany({
+      columns: { id: true, name: true, defaultFee: true, isActive: true },
+      extras: {
+        reservationCount: (table) =>
+          sql<number>`(select count(*)::int from amenity_reservations r where r.amenity_id = ${table.id})`,
+      },
+      orderBy: { name: 'asc' },
+    }),
+  )
 
 export const fetchAmenities = () => fetchAmenitiesFn()
 
 function toAmenityMessage(error: unknown, fallback: string) {
-  return postgrestErrorMessage(databaseError(error), {
+  return errorMessage(error, {
     fallback,
-    unique: { amenities_name_unique: m.presidency_error_amenity_name_taken() },
+    constraints: { amenities_name_unique: m.presidency_error_amenity_name_taken() },
   })
 }
 
 const createAmenityFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([amenityWrite])
   .validator((input: AmenityInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
+  .handler(async ({ data: input, context }): Promise<ActionResult<{ id: string }>> => {
     const parsed = amenitySchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { name, default_fee } = parsed.data
-
-    let created: Array<{ id: string }>
     try {
-      created = await withCurrentUser((tx) =>
-        tx.insert(amenities).values({ name, defaultFee: default_fee }).returning({ id: amenities.id }),
+      const [created] = await transactionAs(context.user.id, (tx) =>
+        tx.insert(amenities).values(parsed.data).returning({ id: amenities.id }),
       )
+      return { data: created }
     } catch (error) {
       return { error: toAmenityMessage(error, m.presidency_error_create_amenity()) }
     }
-
-    return { data: created[0] }
   })
 
 export const createAmenity = (input: AmenityInput) => createAmenityFn({ data: input })
 
 /** Past bookings keep their amount; the new fee applies from the next one. */
 const updateAmenityFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([amenityWrite])
   .validator((data: { id: string; input: AmenityInput }) => data)
-  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+  .handler(async ({ data: { id, input }, context }): Promise<ActionResult> => {
     const parsed = amenitySchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { name, default_fee } = parsed.data
-
-    let updated: Array<{ id: string }>
     try {
-      updated = await withCurrentUser((tx) =>
-        tx
-          .update(amenities)
-          .set({ name, defaultFee: default_fee })
-          .where(eq(amenities.id, id))
-          .returning({ id: amenities.id }),
+      await transactionAs(context.user.id, (tx) =>
+        tx.update(amenities).set(parsed.data).where(eq(amenities.id, id)),
       )
     } catch (error) {
       return { error: toAmenityMessage(error, m.presidency_error_update_amenity()) }
-    }
-    if (updated.length === 0) {
-      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -171,19 +130,15 @@ export const updateAmenity = (id: string, input: AmenityInput) => updateAmenityF
 
 /** Retire / reinstate. Retired areas keep their bookings but leave the booking form. */
 const setAmenityActiveFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([amenityWrite])
   .validator((data: { id: string; isActive: boolean }) => data)
-  .handler(async ({ data: { id, isActive } }): Promise<ActionResult> => {
-    let updated: Array<{ id: string }>
+  .handler(async ({ data: { id, isActive }, context }): Promise<ActionResult> => {
     try {
-      updated = await withCurrentUser((tx) =>
-        tx.update(amenities).set({ isActive }).where(eq(amenities.id, id)).returning({ id: amenities.id }),
+      await transactionAs(context.user.id, (tx) =>
+        tx.update(amenities).set({ isActive }).where(eq(amenities.id, id)),
       )
     } catch (error) {
       return { error: toAmenityMessage(error, m.presidency_error_update_amenity()) }
-    }
-    if (updated.length === 0) {
-      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -194,22 +149,16 @@ export const setAmenityActive = (id: string, isActive: boolean) =>
 
 /** Hard delete; only possible while the area has no bookings. */
 const deleteAmenityFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([amenityWrite])
   .validator((id: string) => id)
-  .handler(async ({ data: id }): Promise<ActionResult> => {
-    let deleted: Array<{ id: string }>
+  .handler(async ({ data: id, context }): Promise<ActionResult> => {
     try {
-      deleted = await withCurrentUser((tx) =>
-        tx.delete(amenities).where(eq(amenities.id, id)).returning({ id: amenities.id }),
-      )
+      await transactionAs(context.user.id, (tx) => tx.delete(amenities).where(eq(amenities.id, id)))
     } catch (error) {
       if (databaseError(error).code === FK_VIOLATION) {
         return { error: m.presidency_error_amenity_in_use() }
       }
       return { error: toAmenityMessage(error, m.presidency_error_delete_amenity()) }
-    }
-    if (deleted.length === 0) {
-      return { error: m.common_no_permission() }
     }
 
     return { data: undefined }
@@ -227,156 +176,111 @@ export const deleteAmenity = (id: string) => deleteAmenityFn({ data: id })
  * the payment status is derived from them (see reservationStatus).
  */
 const fetchReservationsFn = createServerFn()
-  .middleware([authMiddleware])
+  .middleware([boardMiddleware])
   .handler(async () => {
-    const reservations = await withCurrentUser((tx) =>
-      tx.query.amenityReservations.findMany({
-        columns: {
-          id: true,
-          reservedOn: true,
-          amount: true,
-          currency: true,
-          notes: true,
-          createdAt: true,
-          cancelledAt: true,
+    const reservations = await db.query.amenityReservations.findMany({
+      columns: {
+        id: true,
+        reservedOn: true,
+        amount: true,
+        currency: true,
+        notes: true,
+        createdAt: true,
+        cancelledAt: true,
+      },
+      with: {
+        amenity: { columns: { id: true, name: true } },
+        property: { columns: { id: true, number: true } },
+        transactions: {
+          columns: { id: true, kind: true, amount: true, occurredOn: true, folio: true },
+          where: { deletedAt: { isNull: true } },
         },
-        with: {
-          amenity: { columns: { id: true, name: true } },
-          property: { columns: { id: true, number: true } },
-          transactions: {
-            columns: { id: true, kind: true, amount: true, occurredOn: true, folio: true },
-            where: { deletedAt: { isNull: true } },
-          },
-        },
-        orderBy: { reservedOn: 'desc' },
-      }),
-    )
-
-    return reservations.flatMap((reservation) => {
-      const { amenity, property } = reservation
-      // Both are required columns, so always there; Drizzle types the joins as optional anyway.
-      if (!amenity || !property) {
-        return []
-      }
-      return [
-        {
-          id: reservation.id,
-          reserved_on: reservation.reservedOn,
-          amount: reservation.amount,
-          currency: reservation.currency,
-          notes: reservation.notes,
-          created_at: reservation.createdAt.toISOString(),
-          cancelled_at: reservation.cancelledAt ? reservation.cancelledAt.toISOString() : null,
-          amenity: { id: amenity.id, name: amenity.name },
-          property: { id: property.id, number: property.number },
-          movements: reservation.transactions.map((movement) => ({
-            id: movement.id,
-            kind: movement.kind,
-            amount: movement.amount,
-            occurred_on: movement.occurredOn,
-            folio: movement.folio,
-          })),
-        },
-      ]
+      },
+      orderBy: { reservedOn: 'desc' },
     })
+
+    return reservations.map(({ transactions, ...reservation }) => ({
+      ...reservation,
+      movements: transactions,
+    }))
   })
 
 export const fetchReservations = () => fetchReservationsFn()
 
-// Raised by the guard trigger once a booking has money recorded against it.
-const PAID = 'P0003'
-
-function toMessage(error: unknown, fallback: string) {
-  const cause = databaseError(error)
-  if (cause.code === PAID && cause.message.includes('cancel it instead')) {
-    return m.presidency_error_reservation_paid_cancel()
-  }
-  if (cause.code === PAID) {
-    return m.presidency_error_reservation_paid_locked()
-  }
-  return postgrestErrorMessage(cause, {
+/** What the booking rules say, wherever they come up; `service` overrides them. */
+function toMessage(error: unknown, fallback: string, service?: Partial<Record<ServiceErrorCode, string>>) {
+  return errorMessage(error, {
     fallback,
-    unique: { amenity_reservations_one_per_day: m.presidency_error_day_taken() },
+    service: {
+      not_found: m.presidency_error_reservation_not_found(),
+      reservation_cancelled: m.presidency_error_already_cancelled(),
+      reservation_free: m.presidency_error_no_cost(),
+      already_resolved: m.presidency_error_already_paid(),
+      refund_too_large: m.presidency_error_refund_exceeds(),
+      transfer_needs_reference: m.presidency_reference_required(),
+      ...service,
+    },
+    constraints: { amenity_reservations_one_per_day: m.presidency_error_day_taken() },
   })
 }
 
-/** Errors from pay_amenity_reservation / cancel_amenity_reservation. */
-function toResolutionMessage(error: DatabaseError, fallback: string) {
-  if (isFolioTaken(error)) return m.common_folio_taken()
-  if (error.message.includes('already paid')) return m.presidency_error_already_paid()
-  if (error.message.includes('cancelled')) return m.presidency_error_already_cancelled()
-  if (error.message.includes('no cost')) return m.presidency_error_no_cost()
-  if (error.message.includes('exceeds')) return m.presidency_error_refund_exceeds()
-  if (error.message.includes('not found')) return m.presidency_error_reservation_not_found()
-  return requestResolutionErrorMessage(error, fallback)
-}
-
 const createReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationWrite])
   .validator((input: ReservationInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult<{ id: string }>> => {
+  .handler(async ({ data: input, context }): Promise<ActionResult<{ id: string }>> => {
     const parsed = reservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { amenity_id, property_id, reserved_on, amount, notes } = parsed.data
+    const { amenityId, propertyId, reservedOn, amount, notes } = parsed.data
 
-    let created: Array<{ id: string }>
     try {
-      created = await withCurrentUser((tx) =>
-        tx
-          .insert(amenityReservations)
-          .values({
-            amenityId: amenity_id,
-            propertyId: property_id,
-            reservedOn: reserved_on,
-            amount,
-            notes: notes || null,
-          })
-          .returning({ id: amenityReservations.id }),
+      const created = await transactionAs(context.user.id, (tx) =>
+        presidency.createReservation(tx, context.user, {
+          amenityId,
+          propertyId,
+          reservedOn,
+          amount,
+          notes: notes || null,
+        }),
       )
+      return { data: created }
     } catch (error) {
       return { error: toMessage(error, m.presidency_error_create_reservation()) }
     }
-
-    return { data: created[0] }
   })
 
 export const createReservation = (input: ReservationInput) => createReservationFn({ data: input })
 
-/** Not once cancelled (RLS). Once paid, the guard trigger keeps the area, house and amount. */
+/** Not once cancelled. Once paid, the area, house and amount stay. */
 const updateReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationWrite])
   .validator((data: { id: string; input: ReservationInput }) => data)
-  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+  .handler(async ({ data: { id, input }, context }): Promise<ActionResult> => {
     const parsed = reservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { amenity_id, property_id, reserved_on, amount, notes } = parsed.data
+    const { amenityId, propertyId, reservedOn, amount, notes } = parsed.data
 
-    let updated: Array<{ id: string }>
     try {
-      updated = await withCurrentUser((tx) =>
-        tx
-          .update(amenityReservations)
-          .set({
-            amenityId: amenity_id,
-            propertyId: property_id,
-            reservedOn: reserved_on,
-            amount,
-            notes: notes || null,
-          })
-          .where(eq(amenityReservations.id, id))
-          .returning({ id: amenityReservations.id }),
+      await transactionAs(context.user.id, (tx) =>
+        presidency.updateReservation(tx, id, {
+          amenityId,
+          propertyId,
+          reservedOn,
+          amount,
+          notes: notes || null,
+        }),
       )
     } catch (error) {
-      return { error: toMessage(error, m.presidency_error_update_reservation()) }
-    }
-    if (updated.length === 0) {
-      return { error: m.common_no_permission() }
+      return {
+        error: toMessage(error, m.presidency_error_update_reservation(), {
+          reservation_paid: m.presidency_error_reservation_paid_locked(),
+        }),
+      }
     }
 
     return { data: undefined }
@@ -387,22 +291,17 @@ export const updateReservation = (id: string, input: ReservationInput) =>
 
 /** Unpaid bookings only; a paid one is cancelled with cancelReservation. */
 const deleteReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationWrite])
   .validator((id: string) => id)
-  .handler(async ({ data: id }): Promise<ActionResult> => {
-    let deleted: Array<{ id: string }>
+  .handler(async ({ data: id, context }): Promise<ActionResult> => {
     try {
-      deleted = await withCurrentUser((tx) =>
-        tx
-          .delete(amenityReservations)
-          .where(eq(amenityReservations.id, id))
-          .returning({ id: amenityReservations.id }),
-      )
+      await transactionAs(context.user.id, (tx) => presidency.deleteReservation(tx, id))
     } catch (error) {
-      return { error: toMessage(error, m.presidency_error_cancel_reservation()) }
-    }
-    if (deleted.length === 0) {
-      return { error: m.common_no_permission() }
+      return {
+        error: toMessage(error, m.presidency_error_cancel_reservation(), {
+          reservation_paid: m.presidency_error_reservation_paid_cancel(),
+        }),
+      }
     }
 
     return { data: undefined }
@@ -411,67 +310,58 @@ const deleteReservationFn = createServerFn({ method: 'POST' })
 export const deleteReservation = (id: string) => deleteReservationFn({ data: id })
 
 const payReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationCollect])
   .validator((data: { id: string; input: PayReservationInput }) => data)
-  .handler(async ({ data: { id, input } }): Promise<ActionResult<{ transaction_id: string }>> => {
+  .handler(async ({ data: { id, input }, context }): Promise<ActionResult<{ transactionId: string }>> => {
     const parsed = payReservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { occurred_on, folio, payment_method, reference, notes } = parsed.data
+    const { occurredOn, folio, paymentMethod, reference, notes } = parsed.data
 
-    let transactionId: string
     try {
-      const result = await withCurrentUser((tx) =>
-        tx.execute<{ transaction_id: string }>(sql`
-          select public.pay_amenity_reservation(
-            p_reservation_id => ${id},
-            p_occurred_on => ${occurred_on},
-            p_folio => ${folio},
-            p_payment_method => ${payment_method},
-            p_reference => ${reference || null},
-            p_notes => ${notes || null}
-          ) as transaction_id
-        `),
+      const paid = await transactionAs(context.user.id, (tx) =>
+        presidency.payReservation(tx, context.user, id, {
+          occurredOn,
+          folio,
+          paymentMethod,
+          reference: reference || null,
+          notes: notes || null,
+        }),
       )
-      transactionId = result.rows[0].transaction_id
+      return { data: paid }
     } catch (error) {
-      return { error: toResolutionMessage(databaseError(error), m.presidency_error_record_payment()) }
+      return { error: toMessage(error, m.presidency_error_record_payment()) }
     }
-
-    return { data: { transaction_id: transactionId } }
   })
 
 export const payReservation = (id: string, input: PayReservationInput) =>
   payReservationFn({ data: { id, input } })
 
 const cancelReservationFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([reservationCollect])
   .validator((data: { id: string; input: CancelReservationInput }) => data)
-  .handler(async ({ data: { id, input } }): Promise<ActionResult> => {
+  .handler(async ({ data: { id, input }, context }): Promise<ActionResult> => {
     const parsed = cancelReservationSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const { refund_amount, occurred_on, payment_method, reference, notes } = parsed.data
+    const { refundAmount, occurredOn, paymentMethod, reference, notes } = parsed.data
 
     try {
-      await withCurrentUser((tx) =>
-        tx.execute(sql`
-          select public.cancel_amenity_reservation(
-            p_reservation_id => ${id},
-            p_refund_amount => ${refund_amount},
-            p_occurred_on => ${occurred_on},
-            p_payment_method => ${payment_method},
-            p_reference => ${reference || null},
-            p_notes => ${notes || null}
-          )
-        `),
+      await transactionAs(context.user.id, (tx) =>
+        presidency.cancelReservation(tx, context.user, id, {
+          refundAmount,
+          occurredOn,
+          paymentMethod,
+          reference: reference || null,
+          notes: notes || null,
+        }),
       )
     } catch (error) {
-      return { error: toResolutionMessage(databaseError(error), m.presidency_error_cancel_reservation()) }
+      return { error: toMessage(error, m.presidency_error_cancel_reservation()) }
     }
 
     return { data: undefined }

@@ -10,10 +10,10 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import { signInWithPassword } from '@/lib/auth/client'
 import { type LoginInput, loginSchema } from '@/lib/validations/auth'
 import { m } from '@/paraglide/messages'
 import { getLocale } from '@/paraglide/runtime'
-import { login } from '@/server-actions/auth'
 import { USER_QUERY_KEY } from '@/tanstack-queries/session'
 
 interface LoginFormProps {
@@ -34,16 +34,16 @@ export function LoginForm({ redirectTo = '/' }: LoginFormProps) {
 
   async function onSubmit(values: LoginInput) {
     setLoading(true)
-    const result = await login(values)
+    const result = await signInWithPassword(values)
 
-    if (result?.error) {
+    if ('error' in result) {
       setLoading(false)
       form.setError('root', { message: result.error })
       return
     }
 
     // Now in the HOA's language: a full load renders the app in it.
-    if (result?.locale && result.locale !== getLocale()) {
+    if (result.locale && result.locale !== getLocale()) {
       window.location.replace(redirectTo)
       return
     }

@@ -17,6 +17,7 @@
   "auth_password_required": "Contraseña es requerida",
   "auth_credentials_required": "Correo y contraseña son requeridos",
   "auth_credentials_invalid": "Correo o contraseña inválidos",
+  "auth_too_many_attempts": "Demasiados intentos. Espera unos segundos y vuelve a intentarlo.",
   "auth_no_access_message": "Tu cuenta aún no tiene acceso a la aplicación. Si deberías tenerlo, pide a un administrador que te lo dé.",
 
   "auth_logout": "Cerrar sesión",

@@ -43,7 +43,7 @@ export function RemoveBoardMemberAlertDialog({
       toastManager.add({
         type: 'success',
         title: m.board_member_removed(),
-        description: m.board_member_removed_description({ name: member.full_name }),
+        description: m.board_member_removed_description({ name: member.name }),
       })
       onOpenChange(false)
     },
@@ -80,7 +80,7 @@ export function RemoveBoardMemberAlertDialog({
       <ResponsiveAlertDialogPopup>
         <ResponsiveAlertDialogHeader>
           <ResponsiveAlertDialogTitle>
-            {m.board_remove_title({ name: member.full_name })}
+            {m.board_remove_title({ name: member.name })}
           </ResponsiveAlertDialogTitle>
           <ResponsiveAlertDialogDescription>{m.board_remove_description()}</ResponsiveAlertDialogDescription>
         </ResponsiveAlertDialogHeader>

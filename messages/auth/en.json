@@ -17,6 +17,7 @@
   "auth_password_required": "Password is required",
   "auth_credentials_required": "Email and password are required",
   "auth_credentials_invalid": "Invalid email or password",
+  "auth_too_many_attempts": "Too many attempts. Wait a few seconds and try again.",
   "auth_no_access_message": "Your account doesn't have access to the app yet. If it should, ask an administrator to grant it.",
 
   "auth_logout": "Sign out",

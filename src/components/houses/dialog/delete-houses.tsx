@@ -63,7 +63,7 @@ export function DeleteHousesAlertDialog({
   const count = houses.length
   const isSingle = count === 1
   const singleNumber = isSingle ? houses[0].number : ''
-  const residentCount = new Set(houses.flatMap((h) => h.property_residents.map((pr) => pr.resident.id))).size
+  const residentCount = new Set(houses.flatMap((h) => h.residentLinks.map((link) => link.resident.id))).size
   function residentsClause() {
     if (residentCount === 0) {
       return isSingle ? m.residential_delete_house_no_residents() : m.residential_delete_houses_no_residents()
@@ -85,7 +85,7 @@ export function DeleteHousesAlertDialog({
       void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
 
-      const partial = deleted < count // RLS filtered some rows out
+      const partial = deleted < count // some were already deleted, by someone else meanwhile
       const toastId = toastManager.add({
         type: partial ? 'warning' : 'success',
         title: partial

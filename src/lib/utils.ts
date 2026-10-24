@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from 'clsx'
 import { format, isValid, type Locale as DateLocale, parseISO } from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
 import { twMerge } from 'tailwind-merge'
-import { Constants, type Database } from '@/lib/supabase/database.types'
+import type { CurrencyCode } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 import { getLocale, type Locale } from '@/paraglide/runtime'
 
@@ -118,9 +118,7 @@ export function getAvatarFallback(name: string) {
   return fallabck
 }
 
-export type CurrencyCode = Database['public']['Enums']['currency_code']
-
-export const CURRENCIES = Constants.public.Enums.currency_code
+export { CURRENCIES, type CurrencyCode } from '@/lib/enums'
 
 const currencyFormatters = new Map<string, Intl.NumberFormat>()
 
@@ -153,7 +151,7 @@ export const MONEY_FORMAT: Intl.NumberFormatOptions = { minimumFractionDigits: 2
 export const MONEY_STEP = 'any'
 
 /**
- * "$1,250.00" from a number or the numeric string PostgREST returns. With
+ * "$1,250.00" from a number or a numeric string (the activity log's snapshots). With
  * `home` (the HOA's current currency), an amount in any other currency gets
  * its code, "$1,250.00 MXN", so records from before a switch stand out.
  * Components use useFormatCurrency(), which passes it. `locale` defaults to

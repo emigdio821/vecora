@@ -1,7 +1,7 @@
 import { IconTrash } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Badge } from '@/components/ui/badge'
@@ -18,7 +18,7 @@ interface HousesDataTableHeaderProps {
 }
 
 export function HousesDataTableHeader({ table, isLoading }: HousesDataTableHeaderProps) {
-  const canManage = useHasRole('president')
+  const canManage = useCan({ registry: ['write'] })
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [isDeleteSelectedOpen, setDeleteSelectedOpen] = useState(false)
   const selectedRows = table.getFilteredSelectedRowModel().rows

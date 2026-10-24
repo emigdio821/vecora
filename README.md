@@ -6,7 +6,7 @@ Residential management for the HOA board: houses and residents, treasury (fees, 
 
 The app itself is in Spanish (es-MX); code, comments and docs are in English and call each section by its English name (see [Sections](#sections)). Every on-screen text is also translated to English, switched off for now (see [Languages](#languages)).
 
-TanStack Start (Vite + Nitro) · React · Supabase (Postgres, Auth, RLS) · Tailwind CSS · [coss ui](https://coss.com/ui) (Base UI) · TanStack Query / Table · React Hook Form + zod · [Paraglide](https://inlang.com/m/gerre34r/library-inlang-paraglideJs) (i18n).
+TanStack Start (Vite + Nitro) · React · Neon (Postgres, object storage) · Drizzle ORM · Better Auth · Tailwind CSS · [coss ui](https://coss.com/ui) (Base UI) · TanStack Query / Table · React Hook Form + zod · [Paraglide](https://inlang.com/m/gerre34r/library-inlang-paraglideJs) (i18n).
 
 ## Run it locally
 
@@ -24,26 +24,22 @@ You need **Node 24**, npm, the [Neon CLI](https://neon.com/docs/reference/neon-c
    cp .env.example .env.local
    ```
 
-   | Variable                     | Value                                                                        |
-   | ---------------------------- | ---------------------------------------------------------------------------- |
-   | `VITE_SITE_URL`              | `http://localhost:3000`                                                      |
-   | `DATABASE_URL`               | Pooled connection string of your Neon `dev` branch (owner role)              |
-   | `DATABASE_URL_UNPOOLED`      | Direct connection string of the same branch (for drizzle-kit and the loader) |
-   | `DATABASE_AUTHENTICATED_URL` | The app's own role, written by `npm run db:neon:app-role` (step 3)           |
-   | `DATABASE_AUTH_URL`          | Better Auth's role, written by `npm run db:neon:app-role` (step 3)           |
-   | `BETTER_AUTH_SECRET`         | Output of `openssl rand -base64 32`                                          |
-   | `AWS_*` (four of them)       | Object storage of the `dev` branch, from `neon env pull`                     |
+   | Variable                | Value                                                                        |
+   | ----------------------- | ---------------------------------------------------------------------------- |
+   | `VITE_SITE_URL`         | `http://localhost:3000`                                                      |
+   | `DATABASE_URL`          | Pooled connection string of your Neon `dev` branch, from `neon checkout dev` |
+   | `DATABASE_URL_UNPOOLED` | Direct connection string of the same branch (drizzle-kit and the reset)      |
+   | `NEON_BRANCH`           | `dev`, also from `neon checkout dev`; the reset refuses `production`         |
+   | `BETTER_AUTH_SECRET`    | Output of `openssl rand -base64 32`                                          |
+   | `AWS_*` (four of them)  | Object storage of the `dev` branch, from `neon env pull`                     |
 
    The app checks them on start and stops with the name of any that's missing or invalid.
 
-3. **Load the schema and test data** into the empty `dev` branch, then give the app's two roles their logins. The load applies every migration, both seeds and the Neon migrations, and sets the test accounts' passwords.
+3. **Load the schema and test data** into the `dev` branch. The reset empties it, applies every migration in `drizzle/` and runs the seed; run it again any time for a clean slate.
 
    ```bash
-   npm run db:neon:load
-   npm run db:neon:app-role
+   npm run db:reset
    ```
-
-   For a clean slate, `neon branches reset dev --parent` empties the branch; run both commands again.
 
 4. **Start the app**
 
@@ -55,7 +51,7 @@ You need **Node 24**, npm, the [Neon CLI](https://neon.com/docs/reference/neon-c
 
 ## Test accounts
 
-All local accounts use the password **`admin`**, set by `scripts/neon/dev-passwords.ts` during the load. They come from `supabase/seed.sql` (admin) and `supabase/seeds/dev.sql` (everyone else) and only exist in the `dev` branch.
+All local accounts use the password **`admin`**. They come from `scripts/db/seed.ts` and only exist in development branches.
 
 | Email                    | Role                         | Can write in                                                               |
 | ------------------------ | ---------------------------- | -------------------------------------------------------------------------- |
@@ -65,9 +61,9 @@ All local accounts use the password **`admin`**, set by `scripts/neon/dev-passwo
 | `security@vecora.com`    | Security (María García)      | Requests in Security                                                       |
 | `maintenance@vecora.com` | Maintenance (Diego Martínez) | Requests in Maintenance                                                    |
 
-Every role can read every section. The seed also creates 20 houses (A1–D5), 10 residents, the current year's period with a few payments, two common areas with bookings, requests in every status, and 45 days of activity in the activity log.
+Every role can read every section. The seed also creates 20 houses (A1–D5), 10 residents, the current year's period with a few payments, two common areas with bookings, requests in every status, and 45 days of activity in the activity log. Every step runs as the board member who would do it, through the same services as the app.
 
-`supabase/seeds/periods.sql` adds the period scenarios around the current year: the two previous years as back-to-back periods with a year of fees and expenses each, no period next year (a gap), and a future period the year after with no movements yet. For the "no periods" state, run `npm run db:reset:empty`.
+Around the current year it adds the period scenarios: the two previous years as back-to-back periods with a year of fees and expenses each, no period next year (a gap), and a future period the year after with no movements yet. For the "no periods" state, run `npm run db:reset:empty`.
 
 ## Sections
 
@@ -99,84 +95,77 @@ What each section is called on screen. Docs and comments use the English name.
 
 ## Useful commands
 
-| Command                           | What it does                                                                                                                                                                                                   |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`                     | Development server                                                                                                                                                                                             |
-| `npm run db:reset`                | Recreate the local database from migrations + seeds (destroys local data)                                                                                                                                      |
-| `npm run db:reset:empty`          | Same, but only the admin account from `seed.sql`: a fresh install with no data                                                                                                                                 |
-| `npm run db:neon:load`            | Load the migrations + seeds into the (empty) Neon branch in `.env.local`, through `scripts/neon/supabase-compat.sql`; start over with `neon branches reset dev --parent`                                       |
-| `npm run db:neon:migrate`         | Apply the pending `neon/migrations/` to the Neon branch in `.env.local` (the load already runs them)                                                                                                           |
-| `npm run db:neon:dev-passwords`   | Give every account without a password the test password `admin` (the load already runs it; refuses the production branch)                                                                                      |
-| `npm run db:neon:app-role`        | Give the app's role (`vecora_app`) and Better Auth's (`vecora_auth`) their logins on that branch, after a load; the first time, it writes `DATABASE_AUTHENTICATED_URL` and `DATABASE_AUTH_URL` to `.env.local` |
-| `npm run db:schema`               | Regenerate the Drizzle schema (`src/lib/db/schema.ts`, `relations.ts`) from the Neon branch in `.env.local`; run after changing a migration                                                                    |
-| `npm run db:types`                | Regenerate `src/lib/supabase/database.types.ts` from the local schema — run after changing a migration                                                                                                         |
-| `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                                                                                                                                     |
-| `npm run i18n`                    | Compile `messages/` into `src/paraglide/` (the dev server also does it on its own)                                                                                                                             |
-| `npm run lint` / `npm run format` | oxlint / oxfmt                                                                                                                                                                                                 |
-| `npx supabase status`             | Local URLs and keys; Studio is at <http://127.0.0.1:54323>                                                                                                                                                     |
-| `npx supabase stop`               | Stop the local stack (data is kept)                                                                                                                                                                            |
+| Command                           | What it does                                                                                               |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                     | Development server                                                                                         |
+| `npm run db:reset`                | Empty the Neon branch in `.env.local`, apply every migration and load the test data (refuses `production`) |
+| `npm run db:reset:empty`          | Same, but only the main admin (password `admin`): a fresh install with no data                             |
+| `npm run db:generate`             | Turn a change in `src/lib/db/schema/` into a new migration in `drizzle/`                                   |
+| `npm run db:migrate`              | Apply the pending migrations to the branch in `.env.local`                                                 |
+| `npm run typecheck`               | Compiles the messages, then `tsc --noEmit`                                                                 |
+| `npm run i18n`                    | Compile `messages/` into `src/paraglide/` (the dev server also does it on its own)                         |
+| `npm run lint` / `npm run format` | oxlint / oxfmt                                                                                             |
+
+## Database
+
+The TypeScript schema in `src/lib/db/schema/` is the source of truth. After changing it, `npm run db:generate` writes the migration; read the SQL, then `npm run db:migrate`. A migration that's been applied anywhere stays as it is: the next change is a new one.
+
+What the schema can't declare (the exclusion constraints, the activity log's trigger) lives in a custom migration, `drizzle/*_database_rules`; add another with `npx drizzle-kit generate --custom --name <name>`. Never `drizzle-kit push`, which would drop it.
 
 ## Deploy
 
-The app runs on Vercel against a hosted Supabase project.
+The app runs on Vercel against the Neon `production` branch.
 
-1. **Push the schema** to the hosted project. Seeds are not pushed, so production starts with no accounts until step 4.
+1. **Apply the migrations** to the production branch with `npm run db:migrate`, with `.env.local` pointing at it (`neon checkout production`; `neon checkout dev` to go back).
 
-   ```bash
-   npx supabase login
-   npx supabase link --project-ref <project-ref>
-   npx supabase db push --dry-run   # lists the migrations it would apply
-   npx supabase db push
-   ```
+2. **Set the environment variables** in Vercel:
 
-2. **Configure Auth** in the Supabase dashboard, under Authentication:
-   - **Sign In / Providers**: turn off "Allow new users to sign up", and leave the **Email** provider on (turning it off also disables password login).
-   - **URL Configuration**: set the Site URL to the app's URL (e.g. `https://vecora.vercel.app`) and add `https://vecora.vercel.app/**` to the redirect URLs.
+   | Variable               | Value                                                  |
+   | ---------------------- | ------------------------------------------------------ |
+   | `VITE_SITE_URL`        | The app's URL, e.g. `https://vecora.vercel.app`        |
+   | `DATABASE_URL`         | Pooled connection string of the Neon production branch |
+   | `BETTER_AUTH_SECRET`   | Its own `openssl rand -base64 32`, never the local one |
+   | `AWS_*` (four of them) | Object storage of the Neon production branch           |
 
-3. **Set the environment variables** in Vercel, from Project Settings → API Keys in the Supabase dashboard:
+   `VITE_SITE_URL` is bundled into the browser code at build time, so redeploy after changing it.
 
-   | Variable                     | Value                                                                 |
-   | ---------------------------- | --------------------------------------------------------------------- |
-   | `VITE_SUPABASE_URL`          | `https://<project-ref>.supabase.co`                                   |
-   | `VITE_SUPABASE_KEY`          | A publishable key                                                     |
-   | `VITE_SITE_URL`              | The app's URL, e.g. `https://vecora.vercel.app`                       |
-   | `SUPABASE_SECRET_KEY`        | A secret key (server-only, needed to add board members)               |
-   | `DATABASE_AUTHENTICATED_URL` | The app role's pooled connection string on the Neon production branch |
-   | `BETTER_AUTH_SECRET`         | Its own `openssl rand -base64 32`, never the local one                |
-   | `AWS_*` (four of them)       | Object storage of the Neon production branch                          |
+3. **Create the main admin.** Nobody can sign in until an account has a role. The script that creates `admin@vecora.app` on production, with a default password it has to change at the first sign-in, is still to do.
 
-   The `VITE_` values are bundled into the browser code at build time, so redeploy after changing them.
-
-4. **Create the main admin** with `npm run db:seed`. Nobody can sign in until an account has a role; this runs `supabase/seed.sql`, which creates `admin@vecora.app` with the default password `admin123`. The test data in `supabase/seeds/` skips itself on hosted.
-
-5. **Deploy** and sign in as the admin. The app first asks for a new password: everyone can read the default one in the repo, so it's only good for that. Then set the residential's name, logo and currency in Ajustes → Residencial and add the board members in HOA board.
+4. **Deploy** and sign in as the admin. Then set the residential's name, logo and currency in Ajustes → Residencial and add the board members in HOA board.
 
 ### The main admin
 
-`admin@vecora.app` is the app's own account, not a resident's. It can't be deleted, lose the admin role, change its email or its name ("Vecora Admin"); the database refuses all four, including from the dashboard. Other admins are residents and are removed in HOA board like anyone else.
+`admin@vecora.app` is the app's own account, not a resident's. It can't be deleted, lose the admin role, change its email or its name ("Vecora Admin"); the app refuses all four. Other admins are residents and are removed in HOA board like anyone else.
 
-Nobody receives mail at `vecora.app`, so the dashboard's password reset email won't arrive. Change the password in Ajustes → Cuenta, which only the main admin sees; board members get a new access link in HOA board instead. If the password is lost, set one in the SQL Editor:
+Nobody receives mail at `vecora.app`. Change the password in Ajustes → Cuenta, which only the main admin sees; board members get a new access link in HOA board instead. If the password is lost, hash a new one and set it in the Neon SQL Editor:
 
-```sql
-update auth.users
-set encrypted_password = extensions.crypt('the-new-password', extensions.gen_salt('bf'))
-where email = 'admin@vecora.app';
+```bash
+node -e "import('better-auth/crypto').then(async ({ hashPassword }) => console.log(await hashPassword(process.argv[1])))" 'the-new-password'
 ```
 
-### Reset
+```sql
+update accounts
+set password = '<the hash>'
+where provider_id = 'credential'
+  and user_id = (select id from users where email = 'admin@vecora.app');
+```
 
-To wipe the hosted database and re-apply every migration, run `npx supabase db reset --linked`. The seed creates the main admin again with the default password `admin123`, which it has to change at the first sign-in. A reset can't be undone; `npx supabase db dump --linked --data-only -f backup.sql` saves the data first.
+### Backups
+
+Neon keeps the branch's history for instant restore. `pg_dump --data-only "$DATABASE_URL_UNPOOLED" > backup.sql` saves a copy of the data.
 
 ## Project layout
 
 ```
-supabase/migrations/   schema, RLS policies and RPCs (one file per area)
-supabase/seed.sql      main admin account (local and hosted)
-supabase/seeds/        local-only test data: dev.sql, then periods.sql
+drizzle/               migrations, generated from the schema (plus the custom database rules)
+scripts/db/            the reset and the test data
 src/routes/_authed/    one route per section (TanStack Router file routes)
 src/routes/_auth/      login, set-password and the auth callbacks
 src/components/        UI per section (table/, drawer/, dialog/) + shared/ and ui/
-src/server-actions/    mutations (server functions), called from the client with the user's session
+src/server-actions/    server functions: reads and writes, behind the auth middleware
+src/lib/services/      the business rules the writes go through (fees, reservations, requests, board)
+src/lib/auth/          Better Auth, the roles and what each may do (permissions.ts)
+src/lib/db/            Drizzle: the client, schema/ and relations
 src/tanstack-queries/  read queries and query keys
 src/lib/validations/   zod schemas shared by forms and server actions
 messages/              on-screen text, one folder per section with es.json and en.json
@@ -198,6 +187,6 @@ Records keep the language they were written in: category names and generated des
 ## Notes
 
 - Access is invite-only: there is no sign-up page. The admin or president adds a board member in HOA board and shares the access link; the same link is how someone resets a forgotten password.
-- Permissions are enforced by Postgres RLS; the UI hides what a role can't do, but the database is the source of truth.
+- Permissions are checked on the server: each server function names what it needs (`requirePermission`, from `src/lib/auth/permissions.ts`) and the services check the rest (authorship, the main admin). The UI hides what a role can't do, but the server is the source of truth.
 - Every insert, update and delete is recorded in `audit_log` and shown to admins in the activity log.
 - Every amount keeps the currency it was recorded in. Changing the HOA's currency (admin only) applies to new records; existing transactions, periods and their fees keep theirs, and totals are shown per currency.

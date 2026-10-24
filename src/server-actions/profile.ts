@@ -1,31 +1,18 @@
 import { createServerFn } from '@tanstack/react-start'
-import { and, eq, isNull } from 'drizzle-orm'
-import { type ActionResult, databaseError, postgrestErrorMessage } from '@/lib/action-result'
-import { authMiddleware } from '@/lib/auth/middleware'
-import { getSessionUserId, withCurrentUser } from '@/lib/db/current-user'
-import { profiles } from '@/lib/db/schema'
+import { type ActionResult, errorMessage } from '@/lib/action-result'
+import { sessionMiddleware } from '@/lib/auth/middleware'
+import { transactionAs } from '@/lib/db'
+import { markWelcomed as markUserWelcomed } from '@/lib/services/board'
 import { m } from '@/paraglide/messages'
 
 /** The welcome dialog was closed: don't open it by itself again, on any device. */
 const markWelcomedFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
-  .handler(async (): Promise<ActionResult> => {
-    const userId = await getSessionUserId()
-    if (!userId) {
-      return { error: m.common_no_permission() }
-    }
-
+  .middleware([sessionMiddleware])
+  .handler(async ({ context: { user } }): Promise<ActionResult> => {
     try {
-      await withCurrentUser((tx) =>
-        tx
-          .update(profiles)
-          .set({ welcomedAt: new Date() })
-          .where(and(eq(profiles.id, userId), isNull(profiles.welcomedAt))),
-      )
+      await transactionAs(user.id, (tx) => markUserWelcomed(tx, user.id))
     } catch (error) {
-      return {
-        error: postgrestErrorMessage(databaseError(error), { fallback: m.settings_generic_save_failed() }),
-      }
+      return { error: errorMessage(error, { fallback: m.settings_generic_save_failed() }) }
     }
 
     return { data: undefined }

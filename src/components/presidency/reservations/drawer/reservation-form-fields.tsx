@@ -58,16 +58,16 @@ export function ReservationFormFields({
   const { data: amenities } = useQuery(amenitiesQueryOptions)
   const { data: reservations } = useQuery(reservationsQueryOptions)
   const { data: feeStatus } = useQuery(houseFeeStatusQueryOptions)
-  const amenityId = useWatch({ control: form.control, name: 'amenity_id' })
-  const propertyId = useWatch({ control: form.control, name: 'property_id' })
+  const amenityId = useWatch({ control: form.control, name: 'amenityId' })
+  const propertyId = useWatch({ control: form.control, name: 'propertyId' })
   const amount = useWatch({ control: form.control, name: 'amount' })
 
   // Retired areas leave the list, except the one this booking already has.
-  const initialAmenityId = form.formState.defaultValues?.amenity_id
+  const initialAmenityId = form.formState.defaultValues?.amenityId
   const amenityItems = useMemo(
     () =>
       (amenities ?? [])
-        .filter((a) => a.is_active || a.id === initialAmenityId)
+        .filter((a) => a.isActive || a.id === initialAmenityId)
         .map((a) => ({ value: a.id, label: a.name })),
     [amenities, initialAmenityId],
   )
@@ -84,8 +84,8 @@ export function ReservationFormFields({
   const takenDays = useMemo(
     () =>
       (reservations ?? [])
-        .filter((r) => r.id !== currentId && r.amenity.id === amenityId && !r.cancelled_at)
-        .map((r) => parseISO(r.reserved_on)),
+        .filter((r) => r.id !== currentId && r.amenity.id === amenityId && !r.cancelledAt)
+        .map((r) => parseISO(r.reservedOn)),
     [reservations, currentId, amenityId],
   )
 
@@ -93,12 +93,12 @@ export function ReservationFormFields({
   // paid the house is settled, so there's nothing left to warn about.
   const unpaidMonths = lockPaidFields
     ? []
-    : (feeStatus?.find((h) => h.property_id === propertyId)?.unpaid_months ?? [])
+    : (feeStatus?.find((h) => h.propertyId === propertyId)?.unpaidMonths ?? [])
 
   return (
     <>
       <Controller
-        name="amenity_id"
+        name="amenityId"
         control={form.control}
         render={({ field, fieldState }) => (
           <Field
@@ -117,7 +117,7 @@ export function ReservationFormFields({
                 field.onChange(value ?? '')
                 // Each area proposes its own fee.
                 const next = amenities?.find((a) => a.id === value)
-                if (next) form.setValue('amount', Number(next.default_fee), { shouldDirty: true })
+                if (next) form.setValue('amount', next.defaultFee, { shouldDirty: true })
               }}
               disabled={disabled || lockPaidFields}
             >
@@ -138,7 +138,7 @@ export function ReservationFormFields({
       />
 
       <Controller
-        name="property_id"
+        name="propertyId"
         control={form.control}
         render={({ field, fieldState }) => (
           <Field
@@ -178,7 +178,7 @@ export function ReservationFormFields({
       )}
 
       <Controller
-        name="reserved_on"
+        name="reservedOn"
         control={form.control}
         render={({ field, fieldState }) => (
           <Field
@@ -236,7 +236,7 @@ export function ReservationFormFields({
           checked={hasFee}
           onCheckedChange={(checked) => {
             // Off means free; on starts from the area's fee, or empty to force one.
-            const defaultFee = Number(amenity?.default_fee ?? 0)
+            const defaultFee = amenity?.defaultFee ?? 0
             form.setValue('amount', checked ? defaultFee || (null as unknown as number) : 0, {
               shouldDirty: true,
             })

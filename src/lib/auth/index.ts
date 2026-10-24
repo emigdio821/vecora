@@ -2,34 +2,28 @@ import '@tanstack/react-start/server-only'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter/relations-v2'
 import { getRequestHeaders } from '@tanstack/react-start/server'
-import { attachDatabasePool } from '@vercel/functions'
 import { betterAuth } from 'better-auth'
 import { APIError } from 'better-auth/api'
+import { admin } from 'better-auth/plugins/admin'
 import { magicLink } from 'better-auth/plugins/magic-link'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
-import { eq } from 'drizzle-orm'
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { Pool } from 'pg'
 import { env } from '@/lib/config/env'
 import { serverEnv } from '@/lib/config/env.server'
-import { withUser } from '@/lib/db'
-import { relations } from '@/lib/db/relations'
-import { accountsInAuth, profiles, sessionsInAuth, userRoles, verificationsInAuth } from '@/lib/db/schema'
+import { db } from '@/lib/db'
+import { ac, roles } from './permissions'
+import { parseRoles } from './roles'
 
 /*
- * Better Auth, on the server only: no /api/auth route is mounted, so none of
- * its endpoints are reachable from outside. The server functions in
- * server-actions/auth.ts and hoa-board.ts call it directly (auth.api.*), and
- * tanstackStartCookies writes the session cookie it hands back.
+ * Better Auth, on Better Auth's own tables (src/lib/db/schema/auth.ts).
  *
- * Its user table is profiles; sessions, passwords and one-time tokens are in
- * the auth schema (neon/migrations). It connects as vecora_auth, which can
- * read profiles and its own tables and nothing else.
+ *   * Signing in and out goes through its HTTP handler (src/routes/api/auth/$.ts),
+ *     which only lets those few endpoints through, so its rate limiter guards
+ *     the password form. Everything else (access links, choosing a password,
+ *     the main admin's password) is called from server functions (auth.api.*).
+ *   * Accounts come from the board (src/lib/services/board.ts), never a signup.
+ *   * Roles are the admin plugin's users.role; what each may do is in
+ *     ./permissions.ts.
  */
-
-const pool = new Pool({ connectionString: serverEnv.DATABASE_AUTH_URL })
-attachDatabasePool(pool)
-const authDb = drizzle({ client: pool, relations })
 
 /** What the invite dialog promises ("expires in 1 hour"). */
 const ACCESS_LINK_SECONDS = 60 * 60
@@ -46,49 +40,46 @@ const issuedTokens = new AsyncLocalStorage<{ token?: string }>()
 
 export const auth = betterAuth({
   appName: 'Vecora',
-  // Only decides whether cookies are Secure (https). The links the board shares
-  // are built from the request (createInviteLink), as before.
   baseURL: env.VITE_SITE_URL,
   secret: serverEnv.BETTER_AUTH_SECRET,
-  database: drizzleAdapter(authDb, {
-    provider: 'pg',
-    schema: {
-      user: profiles,
-      session: sessionsInAuth,
-      account: accountsInAuth,
-      verification: verificationsInAuth,
+  // The relations carry the tables; usePlural maps its models (user, session...) to them.
+  database: drizzleAdapter(db, { provider: 'pg', usePlural: true }),
+  user: {
+    additionalFields: {
+      isMainAdmin: { type: 'boolean', required: false, defaultValue: false, input: false },
+      mustChangePassword: { type: 'boolean', required: false, defaultValue: false, input: false },
+      welcomedAt: { type: 'date', required: false, input: false },
     },
-  }),
-  user: { fields: { name: 'fullName' } },
+  },
   session: {
     // Kept signed in for 30 days from the last visit (refreshed daily).
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24,
-    // Each server function checks the session; for 5 minutes a signed cookie
-    // answers instead of the database. A session ended elsewhere (password
-    // change, sign-out) can live that long on another device.
-    cookieCache: { enabled: true, maxAge: 5 * 60 },
+    // No cookie cache: every request reads the session and its user from the
+    // database, so a role taken away or a session ended elsewhere (a new
+    // password) counts from the next request.
+    cookieCache: { enabled: false },
     additionalFields: {
       fromAccessLink: { type: 'boolean', required: false, defaultValue: false, input: false },
     },
   },
-  // Accounts come from the board (server-actions/hoa-board.ts), never a signup.
   emailAndPassword: { enabled: true, disableSignUp: true, minPasswordLength: 8 },
+  // In the database: each Vercel function instance would keep its own count
+  // in memory. On by default in production only; sign-in allows 3 tries per
+  // 10 seconds per address.
+  rateLimit: { storage: 'database' },
   databaseHooks: {
     session: {
       create: {
         before: async (session, context) => {
           // Only board members (accounts with a role) may use the app. Someone
           // taken off the board keeps their account, for history, but gets no
-          // session: not from the login form, not from an old access link.
-          const roles = await withUser(session.userId, (tx) =>
-            tx
-              .select({ role: userRoles.role })
-              .from(userRoles)
-              .where(eq(userRoles.userId, session.userId))
-              .limit(1),
-          )
-          if (roles.length === 0) {
+          // session: not from the sign-in form, not from an old access link.
+          const user = await db.query.users.findFirst({
+            columns: { role: true },
+            where: { id: session.userId },
+          })
+          if (parseRoles(user?.role).length === 0) {
             throw APIError.from('FORBIDDEN', { code: NOT_ON_THE_BOARD, message: 'The account holds no role' })
           }
 
@@ -101,9 +92,14 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: 'vecora',
     database: { generateId: 'uuid' },
+    // Vercel puts the visitor's address here; the rate limiter counts by it.
+    ipAddress: { ipAddressHeaders: ['x-vercel-forwarded-for', 'x-forwarded-for'] },
   },
   telemetry: { enabled: false },
   plugins: [
+    // Its "user" default isn't one of ours: an account it creates holds no role
+    // until the board gives it one.
+    admin({ ac, roles, defaultRole: '' }),
     // The access links: a one-time token that opens a session. Nothing is
     // emailed; createAccessToken() hands the token to the board to share.
     magicLink({
@@ -124,8 +120,10 @@ export const auth = betterAuth({
   ],
 })
 
+export type AuthSession = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>
+
 /** The signed-in session and its user, or null. Refreshes the cookie when due. */
-export async function getAuthSession() {
+export async function getAuthSession(): Promise<AuthSession | null> {
   return auth.api.getSession({ headers: getRequestHeaders() })
 }
 

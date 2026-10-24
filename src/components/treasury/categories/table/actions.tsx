@@ -1,7 +1,7 @@
 import { IconDots } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { toastManager } from '@/components/ui/toast'
@@ -16,7 +16,7 @@ interface ActionsProps {
 }
 
 export function CategoriesTableActions({ category }: ActionsProps) {
-  const canManage = useHasRole('treasurer')
+  const canManage = useCan({ category: ['write'] })
   const queryClient = useQueryClient()
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
@@ -27,15 +27,15 @@ export function CategoriesTableActions({ category }: ActionsProps) {
 
   const toggleActive = useMutation({
     mutationFn: async () => {
-      const result = await setCategoryActive(category.id, !category.is_active)
+      const result = await setCategoryActive(category.id, !category.isActive)
       if (result.error !== undefined) throw new Error(result.error)
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY, 'categories'] })
       toastManager.add({
         type: 'success',
-        title: category.is_active ? m.treasury_category_deactivated() : m.treasury_category_activated(),
-        description: category.is_active
+        title: category.isActive ? m.treasury_category_deactivated() : m.treasury_category_activated(),
+        description: category.isActive
           ? m.treasury_category_deactivated_description({ name: category.name })
           : m.treasury_category_activated_description({ name: category.name }),
       })
@@ -87,7 +87,7 @@ export function CategoriesTableActions({ category }: ActionsProps) {
                   toggleActive.mutate()
                 }}
               >
-                {category.is_active ? m.treasury_category_deactivate() : m.treasury_category_activate()}
+                {category.isActive ? m.treasury_category_deactivate() : m.treasury_category_activate()}
               </MenuItem>
             )}
 

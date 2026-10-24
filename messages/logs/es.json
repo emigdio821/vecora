@@ -3,7 +3,6 @@
   "logs_page_description": "Aquí queda registrado cada cambio en la aplicación: qué se hizo, quién lo hizo y cuándo. Nadie puede editar ni borrar este historial.",
 
   "logs_section_transaction_categories": "Categorías de movimientos",
-  "logs_section_profiles": "Cuentas de acceso",
   "logs_section_property_residents": "Casas y residentes",
   "logs_section_document_templates": "Plantillas de documentos",
 
@@ -26,6 +25,7 @@
   "logs_summary_language_changed": "Idioma predeterminado cambiado a {language}",
   "logs_summary_password_changed": "Contraseña cambiada",
   "logs_summary_account_activated": "Cuenta activada",
+  "logs_summary_board_removed": "Retirado de la mesa directiva",
 
   "logs_field_number": "Número",
   "logs_field_first_name": "Nombre",
@@ -53,7 +53,6 @@
   "logs_field_reservation": "Reservación",
   "logs_field_default_fee": "Tarifa sugerida",
   "logs_field_created_by": "Registrado por",
-  "logs_field_granted_by": "Otorgado por",
   "logs_field_resolved_by": "Resuelto por",
   "logs_field_resolved_at": "Fecha de resolución",
   "logs_field_cancelled_at": "Fecha de cancelación",

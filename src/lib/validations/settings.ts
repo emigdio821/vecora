@@ -1,8 +1,9 @@
 import { z } from 'zod'
-import { Constants, type Database } from '@/lib/supabase/database.types'
-import { CURRENCIES, type CurrencyCode } from '@/lib/utils'
+import { type AppLanguage, CURRENCIES, type CurrencyCode, LANGUAGES } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 import type { Locale } from '@/paraglide/runtime'
+
+export { type AppLanguage, LANGUAGES } from '@/lib/enums'
 
 /**
  * What stands in for the name when none has been set: in the screen language,
@@ -11,10 +12,6 @@ import type { Locale } from '@/paraglide/runtime'
 export function defaultResidentialLabel(locale?: Locale) {
   return m.common_default_residential_label({}, { locale })
 }
-
-export type AppLanguage = Database['public']['Enums']['app_language']
-
-export const LANGUAGES = Constants.public.Enums.app_language
 
 /** Each language in itself, so anyone can find theirs. */
 export const LANGUAGE_LABEL: Record<AppLanguage, string> = { es: 'Español', en: 'English' }
@@ -51,15 +48,14 @@ const residentialName = z
 
 export const settingsSchema = z.object({
   // Empty is allowed: the app falls back to defaultResidentialLabel().
-  residential_name: residentialName,
-  // Admin only (the database checks it); left out when the president saves.
-  default_language: z.enum(LANGUAGES).optional(),
+  residentialName,
+  // Admin only (settings.configure); left out when the president saves.
+  defaultLanguage: z.enum(LANGUAGES).optional(),
   currency: z.enum(CURRENCIES).optional(),
 })
 
 export type SettingsInput = z.infer<typeof settingsSchema>
 
-/** Storage bucket for the logo (see the settings_logo migration). */
 /** The bucket is private, so the settings preview goes through a link that expires. */
 export const LOGO_URL_SECONDS = 60 * 60
 

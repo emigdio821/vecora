@@ -36,7 +36,7 @@ interface TransactionFormFieldsProps {
   /** Editing: the kind is fixed once recorded. */
   lockKind?: boolean
   /**
-   * Editing a fee / late-fee row: those come from record_fee_payment, so only
+   * Editing a fee / late-fee row: those come from the fee payment, so only
    * the receipt details (folio, method, reference, notes) may change.
    */
   lockFeeFields?: boolean
@@ -55,7 +55,7 @@ export function TransactionFormFields({
   const { data: categories } = useQuery(categoriesQueryOptions)
   const [kind, paymentMethod, categoryId] = useWatch({
     control: form.control,
-    name: ['kind', 'payment_method', 'category_id'],
+    name: ['kind', 'paymentMethod', 'categoryId'],
   })
 
   // Fees have their own drawer, so the two system categories (key != null) are
@@ -63,7 +63,7 @@ export function TransactionFormFields({
   const categoryItems = useMemo(
     () =>
       (categories ?? [])
-        .filter((c) => c.kind === kind && ((c.is_active && !c.key) || c.id === categoryId))
+        .filter((c) => c.kind === kind && ((c.isActive && !c.key) || c.id === categoryId))
         .map((c) => ({ value: c.id, label: c.name })),
     [categories, kind, categoryId],
   )
@@ -93,7 +93,7 @@ export function TransactionFormFields({
                     onValueChange={(value) => {
                       field.onChange(value)
                       // Categories belong to one kind, so the pick no longer applies.
-                      form.setValue('category_id', '')
+                      form.setValue('categoryId', '')
                     }}
                   />
                 }
@@ -114,7 +114,7 @@ export function TransactionFormFields({
       />
 
       <Controller
-        name="category_id"
+        name="categoryId"
         control={form.control}
         render={({ field, fieldState }) => (
           <Field
@@ -210,7 +210,7 @@ export function TransactionFormFields({
         />
 
         <Controller
-          name="occurred_on"
+          name="occurredOn"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field
@@ -258,7 +258,7 @@ export function TransactionFormFields({
       </div>
 
       <Controller
-        name="payment_method"
+        name="paymentMethod"
         control={form.control}
         render={({ field, fieldState }) => (
           <Field
@@ -338,7 +338,7 @@ export function TransactionFormFields({
           />
 
           <Controller
-            name="property_id"
+            name="propertyId"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field

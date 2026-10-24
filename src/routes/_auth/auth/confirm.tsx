@@ -56,7 +56,7 @@ function ConfirmAccessPage() {
           <EmptyTitle>{m.auth_confirm_session_title()}</EmptyTitle>
           <EmptyDescription>
             {m.auth_confirm_session_before()}{' '}
-            <strong className="font-medium text-foreground">{user.fullName}</strong>{' '}
+            <strong className="font-medium text-foreground">{user.name}</strong>{' '}
             {m.auth_confirm_session_after({ email: user.email })}
           </EmptyDescription>
         </EmptyHeader>

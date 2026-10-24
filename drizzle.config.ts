@@ -13,9 +13,13 @@ if (!url) {
   throw new Error('DATABASE_URL_UNPOOLED is missing (see .env.example)')
 }
 
+// The TypeScript schema is the source of truth: `npm run db:generate` turns a
+// change into a migration in drizzle/, `npm run db:migrate` applies them.
+// Never `drizzle-kit push`: it would drop what the custom migration adds
+// (the exclusion constraints, the audit trigger), which the schema can't declare.
 export default defineConfig({
   dialect: 'postgresql',
-  schema: './src/lib/db/schema.ts',
+  schema: './src/lib/db/schema/index.ts',
   out: './drizzle',
   dbCredentials: { url },
 })

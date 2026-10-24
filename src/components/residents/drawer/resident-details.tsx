@@ -7,7 +7,7 @@ import {
   IconUserCircle,
 } from '@tabler/icons-react'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { RELATIONSHIP_LABEL } from '@/components/houses/relationship'
 import { CollapsibleSection, Detail, Muted, Timestamp } from '@/components/shared/details'
 import { RoleNameBadge } from '@/components/shared/role-name-badge'
@@ -39,10 +39,10 @@ export function ResidentDetailsDrawer({
   onOpenChange,
   ...props
 }: ResidentDetailsDrawerProps) {
-  const canManage = useHasRole('president')
+  const canManage = useCan({ registry: ['write'] })
   const [isEditOpen, setEditOpen] = useState(false)
-  const fullName = `${resident.first_name} ${resident.last_name}`
-  const roles = resident.profile?.user_roles.map((r) => r.role) ?? []
+  const fullName = `${resident.firstName} ${resident.lastName}`
+  const roles = resident.account?.roles ?? []
 
   return (
     <Drawer position="right" open={open} onOpenChange={onOpenChange} {...props}>
@@ -73,11 +73,11 @@ export function ResidentDetailsDrawer({
           <CollapsibleSection
             icon={<IconHome />}
             title={m.common_section_houses()}
-            count={resident.property_residents.length}
+            count={resident.propertyLinks.length}
           >
-            {resident.property_residents.length ? (
+            {resident.propertyLinks.length ? (
               <ul className="grid gap-2">
-                {resident.property_residents.map(({ property, relationship }) => (
+                {resident.propertyLinks.map(({ property, relationship }) => (
                   <li key={property.id} className="flex items-center justify-between text-sm">
                     <span className="font-medium">{property.number}</span>
                     <Badge variant="outline">{RELATIONSHIP_LABEL[relationship]}</Badge>
@@ -90,10 +90,10 @@ export function ResidentDetailsDrawer({
           </CollapsibleSection>
 
           <CollapsibleSection icon={<IconUserCircle />} title={m.residential_section_account()}>
-            {resident.profile ? (
+            {resident.account ? (
               <>
                 <Detail label={m.residential_account_name()}>
-                  {resident.profile.full_name || <Muted>{m.residential_no_name()}</Muted>}
+                  {resident.account.name || <Muted>{m.residential_no_name()}</Muted>}
                 </Detail>
                 <Detail label={m.residential_roles()}>
                   {roles.length ? (
@@ -122,12 +122,12 @@ export function ResidentDetailsDrawer({
             <Timestamp
               icon={<IconCalendarPlus />}
               label={m.residential_created_masculine()}
-              value={resident.created_at}
+              value={resident.createdAt}
             />
             <Timestamp
               icon={<IconHistory />}
               label={m.residential_updated_masculine()}
-              value={resident.updated_at}
+              value={resident.updatedAt}
             />
           </dl>
         </DrawerPanel>

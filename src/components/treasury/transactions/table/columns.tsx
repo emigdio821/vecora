@@ -40,8 +40,8 @@ export const transactionsTableColumns = columnHelper.columns([
     ),
   }),
 
-  columnHelper.accessor('occurred_on', {
-    id: 'occurred_on',
+  columnHelper.accessor('occurredOn', {
+    id: 'occurredOn',
     size: 120,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.common_field_date()} />,
     cell: ({ getValue }) => <span className="whitespace-nowrap tabular-nums">{formatDay(getValue())}</span>,
@@ -87,14 +87,14 @@ export const transactionsTableColumns = columnHelper.columns([
       }),
   }),
 
-  columnHelper.accessor('payment_method', {
-    id: 'payment_method',
+  columnHelper.accessor('paymentMethod', {
+    id: 'paymentMethod',
     size: 130,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.treasury_method()} />,
     cell: ({ getValue }) => PAYMENT_METHOD_LABEL[getValue()],
   }),
 
-  columnHelper.accessor((row) => Number(row.amount), {
+  columnHelper.accessor('amount', {
     id: 'amount',
     size: 130,
     header: ({ column }) => (

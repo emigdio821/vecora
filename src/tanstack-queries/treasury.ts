@@ -17,8 +17,8 @@ export const transactionsListQueryOptions = queryOptions({
 })
 
 /** How many movements point at a period or category, soft-deleted ones included; deletable only at 0. */
-export function transactionCount(row: { transaction_count: number }) {
-  return row.transaction_count
+export function transactionCount(row: { transactionCount: number }) {
+  return row.transactionCount
 }
 
 export type PeriodSummaryQueryData = Awaited<ReturnType<typeof fetchPeriodSummaries>>[number]

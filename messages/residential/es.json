@@ -24,6 +24,8 @@
 
   "residential_house_number_taken": "Ya existe una casa con ese número",
   "residential_house_duplicate": "Ya existe una casa con esos datos",
+  "residential_house_not_found": "La casa ya no existe",
+  "residential_resident_not_found": "El residente ya no existe",
   "residential_create_house_failed": "No se pudo crear la casa, intenta nuevamente",
   "residential_update_house_failed": "No se pudo actualizar la casa, intenta nuevamente",
   "residential_delete_houses_failed": "No se pudieron eliminar las casas, intenta nuevamente",

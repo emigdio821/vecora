@@ -66,7 +66,7 @@ export function DeleteTransactionsAlertDialog({
   // Net effect on the balance, one per currency in the selection.
   const totals = new Map<CurrencyCode, number>()
   for (const t of transactions) {
-    totals.set(t.currency, (totals.get(t.currency) ?? 0) + Number(t.amount) * (t.kind === 'income' ? 1 : -1))
+    totals.set(t.currency, (totals.get(t.currency) ?? 0) + t.amount * (t.kind === 'income' ? 1 : -1))
   }
   const impact = [...totals]
     .map(([currency, total]) => {
@@ -103,7 +103,7 @@ export function DeleteTransactionsAlertDialog({
     onSuccess: ({ deleted, ids }) => {
       void queryClient.invalidateQueries({ queryKey: [TREASURY_QUERY_KEY] })
 
-      const partial = deleted < count // RLS filtered some rows out
+      const partial = deleted < count // some were already deleted, by someone else meanwhile
       const toastId = toastManager.add({
         type: partial ? 'warning' : 'success',
         title: partial

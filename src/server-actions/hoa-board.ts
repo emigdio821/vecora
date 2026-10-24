@@ -1,107 +1,52 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeader, getRequestHeaders, getRequestUrl } from '@tanstack/react-start/server'
-import { and, eq, inArray } from 'drizzle-orm'
-import {
-  type ActionResult,
-  type DatabaseError,
-  databaseError,
-  postgrestErrorMessage,
-} from '@/lib/action-result'
-import { auth, createAccessToken } from '@/lib/auth'
-import { type CurrentUser, getCurrentUser } from '@/lib/auth/current-user'
-import { authMiddleware } from '@/lib/auth/middleware'
-import { withCurrentUser } from '@/lib/db/current-user'
-import { profiles, residents, userRoles } from '@/lib/db/schema'
+import { getRequestHeader, getRequestUrl } from '@tanstack/react-start/server'
+import { type ActionResult, errorMessage } from '@/lib/action-result'
+import { createAccessToken } from '@/lib/auth'
+import { boardMiddleware, requirePermission } from '@/lib/auth/middleware'
+import { parseRoles } from '@/lib/auth/roles'
+import { db, transactionAs } from '@/lib/db'
+import * as board from '@/lib/services/board'
 import {
   type AddBoardMemberInput,
   addBoardMemberSchema,
-  type AppRole,
-  type SetPasswordInput,
-  setPasswordSchema,
   type UpdateBoardMemberRolesInput,
   updateBoardMemberRolesSchema,
 } from '@/lib/validations/hoa-board'
 import { m } from '@/paraglide/messages'
 
-// Raised by the guards on the main admin (admin@vecora.app).
-const MAIN_ADMIN_PROTECTED = 'P0004'
-
-function toMessage(error: DatabaseError, fallback: string) {
-  if (error.code === MAIN_ADMIN_PROTECTED) {
-    return m.board_main_admin_protected()
-  }
-  return postgrestErrorMessage(error, { fallback, unique: { profiles_email_key: m.board_email_taken() } })
-}
+const boardManage = requirePermission({ board: ['manage'] })
 
 /**
  * Board members = accounts holding at least one role. The resident link is
  * optional: an account created outside the app (seeds) may not be tied to the
  * registry yet. The main admin is the app's own account, not a board seat, so
- * it isn't listed. The rows keep the database's column names, the shape the
- * screens were built on.
+ * it isn't listed.
  */
 const fetchBoardMembersFn = createServerFn()
-  .middleware([authMiddleware])
+  .middleware([boardMiddleware])
   .handler(async () => {
-    const members = await withCurrentUser((tx) =>
-      tx.query.profiles.findMany({
-        columns: { id: true, fullName: true },
-        with: {
-          userRolesUserId: { columns: { role: true } },
-          residentsProfileId: {
-            columns: { id: true, firstName: true, lastName: true, email: true, phone: true },
-            with: {
-              propertyResidents: {
-                columns: {},
-                with: { property: { columns: { id: true, number: true } } },
-              },
+    const members = await db.query.users.findMany({
+      columns: { id: true, name: true, role: true },
+      with: {
+        resident: {
+          columns: { id: true, firstName: true, lastName: true, email: true, phone: true },
+          with: {
+            propertyLinks: {
+              columns: {},
+              with: { property: { columns: { id: true, number: true } } },
+              where: { property: { deletedAt: { isNull: true } } },
             },
           },
         },
-        where: { isMainAdmin: false, userRolesUserId: true },
-        orderBy: { fullName: 'asc' },
-      }),
-    )
-
-    return members.map((member) => {
-      const resident = member.residentsProfileId
-      return {
-        id: member.id,
-        full_name: member.fullName,
-        user_roles: member.userRolesUserId,
-        resident: resident
-          ? {
-              id: resident.id,
-              first_name: resident.firstName,
-              last_name: resident.lastName,
-              email: resident.email,
-              phone: resident.phone,
-              // property_id is required, so there's always a house; Drizzle types the join as optional anyway.
-              property_residents: resident.propertyResidents.flatMap((link) =>
-                link.property ? [{ property: link.property }] : [],
-              ),
-            }
-          : null,
-      }
+      },
+      where: { isMainAdmin: false, role: { isNotNull: true, ne: '' } },
+      orderBy: { name: 'asc' },
     })
+
+    return members.map(({ role, ...member }) => ({ ...member, roles: parseRoles(role) }))
   })
 
 export const fetchBoardMembers = () => fetchBoardMembersFn()
-
-/**
- * Admin and president manage the board. RLS enforces the same on profiles and
- * user_roles, but issuing an access link goes past it, so every action checks
- * here first.
- */
-async function requireBoardManager(): Promise<{ user: CurrentUser; isAdmin: boolean } | { error: string }> {
-  const user = await getCurrentUser()
-  if (!user) return { error: m.common_no_permission() }
-
-  const isAdmin = user.roles.includes('admin')
-  if (!isAdmin && !user.roles.includes('president')) return { error: m.common_no_permission() }
-
-  return { user, isAdmin }
-}
 
 /**
  * One-time sign-in link for the account, pointing at our own /auth/confirm
@@ -126,7 +71,7 @@ async function createAccessLink(email: string): Promise<string | null> {
 export interface InviteResult {
   /** Share by WhatsApp or copy; valid until the person opens it (or it expires). */
   link: string
-  full_name: string
+  name: string
   phone: string
 }
 
@@ -136,75 +81,34 @@ export interface InviteResult {
  * the resident link and the roles land together, or not at all.
  */
 const addBoardMemberFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([boardManage])
   .validator((input: AddBoardMemberInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult<InviteResult>> => {
+  .handler(async ({ data: input, context }): Promise<ActionResult<InviteResult>> => {
     const parsed = addBoardMemberSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const manager = await requireBoardManager()
-    if ('error' in manager) return manager
-
-    const { resident_id, roles } = parsed.data
-    if (roles.includes('admin') && !manager.isAdmin) {
-      return { error: m.board_only_admin_grant_admin() }
-    }
-
-    // What the last step was, so a failure says which part didn't work.
-    let failedMessage = m.board_account_create_failed()
-    let seated: { error: string } | { email: string; fullName: string; phone: string }
+    let seated: board.AccessLinkTarget
     try {
-      seated = await withCurrentUser(async (tx) => {
-        const resident = await tx.query.residents.findFirst({
-          columns: { id: true, firstName: true, lastName: true, email: true, phone: true, profileId: true },
-          with: {
-            profileProfileId: {
-              columns: { email: true },
-              with: { userRolesUserId: { columns: { role: true } } },
-            },
-          },
-          where: { id: resident_id, deletedAt: { isNull: true } },
-        })
-
-        if (!resident) return { error: m.board_resident_not_found() }
-        if (!resident.email) {
-          return { error: m.board_resident_no_email() }
-        }
-        const account = resident.profileProfileId
-        if (account && account.userRolesUserId.length > 0) {
-          return { error: m.board_resident_already_member() }
-        }
-
-        const fullName = `${resident.firstName} ${resident.lastName}`
-        let userId = resident.profileId
-        // A returning member signs in with the email their account already has.
-        let email = account?.email ?? resident.email.toLowerCase()
-
-        if (userId === null) {
-          const [created] = await tx
-            .insert(profiles)
-            .values({ email, fullName })
-            .returning({ id: profiles.id, email: profiles.email })
-          userId = created.id
-          email = created.email
-
-          failedMessage = m.board_link_account_failed()
-          await tx.update(residents).set({ profileId: userId }).where(eq(residents.id, resident_id))
-        }
-
-        failedMessage = m.board_assign_roles_failed()
-        const memberId = userId
-        await tx.insert(userRoles).values(roles.map((role) => ({ userId: memberId, role })))
-
-        return { email, fullName, phone: resident.phone }
-      })
+      seated = await transactionAs(context.user.id, (tx) =>
+        board.seatBoardMember(tx, context.user, parsed.data),
+      )
     } catch (error) {
-      return { error: toMessage(databaseError(error), failedMessage) }
+      return {
+        error: errorMessage(error, {
+          fallback: m.board_account_create_failed(),
+          service: {
+            admin_only: m.board_only_admin_grant_admin(),
+            not_found: m.board_resident_not_found(),
+            resident_no_email: m.board_resident_no_email(),
+            already_member: m.board_resident_already_member(),
+            email_taken: m.board_email_taken(),
+          },
+          uniqueFallback: m.board_email_taken(),
+        }),
+      }
     }
-
-    if ('error' in seated) return seated
 
     // On the board by now; if the link fails, "New access link" gets another.
     const link = await createAccessLink(seated.email)
@@ -212,95 +116,67 @@ const addBoardMemberFn = createServerFn({ method: 'POST' })
       return { error: m.board_link_create_failed() }
     }
 
-    return { data: { link, full_name: seated.fullName, phone: seated.phone } }
+    return { data: { link, name: seated.name, phone: seated.phone } }
   })
 
 export const addBoardMember = (input: AddBoardMemberInput) => addBoardMemberFn({ data: input })
 
 /** A fresh link for someone who lost theirs or let it expire. */
 const resendInviteFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([boardManage])
   .validator((userId: string) => userId)
-  .handler(async ({ data: userId }): Promise<ActionResult<InviteResult>> => {
-    const manager = await requireBoardManager()
-    if ('error' in manager) return manager
-
-    const profile = await withCurrentUser((tx) =>
-      tx.query.profiles.findFirst({
-        columns: { fullName: true, email: true },
-        with: {
-          userRolesUserId: { columns: { role: true } },
-          residentsProfileId: { columns: { email: true, phone: true } },
-        },
-        where: { id: userId },
-      }),
-    )
-
-    // The link signs in as that person, so it's as good as their account.
-    if (profile?.userRolesUserId.some((r) => r.role === 'admin') && !manager.isAdmin) {
-      return { error: m.board_only_admin_link_admin() }
-    }
-    const resident = profile?.residentsProfileId
-    if (!profile || !resident?.email) {
-      return { error: m.board_member_no_email() }
+  .handler(async ({ data: userId, context }): Promise<ActionResult<InviteResult>> => {
+    let target: board.AccessLinkTarget
+    try {
+      target = await transactionAs(context.user.id, (tx) => board.accessLinkTarget(tx, context.user, userId))
+    } catch (error) {
+      return {
+        error: errorMessage(error, {
+          fallback: m.board_link_create_failed(),
+          service: {
+            admin_only: m.board_only_admin_link_admin(),
+            not_found: m.board_member_no_email(),
+            resident_no_email: m.board_member_no_email(),
+          },
+        }),
+      }
     }
 
-    const link = await createAccessLink(profile.email)
+    const link = await createAccessLink(target.email)
     if (!link) {
       return { error: m.board_link_create_failed() }
     }
 
-    return { data: { link, full_name: profile.fullName, phone: resident.phone } }
+    return { data: { link, name: target.name, phone: target.phone } }
   })
 
 export const resendInvite = (userId: string) => resendInviteFn({ data: userId })
 
 const updateBoardMemberRolesFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([boardManage])
   .validator((data: { userId: string; input: UpdateBoardMemberRolesInput }) => data)
-  .handler(async ({ data: { userId, input } }): Promise<ActionResult> => {
+  .handler(async ({ data: { userId, input }, context }): Promise<ActionResult> => {
     const parsed = updateBoardMemberRolesSchema.safeParse(input)
     if (!parsed.success) {
       return { error: m.common_form_invalid() }
     }
 
-    const manager = await requireBoardManager()
-    if ('error' in manager) return manager
-    if (userId === manager.user.id) {
-      return { error: m.board_cannot_change_own_roles() }
-    }
-
-    let failedMessage = m.board_read_roles_failed()
     try {
-      const outcome = await withCurrentUser(async (tx) => {
-        const currentRows = await tx
-          .select({ role: userRoles.role })
-          .from(userRoles)
-          .where(eq(userRoles.userId, userId))
-
-        const current = new Set<AppRole>(currentRows.map((r) => r.role))
-        const next = new Set<AppRole>(parsed.data.roles)
-        const toAdd = [...next].filter((role) => !current.has(role))
-        const toRemove = [...current].filter((role) => !next.has(role))
-
-        if ([...toAdd, ...toRemove].includes('admin') && !manager.isAdmin) {
-          return { error: m.board_only_admin_change_admin() }
-        }
-
-        failedMessage = m.board_update_roles_failed()
-        if (toRemove.length > 0) {
-          await tx
-            .delete(userRoles)
-            .where(and(eq(userRoles.userId, userId), inArray(userRoles.role, toRemove)))
-        }
-        if (toAdd.length > 0) {
-          await tx.insert(userRoles).values(toAdd.map((role) => ({ userId, role })))
-        }
-        return undefined
-      })
-      if (outcome) return outcome
+      await transactionAs(context.user.id, (tx) =>
+        board.updateBoardMemberRoles(tx, context.user, { userId, roles: parsed.data.roles }),
+      )
     } catch (error) {
-      return { error: toMessage(databaseError(error), failedMessage) }
+      return {
+        error: errorMessage(error, {
+          fallback: m.board_update_roles_failed(),
+          service: {
+            self_change: m.board_cannot_change_own_roles(),
+            admin_only: m.board_only_admin_change_admin(),
+            main_admin_protected: m.board_main_admin_protected(),
+            not_found: m.board_update_roles_failed(),
+          },
+        }),
+      }
     }
 
     return { data: undefined }
@@ -314,113 +190,26 @@ export const updateBoardMemberRoles = (userId: string, input: UpdateBoardMemberR
  * but with no roles they can no longer sign in, and they leave the board list.
  */
 const removeBoardMemberFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([boardManage])
   .validator((userId: string) => userId)
-  .handler(async ({ data: userId }): Promise<ActionResult> => {
-    const manager = await requireBoardManager()
-    if ('error' in manager) return manager
-    if (userId === manager.user.id) {
-      return { error: m.board_cannot_remove_self() }
-    }
-
+  .handler(async ({ data: userId, context }): Promise<ActionResult> => {
     try {
-      const outcome = await withCurrentUser(async (tx) => {
-        const rows = await tx
-          .select({ role: userRoles.role })
-          .from(userRoles)
-          .where(eq(userRoles.userId, userId))
-        if (rows.some((r) => r.role === 'admin') && !manager.isAdmin) {
-          return { error: m.board_only_admin_remove_admin() }
-        }
-
-        const removed = await tx
-          .delete(userRoles)
-          .where(eq(userRoles.userId, userId))
-          .returning({ role: userRoles.role })
-        if (removed.length === 0) {
-          return { error: m.common_no_permission() }
-        }
-        return undefined
-      })
-      if (outcome) return outcome
+      await transactionAs(context.user.id, (tx) => board.removeBoardMember(tx, context.user, userId))
     } catch (error) {
-      return { error: toMessage(databaseError(error), m.board_remove_member_failed()) }
+      return {
+        error: errorMessage(error, {
+          fallback: m.board_remove_member_failed(),
+          service: {
+            self_change: m.board_cannot_remove_self(),
+            admin_only: m.board_only_admin_remove_admin(),
+            main_admin_protected: m.board_main_admin_protected(),
+            not_found: m.board_remove_member_failed(),
+          },
+        }),
+      }
     }
 
     return { data: undefined }
   })
 
 export const removeBoardMember = (userId: string) => removeBoardMemberFn({ data: userId })
-
-/**
- * First sign-in after an access link: the person chooses their password (a
- * new member, or someone who forgot theirs). Also the main admin's first
- * sign-in, away from the default password; the database clears
- * must_change_password once the password changes.
- *
- * No current password is asked for, so only those two kinds of session may
- * use it. Everyone else changes theirs with an access link (or, the main
- * admin, in Settings).
- */
-const setPasswordFn = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
-  .validator((input: SetPasswordInput) => input)
-  .handler(async ({ data: input }): Promise<ActionResult> => {
-    const parsed = setPasswordSchema.safeParse(input)
-    if (!parsed.success) {
-      return { error: m.common_form_invalid() }
-    }
-
-    const user = await getCurrentUser()
-    if (!user || (!user.mustSetPassword && !user.mustChangePassword)) {
-      return { error: m.common_no_permission() }
-    }
-
-    const { password } = parsed.data
-    try {
-      const context = await auth.$context
-      const credential = await context.internalAdapter.findCredentialAccount(user.id)
-
-      let isSamePassword = false
-      if (credential?.password) {
-        isSamePassword = await context.password.verify({ hash: credential.password, password })
-      }
-      // Someone resetting who typed the password they already had: it's still
-      // theirs, let them in. Unless it's the default one being replaced.
-      if (isSamePassword && user.mustChangePassword) {
-        return { error: m.auth_password_same_as_default() }
-      }
-
-      if (!isSamePassword) {
-        const hash = await context.password.hash(password)
-        if (credential) {
-          await context.internalAdapter.updatePassword(user.id, hash)
-        } else {
-          await context.internalAdapter.createAccount({
-            userId: user.id,
-            providerId: 'credential',
-            accountId: user.id,
-            password: hash,
-          })
-        }
-      }
-
-      // Sign out every device, this access-link session included: it stays
-      // marked as such (see CurrentUser.mustSetPassword), so it's replaced below.
-      await context.internalAdapter.deleteUserSessions(user.id)
-    } catch (error) {
-      console.error('setPassword failed', error)
-      return { error: m.board_password_save_failed() }
-    }
-
-    try {
-      await auth.api.signInEmail({ body: { email: user.email, password }, headers: getRequestHeaders() })
-    } catch (error) {
-      console.error('signInEmail after setPassword failed', error)
-      return { error: m.board_password_saved_sign_in_failed() }
-    }
-
-    return { data: undefined }
-  })
-
-export const setPassword = (input: SetPasswordInput) => setPasswordFn({ data: input })

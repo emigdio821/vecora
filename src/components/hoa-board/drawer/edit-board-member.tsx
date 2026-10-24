@@ -53,7 +53,7 @@ export function EditBoardMemberDrawer({
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [HOA_BOARD_QUERY_KEY] })
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
-      toastManager.add({ type: 'success', title: m.board_roles_updated(), description: member.full_name })
+      toastManager.add({ type: 'success', title: m.board_roles_updated(), description: member.name })
       onOpenChange(false)
     },
   })
@@ -84,7 +84,7 @@ export function EditBoardMemberDrawer({
       <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{m.board_edit_roles()}</DrawerTitle>
-          <DrawerDescription>{member.full_name}</DrawerDescription>
+          <DrawerDescription>{member.name}</DrawerDescription>
         </DrawerHeader>
 
         {/* Mounted only while the drawer is open, so the form always starts
@@ -106,7 +106,7 @@ function EditBoardMemberForm({
 }) {
   const form = useForm<UpdateBoardMemberRolesInput>({
     resolver: zodResolver(updateBoardMemberRolesSchema),
-    defaultValues: { roles: member.user_roles.map((r) => r.role) },
+    defaultValues: { roles: member.roles },
   })
 
   // Still busy after a save, until the drawer has closed and reset the mutation.

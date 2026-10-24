@@ -100,7 +100,7 @@ export function AssignResidentsDrawer({ house, open, onOpenChange, ...props }: A
   // Still busy after a save, until the drawer has closed and reset the mutation.
   const isBusy = mutation.isPending || mutation.isSuccess
 
-  const currentResidentIds = house.property_residents.map((pr) => pr.resident.id)
+  const currentResidentIds = house.residentLinks.map((link) => link.resident.id)
 
   return (
     <Drawer

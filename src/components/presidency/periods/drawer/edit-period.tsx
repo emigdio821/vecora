@@ -97,11 +97,11 @@ export function EditPeriodDrawer({
 function toFormValues(period: PeriodQueryData): PeriodInput {
   return {
     name: period.name,
-    starts_on: period.starts_on,
-    ends_on: period.ends_on,
-    monthly_fee: Number(period.monthly_fee),
-    late_fee: Number(period.late_fee),
-    due_day: period.due_day,
+    startsOn: period.startsOn,
+    endsOn: period.endsOn,
+    monthlyFee: period.monthlyFee,
+    lateFee: period.lateFee,
+    dueDay: period.dueDay,
   }
 }
 

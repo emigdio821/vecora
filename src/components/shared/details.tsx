@@ -69,14 +69,14 @@ export function Muted({ children }: { children: React.ReactNode }) {
 }
 
 /** One `<dt>/<dd>` pair; render inside a `<dl>`. */
-export function Timestamp({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+export function Timestamp({ icon, label, value }: { icon: React.ReactNode; label: string; value: Date }) {
   return (
     <div className="flex items-start gap-2 text-xs [&_svg]:mt-0.5 [&_svg]:size-3.5 [&_svg]:shrink-0 [&_svg]:text-muted-foreground">
       {icon}
       <div className="grid gap-0.5">
         <dt className="text-muted-foreground">{label}</dt>
         <dd>
-          <time dateTime={value} className="font-medium tabular-nums">
+          <time dateTime={value.toISOString()} className="font-medium tabular-nums">
             {formatDate(value)}
           </time>
         </dd>

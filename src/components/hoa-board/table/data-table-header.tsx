@@ -46,12 +46,7 @@ export function BoardMembersDataTableHeader({ table, viewer, isLoading }: BoardM
 
       <div className="flex flex-col justify-between gap-2 sm:flex-row">
         <div className="flex gap-2">
-          <DataTableSearch
-            table={table}
-            columnId="full_name"
-            param="search-board"
-            hint={m.board_search_hint()}
-          />
+          <DataTableSearch table={table} columnId="name" param="search-board" hint={m.board_search_hint()} />
         </div>
 
         {viewer.isManager && (

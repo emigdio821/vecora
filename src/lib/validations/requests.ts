@@ -4,21 +4,18 @@ import { PAYMENT_METHODS } from './treasury'
 
 // Shared by the Maintenance and Security payment requests.
 
-// Mirrors the `request_status` enum in the database.
-export const REQUEST_STATUSES = ['pending', 'paid', 'rejected'] as const
-
-export type RequestStatus = (typeof REQUEST_STATUSES)[number]
+export { REQUEST_STATUSES, type RequestStatus } from '@/lib/enums'
 
 /** Treasurer paying a request: how and when the money went out. */
 export const payRequestSchema = z
   .object({
-    category_id: z.uuid({ error: () => m.requests_select_category() }),
-    occurred_on: z.iso.date({ error: () => m.common_invalid_date() }),
-    payment_method: z.enum(PAYMENT_METHODS),
+    categoryId: z.uuid({ error: () => m.requests_select_category() }),
+    occurredOn: z.iso.date({ error: () => m.common_invalid_date() }),
+    paymentMethod: z.enum(PAYMENT_METHODS),
     reference: z.string().trim(),
     notes: z.string().trim(),
   })
-  .refine((data) => data.payment_method !== 'transfer' || data.reference.length > 0, {
+  .refine((data) => data.paymentMethod !== 'transfer' || data.reference.length > 0, {
     path: ['reference'],
     error: () => m.requests_reference_required(),
   })

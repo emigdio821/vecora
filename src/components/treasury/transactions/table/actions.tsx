@@ -1,6 +1,6 @@
 import { IconDots } from '@tabler/icons-react'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { Button } from '@/components/ui/button'
 import { Menu, MenuGroup, MenuGroupLabel, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui/menu'
 import { m } from '@/paraglide/messages'
@@ -14,7 +14,7 @@ interface ActionsProps {
 
 /** Edit and delete only, so readers see no menu; details open from the concept cell. */
 export function TransactionsTableActions({ transaction }: ActionsProps) {
-  const canManage = useHasRole('treasurer')
+  const canManage = useCan({ transaction: ['write'] })
   const [isEditOpen, setEditOpen] = useState(false)
   const [isDeleteOpen, setDeleteOpen] = useState(false)
 

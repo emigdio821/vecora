@@ -56,7 +56,7 @@ export function EditReservationDrawer({
       toastManager.add({
         type: 'success',
         title: m.presidency_reservation_updated(),
-        description: formatDay(values.reserved_on),
+        description: formatDay(values.reservedOn),
       })
       onOpenChange(false)
     },
@@ -109,10 +109,10 @@ function EditReservationForm({
   const form = useForm<ReservationInput>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
-      amenity_id: reservation.amenity.id,
-      property_id: reservation.property.id,
-      reserved_on: reservation.reserved_on,
-      amount: Number(reservation.amount),
+      amenityId: reservation.amenity.id,
+      propertyId: reservation.property.id,
+      reservedOn: reservation.reservedOn,
+      amount: reservation.amount,
       notes: reservation.notes ?? '',
     },
   })

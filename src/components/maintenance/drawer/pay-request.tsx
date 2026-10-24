@@ -50,7 +50,7 @@ interface PayRequestDrawerProps extends React.ComponentProps<typeof Drawer> {
   onOpenChange: (open: boolean) => void
 }
 
-type PayMutation = UseMutationResult<{ transaction_id: string }, Error, PayRequestInput>
+type PayMutation = UseMutationResult<{ transactionId: string }, Error, PayRequestInput>
 
 /** Treasurer: records the expense in the ledger and marks the request paid. */
 export function PayRequestDrawer({
@@ -136,7 +136,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
   const categoryItems = useMemo(
     () =>
       (categories ?? [])
-        .filter((c) => c.kind === 'expense' && c.is_active)
+        .filter((c) => c.kind === 'expense' && c.isActive)
         .map((c) => ({ value: c.id, label: c.name })),
     [categories],
   )
@@ -144,22 +144,22 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
   const form = useForm<PayRequestInput>({
     resolver: zodResolver(payRequestSchema),
     defaultValues: {
-      category_id: '',
-      occurred_on: format(today, ISO_DAY),
-      payment_method: 'cash',
+      categoryId: '',
+      occurredOn: format(today, ISO_DAY),
+      paymentMethod: 'cash',
       reference: '',
       notes: '',
     },
   })
-  const paymentMethod = useWatch({ control: form.control, name: 'payment_method' })
-  const occurredOn = useWatch({ control: form.control, name: 'occurred_on' })
+  const paymentMethod = useWatch({ control: form.control, name: 'paymentMethod' })
+  const occurredOn = useWatch({ control: form.control, name: 'occurredOn' })
   const isPeriodMissing = useIsPeriodMissing(occurredOn)
 
   // Preselect DEFAULT_CATEGORY_NAME once categories arrive, unless the treasurer already chose.
   const defaultCategoryId = categoryItems.find((c) => c.label === DEFAULT_CATEGORY_NAME)?.value
   useEffect(() => {
-    if (defaultCategoryId && !form.getValues('category_id')) {
-      form.setValue('category_id', defaultCategoryId)
+    if (defaultCategoryId && !form.getValues('categoryId')) {
+      form.setValue('categoryId', defaultCategoryId)
     }
   }, [defaultCategoryId, form])
 
@@ -179,7 +179,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
           )}
         >
           <Controller
-            name="category_id"
+            name="categoryId"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field
@@ -218,7 +218,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
           />
 
           <Controller
-            name="occurred_on"
+            name="occurredOn"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field
@@ -265,7 +265,7 @@ function PayRequestForm({ mutation }: { mutation: PayMutation }) {
           />
 
           <Controller
-            name="payment_method"
+            name="paymentMethod"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field

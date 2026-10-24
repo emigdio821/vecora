@@ -3,7 +3,6 @@
   "logs_page_description": "Every change in the app is recorded here: what was done, who did it and when. No one can edit or delete this log.",
 
   "logs_section_transaction_categories": "Transaction categories",
-  "logs_section_profiles": "Login accounts",
   "logs_section_property_residents": "Houses and residents",
   "logs_section_document_templates": "Document templates",
 
@@ -26,6 +25,7 @@
   "logs_summary_language_changed": "Default language changed to {language}",
   "logs_summary_password_changed": "Password changed",
   "logs_summary_account_activated": "Account activated",
+  "logs_summary_board_removed": "Removed from the board",
 
   "logs_field_number": "Number",
   "logs_field_first_name": "First name",
@@ -53,7 +53,6 @@
   "logs_field_reservation": "Reservation",
   "logs_field_default_fee": "Suggested fee",
   "logs_field_created_by": "Recorded by",
-  "logs_field_granted_by": "Granted by",
   "logs_field_resolved_by": "Resolved by",
   "logs_field_resolved_at": "Resolved on",
   "logs_field_cancelled_at": "Cancelled on",

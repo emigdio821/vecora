@@ -2,7 +2,7 @@ import { IconFilter2 } from '@tabler/icons-react'
 import type { Table } from '@tanstack/react-table'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { DataTableSearch } from '@/components/shared/table/data-table-search'
 import type { DataTableFeatures } from '@/components/shared/table/features'
 import { Button } from '@/components/ui/button'
@@ -35,14 +35,14 @@ export function ReservationsDataTableHeader({
   amenities,
   isLoading,
 }: ReservationsDataTableHeaderProps) {
-  const canManage = useHasRole('president', 'treasurer')
+  const canManage = useCan({ reservation: ['write'] })
   const [amenityId, setAmenityId] = useAmenityFilter()
   const [isCreateOpen, setCreateOpen] = useState(false)
   const activeAmenity = amenities.find((a) => a.id === amenityId)
   const filterLabel = activeAmenity
     ? m.presidency_filters_with_amenity({ name: activeAmenity.name })
     : m.common_filters()
-  const hasActiveAmenity = amenities.some((a) => a.is_active)
+  const hasActiveAmenity = amenities.some((a) => a.isActive)
 
   return (
     <>
@@ -52,7 +52,7 @@ export function ReservationsDataTableHeader({
         <div className="flex gap-2">
           <DataTableSearch
             table={table}
-            columnId="reserved_on"
+            columnId="reservedOn"
             param="search-reservations"
             hint={m.presidency_reservation_search_hint()}
           />

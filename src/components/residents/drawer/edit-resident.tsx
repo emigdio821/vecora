@@ -59,15 +59,15 @@ export function EditResidentDrawer({
     },
     onSuccess: (_data, values) => {
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
-      // A board member's account name follows the resident's (a trigger in the database).
-      if (resident.profile) {
+      // A board member's account name follows the resident's (src/lib/services/registry.ts).
+      if (resident.account) {
         void queryClient.invalidateQueries({ queryKey: [HOA_BOARD_QUERY_KEY] })
       }
       // Renamed themselves: the sidebar reads the cached user, which the guards never refetch.
-      if (resident.profile?.id === user.id) {
+      if (resident.account?.id === user.id) {
         queryClient.setQueryData(currentUserQueryOptions.queryKey, (cached) => {
           if (!cached) return cached
-          return { ...cached, fullName: `${values.first_name} ${values.last_name}` }
+          return { ...cached, name: `${values.firstName} ${values.lastName}` }
         })
         void router.invalidate()
       }
@@ -75,7 +75,7 @@ export function EditResidentDrawer({
         type: 'success',
         title: m.residential_resident_updated(),
         description: m.residential_resident_updated_description({
-          name: `${values.first_name} ${values.last_name}`,
+          name: `${values.firstName} ${values.lastName}`,
         }),
       })
       onOpenChange(false)
@@ -109,7 +109,7 @@ export function EditResidentDrawer({
         <DrawerHeader>
           <DrawerTitle>{m.residential_edit_resident()}</DrawerTitle>
           <DrawerDescription>
-            {resident.first_name} {resident.last_name}
+            {resident.firstName} {resident.lastName}
           </DrawerDescription>
         </DrawerHeader>
 
@@ -123,8 +123,8 @@ export function EditResidentDrawer({
 
 function toFormValues(resident: ResidentQueryData): UpdateResidentInput {
   return {
-    first_name: resident.first_name,
-    last_name: resident.last_name,
+    firstName: resident.firstName,
+    lastName: resident.lastName,
     phone: resident.phone,
     email: resident.email ?? '',
     notes: resident.notes ?? '',
@@ -161,7 +161,7 @@ function EditResidentForm({
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <Controller
-              name="first_name"
+              name="firstName"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field
@@ -180,7 +180,7 @@ function EditResidentForm({
             />
 
             <Controller
-              name="last_name"
+              name="lastName"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field

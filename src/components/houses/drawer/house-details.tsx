@@ -1,6 +1,6 @@
 import { IconCalendarPlus, IconHistory, IconNotes, IconUsers } from '@tabler/icons-react'
 import { useState } from 'react'
-import { useHasRole } from '@/components/current-user-provider'
+import { useCan } from '@/components/current-user-provider'
 import { CollapsibleSection, Muted, Timestamp } from '@/components/shared/details'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,9 +26,9 @@ interface HouseDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
 }
 
 export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: HouseDetailsDrawerProps) {
-  const canManage = useHasRole('president')
+  const canManage = useCan({ registry: ['write'] })
   const [isEditOpen, setEditOpen] = useState(false)
-  const residents = sortByRelationship(house.property_residents)
+  const residents = sortByRelationship(house.residentLinks)
 
   return (
     <Drawer position="right" open={open} onOpenChange={onOpenChange} {...props}>
@@ -50,7 +50,7 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
                   <li key={resident.id} className="flex items-start justify-between gap-3 text-sm">
                     <div className="grid min-w-0 gap-0.5">
                       <span className="truncate font-medium">
-                        {resident.first_name} {resident.last_name}
+                        {resident.firstName} {resident.lastName}
                       </span>
                       <a
                         className="truncate text-xs text-muted-foreground hover:underline"
@@ -80,12 +80,12 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
             <Timestamp
               icon={<IconCalendarPlus />}
               label={m.residential_created_feminine()}
-              value={house.created_at}
+              value={house.createdAt}
             />
             <Timestamp
               icon={<IconHistory />}
               label={m.residential_updated_feminine()}
-              value={house.updated_at}
+              value={house.updatedAt}
             />
           </dl>
         </DrawerPanel>
