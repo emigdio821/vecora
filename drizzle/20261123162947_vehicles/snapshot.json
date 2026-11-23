@@ -1,0 +1,336 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "f64f92a6-7898-4df5-bc7d-a754cc596397",
+  "prevIds": ["9b43c117-5da0-4832-bc08-fb3ab2f37cf0"],
+  "footprints": [
+    {
+      "statementType": "create_enum",
+      "statementTarget": ["enum", "public", "vehicle_kind"],
+      "writes": [
+        "s|enum|public.vehicle_kind",
+        "n|enum|public.vehicle_kind",
+        "e|enum|public.vehicle_kind",
+        "n|type|public.vehicle_kind"
+      ],
+      "reads": ["n|sch|public"]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": ["table", "public", "vehicles"],
+      "writes": [
+        "s|tbl|public.vehicles",
+        "n|tbl|public.vehicles",
+        "e|tbl|public.vehicles",
+        "n|rel|public.vehicles",
+        "n|type|public.vehicles",
+        "n|rel|public.vehicles_pkey"
+      ],
+      "reads": ["n|sch|public", "n|enum|public.vehicle_kind"]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": ["index", "public", "vehicles", "vehicles_plate_unique"],
+      "writes": [
+        "s|idx|public.vehicles_plate_unique",
+        "n|idx|public.vehicles_plate_unique",
+        "e|idx|public.vehicles_plate_unique",
+        "n|rel|public.vehicles_plate_unique"
+      ],
+      "reads": ["n|tbl|public.vehicles", "n|sch|public"]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": ["index", "public", "vehicles", "vehicles_rfid_serial_unique"],
+      "writes": [
+        "s|idx|public.vehicles_rfid_serial_unique",
+        "n|idx|public.vehicles_rfid_serial_unique",
+        "e|idx|public.vehicles_rfid_serial_unique",
+        "n|rel|public.vehicles_rfid_serial_unique"
+      ],
+      "reads": ["n|tbl|public.vehicles", "n|sch|public"]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": ["index", "public", "vehicles", "vehicles_property_id_idx"],
+      "writes": [
+        "s|idx|public.vehicles_property_id_idx",
+        "n|idx|public.vehicles_property_id_idx",
+        "e|idx|public.vehicles_property_id_idx",
+        "n|rel|public.vehicles_property_id_idx"
+      ],
+      "reads": ["n|tbl|public.vehicles", "n|sch|public", "n|col|public.vehicles.property_id"]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": ["table", "public", "vehicles"],
+      "writes": [
+        "s|fk|public.vehicles.vehicles_property_id_properties_id_fkey",
+        "n|fk|public.vehicles.vehicles_property_id_properties_id_fkey",
+        "e|fk|public.vehicles.vehicles_property_id_properties_id_fkey",
+        "n|con|public.vehicles.vehicles_property_id_properties_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.vehicles",
+        "n|sch|public",
+        "n|tbl|public.properties",
+        "n|sch|public",
+        "n|col|public.vehicles.property_id",
+        "n|col|public.properties.id",
+        "e|uniqueness|public.properties.id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "vehicles",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "vehicle_kind",
+        "values": ["car", "motorcycle"],
+        "entityType": "enums"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "id",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "property_id",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "kind",
+        "type": "vehicle_kind",
+        "typeSchema": "public",
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "plate",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "rfid_serial",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "vehicles_plate_unique",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "regexp_replace(upper(\"plate\"), '[^[:alnum:]]', '', 'g')",
+            "isExpression": true,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "vehicles_rfid_serial_unique",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "lower(\"rfid_serial\")",
+            "isExpression": true,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"rfid_serial\" is not null",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "vehicles_property_id_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "property_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "vehicles_property_id_properties_id_fkey",
+        "nameExplicit": false,
+        "columns": ["property_id"],
+        "schemaTo": "public",
+        "tableTo": "properties",
+        "columnsTo": ["id"],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "vehicles_pkey",
+        "columns": ["id"],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "vehicles_plate_not_blank",
+        "value": "btrim(\"plate\") <> ''",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "vehicles_rfid_serial_not_blank",
+        "value": "btrim(\"rfid_serial\") <> ''",
+        "entityType": "checks"
+      }
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "98d00862-d156-4524-b0d4-dd8a7e63d3af",
+  "prevIds": ["7ccf295f-7eff-4f4f-b790-56956110a0c7"],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": ["column", "public", "vehicles", "deleted_by"],
+      "writes": [
+        "s|col|public.vehicles.deleted_by",
+        "n|col|public.vehicles.deleted_by",
+        "e|col|public.vehicles.deleted_by"
+      ],
+      "reads": ["n|tbl|public.vehicles", "n|sch|public"]
+    },
+    {
+      "statementType": "alter_column",
+      "statementTarget": ["column", "public", "vehicles", "property_id"],
+      "writes": ["s|colprop|public.vehicles.property_id.notNull"],
+      "reads": ["n|tbl|public.vehicles", "n|sch|public", "n|col|public.vehicles.property_id"],
+      "sqlHash": "1695f5dae901ee28"
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": ["table", "public", "vehicles"],
+      "writes": [
+        "s|fk|public.vehicles.vehicles_deleted_by_users_id_fkey",
+        "n|fk|public.vehicles.vehicles_deleted_by_users_id_fkey",
+        "e|fk|public.vehicles.vehicles_deleted_by_users_id_fkey",
+        "n|con|public.vehicles.vehicles_deleted_by_users_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.vehicles",
+        "n|sch|public",
+        "n|tbl|public.users",
+        "n|sch|public",
+        "n|col|public.vehicles.deleted_by",
+        "n|col|public.users.id",
+        "e|uniqueness|public.users.id"
+      ]
+    },
+    {
+      "statementType": "recreate_fk",
+      "statementTarget": ["table", "public", "vehicles"],
+      "writes": [
+        "s|fk|public.vehicles.vehicles_property_id_properties_id_fkey",
+        "n|fk|public.vehicles.vehicles_property_id_properties_id_fkey",
+        "e|fk|public.vehicles.vehicles_property_id_properties_id_fkey",
+        "n|con|public.vehicles.vehicles_property_id_properties_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.vehicles",
+        "n|sch|public",
+        "n|tbl|public.properties",
+        "n|sch|public",
+        "n|col|public.vehicles.property_id",
+        "n|col|public.properties.id",
+        "e|uniqueness|public.properties.id"
+      ],
+      "sqlHash": "841f81edc314ee7c"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "deleted_by",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "vehicles_deleted_by_users_id_fkey",
+        "nameExplicit": false,
+        "columns": ["deleted_by"],
+        "schemaTo": "public",
+        "tableTo": "users",
+        "columnsTo": ["id"],
+        "onUpdate": "NO ACTION",
+        "onDelete": "SET NULL",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "columns\u0000[\"public\",\"vehicles\",\"property_id\"]",
+      "set": {
+        "notNull": false
+      }
+    },
+    {
+      "op": "alter",
+      "key": "fks\u0000[\"public\",\"vehicles\",\"vehicles_property_id_properties_id_fkey\"]",
+      "set": {
+        "onDelete": "SET NULL"
+      }
+    }
+  ]
+}

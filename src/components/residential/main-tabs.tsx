@@ -3,6 +3,7 @@ import { m } from '@/paraglide/messages'
 import { HousesDataTable } from '../houses/table/data-table'
 import { ResidentsDataTable } from '../residents/table/data-table'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '../ui/tabs'
+import { VehiclesDataTable } from '../vehicles/table/data-table'
 
 export function ResidentialMainTabs() {
   const [tab, setTab] = useQueryState('tab', { defaultValue: 'houses' })
@@ -18,12 +19,16 @@ export function ResidentialMainTabs() {
       <TabsList>
         <TabsTab value="houses">{m.common_section_houses()}</TabsTab>
         <TabsTab value="residents">{m.common_section_residents()}</TabsTab>
+        <TabsTab value="vehicles">{m.residential_vehicles()}</TabsTab>
       </TabsList>
       <TabsPanel value="houses">
         <HousesDataTable />
       </TabsPanel>
       <TabsPanel value="residents">
         <ResidentsDataTable />
+      </TabsPanel>
+      <TabsPanel value="vehicles">
+        <VehiclesDataTable />
       </TabsPanel>
     </Tabs>
   )

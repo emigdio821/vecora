@@ -5,6 +5,7 @@
   "logs_section_transaction_categories": "Transaction categories",
   "logs_section_property_residents": "Houses and residents",
   "logs_section_document_templates": "Document templates",
+  "logs_section_vehicles": "Vehicles",
 
   "logs_action_created": "Created",
   "logs_action_updated": "Edited",
@@ -28,6 +29,8 @@
   "logs_summary_board_removed": "Removed from the board",
 
   "logs_field_number": "Number",
+  "logs_field_plate": "Plate",
+  "logs_field_rfid_serial": "RFID serial number",
   "logs_field_first_name": "First name",
   "logs_field_last_name": "Last name",
   "logs_field_key": "Key",

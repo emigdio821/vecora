@@ -3,7 +3,7 @@ import { and, eq, inArray, isNotNull, isNull } from 'drizzle-orm'
 import { type ActionResult, errorMessage, isTaken } from '@/lib/action-result'
 import { boardMiddleware, requirePermission } from '@/lib/auth/middleware'
 import { db, transactionAs } from '@/lib/db'
-import { properties, propertyResidents } from '@/lib/db/schema'
+import { properties, propertyResidents, vehicles } from '@/lib/db/schema'
 import { linkResidents } from '@/lib/services/registry'
 import {
   type AssignResidentsInput,
@@ -30,7 +30,7 @@ function toMessage(error: unknown, fallback: string) {
   })
 }
 
-/** The houses and who lives in each, last changed first. */
+/** The houses, who lives in each and their vehicles, last changed first. */
 const fetchHousesFn = createServerFn()
   .middleware([boardMiddleware])
   .handler(() =>
@@ -44,6 +44,11 @@ const fetchHousesFn = createServerFn()
           },
           // Soft-deleted residents keep their links (so undo restores them), but they're not shown.
           where: { resident: { deletedAt: { isNull: true } } },
+        },
+        vehicles: {
+          columns: { id: true, kind: true, plate: true, rfidSerial: true },
+          where: { deletedAt: { isNull: true } },
+          orderBy: { createdAt: 'asc' },
         },
       },
       where: { deletedAt: { isNull: true } },
@@ -138,56 +143,111 @@ const updateHouseFn = createServerFn({ method: 'POST' })
 
 export const updateHouse = (id: string, input: UpdateHouseInput) => updateHouseFn({ data: { id, input } })
 
-/** Soft-deletes one or more houses. Returns how many were still there to delete. */
+/** A vehicle and the house it was on, for undo to assign it back. */
+export interface VehicleLink {
+  id: string
+  propertyId: string
+}
+
+/**
+ * Soft-deletes one or more houses and takes their vehicles off them. Returns
+ * how many houses were still there to delete, and the vehicles it unassigned.
+ */
 const deleteHousesFn = createServerFn({ method: 'POST' })
   .middleware([registryWrite])
   .validator((ids: string[]) => ids)
-  .handler(async ({ data: ids, context }): Promise<ActionResult<{ deleted: number }>> => {
-    const uniqueIds = [...new Set(ids)]
-    if (uniqueIds.length === 0) {
-      return { error: m.residential_select_house_required() }
-    }
+  .handler(
+    async ({ data: ids, context }): Promise<ActionResult<{ deleted: number; vehicles: VehicleLink[] }>> => {
+      const uniqueIds = [...new Set(ids)]
+      if (uniqueIds.length === 0) {
+        return { error: m.residential_select_house_required() }
+      }
 
-    let deleted: Array<{ id: string }>
-    try {
-      deleted = await transactionAs(context.user.id, (tx) =>
-        tx
-          .update(properties)
-          .set({ deletedAt: new Date(), deletedBy: context.user.id })
-          .where(and(inArray(properties.id, uniqueIds), isNull(properties.deletedAt)))
-          .returning({ id: properties.id }),
-      )
-    } catch (error) {
-      return { error: toMessage(error, m.residential_delete_houses_failed()) }
-    }
-    if (deleted.length === 0) {
-      return { error: m.residential_house_not_found() }
-    }
+      let deleted: Array<{ id: string }>
+      let unassigned: VehicleLink[]
+      try {
+        const result = await transactionAs(context.user.id, async (tx) => {
+          const deletedHouses = await tx
+            .update(properties)
+            .set({ deletedAt: new Date(), deletedBy: context.user.id })
+            .where(and(inArray(properties.id, uniqueIds), isNull(properties.deletedAt)))
+            .returning({ id: properties.id })
 
-    return { data: { deleted: deleted.length } }
-  })
+          // The vehicles stay, without a house. Deleted ones too, so a restore can't put
+          // one back on a deleted house.
+          let unassignedVehicles: VehicleLink[] = []
+          const deletedIds = deletedHouses.map((house) => house.id)
+          if (deletedIds.length > 0) {
+            const linked = await tx
+              .select({ id: vehicles.id, propertyId: vehicles.propertyId })
+              .from(vehicles)
+              .where(inArray(vehicles.propertyId, deletedIds))
+            await tx
+              .update(vehicles)
+              .set({ propertyId: null })
+              .where(inArray(vehicles.propertyId, deletedIds))
+            for (const vehicle of linked) {
+              // Always set (the query asked for these houses); the check is for TypeScript.
+              if (vehicle.propertyId !== null) {
+                unassignedVehicles.push({ id: vehicle.id, propertyId: vehicle.propertyId })
+              }
+            }
+          }
+
+          return { deletedHouses, unassignedVehicles }
+        })
+        deleted = result.deletedHouses
+        unassigned = result.unassignedVehicles
+      } catch (error) {
+        return { error: toMessage(error, m.residential_delete_houses_failed()) }
+      }
+      if (deleted.length === 0) {
+        return { error: m.residential_house_not_found() }
+      }
+
+      return { data: { deleted: deleted.length, vehicles: unassigned } }
+    },
+  )
 
 export const deleteHouses = (ids: string[]) => deleteHousesFn({ data: ids })
 
-/** Undoes a soft delete. Fails if the number was used again meanwhile. */
+/**
+ * Undoes a soft delete, and assigns back the vehicles the delete took off
+ * (the ones still without a house: one assigned elsewhere meanwhile stays
+ * there). Fails if the number was used again meanwhile.
+ */
 const restoreHousesFn = createServerFn({ method: 'POST' })
   .middleware([registryWrite])
-  .validator((ids: string[]) => ids)
-  .handler(async ({ data: ids, context }): Promise<ActionResult<{ restored: number }>> => {
-    const uniqueIds = [...new Set(ids)]
+  .validator((data: { ids: string[]; vehicles: VehicleLink[] }) => data)
+  .handler(async ({ data, context }): Promise<ActionResult<{ restored: number }>> => {
+    const uniqueIds = [...new Set(data.ids)]
     if (uniqueIds.length === 0) {
       return { error: m.common_nothing_to_restore() }
     }
 
     let restored: Array<{ id: string }>
     try {
-      restored = await transactionAs(context.user.id, (tx) =>
-        tx
+      restored = await transactionAs(context.user.id, async (tx) => {
+        const restoredHouses = await tx
           .update(properties)
           .set({ deletedAt: null, deletedBy: null })
           .where(and(inArray(properties.id, uniqueIds), isNotNull(properties.deletedAt)))
-          .returning({ id: properties.id }),
-      )
+          .returning({ id: properties.id })
+
+        // Only onto the houses this restored.
+        const restoredIds = new Set(restoredHouses.map((house) => house.id))
+        for (const link of data.vehicles) {
+          if (!restoredIds.has(link.propertyId)) {
+            continue
+          }
+          await tx
+            .update(vehicles)
+            .set({ propertyId: link.propertyId })
+            .where(and(eq(vehicles.id, link.id), isNull(vehicles.propertyId)))
+        }
+
+        return restoredHouses
+      })
     } catch (error) {
       const message = toMessage(error, m.residential_restore_houses_failed())
       if (isTaken(error)) {
@@ -202,7 +262,8 @@ const restoreHousesFn = createServerFn({ method: 'POST' })
     return { data: { restored: restored.length } }
   })
 
-export const restoreHouses = (ids: string[]) => restoreHousesFn({ data: ids })
+export const restoreHouses = (ids: string[], vehicleLinks: VehicleLink[]) =>
+  restoreHousesFn({ data: { ids, vehicles: vehicleLinks } })
 
 /** Links residents to a house with one relationship for the whole batch. */
 const assignResidentsFn = createServerFn({ method: 'POST' })

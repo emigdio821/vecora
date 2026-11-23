@@ -1,11 +1,12 @@
-// The registry: houses, the people in the community, and who is at which
-// house. The president's section.
+// The registry: houses, the people in the community, who is at which house,
+// and the vehicles. The president's section.
 //
-// Houses and residents are soft-deleted (deletedAt / deletedBy), so a mistake
-// can be undone; the nightly purge removes them after 6 months if nothing
-// refers to them (src/lib/services/purge.ts). Someone who moves out isn't
-// deleted: their links are history. The links themselves are hard-deleted,
-// since unlinking is a normal edit.
+// Houses, residents and vehicles are soft-deleted (deletedAt / deletedBy), so
+// a mistake can be undone; the nightly purge removes them after 6 months if
+// nothing refers to them (src/lib/services/purge.ts). Someone who moves out
+// isn't deleted: their links are history. The links themselves are
+// hard-deleted, since unlinking is a normal edit. A vehicle's house is a
+// column, not history: deleting the house leaves its vehicles without one.
 import { sql } from 'drizzle-orm'
 import {
   check,
@@ -18,10 +19,12 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core'
-import { RELATIONSHIPS } from '../../enums'
+import { RELATIONSHIPS, VEHICLE_KINDS } from '../../enums'
 import { users } from './auth'
 
 export const residencyRelationship = pgEnum('residency_relationship', RELATIONSHIPS)
+
+export const vehicleKind = pgEnum('vehicle_kind', VEHICLE_KINDS)
 
 export const properties = pgTable(
   'properties',
@@ -98,5 +101,44 @@ export const propertyResidents = pgTable(
     primaryKey({ columns: [table.propertyId, table.residentId] }),
     // The primary key covers lookups by house; this one, by person.
     index('property_residents_resident_id_idx').on(table.residentId),
+  ],
+)
+
+// The cars and motorcycles in the community, with the RFID tag that opens the gate.
+export const vehicles = pgTable(
+  'vehicles',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    /**
+     * The house it belongs to, always a live one: none until it's assigned,
+     * and none again when its house is deleted (undo assigns it back).
+     */
+    propertyId: uuid('property_id').references(() => properties.id, { onDelete: 'set null' }),
+    kind: vehicleKind('kind').notNull(),
+    /** "RFY-420", saved in uppercase as written. */
+    plate: text('plate').notNull(),
+    /** The serial number of the gate's RFID tag. Optional: the tag may not be installed yet. */
+    rfidSerial: text('rfid_serial'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+    deletedBy: uuid('deleted_by').references(() => users.id, { onDelete: 'set null' }),
+  },
+  (table) => [
+    // Among live vehicles, so a deleted vehicle's plate and tag can be registered again.
+    // Ignoring spaces and dashes, so "RFY-420" and "RFY 420" are the same plate.
+    uniqueIndex('vehicles_plate_unique')
+      .on(sql`regexp_replace(upper(${table.plate}), '[^[:alnum:]]', '', 'g')`)
+      .where(sql`${table.deletedAt} is null`),
+    // One tag opens the gate for one vehicle.
+    uniqueIndex('vehicles_rfid_serial_unique')
+      .on(sql`lower(${table.rfidSerial})`)
+      .where(sql`${table.deletedAt} is null and ${table.rfidSerial} is not null`),
+    index('vehicles_property_id_idx').on(table.propertyId),
+    check('vehicles_plate_not_blank', sql`btrim(${table.plate}) <> ''`),
+    check('vehicles_rfid_serial_not_blank', sql`btrim(${table.rfidSerial}) <> ''`),
   ],
 )

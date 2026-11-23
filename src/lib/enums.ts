@@ -17,6 +17,9 @@ export type TransactionKind = (typeof TRANSACTION_KINDS)[number]
 export const RELATIONSHIPS = ['owner', 'tenant', 'family', 'unconfirmed'] as const
 export type Relationship = (typeof RELATIONSHIPS)[number]
 
+export const VEHICLE_KINDS = ['car', 'motorcycle'] as const
+export type VehicleKind = (typeof VEHICLE_KINDS)[number]
+
 export const REQUEST_STATUSES = ['pending', 'paid', 'rejected'] as const
 export type RequestStatus = (typeof REQUEST_STATUSES)[number]
 

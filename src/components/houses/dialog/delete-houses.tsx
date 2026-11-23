@@ -13,9 +13,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { m } from '@/paraglide/messages'
-import { deleteHouses, restoreHouses } from '@/server-actions/houses'
+import { deleteHouses, restoreHouses, type VehicleLink } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/tanstack-queries/houses'
 import { RESIDENTS_QUERY_KEY } from '@/tanstack-queries/residents'
+import { VEHICLES_QUERY_KEY } from '@/tanstack-queries/vehicles'
 
 /** How long the undo toast stays up. Rows are recoverable for 6 months
  *  either way; this only bounds the one-click shortcut. */
@@ -25,17 +26,19 @@ const UNDO_TOAST_TIMEOUT_MS = 8000
  * Standalone (not a hook): by the time the user clicks Undo the row —
  * and the menu/dialog that started the delete — is usually unmounted.
  */
-async function undoDelete(queryClient: QueryClient, ids: string[]) {
-  const result = await restoreHouses(ids)
+async function undoDelete(queryClient: QueryClient, ids: string[], vehicles: VehicleLink[]) {
+  // The vehicles the delete took off, so they're assigned back.
+  const result = await restoreHouses(ids, vehicles)
 
   if (result.error !== undefined) {
     toastManager.add({ type: 'error', title: m.common_undo_failed(), description: result.error })
     return
   }
 
-  // Residents list their houses, so they change too.
+  // Residents and vehicles list their houses, so they change too.
   void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
   void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
+  void queryClient.invalidateQueries({ queryKey: [VEHICLES_QUERY_KEY] })
   toastManager.add({
     type: 'success',
     title: result.data.restored === 1 ? m.residential_house_restored() : m.residential_houses_restored(),
@@ -71,7 +74,18 @@ export function DeleteHousesAlertDialog({
     if (isSingle) return m.residential_delete_house_residents({ count: residentCount })
     return m.residential_delete_houses_residents({ count: residentCount })
   }
-  const description = `${residentsClause()} ${m.residential_undo_window()}`
+  // The vehicles stay in the Vehicles tab, without a house (undo assigns them back).
+  const vehicleCount = houses.reduce((total, house) => total + house.vehicles.length, 0)
+  const sentences = [residentsClause()]
+  if (vehicleCount > 0) {
+    if (isSingle) {
+      sentences.push(m.residential_delete_house_vehicles({ count: vehicleCount }))
+    } else {
+      sentences.push(m.residential_delete_houses_vehicles({ count: vehicleCount }))
+    }
+  }
+  sentences.push(m.residential_undo_window())
+  const description = sentences.join(' ')
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -80,10 +94,11 @@ export function DeleteHousesAlertDialog({
       if (result.error !== undefined) throw new Error(result.error)
       return { ...result.data, ids }
     },
-    onSuccess: ({ deleted, ids }) => {
-      // Residents list their houses, so they change too.
+    onSuccess: ({ deleted, vehicles, ids }) => {
+      // Residents and vehicles list their houses, so they change too.
       void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
       void queryClient.invalidateQueries({ queryKey: [RESIDENTS_QUERY_KEY] })
+      void queryClient.invalidateQueries({ queryKey: [VEHICLES_QUERY_KEY] })
 
       const partial = deleted < count // some were already deleted, by someone else meanwhile
       const toastId = toastManager.add({
@@ -103,7 +118,7 @@ export function DeleteHousesAlertDialog({
           children: m.common_action_undo(),
           onClick: () => {
             toastManager.close(toastId)
-            void undoDelete(queryClient, ids)
+            void undoDelete(queryClient, ids, vehicles)
           },
         },
       })

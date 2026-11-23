@@ -109,6 +109,9 @@
   "common_relationship_family": "Familiar",
   "common_relationship_unconfirmed": "Sin confirmar",
 
+  "common_vehicle_kind_car": "Auto",
+  "common_vehicle_kind_motorcycle": "Motocicleta",
+
   "common_go_home": "Ir al inicio",
   "common_not_found_title": "Página no encontrada",
   "common_not_found_description": "La dirección no existe o ya no está disponible.",
@@ -143,6 +146,11 @@
   "common_loading_residents": "Cargando residentes…",
   "common_residents_load_failed": "No se pudieron cargar los residentes",
   "common_all_residents_have_house": "Todos los residentes ya tienen casa",
+  "common_search_vehicle": "Buscar vehículo",
+  "common_search_vehicles": "Buscar vehículos",
+  "common_loading_vehicles": "Cargando vehículos…",
+  "common_vehicles_load_failed": "No se pudieron cargar los vehículos",
+  "common_all_vehicles_have_house": "Todos los vehículos ya tienen casa",
   "common_no_house": "Sin casa",
 
   "common_range_last_7_days": "Últimos 7 días",

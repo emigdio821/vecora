@@ -1,0 +1,77 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "7ccf295f-7eff-4f4f-b790-56956110a0c7",
+  "prevIds": ["df9fca79-b697-4e64-a0c7-939514e2209e"],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": ["column", "public", "vehicles", "deleted_at"],
+      "writes": [
+        "s|col|public.vehicles.deleted_at",
+        "n|col|public.vehicles.deleted_at",
+        "e|col|public.vehicles.deleted_at"
+      ],
+      "reads": ["n|tbl|public.vehicles", "n|sch|public"]
+    },
+    {
+      "statementType": "recreate_index",
+      "statementTarget": ["index", "public", "vehicles", "vehicles_plate_unique"],
+      "writes": [
+        "s|idx|public.vehicles_plate_unique",
+        "n|idx|public.vehicles_plate_unique",
+        "e|idx|public.vehicles_plate_unique",
+        "n|rel|public.vehicles_plate_unique"
+      ],
+      "reads": ["n|tbl|public.vehicles", "n|sch|public"],
+      "sharedWrites": [],
+      "sqlHash": "fe3375017777db6d"
+    },
+    {
+      "statementType": "recreate_index",
+      "statementTarget": ["index", "public", "vehicles", "vehicles_rfid_serial_unique"],
+      "writes": [
+        "s|idx|public.vehicles_rfid_serial_unique",
+        "n|idx|public.vehicles_rfid_serial_unique",
+        "e|idx|public.vehicles_rfid_serial_unique",
+        "n|rel|public.vehicles_rfid_serial_unique"
+      ],
+      "reads": ["n|tbl|public.vehicles", "n|sch|public"],
+      "sharedWrites": [],
+      "sqlHash": "1ae36e2a7d5c72b4"
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "vehicles",
+        "name": "deleted_at",
+        "type": "timestamp with time zone",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "indexes\u0000[\"public\",\"vehicles_plate_unique\"]",
+      "set": {
+        "where": "\"deleted_at\" is null"
+      }
+    },
+    {
+      "op": "alter",
+      "key": "indexes\u0000[\"public\",\"vehicles_rfid_serial_unique\"]",
+      "set": {
+        "where": "\"deleted_at\" is null and \"rfid_serial\" is not null"
+      }
+    }
+  ]
+}

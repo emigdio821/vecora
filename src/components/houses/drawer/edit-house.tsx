@@ -21,8 +21,10 @@ import { type UpdateHouseInput, updateHouseSchema } from '@/lib/validations/hous
 import { m } from '@/paraglide/messages'
 import { updateHouse } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY, type HouseQueryData } from '@/tanstack-queries/houses'
+import { VEHICLES_QUERY_KEY } from '@/tanstack-queries/vehicles'
 import { HouseFormFields } from './house-form-fields'
 import { HouseResidents } from './house-residents'
+import { HouseVehicles } from './house-vehicles'
 
 const FORM_ID = 'edit-house-form'
 
@@ -50,6 +52,8 @@ export function EditHouseDrawer({
     },
     onSuccess: (_data, values) => {
       void queryClient.invalidateQueries({ queryKey: [HOUSES_QUERY_KEY] })
+      // The Vehicles tab shows each vehicle's house number.
+      void queryClient.invalidateQueries({ queryKey: [VEHICLES_QUERY_KEY] })
       toastManager.add({
         type: 'success',
         title: m.residential_house_updated(),
@@ -137,8 +141,9 @@ function EditHouseForm({ house, mutation }: { house: HouseQueryData; mutation: U
           )}
         </Form>
 
-        {/* Links save on their own (assign/unassign), independent of the form's Guardar. */}
+        {/* Links and vehicles save on their own, independent of the form's Guardar. */}
         <HouseResidents house={house} disabled={isBusy} />
+        <HouseVehicles house={house} disabled={isBusy} />
       </DrawerPanel>
 
       <DrawerFooter>

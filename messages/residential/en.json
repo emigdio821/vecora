@@ -71,13 +71,33 @@
       }
     }
   ],
+  "residential_delete_house_vehicles": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Its vehicle will stay in the \"Vehicles\" tab, but without a house.",
+        "countPlural=other": "Its {count} vehicles will stay in the \"Vehicles\" tab, but without a house."
+      }
+    }
+  ],
+  "residential_delete_houses_vehicles": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "The vehicle of these houses will stay in the \"Vehicles\" tab, but without a house.",
+        "countPlural=other": "The {count} vehicles of these houses will stay in the \"Vehicles\" tab, but without a house."
+      }
+    }
+  ],
 
   "residential_assign_residents": "Assign residents",
   "residential_resident_assigned": "Resident assigned",
   "residential_residents_assigned": "Residents assigned",
   "residential_resident_assigned_description": "Assigned to house {number}",
   "residential_residents_assigned_description": "{count} residents assigned to house {number}",
-  "residential_residents_picker_hint": "People who already live in this house aren't listed.",
+  "residential_residents_picker_hint": "People who already live in this house aren't listed. To register someone new, go to the \"Residents\" tab.",
   "residential_only_unassigned": "Only residents without a house",
   "residential_only_unassigned_hint": "Uncheck it to include people already assigned to another house.",
   "residential_relationship_applies_to_all": "Applies to all selected residents.",
@@ -103,7 +123,7 @@
   "residential_column_owners": "Owners",
   "residential_no_owner": "No owner",
   "residential_column_people": "People",
-  "residential_search_houses_hint": "Search by house number or resident name",
+  "residential_search_houses_hint": "Search by house number, resident name or plate",
   "residential_delete_selected_houses_label": "Delete {count} selected houses",
   "residential_delete_selected_houses": "Delete selected houses",
 
@@ -190,5 +210,66 @@
   "residential_no_account": "No account",
   "residential_search_residents_hint": "Search by name, email or phone",
   "residential_delete_selected_residents_label": "Delete {count} selected residents",
-  "residential_delete_selected_residents": "Delete selected residents"
+  "residential_delete_selected_residents": "Delete selected residents",
+
+  "residential_vehicles": "Vehicles",
+  "residential_house_no_vehicles": "This house has no registered vehicles.",
+  "residential_edit_vehicle": "Edit vehicle",
+  "residential_remove_vehicle_label": "Remove plate {plate} from the house",
+  "residential_field_plate": "Plate",
+  "residential_plate_hint": "As it appears on the vehicle. It can't be repeated.",
+  "residential_plate_required": "Plate is required",
+  "residential_field_rfid": "RFID serial number",
+  "residential_rfid_hint": "Optional. The number of the tag that opens the gate. You can add it later.",
+  "residential_rfid_value": "RFID {serial}",
+  "residential_no_rfid": "No RFID",
+  "residential_vehicle_kind_required": "Type is required",
+  "residential_plate_taken": "A vehicle with that plate is already registered",
+  "residential_rfid_taken": "That RFID serial number is already assigned to another vehicle",
+  "residential_vehicle_not_found": "The vehicle no longer exists",
+  "residential_add_vehicle_failed": "Couldn't add the vehicle, please try again",
+  "residential_update_vehicle_failed": "Couldn't update the vehicle, please try again",
+  "residential_remove_vehicle_failed": "Couldn't remove the vehicle, please try again",
+  "residential_vehicle_added": "Vehicle added",
+  "residential_vehicle_added_description": "Plate {plate} was added to house {number}",
+  "residential_vehicle_updated": "Vehicle updated",
+  "residential_vehicle_updated_description": "The details of plate {plate} were saved",
+  "residential_vehicle_removed": "Vehicle removed",
+  "residential_vehicle_removed_description": "Plate {plate} was removed from house {number}",
+  "residential_remove_vehicle_title": "Remove plate {plate} from house {number}?",
+  "residential_remove_vehicle_description": "It will stay in the \"Vehicles\" tab, without a house. You can assign it a house later.",
+
+  "residential_new_vehicle": "New vehicle",
+  "residential_new_vehicle_description": "Register a vehicle. You can assign it a house now or later.",
+  "residential_vehicles_empty": "No vehicles.",
+  "residential_search_vehicles_hint": "Search by plate, RFID or house number",
+  "residential_column_rfid": "RFID",
+  "residential_vehicle_house_hint": "Optional. You can assign it a house later.",
+  "residential_vehicle_created_description": "Plate {plate} was added to the registry.",
+  "residential_select_vehicle_required": "Select at least one vehicle",
+  "residential_delete_vehicles_failed": "Couldn't delete the vehicles, please try again",
+  "residential_restore_vehicles_failed": "Couldn't restore the vehicles, please try again",
+  "residential_delete_vehicle_title": "Delete the vehicle with plate {plate}?",
+  "residential_delete_vehicles_title": "Delete {count} vehicles?",
+  "residential_delete_vehicle_description": "It will no longer appear in the vehicles list or on its house, and its RFID serial number will be free.",
+  "residential_delete_vehicles_description": "They will no longer appear in the vehicles list or on their houses, and their RFID serial numbers will be free.",
+  "residential_vehicle_deleted": "Vehicle deleted",
+  "residential_vehicles_deleted": "Vehicles deleted",
+  "residential_vehicle_deleted_description": "Plate {plate} was deleted",
+  "residential_vehicles_deleted_description": "{count} vehicles were deleted",
+  "residential_vehicles_deleted_partial": "{deleted} of {count} vehicles were deleted",
+  "residential_vehicle_restored": "Vehicle restored",
+  "residential_vehicles_restored": "Vehicles restored",
+  "residential_delete_selected_vehicles_label": "Delete {count} selected vehicles",
+  "residential_delete_selected_vehicles": "Delete selected vehicles",
+
+  "residential_assign_vehicles": "Assign vehicles",
+  "residential_assign_vehicles_failed": "Couldn't assign the vehicles, please try again",
+  "residential_vehicle_assigned": "Vehicle assigned",
+  "residential_vehicles_assigned": "Vehicles assigned",
+  "residential_vehicle_assigned_description": "Assigned to house {number}",
+  "residential_vehicles_assigned_description": "{count} vehicles assigned to house {number}",
+  "residential_vehicles_picker_hint": "This house's vehicles don't appear in the list. To register a new one, go to the \"Vehicles\" tab.",
+  "residential_only_unassigned_vehicles": "Only vehicles without a house",
+  "residential_only_unassigned_vehicles_hint": "Uncheck it to include the ones on other houses. A vehicle has a single house: it will leave the one it's on now."
 }

@@ -20,6 +20,7 @@ export const relations = defineRelations(schema, (r) => ({
 
   properties: {
     residentLinks: r.many.propertyResidents({ from: r.properties.id, to: r.propertyResidents.propertyId }),
+    vehicles: r.many.vehicles({ from: r.properties.id, to: r.vehicles.propertyId }),
     deletedByUser: r.one.users({ from: r.properties.deletedBy, to: r.users.id }),
   },
   residents: {
@@ -34,6 +35,10 @@ export const relations = defineRelations(schema, (r) => ({
       optional: false,
     }),
     resident: r.one.residents({ from: r.propertyResidents.residentId, to: r.residents.id, optional: false }),
+  },
+  vehicles: {
+    property: r.one.properties({ from: r.vehicles.propertyId, to: r.properties.id }),
+    deletedByUser: r.one.users({ from: r.vehicles.deletedBy, to: r.users.id }),
   },
 
   periods: {

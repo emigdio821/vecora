@@ -5,6 +5,7 @@
   "logs_section_transaction_categories": "Categorías de movimientos",
   "logs_section_property_residents": "Casas y residentes",
   "logs_section_document_templates": "Plantillas de documentos",
+  "logs_section_vehicles": "Vehículos",
 
   "logs_action_created": "Creó",
   "logs_action_updated": "Editó",
@@ -28,6 +29,8 @@
   "logs_summary_board_removed": "Retirado de la mesa directiva",
 
   "logs_field_number": "Número",
+  "logs_field_plate": "Placa",
+  "logs_field_rfid_serial": "Número de serie RFID",
   "logs_field_first_name": "Nombre",
   "logs_field_last_name": "Apellidos",
   "logs_field_key": "Clave",

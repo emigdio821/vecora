@@ -2,7 +2,7 @@
 
 > _Vecora_: from _vecino_ (Spanish for "neighbor") and _ágora_, the square where citizens of ancient Greece met to talk and settle the city's affairs. This is the neighbors' agora, where the HOA board runs the residential.
 
-Residential management for the HOA board: houses and residents, treasury (fees, transactions and periods), common area bookings, maintenance and security payment requests, and an activity log for the admin.
+Residential management for the HOA board: houses, residents and their vehicles (plates and gate RFID tags), treasury (fees, transactions and periods), common area bookings, maintenance and security payment requests, and an activity log for the admin.
 
 The app itself is in Spanish (es-MX); code, comments and docs are in English and call each section by its English name (see [Sections](#sections)). Every on-screen text is also translated to English, switched off for now (see [Languages](#languages)).
 
@@ -85,6 +85,7 @@ What each section is called on screen. Docs and comments use the English name.
 | Residential      | "Residencial"        | `/residential`                                        |
 | - Houses         | "Casas"              | `?tab=houses`                                         |
 | - Residents      | "Residentes"         | `?tab=residents`                                      |
+| - Vehicles       | "Vehículos"          | `?tab=vehicles`                                       |
 | Activity log     | "Historial"          | `/logs` (admin only)                                  |
 | Financial report | "Reporte financiero" | `/financial-report`; the PDF is `/reports/pdf`        |
 | Notices          | "Avisos y minutas"   | `/documents`; the PDF is `/reports/document`          |

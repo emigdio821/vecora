@@ -11,7 +11,8 @@
  *
  * 10 residents (the 4 board members above + 6 without an account), phones
  * +523139612222 upward; the admin isn't one. 20 houses A1–D5, some empty, and
- * one resident without a house. Periods, with Y the current year:
+ * one resident without a house. A few vehicles: cars and a motorcycle, one
+ * without an RFID tag yet, one without a house. Periods, with Y the current year:
  *
  *   Y-2, Y-1  back to back, a year of fees and expenses each at older rates
  *             (650 and 700 a month), so the report and the ledger have history
@@ -47,7 +48,7 @@ import {
 } from '../../src/lib/db/schema'
 import type { Actor } from '../../src/lib/services/actor'
 import { createReservation } from '../../src/lib/services/presidency'
-import { createResident } from '../../src/lib/services/registry'
+import { createResident, createVehicle } from '../../src/lib/services/registry'
 import { createRequest, payRequest, rejectRequest } from '../../src/lib/services/requests'
 import { createPeriod, createTransaction, recordFeePayment } from '../../src/lib/services/treasury'
 
@@ -186,6 +187,17 @@ const LINKS = [
   ['C1', 5, 'owner'], // the landlord, who lives in B2
   ['C1', 7, 'tenant'],
   ['C1', 8, 'family'],
+] as const
+
+// [house, kind, plate, RFID serial]. C1's tenant hasn't got a tag yet, and
+// the last one isn't assigned to a house yet.
+const VEHICLES = [
+  ['A1', 'car', 'RFY-420', 'RF-000123'],
+  ['A1', 'motorcycle', 'M4-21B', 'RF-000124'],
+  ['B1', 'car', 'JKL-315-A', 'RF-000131'],
+  ['B2', 'car', 'PQR-778', 'RF-000152'],
+  ['C1', 'car', 'XYZ-904', null],
+  [null, 'car', 'LMN-210', 'RF-000190'],
 ] as const
 
 // The houses that pay every month: the day they pay and how. C1, the tenant,
@@ -376,7 +388,20 @@ export async function seed(db: Database): Promise<void> {
         .values({ propertyId: ids.house(number), residentId: residentId(resident), relationship })
     }
   })
-  console.log('Created the main admin, 4 board members, 20 houses and 10 residents')
+
+  t = addMinutes(t, 30)
+  await step(db, president, t, async (tx) => {
+    for (const [number, kind, plate, rfidSerial] of VEHICLES) {
+      let propertyId: string | null = null
+      if (number !== null) {
+        propertyId = ids.house(number)
+      }
+      await createVehicle(tx, { propertyId, kind, plate, rfidSerial })
+    }
+  })
+  console.log(
+    `Created the main admin, 4 board members, 20 houses, 10 residents and ${VEHICLES.length} vehicles`,
+  )
 
   // Each year writes its own period's rows only, so the three load side by
   // side: a step waits on Neon about ten times, and one after another the

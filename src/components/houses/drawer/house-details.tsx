@@ -1,4 +1,4 @@
-import { IconCalendarPlus, IconHistory, IconNotes, IconUsers } from '@tabler/icons-react'
+import { IconCalendarPlus, IconCar, IconHistory, IconNotes, IconUsers } from '@tabler/icons-react'
 import { useState } from 'react'
 import { useCan } from '@/components/current-user-provider'
 import { CollapsibleSection, Muted, Timestamp } from '@/components/shared/details'
@@ -18,6 +18,7 @@ import { m } from '@/paraglide/messages'
 import type { HouseQueryData } from '@/tanstack-queries/houses'
 import { RELATIONSHIP_LABEL, sortByRelationship } from '../relationship'
 import { EditHouseDrawer } from './edit-house'
+import { VehicleSummary } from './house-vehicles'
 
 interface HouseDetailsDrawerProps extends React.ComponentProps<typeof Drawer> {
   house: HouseQueryData
@@ -67,6 +68,24 @@ export function HouseDetailsDrawer({ house, open, onOpenChange, ...props }: Hous
               </ul>
             ) : (
               <Muted>{m.residential_house_no_residents()}</Muted>
+            )}
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            icon={<IconCar />}
+            title={m.residential_vehicles()}
+            count={house.vehicles.length}
+          >
+            {house.vehicles.length ? (
+              <ul className="grid gap-3">
+                {house.vehicles.map((vehicle) => (
+                  <li key={vehicle.id} className="text-sm">
+                    <VehicleSummary vehicle={vehicle} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <Muted>{m.residential_house_no_vehicles()}</Muted>
             )}
           </CollapsibleSection>
 

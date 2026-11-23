@@ -3,6 +3,7 @@ import type { DataTableFeatures } from '@/components/shared/table/features'
 import { DataTableSortableHeader } from '@/components/shared/table/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
+import { compactPlate, VEHICLE_KIND_ICON } from '@/components/vehicles/vehicle'
 import { normalizeString } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import type { HouseQueryData } from '@/tanstack-queries/houses'
@@ -54,17 +55,20 @@ export const housesTableColumns = columnHelper.columns([
     // "2A" < "10B": compare numerically where possible.
     sortFn: (rowA, rowB) =>
       rowA.original.number.localeCompare(rowB.original.number, 'es', { numeric: true, sensitivity: 'base' }),
-    // Search box target: matches number or any linked resident, accent-insensitive.
+    // Search box target: matches number or any linked resident, accent-insensitive,
+    // or a vehicle's plate ignoring spaces and dashes.
     filterFn: (row, _columnId, value: string) => {
       const filterValue = normalizeString(value)
 
       if (!filterValue) return true
 
-      const { number, residentLinks } = row.original
+      const { number, residentLinks, vehicles } = row.original
+      const plateValue = compactPlate(value)
 
       return (
         normalizeString(number).includes(filterValue) ||
-        residentLinks.some((link) => normalizeString(residentName(link.resident)).includes(filterValue))
+        residentLinks.some((link) => normalizeString(residentName(link.resident)).includes(filterValue)) ||
+        (plateValue !== '' && vehicles.some((vehicle) => compactPlate(vehicle.plate).includes(plateValue)))
       )
     },
   }),
@@ -112,6 +116,27 @@ export const housesTableColumns = columnHelper.columns([
     size: 100,
     header: ({ column }) => <DataTableSortableHeader column={column} title={m.residential_column_people()} />,
     cell: ({ getValue }) => <span className="tabular-nums">{getValue()}</span>,
+  }),
+
+  columnHelper.display({
+    id: 'vehicles',
+    size: 200,
+    enableSorting: false,
+    header: () => m.residential_vehicles(),
+    cell: ({ row }) => (
+      <div className="flex flex-wrap gap-1">
+        {row.original.vehicles.map((vehicle) => {
+          const Icon = VEHICLE_KIND_ICON[vehicle.kind]
+
+          return (
+            <Badge key={vehicle.id} variant="outline">
+              <Icon />
+              {vehicle.plate}
+            </Badge>
+          )
+        })}
+      </div>
+    ),
   }),
 
   columnHelper.display({

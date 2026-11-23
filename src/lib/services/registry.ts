@@ -7,10 +7,10 @@
 //     rename in the registry shows in the board, the sidebar and the log.
 //     The main admin keeps its own name.
 //   * A resident is linked to a live house only (the foreign key accepts a
-//     deleted one, which would be invisible).
-import { and, eq, isNull, ne } from 'drizzle-orm'
+//     deleted one, which would be invisible). The same goes for a vehicle.
+import { and, eq, inArray, isNull, ne } from 'drizzle-orm'
 import type { Transaction } from '@/lib/db/client'
-import { properties, propertyResidents, residents, users } from '@/lib/db/schema'
+import { properties, propertyResidents, residents, users, vehicles } from '@/lib/db/schema'
 import { isEmailTaken } from './board'
 import { ServiceError } from './errors'
 
@@ -134,4 +134,68 @@ export async function linkResidents(
     )
     .returning({ residentId: propertyResidents.residentId })
   return linked.length
+}
+
+type VehicleFields = Pick<typeof vehicles.$inferInsert, 'kind' | 'plate' | 'rfidSerial'> & {
+  /** None: the vehicle isn't assigned to a house (yet). */
+  propertyId: string | null
+}
+
+/** Registers a vehicle, assigned to a live house when one is given. */
+export async function createVehicle(tx: Transaction, input: VehicleFields): Promise<{ id: string }> {
+  if (input.propertyId !== null) {
+    await requireLiveHouse(tx, input.propertyId)
+  }
+  const [created] = await tx
+    .insert(vehicles)
+    .values({
+      propertyId: input.propertyId,
+      kind: input.kind,
+      plate: input.plate,
+      rfidSerial: input.rfidSerial,
+    })
+    .returning({ id: vehicles.id })
+  return created
+}
+
+/**
+ * Assigns live vehicles to a live house. A vehicle has one house, so one
+ * on another house moves here. Returns how many were still there to assign.
+ */
+export async function assignVehicles(
+  tx: Transaction,
+  input: { propertyId: string; vehicleIds: string[] },
+): Promise<number> {
+  await requireLiveHouse(tx, input.propertyId)
+  const assigned = await tx
+    .update(vehicles)
+    .set({ propertyId: input.propertyId })
+    .where(and(inArray(vehicles.id, input.vehicleIds), isNull(vehicles.deletedAt)))
+    .returning({ id: vehicles.id })
+  return assigned.length
+}
+
+/** Edits a live vehicle, its house included. Null when the vehicle is gone. */
+export async function updateVehicle(
+  tx: Transaction,
+  id: string,
+  input: VehicleFields,
+): Promise<{ id: string } | null> {
+  if (input.propertyId !== null) {
+    await requireLiveHouse(tx, input.propertyId)
+  }
+  const [updated] = await tx
+    .update(vehicles)
+    .set({
+      propertyId: input.propertyId,
+      kind: input.kind,
+      plate: input.plate,
+      rfidSerial: input.rfidSerial,
+    })
+    .where(and(eq(vehicles.id, id), isNull(vehicles.deletedAt)))
+    .returning({ id: vehicles.id })
+  if (!updated) {
+    return null
+  }
+  return updated
 }

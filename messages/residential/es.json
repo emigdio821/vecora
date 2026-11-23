@@ -71,13 +71,33 @@
       }
     }
   ],
+  "residential_delete_house_vehicles": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Su vehículo seguirá en la pestaña \"Vehículos\", pero sin casa asignada.",
+        "countPlural=other": "Sus {count} vehículos seguirán en la pestaña \"Vehículos\", pero sin casa asignada."
+      }
+    }
+  ],
+  "residential_delete_houses_vehicles": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "El vehículo de estas casas seguirá en la pestaña \"Vehículos\", pero sin casa asignada.",
+        "countPlural=other": "Los {count} vehículos de estas casas seguirán en la pestaña \"Vehículos\", pero sin casa asignada."
+      }
+    }
+  ],
 
   "residential_assign_residents": "Asignar residentes",
   "residential_resident_assigned": "Residente asignado",
   "residential_residents_assigned": "Residentes asignados",
   "residential_resident_assigned_description": "Se asignó a la casa {number}",
   "residential_residents_assigned_description": "Se asignaron {count} residentes a la casa {number}",
-  "residential_residents_picker_hint": "Quienes ya viven en esta casa no aparecen en la lista.",
+  "residential_residents_picker_hint": "Quienes ya viven en esta casa no aparecen en la lista. Para registrar a alguien nuevo, ve a la pestaña \"Residentes\".",
   "residential_only_unassigned": "Solo residentes sin casa",
   "residential_only_unassigned_hint": "Desmárcalo para incluir a quienes ya tienen otra casa asignada.",
   "residential_relationship_applies_to_all": "Se aplica a todos los residentes seleccionados.",
@@ -103,7 +123,7 @@
   "residential_column_owners": "Propietarios",
   "residential_no_owner": "Sin propietario",
   "residential_column_people": "Personas",
-  "residential_search_houses_hint": "Buscar por número de casa o nombre de residente",
+  "residential_search_houses_hint": "Buscar por número de casa, nombre de residente o placa",
   "residential_delete_selected_houses_label": "Eliminar {count} casas seleccionadas",
   "residential_delete_selected_houses": "Eliminar casas seleccionadas",
 
@@ -190,5 +210,66 @@
   "residential_no_account": "Sin cuenta",
   "residential_search_residents_hint": "Buscar por nombre, correo o teléfono",
   "residential_delete_selected_residents_label": "Eliminar {count} residentes seleccionados",
-  "residential_delete_selected_residents": "Eliminar residentes seleccionados"
+  "residential_delete_selected_residents": "Eliminar residentes seleccionados",
+
+  "residential_vehicles": "Vehículos",
+  "residential_house_no_vehicles": "Esta casa no tiene vehículos registrados.",
+  "residential_edit_vehicle": "Editar vehículo",
+  "residential_remove_vehicle_label": "Quitar la placa {plate} de la casa",
+  "residential_field_plate": "Placa",
+  "residential_plate_hint": "Tal como aparece en el vehículo. No puede repetirse.",
+  "residential_plate_required": "Placa es requerida",
+  "residential_field_rfid": "Número de serie RFID",
+  "residential_rfid_hint": "Opcional. El número del tag que abre el acceso. Puedes agregarlo después.",
+  "residential_rfid_value": "RFID {serial}",
+  "residential_no_rfid": "Sin RFID",
+  "residential_vehicle_kind_required": "Tipo es requerido",
+  "residential_plate_taken": "Ya hay un vehículo registrado con esa placa",
+  "residential_rfid_taken": "Ese número de serie RFID ya está asignado a otro vehículo",
+  "residential_vehicle_not_found": "El vehículo ya no existe",
+  "residential_add_vehicle_failed": "No se pudo agregar el vehículo, intenta nuevamente",
+  "residential_update_vehicle_failed": "No se pudo actualizar el vehículo, intenta nuevamente",
+  "residential_remove_vehicle_failed": "No se pudo quitar el vehículo, intenta nuevamente",
+  "residential_vehicle_added": "Vehículo agregado",
+  "residential_vehicle_added_description": "La placa {plate} se agregó a la casa {number}",
+  "residential_vehicle_updated": "Vehículo actualizado",
+  "residential_vehicle_updated_description": "Los datos de la placa {plate} fueron guardados",
+  "residential_vehicle_removed": "Vehículo quitado",
+  "residential_vehicle_removed_description": "La placa {plate} se quitó de la casa {number}",
+  "residential_remove_vehicle_title": "¿Quitar la placa {plate} de la casa {number}?",
+  "residential_remove_vehicle_description": "Seguirá en la pestaña \"Vehículos\", sin casa asignada. Podrás asignarle una casa después.",
+
+  "residential_new_vehicle": "Nuevo vehículo",
+  "residential_new_vehicle_description": "Registra un vehículo. Puedes asignarle una casa ahora o después.",
+  "residential_vehicles_empty": "Sin vehículos.",
+  "residential_search_vehicles_hint": "Buscar por placa, RFID o número de casa",
+  "residential_column_rfid": "RFID",
+  "residential_vehicle_house_hint": "Opcional. Puedes asignarle una casa después.",
+  "residential_vehicle_created_description": "La placa {plate} se agregó al registro.",
+  "residential_select_vehicle_required": "Selecciona al menos un vehículo",
+  "residential_delete_vehicles_failed": "No se pudieron eliminar los vehículos, intenta nuevamente",
+  "residential_restore_vehicles_failed": "No se pudieron restaurar los vehículos, intenta nuevamente",
+  "residential_delete_vehicle_title": "¿Eliminar el vehículo con placa {plate}?",
+  "residential_delete_vehicles_title": "¿Eliminar {count} vehículos?",
+  "residential_delete_vehicle_description": "Dejará de aparecer en el listado de vehículos y en su casa, y su número de serie RFID quedará libre.",
+  "residential_delete_vehicles_description": "Dejarán de aparecer en el listado de vehículos y en sus casas, y sus números de serie RFID quedarán libres.",
+  "residential_vehicle_deleted": "Vehículo eliminado",
+  "residential_vehicles_deleted": "Vehículos eliminados",
+  "residential_vehicle_deleted_description": "Se eliminó la placa {plate}",
+  "residential_vehicles_deleted_description": "Se eliminaron {count} vehículos",
+  "residential_vehicles_deleted_partial": "Se eliminaron {deleted} de {count} vehículos",
+  "residential_vehicle_restored": "Vehículo restaurado",
+  "residential_vehicles_restored": "Vehículos restaurados",
+  "residential_delete_selected_vehicles_label": "Eliminar {count} vehículos seleccionados",
+  "residential_delete_selected_vehicles": "Eliminar vehículos seleccionados",
+
+  "residential_assign_vehicles": "Asignar vehículos",
+  "residential_assign_vehicles_failed": "No se pudieron asignar los vehículos, intenta nuevamente",
+  "residential_vehicle_assigned": "Vehículo asignado",
+  "residential_vehicles_assigned": "Vehículos asignados",
+  "residential_vehicle_assigned_description": "Se asignó a la casa {number}",
+  "residential_vehicles_assigned_description": "Se asignaron {count} vehículos a la casa {number}",
+  "residential_vehicles_picker_hint": "Los vehículos de esta casa no aparecen en la lista. Para registrar uno nuevo, ve a la pestaña \"Vehículos\".",
+  "residential_only_unassigned_vehicles": "Solo vehículos sin casa",
+  "residential_only_unassigned_vehicles_hint": "Desmárcalo para incluir los de otras casas. Un vehículo tiene una sola casa: dejará de estar en la que tiene ahora."
 }

@@ -56,6 +56,9 @@ export const SECTION_LABEL: Record<string, string> = {
   get property_residents() {
     return m.logs_section_property_residents()
   },
+  get vehicles() {
+    return m.logs_section_vehicles()
+  },
   get document_templates() {
     return m.logs_section_document_templates()
   },
@@ -267,6 +270,12 @@ export function entrySummary(entry: LogEntryQueryData): string {
     }
     case 'properties':
       return m.common_house_label({ number: label })
+    // The trigger gives vehicles no label: the row has the plate, and the refs its house.
+    case 'vehicles': {
+      const plate = asText(row.plate)
+      const house = refName(entry, row.property_id)
+      return house ? `${m.common_house_label({ number: house })} - ${plate}` : plate
+    }
     case 'users': {
       // Written by its own trigger, on the account (see entryChanges).
       if (entry.changedFields?.includes('password')) {
@@ -298,6 +307,12 @@ export function entrySummary(entry: LogEntryQueryData): string {
 const FIELD_LABEL: Record<string, string> = {
   get number() {
     return m.logs_field_number()
+  },
+  get plate() {
+    return m.logs_field_plate()
+  },
+  get rfid_serial() {
+    return m.logs_field_rfid_serial()
   },
   get notes() {
     return m.common_field_notes()
@@ -540,6 +555,12 @@ const ENUM_LABEL: Record<string, string> = {
   },
   get unconfirmed() {
     return m.common_relationship_unconfirmed()
+  },
+  get car() {
+    return m.common_vehicle_kind_car()
+  },
+  get motorcycle() {
+    return m.common_vehicle_kind_motorcycle()
   },
   get cameras() {
     return m.logs_enum_cameras()
