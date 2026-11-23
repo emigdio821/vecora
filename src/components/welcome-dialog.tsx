@@ -55,7 +55,7 @@ const ABILITIES: Ability[] = [
     get description() {
       return m.settings_welcome_ability_residential()
     },
-    roles: ['president'],
+    roles: ['president', 'treasurer', 'security', 'maintenance'],
   },
   {
     icon: IconGavel,

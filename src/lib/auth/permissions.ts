@@ -15,7 +15,7 @@ import { createAccessControl } from 'better-auth/plugins/access'
 import type { AppRole } from './roles'
 
 export const statement = {
-  /** Houses and residents. */
+  /** Houses, residents and vehicles: every board member. */
   registry: ['write'],
   /** Seat and remove board members, change their roles, hand out access links. */
   board: ['manage'],
@@ -50,9 +50,13 @@ const president = ac.newRole({
   document: ['write'],
 })
 
+// Every board member keeps the registry (houses, residents and their vehicles)
+// up to date, whatever else their role does.
+
 // Creating the next period is part of closing the books, so the treasurer
 // writes periods too.
 const treasurer = ac.newRole({
+  registry: ['write'],
   period: ['write'],
   reservation: ['write', 'collect'],
   transaction: ['write'],
@@ -63,11 +67,13 @@ const treasurer = ac.newRole({
 })
 
 const security = ac.newRole({
+  registry: ['write'],
   securityRequest: ['write'],
   document: ['write'],
 })
 
 const maintenance = ac.newRole({
+  registry: ['write'],
   maintenanceRequest: ['write'],
   document: ['write'],
 })

@@ -53,13 +53,13 @@ You need **Node 24**, npm, the [Neon CLI](https://neon.com/docs/reference/neon-c
 
 All local accounts use the password **`admin`**. They come from `scripts/db/seed.ts` and only exist in development branches.
 
-| Email                    | Role                         | Can write in                                                               |
-| ------------------------ | ---------------------------- | -------------------------------------------------------------------------- |
-| `admin@vecora.app`       | Admin                        | Everything, plus the HOA board and the activity log                        |
-| `president@vecora.com`   | President (Ana López)        | Residential, Presidency, HOA board                                         |
-| `treasurer@vecora.com`   | Treasurer (Luis Fernández)   | Treasury, periods and reservations in Presidency; pays or rejects requests |
-| `security@vecora.com`    | Security (María García)      | Requests in Security                                                       |
-| `maintenance@vecora.com` | Maintenance (Diego Martínez) | Requests in Maintenance                                                    |
+| Email                    | Role                         | Can write in                                                                            |
+| ------------------------ | ---------------------------- | --------------------------------------------------------------------------------------- |
+| `admin@vecora.app`       | Admin                        | Everything, plus the HOA board and the activity log                                     |
+| `president@vecora.com`   | President (Ana López)        | Residential, Presidency, HOA board                                                      |
+| `treasurer@vecora.com`   | Treasurer (Luis Fernández)   | Residential, Treasury, periods and reservations in Presidency; pays or rejects requests |
+| `security@vecora.com`    | Security (María García)      | Residential, requests in Security                                                       |
+| `maintenance@vecora.com` | Maintenance (Diego Martínez) | Residential, requests in Maintenance                                                    |
 
 Every role can read every section. The seed also creates 20 houses (A1–D5), 10 residents, the current year's period with a few payments, two common areas with bookings, requests in every status, and 45 days of activity in the activity log. Every step runs as the board member who would do it, through the same services as the app.
 
