@@ -1,4 +1,4 @@
-import { SECURITY_REQUEST_KINDS, type SecurityRequestKind } from '@/lib/validations/security'
+import { SECURITY_REQUEST_KINDS, type SecurityRequestKind } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 
 export const KIND_LABEL: Record<SecurityRequestKind, string> = {

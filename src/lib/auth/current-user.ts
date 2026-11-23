@@ -3,8 +3,6 @@ import { type AuthSession, getAuthSession } from '@/lib/auth'
 import { m } from '@/paraglide/messages'
 import { type AppRole, parseRoles } from './roles'
 
-export type { AppRole }
-
 export interface CurrentUser {
   id: string
   email: string

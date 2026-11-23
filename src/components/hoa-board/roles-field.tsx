@@ -11,8 +11,8 @@ import {
   ComboboxValue,
 } from '@/components/ui/combobox'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { APP_ROLES, type AppRole } from '@/lib/auth/roles'
 import { getRoleLabel } from '@/lib/utils'
-import { APP_ROLES, type AppRole } from '@/lib/validations/hoa-board'
 import { m } from '@/paraglide/messages'
 
 const ROLE_DESCRIPTION: Record<AppRole, string> = {

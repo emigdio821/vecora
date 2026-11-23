@@ -70,10 +70,7 @@ export function getRoleLabel(roleName: string): string {
 
 /** Lowercase and strip accents so "López" matches "lopez". */
 export function normalizeString(value: string | null | undefined): string {
-  return (value ?? '')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
+  return (value ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 }
 
 /** "Loma Verde, Coto 404" → "loma-verde-coto-404", for file names. */
@@ -117,8 +114,6 @@ export function getAvatarFallback(name: string) {
 
   return fallabck
 }
-
-export { CURRENCIES, type CurrencyCode } from '@/lib/enums'
 
 const currencyFormatters = new Map<string, Intl.NumberFormat>()
 

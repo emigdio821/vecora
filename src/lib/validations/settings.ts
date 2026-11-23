@@ -3,8 +3,6 @@ import { type AppLanguage, CURRENCIES, type CurrencyCode, LANGUAGES } from '@/li
 import { m } from '@/paraglide/messages'
 import type { Locale } from '@/paraglide/runtime'
 
-export { type AppLanguage, LANGUAGES } from '@/lib/enums'
-
 /**
  * What stands in for the name when none has been set: in the screen language,
  * or in `locale` (e.g. the HOA's, for reports).

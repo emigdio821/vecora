@@ -1,5 +1,5 @@
 import type { Badge } from '@/components/ui/badge'
-import type { RequestStatus } from '@/lib/validations/requests'
+import type { RequestStatus } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 
 // Shared by the Maintenance and Security payment requests.

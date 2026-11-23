@@ -1,4 +1,4 @@
-import type { Relationship } from '@/lib/validations/houses'
+import type { Relationship } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 
 export const RELATIONSHIP_LABEL: Record<Relationship, string> = {

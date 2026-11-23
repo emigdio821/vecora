@@ -12,16 +12,9 @@ import { InputGroup, InputGroupAddon, InputGroupText } from '@/components/ui/inp
 import { NumberField, NumberFieldGroup, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { useToday } from '@/hooks/use-today'
+import type { CurrencyCode } from '@/lib/enums'
 import { adjacentGaps } from '@/lib/periods'
-import {
-  type CurrencyCode,
-  currencySymbol,
-  formatDay,
-  intlLocale,
-  ISO_DAY,
-  MONEY_FORMAT,
-  MONEY_STEP,
-} from '@/lib/utils'
+import { currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT, MONEY_STEP } from '@/lib/utils'
 import type { PeriodInput } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { periodsQueryOptions } from '@/tanstack-queries/presidency'

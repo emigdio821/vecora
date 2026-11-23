@@ -42,8 +42,9 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
+import type { CurrencyCode } from '@/lib/enums'
 import { periodFor } from '@/lib/periods'
-import { type CurrencyCode, cn, dateLocale, ISO_DAY, intlLocale } from '@/lib/utils'
+import { cn, dateLocale, ISO_DAY, intlLocale } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import { type PeriodQueryData, periodsQueryOptions } from '@/tanstack-queries/presidency'
 import {

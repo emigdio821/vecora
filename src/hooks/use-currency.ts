@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { type CurrencyCode, formatCurrency } from '@/lib/utils'
+import type { CurrencyCode } from '@/lib/enums'
+import { formatCurrency } from '@/lib/utils'
 import { settingsQueryOptions } from '@/tanstack-queries/session'
 
 /** The HOA's current currency: what new amounts are recorded in. Only inside the authed layout, which loads settings. */

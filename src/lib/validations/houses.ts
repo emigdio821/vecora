@@ -18,8 +18,6 @@ export const updateHouseSchema = createHouseSchema
 
 export type UpdateHouseInput = z.infer<typeof updateHouseSchema>
 
-export { RELATIONSHIPS, type Relationship } from '@/lib/enums'
-
 export const assignResidentsSchema = z.object({
   residentIds: z.array(z.uuid()).min(1, { error: () => m.residential_select_resident_required() }),
   relationship: z.enum(RELATIONSHIPS, { error: () => m.residential_relationship_required() }),

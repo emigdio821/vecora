@@ -1,5 +1,5 @@
 import { useCurrency, useFormatCurrency } from '@/hooks/use-currency'
-import type { CurrencyCode } from '@/lib/utils'
+import type { CurrencyCode } from '@/lib/enums'
 
 interface MoneyProps {
   value: number | string

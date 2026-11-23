@@ -1,10 +1,8 @@
 import { z } from 'zod'
+import { PAYMENT_METHODS } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
-import { PAYMENT_METHODS } from './treasury'
 
 // Shared by the Maintenance and Security payment requests.
-
-export { REQUEST_STATUSES, type RequestStatus } from '@/lib/enums'
 
 /** Treasurer paying a request: how and when the money went out. */
 export const payRequestSchema = z

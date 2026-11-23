@@ -1,9 +1,8 @@
 import '@tanstack/react-start/server-only'
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { db } from '@/lib/db'
+import type { AppLanguage, CurrencyCode } from '@/lib/enums'
 import { ASSETS_BUCKET, storage } from '@/lib/storage'
-import type { CurrencyCode } from '@/lib/utils'
-import type { AppLanguage } from '@/lib/validations/settings'
 
 export interface Settings {
   /** Empty when the president hasn't set one yet. */

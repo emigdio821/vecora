@@ -1,6 +1,6 @@
 import { z } from 'zod'
+import { PAYMENT_METHODS } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
-import { PAYMENT_METHODS } from './treasury'
 
 /** A bookable common area: terrace, pool, gym... */
 export const amenitySchema = z.object({

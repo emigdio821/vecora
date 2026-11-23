@@ -2,8 +2,6 @@ import { z } from 'zod'
 import { SECURITY_REQUEST_KINDS } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 
-export { SECURITY_REQUEST_KINDS, type SecurityRequestKind } from '@/lib/enums'
-
 /** A security expense (cameras, guards, gates...) that the treasurer should pay for. */
 export const securityRequestSchema = z.object({
   kind: z.enum(SECURITY_REQUEST_KINDS, { error: () => m.requests_security_select_kind() }),

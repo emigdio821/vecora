@@ -11,15 +11,8 @@ import { NumberField, NumberFieldInput } from '@/components/ui/number-field'
 import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
-import {
-  type CurrencyCode,
-  currencySymbol,
-  formatDay,
-  intlLocale,
-  ISO_DAY,
-  MONEY_FORMAT,
-  MONEY_STEP,
-} from '@/lib/utils'
+import type { CurrencyCode } from '@/lib/enums'
+import { currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT, MONEY_STEP } from '@/lib/utils'
 import type { MaintenanceRequestInput } from '@/lib/validations/maintenance'
 import { m } from '@/paraglide/messages'
 

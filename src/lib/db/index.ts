@@ -3,8 +3,6 @@ import { attachDatabasePool } from '@vercel/functions'
 import { serverEnv } from '@/lib/config/env.server'
 import { actorTransaction, createDatabase, type Database, type Transaction } from '@/lib/db/client'
 
-export type { Database, Transaction } from '@/lib/db/client'
-
 // node-postgres over Neon's pooled URL, as Neon recommends on Vercel: the pool
 // lives as long as the function instance, and attachDatabasePool lets Vercel
 // close idle clients before the instance is suspended. Outside Vercel it does nothing.

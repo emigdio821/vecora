@@ -1,7 +1,7 @@
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import { z } from 'zod'
+import { RELATIONSHIPS } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
-import { RELATIONSHIPS } from './houses'
 
 const requiredText = (message: () => string) => z.string().trim().min(1, { error: message })
 

@@ -22,12 +22,9 @@ import {
 import { Form } from '@/components/ui/form'
 import { toastManager } from '@/components/ui/toast'
 import { useCurrency, useFormatCurrency } from '@/hooks/use-currency'
+import type { TransactionKind } from '@/lib/enums'
 import { ISO_DAY } from '@/lib/utils'
-import {
-  type CreateTransactionInput,
-  createTransactionSchema,
-  type TransactionKind,
-} from '@/lib/validations/treasury'
+import { type CreateTransactionInput, createTransactionSchema } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { createTransaction } from '@/server-actions/treasury'
 import { PRESIDENCY_QUERY_KEY } from '@/tanstack-queries/presidency'

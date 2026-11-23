@@ -1,15 +1,8 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { addMonths, endOfMonth, format, parseISO, startOfMonth } from 'date-fns'
+import type { CurrencyCode } from '@/lib/enums'
 import type { CurrencyTotals, FinancialReport } from '@/lib/services/financial-report'
-import {
-  type CurrencyCode,
-  dateLocale,
-  formatCurrency,
-  formatDay,
-  formatMonth,
-  ISO_DAY,
-  intlLocale,
-} from '@/lib/utils'
+import { dateLocale, formatCurrency, formatDay, formatMonth, ISO_DAY, intlLocale } from '@/lib/utils'
 import { m } from '@/paraglide/messages'
 import type { Locale } from '@/paraglide/runtime'
 import { COLOR, layoutStyles, PageFooter, PageHeader } from './layout'

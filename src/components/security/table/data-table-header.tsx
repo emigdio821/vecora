@@ -15,8 +15,7 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from '@/components/ui/menu'
-import { REQUEST_STATUSES } from '@/lib/validations/requests'
-import { SECURITY_REQUEST_KINDS, type SecurityRequestKind } from '@/lib/validations/security'
+import { REQUEST_STATUSES, SECURITY_REQUEST_KINDS, type SecurityRequestKind } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 import type { SecurityRequestQueryData } from '@/tanstack-queries/security'
 import { CreateRequestDrawer } from '../drawer/create-request'

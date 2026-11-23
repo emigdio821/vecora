@@ -1,8 +1,6 @@
 import type { PaymentMethod, TransactionKind } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 
-export type { PaymentMethod, TransactionKind } from '@/lib/enums'
-
 export const KIND_LABEL: Record<TransactionKind, string> = {
   get income() {
     return m.treasury_kind_income()

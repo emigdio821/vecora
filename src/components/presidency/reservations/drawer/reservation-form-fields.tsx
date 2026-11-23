@@ -18,8 +18,8 @@ import { Popover, PopoverPopup, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useToday } from '@/hooks/use-today'
+import type { CurrencyCode } from '@/lib/enums'
 import {
-  type CurrencyCode,
   currencySymbol,
   formatDay,
   formatMonth,

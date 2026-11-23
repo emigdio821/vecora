@@ -14,7 +14,7 @@ import {
   MenuRadioItem,
   MenuTrigger,
 } from '@/components/ui/menu'
-import { REQUEST_STATUSES } from '@/lib/validations/requests'
+import { REQUEST_STATUSES } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 import type { MaintenanceRequestQueryData } from '@/tanstack-queries/maintenance'
 import { CreateRequestDrawer } from '../drawer/create-request'

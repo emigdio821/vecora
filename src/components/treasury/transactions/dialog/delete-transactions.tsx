@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { useFormatCurrency } from '@/hooks/use-currency'
-import type { CurrencyCode } from '@/lib/utils'
+import type { CurrencyCode } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 import { deleteTransactions, restoreTransactions } from '@/server-actions/treasury'
 import { type TransactionQueryData, TREASURY_QUERY_KEY } from '@/tanstack-queries/treasury'

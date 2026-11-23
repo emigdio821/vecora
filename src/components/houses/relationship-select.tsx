@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toastManager } from '@/components/ui/toast'
-import type { Relationship } from '@/lib/validations/houses'
+import type { Relationship } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 import { updateRelationship } from '@/server-actions/houses'
 import { HOUSES_QUERY_KEY } from '@/tanstack-queries/houses'

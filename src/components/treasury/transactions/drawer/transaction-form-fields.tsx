@@ -15,14 +15,8 @@ import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group
 import { SegmentedControl, SegmentedControlItem } from '@/components/ui/segmented-control'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  type CurrencyCode,
-  currencySymbol,
-  formatDay,
-  intlLocale,
-  MONEY_FORMAT,
-  MONEY_STEP,
-} from '@/lib/utils'
+import type { CurrencyCode } from '@/lib/enums'
+import { currencySymbol, formatDay, intlLocale, MONEY_FORMAT, MONEY_STEP } from '@/lib/utils'
 import type { CreateTransactionInput } from '@/lib/validations/treasury'
 import { m } from '@/paraglide/messages'
 import { categoriesQueryOptions } from '@/tanstack-queries/treasury'

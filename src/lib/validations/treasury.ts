@@ -2,8 +2,6 @@ import { z } from 'zod'
 import { PAYMENT_METHODS, TRANSACTION_KINDS } from '@/lib/enums'
 import { m } from '@/paraglide/messages'
 
-export { PAYMENT_METHODS, type PaymentMethod, TRANSACTION_KINDS, type TransactionKind } from '@/lib/enums'
-
 const requiredText = (message: () => string) => z.string().trim().min(1, { error: message })
 
 /** One paper receipt: a house paying one or more months of the fee. */

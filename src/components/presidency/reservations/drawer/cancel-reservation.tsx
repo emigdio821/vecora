@@ -33,15 +33,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { toastManager } from '@/components/ui/toast'
 import { useFormatCurrency } from '@/hooks/use-currency'
 import { useToday } from '@/hooks/use-today'
-import {
-  type CurrencyCode,
-  currencySymbol,
-  formatDay,
-  intlLocale,
-  ISO_DAY,
-  MONEY_FORMAT,
-  MONEY_STEP,
-} from '@/lib/utils'
+import type { CurrencyCode } from '@/lib/enums'
+import { currencySymbol, formatDay, intlLocale, ISO_DAY, MONEY_FORMAT, MONEY_STEP } from '@/lib/utils'
 import { type CancelReservationInput, cancelReservationSchema } from '@/lib/validations/presidency'
 import { m } from '@/paraglide/messages'
 import { cancelReservation } from '@/server-actions/presidency'

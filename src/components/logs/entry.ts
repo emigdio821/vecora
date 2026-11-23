@@ -1,6 +1,6 @@
 import type { Badge } from '@/components/ui/badge'
+import { CURRENCIES } from '@/lib/enums'
 import {
-  CURRENCIES,
   formatCurrency,
   formatDate,
   formatDay,
