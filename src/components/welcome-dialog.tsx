@@ -1,6 +1,7 @@
 import { ParaglideMessage } from '@inlang/paraglide-js-react'
 import {
   IconBuildingCommunity,
+  IconCalendarEvent,
   IconChartLine,
   IconClipboardText,
   IconEye,
@@ -66,6 +67,16 @@ const ABILITIES: Ability[] = [
       return m.settings_welcome_ability_presidency()
     },
     roles: ['president', 'treasurer'],
+  },
+  {
+    icon: IconCalendarEvent,
+    get title() {
+      return m.common_section_reservations()
+    },
+    get description() {
+      return m.settings_welcome_ability_reservations()
+    },
+    roles: ['president', 'treasurer', 'security', 'maintenance'],
   },
   {
     icon: IconHeartHandshake,

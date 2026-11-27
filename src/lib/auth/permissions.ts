@@ -23,7 +23,7 @@ export const statement = {
   period: ['write'],
   /** Common areas. */
   amenity: ['write'],
-  /** Book, edit and delete unpaid bookings; collect: record the fee, cancel a paid one. */
+  /** write: book, edit and delete unpaid bookings (every board member); collect: record the fee, cancel a paid one. */
   reservation: ['write', 'collect'],
   transaction: ['write'],
   category: ['write'],
@@ -51,7 +51,7 @@ const president = ac.newRole({
 })
 
 // Every board member keeps the registry (houses, residents and their vehicles)
-// up to date, whatever else their role does.
+// up to date and books the common areas, whatever else their role does.
 
 // Creating the next period is part of closing the books, so the treasurer
 // writes periods too.
@@ -68,12 +68,14 @@ const treasurer = ac.newRole({
 
 const security = ac.newRole({
   registry: ['write'],
+  reservation: ['write'],
   securityRequest: ['write'],
   document: ['write'],
 })
 
 const maintenance = ac.newRole({
   registry: ['write'],
+  reservation: ['write'],
   maintenanceRequest: ['write'],
   document: ['write'],
 })

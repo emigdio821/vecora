@@ -58,7 +58,8 @@
 
   "settings_welcome_payment_requests": "Solicitudes de pago",
   "settings_welcome_ability_residential": "Da de alta las casas y a sus residentes.",
-  "settings_welcome_ability_presidency": "Abre los periodos de cuotas y aparta las áreas comunes.",
+  "settings_welcome_ability_presidency": "Abre los periodos de cuotas.",
+  "settings_welcome_ability_reservations": "Aparta las áreas comunes para los residentes.",
   "settings_welcome_ability_hoa_board": "Agrega a los integrantes y compárteles su enlace de acceso.",
   "settings_welcome_ability_treasury": "Registra los ingresos, egresos y cuotas pagadas, y sus categorías.",
   "settings_welcome_ability_payment_requests": "Marca como pagadas o rechazadas las de {#b}Mantenimiento{/b} y {#b}Seguridad{/b}.",

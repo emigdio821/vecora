@@ -58,7 +58,8 @@
 
   "settings_welcome_payment_requests": "Payment requests",
   "settings_welcome_ability_residential": "Add the houses and their residents.",
-  "settings_welcome_ability_presidency": "Open fee periods and book the common areas.",
+  "settings_welcome_ability_presidency": "Open fee periods.",
+  "settings_welcome_ability_reservations": "Book the common areas for residents.",
   "settings_welcome_ability_hoa_board": "Add members and share their access link with them.",
   "settings_welcome_ability_treasury": "Record income, expenses and paid fees, and their categories.",
   "settings_welcome_ability_payment_requests": "Mark the ones from {#b}Maintenance{/b} and {#b}Security{/b} as paid or rejected.",
